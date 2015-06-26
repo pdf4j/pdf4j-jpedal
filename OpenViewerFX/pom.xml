@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.jpedal</groupId>
+    <artifactId>OpenViewerFX</artifactId>
+    <version>6.2.25</version>
+    <packaging>jar</packaging>
+    
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>An Open Source JavaFX PDF Viewer</description>
+    <url>https://www.idrsolutions.com/openviewerfx/</url>
+    
+    <licenses>
+        <license>
+            <name>LGPL license, Version 3.0</name>
+            <url>https://www.gnu.org/licenses/lgpl.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+    <developer>
+      <name>IDRSolutios</name>
+      <email>contact2007@idrsolutions.com</email>
+      <organization>IDRSolutions</organization>
+      <organizationUrl>https://www.isrdolutions.com</organizationUrl>
+    </developer>
+  </developers>
+  
+  <scm>
+      <connection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</connection>
+      <developerConnection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</developerConnection>
+      <url>git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</url>
+  </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.birt.runtime.3_7_1</groupId>
+            <artifactId>org.mozilla.javascript</artifactId>
+            <version>1.7.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>140</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcmail-jdk16</artifactId>
+            <version>140</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+    
+      
+    
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+      
+      <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.3</version>
+          <extensions>true</extensions>
+          <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <stagingProfileId>19375019933d12</stagingProfileId>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          </configuration>
+      </plugin>
+      
+      <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-source-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>attach-sources</id>
+          <goals>
+            <goal>jar</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+     
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                    <goal>jar</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
+    </plugin>
+      
+        </plugins>
+    
+  </build>
+  
+</project>

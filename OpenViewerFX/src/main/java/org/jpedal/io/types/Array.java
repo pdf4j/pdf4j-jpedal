@@ -141,7 +141,6 @@ public class Array extends ObjectDecoder{
 
         //may need to add method to PdfObject is others as well as Mask
         boolean isIndirect=raw[i]!=91 && raw[i]!='(' && (PDFkeyInt!=PdfDictionary.Mask && PDFkeyInt!=PdfDictionary.TR &&
-                //pdfObject.getObjectType()!=PdfDictionary.ColorSpace &&
                 raw[0]!=0); //0 never occurs but we set as flag if called from gotoDest/DefaultActionHandler
 
         // allow for /Contents null
@@ -191,9 +190,7 @@ public class Array extends ObjectDecoder{
                 }
 
                 //move cursor to end of ref
-                while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62){
-                    i++;
-                }
+                i=ArrayUtils.skipToEndOfRef(i, raw);
 
                 //actual value or first part of ref
                 final int ref= NumberUtils.parseInt(keyStart, i, raw);
@@ -205,10 +202,9 @@ public class Array extends ObjectDecoder{
 
                 // get generation number
                 keyStart=i;
+
                 //move cursor to end of reference
-                while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62) {
-                    i++;
-                }
+                i=ArrayUtils.skipToEndOfRef(i, raw);
 
                 final int generation= NumberUtils.parseInt(keyStart, i, raw);
 
@@ -242,10 +238,6 @@ public class Array extends ObjectDecoder{
                 if(arrayData==null){
                     pdfObject.setFullyResolved(false);
 
-                    if(debugFastCode) {
-                        System.out.println(padding + "Data not yet loaded");
-                    }
-
                     if(LogWriter.isOutput()) {
                         LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (14)");
                     }
@@ -259,15 +251,7 @@ public class Array extends ObjectDecoder{
 
                     //allow for % comment
                     if(arrayData[j2]=='%'){
-                        while(true){
-                            j2++;
-                            if(arrayData[j2]==13 || arrayData[j2]==10) {
-                                break;
-                            }
-                        }
-                        while(arrayData[j2]==13 || arrayData[j2]==10) {
-                            j2++;
-                        }
+                        j2 = ArrayUtils.skipComment(arrayData, j2);
 
                         //roll back as [ may be next char
                         j2--;
@@ -417,7 +401,6 @@ public class Array extends ObjectDecoder{
                 }
 
                 if(type==PdfDictionary.VALUE_IS_KEY_ARRAY){
-     
 
                     if(arrayData[endPtr]=='R'  || ((PDFkeyInt==PdfDictionary.TR|| PDFkeyInt==PdfDictionary.Category) && arrayData[endPtr]=='/'  )) {
                         elementCount++;
@@ -636,6 +619,19 @@ public class Array extends ObjectDecoder{
             //move cursor to start of text
             while(arrayData[j2]==10 || arrayData[j2]==13 || arrayData[j2]==32 || arrayData[j2]==47) {
                 j2++;
+            }
+            
+            if(arrayData[j2]=='%'){ //ignore % comments in middle of value
+                while(j2<arrayData.length){
+                    j2++;
+                    if(arrayData[j2]==10){
+                        break;
+                    }
+                }
+                //move cursor to start of text
+                while(arrayData[j2]==10 || arrayData[j2]==13 || arrayData[j2]==32 || arrayData[j2]==47) {
+                    j2++;
+                }
             }
 
             keyStart=j2;

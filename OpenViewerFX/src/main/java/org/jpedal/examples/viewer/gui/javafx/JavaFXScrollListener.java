@@ -46,7 +46,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.gui.GUI;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.utils.LogWriter;
 
 /**
@@ -59,7 +59,7 @@ public class JavaFXScrollListener implements ChangeListener<Number>, EventHandle
     // Avoid StackOverflowExceptions
     private boolean setValueLocally;
     private final GUI gui;
-    private int nextPage=-1, lastPageSent=-1;;
+    private int nextPage=-1, lastPageSent=-1;
     private boolean decodeLock;
     private final ScrollBar scroll;
     boolean showLast;

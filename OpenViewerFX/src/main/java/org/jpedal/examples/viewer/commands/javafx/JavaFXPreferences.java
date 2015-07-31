@@ -947,11 +947,6 @@ public class JavaFXPreferences {
 
     private static boolean removeOption(final String name) {
 
-    //Remove export menu not available as Itext no longer used
-        if(name.equals("ExportMenu") || name.equals("PagetoolsMenu")){
-            return true;
-        }
-
         //
         //Remove help button as it is not in use in gpl version
         if(name.equals("Helpbutton")){

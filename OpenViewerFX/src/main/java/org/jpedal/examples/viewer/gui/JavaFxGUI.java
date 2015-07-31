@@ -31,6 +31,7 @@
  * ---------------
  */
 package org.jpedal.examples.viewer.gui;
+import org.jpedal.utils.BrowserLauncher;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -94,9 +95,8 @@ import javafx.stage.*;
 import javafx.util.Duration;
 import javax.imageio.ImageIO;
 import org.jpedal.*;
-import org.jpedal.display.Display;
-import org.jpedal.display.GUIModes;
-import org.jpedal.display.PageOffsets;
+import org.jpedal.display.*;
+import org.jpedal.display.javafx.*;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.JavaFXRecentDocuments;
 import org.jpedal.examples.viewer.RecentDocumentsFactory;
@@ -109,7 +109,6 @@ import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
 import org.jpedal.examples.viewer.gui.generic.GUIMouseHandler;
 import org.jpedal.examples.viewer.gui.generic.GUISearchList;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.javafx.*;
 import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions.TransitionDirection;
 import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions.TransitionType;
@@ -119,9 +118,12 @@ import org.jpedal.examples.viewer.gui.javafx.dialog.FXOptionDialog;
 import org.jpedal.examples.viewer.gui.popups.PrintPanelFX;
 import org.jpedal.examples.viewer.paper.PaperSizes;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
+import org.jpedal.external.ExternalHandlers;
 import org.jpedal.external.Options;
+import org.jpedal.external.RenderChangeListener;
 import org.jpedal.fonts.tt.TTGlyph;
 import org.jpedal.gui.*;
+import org.jpedal.io.StatusBarFX;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
@@ -130,6 +132,7 @@ import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.DecoderOptions;
+import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.utils.*;
 import org.w3c.dom.Node;
 
@@ -142,6 +145,8 @@ import org.w3c.dom.Node;
 @SuppressWarnings("MagicConstant")
 public class JavaFxGUI extends GUI implements GUIFactory { 
             
+    private RefreshLayout viewListener;
+    
     private static final int bottomPaneHeight = 40;
     
     protected final JavaFXButtons fxButtons;
@@ -234,6 +239,10 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     private SplitPane center;
     private final VBox topPane;
 	
+    /**Interactive display object - needs to be added to PdfDecoder*/
+//	private StatusBarFX statusBar=new StatusBarFX(new Color((235.0d/255.0d), (154.0d/255.0d), 0, 1));
+	private StatusBarFX downloadBar;
+
 	private boolean addSearchTab;
 	private boolean searchInMenu;
         
@@ -344,7 +353,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             System.out.println("setupDisplay - Not yet implemented in JavaFX");
         }
 
-        decode_pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+        setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
         //pass in SwingGUI so we can call via callback
         decode_pdf.addExternalHandler(this,Options.GUIContainer);
@@ -1293,7 +1302,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 		 * Load properties
 		 */
         try{
-            Properties.load(properties, this, commonValues, fxButtons, menuItems);
+            GUIModifier.load(properties, this);
         }catch(final Exception e){
             e.printStackTrace();
         }
@@ -1387,6 +1396,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         multiboxfx = new HBox();
         initCoordBox();
         initMemoryBar();
+        initDownloadBar();
         
         // Temp code to demonstrate functionality - move to JavaFXMouseListener when implmented
         
@@ -1475,21 +1485,18 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 //        }
 
         //CURSOR:
-        if (coordsFX.isVisible()) {
+        if (cursorOverPage && decode_pdf.isOpen()) {
             multiboxfx.getChildren().clear();
             multiboxfx.getChildren().add(coordsFX);
             return;
         }
 
         //DOWNLOAD_PROGRESS:
-//        if (downloadBar.isEnabled() && downloadBar.isVisible() && !downloadBar.isDone() && (decode_pdf.isLoadingLinearizedPDF() || !decode_pdf.isOpen())) {
-//            multibox.removeAll();
-//            downloadBar.getStatusObject().setSize(multibox.getSize());
-//            multibox.add(downloadBar.getStatusObject(), BorderLayout.CENTER);
-//
-//            multibox.repaint();
-            //return;
-//        }
+        if (!downloadBar.isDisable()&& downloadBar.isVisible() && !downloadBar.isDone() && (decode_pdf.isLoadingLinearizedPDF() || !decode_pdf.isOpen())) {
+             multiboxfx.getChildren().clear();
+             multiboxfx.getChildren().add(downloadBar.getStatusObject());
+            return;
+        }
         
         //MEMORY:
         if (memoryBarFX.isVisible()) {
@@ -1499,6 +1506,14 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
     }
 
+    private void initDownloadBar(){
+        downloadBar=new StatusBarFX(new Color((185.0d/255.0d), (209.0d/255.0d), 0, 1));
+        downloadBar.getStatusObject().prefHeightProperty().bind(multiboxfx.heightProperty());
+        downloadBar.getStatusObject().prefWidthProperty().bind(multiboxfx.widthProperty());
+        
+        downloadBar.setVisible(false);
+    }
+    
     private void initMemoryBar(){
         memoryBarFX = new FXProgressBarWithText();
         memoryBarFX.prefHeightProperty().bind(multiboxfx.heightProperty());
@@ -1564,6 +1579,210 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
 
     }
+    
+     
+    private boolean setDisplayView2(final int displayView, final int orientation) {
+        
+        DecoderOptions options =decode_pdf.getDecoderOptions();
+        Display pages =decode_pdf.getPages();
+        int lastDisplayView=decode_pdf.getDisplayView();
+        FileAccess fileAccess=(FileAccess) decode_pdf.getExternalHandler(Options.FileAccess);
+        int pageNumber=decode_pdf.getPageNumber();
+        ExternalHandlers externalHandlers=decode_pdf.getExternalHandler();
+        
+        final PdfDecoderFX comp=(PdfDecoderFX)decode_pdf;
+       
+        final Pane highlightsPane=comp.highlightsPane;
+        
+        options.setPageAlignment(orientation);
+        
+        if (pages != null) {
+            pages.stopGeneratingPage();
+        }
+        
+        if (Platform.isFxApplicationThread()) {
+            
+            if(highlightsPane != null && highlightsPane.getParent() != null) {
+                ((Group) highlightsPane.getParent()).getChildren().remove(highlightsPane);
+            }
+            
+        } else {
+            final Runnable doPaintComponent = new Runnable() {
+                
+                @Override
+                public void run() {
+                    if(highlightsPane != null && highlightsPane.getParent() != null) {
+                        ((Group) highlightsPane.getParent()).getChildren().remove(highlightsPane);
+                    }
+                }
+            };
+            Platform.runLater(doPaintComponent);
+        }
+        
+        
+        boolean needsReset = (displayView != Display.SINGLE_PAGE || lastDisplayView != Display.SINGLE_PAGE);
+        if (needsReset && (lastDisplayView == Display.FACING || displayView == Display.FACING)) {
+            needsReset = false;
+        }
+        
+        final boolean hasChanged = displayView != lastDisplayView;
+        
+        options.setDisplayView(displayView);
+        
+        if (lastDisplayView != displayView && lastDisplayView == Display.PAGEFLOW) {
+            pages.dispose();
+        }
+        
+        final Object customFXHandle=externalHandlers.getExternalHandler(Options.MultiPageUpdate);
+        
+        switch (displayView) {
+            case Display.SINGLE_PAGE:
+                if(pages==null || hasChanged){
+                    final DynamicVectorRenderer currentDisplay= decode_pdf.getDynamicRenderer();
+                    
+                    pages = new SingleDisplayFX(pageNumber, currentDisplay,comp,options);
+                }
+                break;
+                
+            case Display.PAGEFLOW:
+                
+                if (pages instanceof PageFlowDisplayFX) {
+                    return hasChanged;
+                }
+                
+                if (lastDisplayView!=Display.SINGLE_PAGE) {
+                    setDisplayView(Display.SINGLE_PAGE, 0);
+                    setDisplayView(Display.PAGEFLOW, 0);
+                    return hasChanged;
+                }
+                                
+                pages = new PageFlowDisplayFX((GUIFactory)customFXHandle, comp);
+
+                break;
+                /**/
+            default:
+                
+                //
+                
+                break;
+            
+               
+        }
+       
+        /**
+         * enable pageFlow mode and setup slightly different display configuration
+         */
+        if (lastDisplayView == Display.PAGEFLOW && displayView != Display.PAGEFLOW) {
+            //@swing
+            /*
+            removeAll();
+            
+            //forms needs null layout manager
+            this.setLayout(null);
+            
+            ((JScrollPane)getParent().getParent()).setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            ((JScrollPane)getParent().getParent()).setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            
+            javax.swing.Timer t = new javax.swing.Timer(1000,new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    repaint();
+                }
+            });
+            t.setRepeats(false);
+            t.start();
+            /**/
+        }
+        
+        /**
+         * setup once per page getting all page sizes and working out settings
+         * for views
+         */
+        if (fileAccess.getOffset() == null) {
+            fileAccess.setOffset(new PageOffsets(decode_pdf.getPageCount(), decode_pdf.getPdfPageData()));
+        }
+        
+        pages.setup(options.useHardwareAcceleration(), fileAccess.getOffset());
+        
+        final DynamicVectorRenderer currentDisplay= decode_pdf.getDynamicRenderer();
+        
+        if(decode_pdf.isOpen()) {
+            pages.init(scaling, decode_pdf.getDisplayRotation(), pageNumber, currentDisplay, true);
+        }
+        
+        // force redraw
+        pages.forceRedraw();
+        
+        pages.refreshDisplay();
+        
+        //needs to be realigned (in longer term refactored out)
+        comp.pages=pages;
+        
+        return hasChanged;
+    }
+    
+    
+     /**
+     * set view mode used in panel and redraw in new mode
+     * SINGLE_PAGE,CONTINUOUS,FACING,CONTINUOUS_FACING delay is the time in
+     * milli-seconds which scrolling can stop before background page drawing
+     * starts Multipage views not in OS releases
+     */
+    @Override
+    public void setDisplayView(final int displayView, final int orientation) {
+
+        // remove listener if setup
+        if (viewListener!=null) {
+
+           removeComponentListener(viewListener);
+
+            viewListener.dispose();
+            viewListener=null;
+        }
+        
+        boolean hasChanged=setDisplayView2(displayView, orientation);
+        
+        //move to correct page
+        final int pageNumber=decode_pdf.getPageNumber();
+        if (pageNumber > 0) {
+            if (hasChanged && displayView == Display.SINGLE_PAGE && decode_pdf.isOpen()) {
+                try {
+                    decode_pdf.setPageParameters(scaling, pageNumber, decode_pdf.getDisplayRotation());
+                    //@swing
+//                    invalidate();
+//                    updateUI();
+                    decode_pdf.decodePage(pageNumber);
+                } catch (final Exception e) {
+                    //tell user and log
+                    if(LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
+                    }
+                    //
+                }
+            } else if (displayView != Display.SINGLE_PAGE && displayView != Display.PAGEFLOW) {
+                
+                scrollToPage(pageNumber);
+                
+            }
+        }
+       
+        //Only all search in certain modes
+        if (displayView != Display.SINGLE_PAGE &&
+                displayView != Display.CONTINUOUS &&
+                displayView != Display.CONTINUOUS_FACING){
+            enableSearchItems(false);
+        }else{
+            enableSearchItems(true);
+        }
+        
+         // add listener if one not already there
+        if (viewListener==null) {
+            viewListener = new RefreshLayout(decode_pdf);
+            addComponentListener(viewListener);
+        }
+    }
+   
+   
     
     /**
      * Overrides method from GUI.java, see GUI.java for DOCS.
@@ -2190,7 +2409,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
 	}/**/
 
-	//	<start-thin>
+	
     @Override
 	public void setupThumbnailPanel() {
 
@@ -2221,8 +2440,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
 		}
 	}
-	//	<end-thin>
-
+	
     @Override
 	public void setBookmarks(final boolean alwaysGenerate) {
 
@@ -2949,13 +3167,16 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     @Override
 	public void setDownloadProgress(final String message, final int percentage) {
         
-        if(debugFX){
-            System.out.println("setDownloadProgress not yet implemented for JavaFX");
-        }
-        
-//        downloadBar.setProgress(message, percentage);
+        downloadBar.setProgress(message, percentage);
 
-        setMultibox(new int[]{});
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                setMultibox(new int[]{});
+            }
+        });
+        
 	}
 
 	/* (non-Javadoc)
@@ -3300,7 +3521,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     @Override
     public void alterProperty(final String value, final boolean set) {
         if(GUI.debugFX){
-            Properties.alterProperty(value, set, properties, this, isSingle, fxButtons, menuItems);
+            GUIModifier.alterProperty(value, set, this);
         }
     }
     
@@ -3561,7 +3782,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             final int r = ((col >> 16) & 255);
             final int g = ((col >> 8) & 255);
             final int b = ((col) & 255);
-            pageContainer.setStyle("-fx-background:rgb("+r+","+g+","+b+");");
+            pageContainer.setStyle("-fx-background:rgb("+r+ ',' +g+ ',' +b+");");
 
         } else {
 
@@ -3570,7 +3791,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 final int r = ((col >> 16) & 255);
                 final int g = ((col >> 8) & 255);
                 final int b = ((col) & 255);
-                pageContainer.setStyle("-fx-background:rgb(" + r + "," + g + "," + b + ");");
+                pageContainer.setStyle("-fx-background:rgb(" + r + ',' + g + ',' + b + ");");
             } else if (decode_pdf.useNewGraphicsMode()) {
                 pageContainer.setStyle("-fx-background:#555565;");
             } else {
@@ -4059,14 +4280,22 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     }
     
     private void resetPDFBorder(final Color color){
-        final DropShadow pdfBorder = new DropShadow();
-        pdfBorder.setOffsetY(0f);
-        pdfBorder.setOffsetX(0f);
-        pdfBorder.setColor(color);
-        pdfBorder.setWidth(dropshadowDepth);
-        pdfBorder.setHeight(dropshadowDepth);
+        Platform.runLater(new Runnable() {
 
-        ((PdfDecoderFX)decode_pdf).setEffect(pdfBorder); 
+            @Override
+            public void run() {
+
+                final DropShadow pdfBorder = new DropShadow();
+                pdfBorder.setOffsetY(0f);
+                pdfBorder.setOffsetX(0f);
+                pdfBorder.setColor(color);
+                pdfBorder.setWidth(dropshadowDepth);
+                pdfBorder.setHeight(dropshadowDepth);
+
+                ((PdfDecoderFX) decode_pdf).setEffect(pdfBorder);
+
+            }
+        });
     }
     
     /**
@@ -4237,6 +4466,23 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 break;
         }
     }
+    
+    @Override
+    public void removePageListener(){
+        
+        // remove listener if not removed by close
+       if (viewListener!=null) {
+            
+            //flush any cached pages
+            decode_pdf.getPages().flushPageCaches();
+            
+            removeComponentListener(viewListener);
+            
+            viewListener.dispose();
+            viewListener=null;
+            
+        }
+    }
 
     @Override
     public void setPageCounterText(final PageCounter value, final String text) {
@@ -4316,9 +4562,8 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     
     @Override
     public void enableDownloadBar(final boolean enabled, final boolean visible){
-        if(GUI.debugFX){
-            System.out.println("downloadBar for JavaFX is not implemented yet");
-        } 
+        downloadBar.setDisable(!enabled);
+        downloadBar.setVisible(visible);
     }
 
     @Override
@@ -4415,4 +4660,64 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     public void enableStatusBar(final boolean enabled, final boolean visible){
       // System.out.println("enableStatusBar not yet implemented for JavaFX");
     }
+    
+    private void removeComponentListener(RefreshLayout viewListener) {
+        
+        final ScrollPane customFXHandle=this.getPageContainer();
+        
+        //picks up mode change
+        customFXHandle.viewportBoundsProperty().removeListener(viewListener);
+        
+        //and user scrolling
+        customFXHandle.vvalueProperty().addListener(viewListener);
+        customFXHandle.hvalueProperty().addListener(viewListener);
+    }
+
+    private void addComponentListener(RefreshLayout viewListener) {
+        
+        final ScrollPane customFXHandle= this.getPageContainer();
+        
+        if(customFXHandle!=null){
+            //picks up mode change
+            customFXHandle.viewportBoundsProperty().addListener(viewListener);
+            
+            customFXHandle.vvalueProperty().addListener(viewListener);
+            customFXHandle.hvalueProperty().addListener(viewListener);
+        }
+    }
+   
+    /**
+     * class to repaint multiple views
+     */
+    class RefreshLayout implements ChangeListener {
+
+        final PageMoveTracker tracker=new PageMoveTracker();
+       
+        final PdfDecoderInt decode_pdf;
+        
+        RefreshLayout(PdfDecoderInt pdf) {
+            this.decode_pdf = pdf;
+        }
+        
+        /**
+         * fix submitted by Niklas Matthies
+         */
+        public void dispose() {
+            tracker.dispose();
+        }
+ 
+        @Override
+        public void changed(ObservableValue ov, Object t, Object t1) {
+          
+           // System.out.println("XXXXXXX"+ov);//+" "+t+" "+t1);
+          //  final ScrollPane customFXHandle= ((JavaFxGUI)getExternalHandler(Options.MultiPageUpdate)).getPageContainer();
+        
+           //  customFXHandle.setVvalue(500);
+        
+          //  pages.getDisplayedRectangle();
+            tracker.startTimer(decode_pdf.getPages(),decode_pdf.getPageNumber(),(FileAccess)decode_pdf.getExternalHandler(Options.FileAccess));
+
+        }
+    }
+
 }

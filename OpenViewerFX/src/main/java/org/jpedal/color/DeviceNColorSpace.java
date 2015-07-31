@@ -111,11 +111,6 @@ public class DeviceNColorSpace extends SeparationColorSpace {
             
             final float[] newOp={raw[0],raw[1],raw[2],raw[3]};
             altCS.setColor(newOp,newOp.length);
-        }else if(this.cmykMapping==CMYK && opCount==6){ //special case coded in
-            
-            final float[] newOp={raw[5],raw[4],raw[3],raw[2]};
-            altCS.setColor(newOp,newOp.length);
-            
         }else if(this.cmykMapping==MYK && opCount==3){ //special case coded in
             
             final float[] newOp={0.0f,raw[0],raw[1],raw[2]};

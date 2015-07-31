@@ -33,6 +33,7 @@
 
 package org.jpedal.examples.viewer.gui;
 
+import org.jpedal.display.GUIThumbnailPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -96,7 +97,7 @@ public abstract class GUI implements GUIFactory {
     public enum ScrollPolicy {
         VERTICAL_AS_NEEDED, HORIZONTAL_AS_NEEDED, VERTICAL_NEVER, HORIZONTAL_NEVER
     }
-    public static enum PageCounter {
+    public enum PageCounter {
         PAGECOUNTER1, PAGECOUNTER2, PAGECOUNTER3, ALL
     }
         
@@ -143,10 +144,6 @@ public abstract class GUI implements GUIFactory {
     protected Font headFont=new Font("SansSerif",Font.BOLD,14);
 
     protected boolean previewOnSingleScroll =true;
-
-    /** Whether the left page drag or right page drag is drawing */
-    protected boolean dragLeft;
-    protected boolean dragTop;
 
     /** Constants for glowing border */
     protected final int glowThickness = 11;
@@ -680,33 +677,12 @@ public abstract class GUI implements GUIFactory {
         return glowInnerColor;
     }
 
-    @Override
-    public boolean getDragLeft() {
-        return dragLeft;
-    }
-
-    @Override
-    public boolean getDragTop() {
-        return dragTop;
-    }
-
     // Adding the search frame on to the GUI
     @Override
     public void setSearchFrame(final GUISearchWindow searchFrame) {
 
         this.searchFrame = searchFrame;
 
-    }
-
-    @Override
-    @SuppressWarnings("UnusedDeclaration")
-    public void setDragCorner(final int a) {
-        dragLeft = a == org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_LEFT ||
-                a == org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_LEFT ||
-                a == org.jpedal.external.OffsetOptions.INTERNAL_DRAG_BLANK;
-
-        dragTop = a == org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_LEFT ||
-                a == org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_RIGHT;
     }
 
     protected void setRotation(){
@@ -844,7 +820,8 @@ public abstract class GUI implements GUIFactory {
         }
 
         if (decode_pdf.getDisplayView() == Display.SINGLE_PAGE) {
-            //
+            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, String.valueOf(commonValues.getCurrentPage()));
+            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER3, Messages.getMessage("PdfViewerOfLabel.text") + ' ' + commonValues.getPageCount());
         }
 
         currentGUI.updateTextBoxSize();
@@ -1223,7 +1200,27 @@ public abstract class GUI implements GUIFactory {
             displayFrame.setVisible(true);
         }
         
-        //<start-server><end-server>
+        /**
+         * if page has transition we will have stored values earlier and now need to use and remove
+         */
+        if(isJavaFX){
+            FXAdditionalData additionaValuesforPage=(FXAdditionalData) decode_pdf.getExternalHandler(Options.JavaFX_ADDITIONAL_OBJECTS);
+            
+            if(additionaValuesforPage!=null){
+                
+                FXDisplay fxDisplay=(FXDisplay) decode_pdf.getDynamicRenderer();
+                
+                try {
+                    fxDisplay.drawAdditionalObjectsOverPage(additionaValuesforPage.getType(), null,additionaValuesforPage.getObj());
+                } catch (PdfException ex) {
+                    //
+                    if (org.jpedal.utils.LogWriter.isOutput()) {
+                        org.jpedal.utils.LogWriter.writeLog("Exception attempting to draw additional objects " + ex);
+                    }
+                }
+                
+            }
+        }
         
         if(currentGUI.getFrame() != null){
             currentGUI.reinitialiseTabs(currentGUI.getDividerLocation() > currentGUI.getStartSize());
@@ -1393,7 +1390,7 @@ public abstract class GUI implements GUIFactory {
         pageTitle = Messages.getMessage("PdfViewerJPanel.thumbnails");
         bookmarksTitle = Messages.getMessage("PdfViewerJPanel.bookmarks");
         layersTitle = Messages.getMessage("PdfViewerJPanel.layers");
-        signaturesTitle = "Signatures";
+        signaturesTitle = Messages.getMessage("PdfViewerJPanel.signatures");
     }
 
 }

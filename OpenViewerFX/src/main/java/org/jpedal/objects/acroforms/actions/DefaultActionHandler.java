@@ -94,6 +94,12 @@ public class DefaultActionHandler implements ActionHandler {
     //handle so we can access
     protected PdfDecoderInt decode_pdf;
     
+    GUIFactory gui;
+    
+    public DefaultActionHandler(GUIFactory viewerGUI){
+        this.gui=viewerGUI;
+    }
+    
     @Override
     public void init(final PdfDecoderInt decode_pdf, final Javascript javascript, final AcroRenderer acrorend) {
         if(showMethods) {
@@ -502,13 +508,11 @@ public class DefaultActionHandler implements ActionHandler {
     private void additionalAction_SaveAs() {
         //- we should call it directly - I have put code below from Commands
         
-        //<start-adobe><start-thin><start-server>
         final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
         
         if(gui!=null) {
             gui.getCommand().executeCommand(Commands.SAVEFORM, null);
         }
-        //<end-server><end-thin><end-adobe>
     }
     
     static void additionalAction_URI(final String url) {
@@ -1037,8 +1041,7 @@ public class DefaultActionHandler implements ActionHandler {
                                      * magnified just enough to fit the entire height of its bounding box within the window.
                                      * A null value for left specifies
                                      */
-                                default:
-                                    //
+                               
                                     
                             }
                             
@@ -1051,7 +1054,6 @@ public class DefaultActionHandler implements ActionHandler {
                         // F specifies the file (GoToR only)
                         // D specifies the location or page
                         
-                        //
                         
                         if(page!=-1) {
                             changeTo(null, page, null, null, true);
@@ -1090,8 +1092,7 @@ public class DefaultActionHandler implements ActionHandler {
                             showMessageDialog("The file specified " + filename + " Does Not Exist!");
                         }
                         break;
-                    default:
-                        // 
+                  
                 }
             } else {
                 setCursor(eventType);
@@ -1210,7 +1211,7 @@ public class DefaultActionHandler implements ActionHandler {
                         //<start-adobe><start-thin><start-server>
                         //update page number
                         if (page != -1){
-                            decode_pdf.updatePageNumberDisplayed(page);
+                            gui.setPage(page);
                         }
                         //<end-server><end-thin><end-adobe>
                         
@@ -1690,10 +1691,10 @@ public class DefaultActionHandler implements ActionHandler {
     }
     
     protected void setCursor(final int eventType) {
-        
-        //<start-adobe><start-thin><start-server><end-server><end-thin><end-adobe>
+
+        //<start-adobe><start-server><end-server><end-adobe>
     }
-    
+
     protected void showSig(final PdfObject sigObject) {
         
         //<start-server><end-server>

@@ -181,7 +181,7 @@ public class MaskDecoder {
         */
         int w=imageData.getWidth();
         int h=imageData.getHeight();
-        int d=imageData.getDepth();
+        //int d=imageData.getDepth();
         
         /*
         * mask data (ASSUME single component at moment)
@@ -271,12 +271,7 @@ public class MaskDecoder {
                     }
                 }
                 
-                boolean allowPrintTransparency = false;
-                String value = System.getProperty("org.jpedal.printTransparency");
-                if (isPrinting && value != null && value.equalsIgnoreCase("true")) {
-                    allowPrintTransparency = true;
-                }
-                if(!allowPrintTransparency && isPrinting && (imageData.getMode()==ImageCommands.ID || isType3Font || d==1)){ //avoid transparency if possible
+                if(isPrinting && (imageData.getMode()==ImageCommands.ID || isType3Font || d==1)){ //avoid transparency if possible
                     final WritableRaster raster =Raster.createPackedRaster(new DataBufferByte(data, data.length), w, h, 1, null);
                     image =new BufferedImage(w,h,BufferedImage.TYPE_BYTE_BINARY);
                     image.setData(raster);
@@ -377,7 +372,7 @@ public class MaskDecoder {
     
     private static byte[] upScaleMaskToImage(final int w, final int h, final int maskW, final int maskH, final byte[] objectData, final byte[] maskData) {
         
-        int rgbPtr=0, aPtr=0;
+        int rgbPtr=0, aPtr;
         int i=0;
         float ratioW=(float)maskW/(float)w;
         float ratioH=(float)maskH/(float)h;
@@ -430,7 +425,7 @@ public class MaskDecoder {
     
     private static byte[] upScaleImageToMask(final int w, final int h, final int maskW, final int maskH, final byte[] objectData, final byte[] maskData) {
         
-        int rgbPtr=0, aPtr=0;
+        int rgbPtr, aPtr=0;
         int i=0;
         float ratioW=(float)w/(float)maskW;
         float ratioH=(float)h/(float)maskH;

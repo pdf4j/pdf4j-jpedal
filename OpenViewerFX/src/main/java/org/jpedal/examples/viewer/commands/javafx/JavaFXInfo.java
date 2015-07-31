@@ -73,7 +73,7 @@ public class JavaFXInfo {
         /**
          * Build Main Body Title.
          */
-        final Text title = new Text ("Simple Viewer Information");
+        final Text title = new Text ("JavaFX Viewer Information");
         title.setTextAlignment(TextAlignment.CENTER);
         title.setFont(Font.font("SansSerif", FontWeight.BOLD, 14));
          

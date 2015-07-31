@@ -144,7 +144,12 @@ public class PdfStreamDecoder extends BaseDecoder{
     
     boolean isXMLExtraction;
     
-    //
+    /**
+     * internal development flag which should not be used
+     */
+    //turn on debugging to see commands
+    final public static boolean showCommands=false;
+//    public static boolean showCommands = true;
     
     /**interactive display*/
     private StatusBar statusBar;
@@ -176,7 +181,6 @@ public class PdfStreamDecoder extends BaseDecoder{
     public static boolean useTextPrintingForNonEmbeddedFonts;
     
     /**allows us to terminate file if looks like might crash JVM due to complexity*/
-    @SuppressWarnings("CanBeFinal")
     private static int maxShapesAllowed=-1;
     
     // Used to get the blendmode of an object in PDFObjectToImage

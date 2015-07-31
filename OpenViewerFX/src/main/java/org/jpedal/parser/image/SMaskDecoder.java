@@ -33,11 +33,10 @@
 
 package org.jpedal.parser.image;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import org.bouncycastle.util.Arrays;
+import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.JPEGDecoder;
 import org.jpedal.io.ColorSpaceConvertor;
@@ -51,60 +50,207 @@ import org.jpedal.parser.image.data.ImageData;
  */
 class SMaskDecoder {
     
-    static BufferedImage applyJPX_JBIG_Smask(final ImageData imageData, final ImageData smaskData, byte[] maskData, PdfObject maskObject){
+    public static BufferedImage applyJPX_JBIG_Smask(final ImageData imageData, final ImageData smaskData, byte[] maskData,PdfObject imageObject, PdfObject maskObject, GenericColorSpace colorSpace, GenericColorSpace maskCS){
         byte[] objectData = imageData.getObjectData();
-        
         int iw=imageData.getWidth();
         int ih=imageData.getHeight();
+        int id=imageData.getDepth();
         
+        float[] matte = maskObject.getFloatArray(PdfDictionary.Matte);
+        
+        smaskData.getFilter(maskObject);
+        if(smaskData.isDCT()){
+            maskData=JPEGDecoder.getBytesFromJPEG(maskData,maskCS,maskObject);
+            maskObject.setMixedArray(PdfDictionary.Filter,null);
+            maskObject.setDecodedStream(maskData);
+        }else if(smaskData.isJPX()){
+            maskData=JPeg2000ImageDecoder.getBytesFromJPEG2000(maskData,maskCS,maskObject);
+            maskObject.setMixedArray(PdfDictionary.Filter,null);
+            maskObject.setDecodedStream(maskData);
+        }else {
+            objectData = ColorSpaceConvertor.normaliseTo8Bit(id, iw, ih, objectData);
+        }
+                
         int sw=smaskData.getWidth();
         int sh=smaskData.getHeight();
         int sd=smaskData.getDepth();
         
         float [] decodeArr = maskObject.getFloatArray(PdfDictionary.Decode);
-        
-        
-        
+                
         if(decodeArr!=null && decodeArr[0]==1 && decodeArr[1]==0){ // data inverted refer to dec2011/example.pdf
             for (int i = 0; i < maskData.length; i++) {
                 maskData[i]^= 0xff;
             }
         }
         
+        byte[] index=colorSpace.getIndexedMap();
+       
+        if(index!=null){
+            index=colorSpace.convertIndexToRGB(index);
+            objectData=ColorSpaceConvertor.convertIndexToRGBByte(index, iw, ih, imageData.getCompCount(), id, objectData, false, false);
+        } else if (imageData.isDCT() || imageData.isJPX() || imageData.isJBIG()) {      
+         
+        } else if(colorSpace.getID()==ColorSpaces.DeviceGray){
+            objectData=colorSpace.dataToRGBByteArray(objectData,iw,ih,false);
+            if(matte!=null){
+                matte = new float[]{matte[0],matte[0],matte[0]};
+            }
+        } else if(colorSpace.getID()==ColorSpaces.CalRGB){
+        } else if(colorSpace.getID()==ColorSpaces.DeviceRGB){
+        } else {
+            objectData=colorSpace.dataToRGBByteArray(objectData,iw,ih,false);   
+        }
+        
         maskData = ColorSpaceConvertor.normaliseTo8Bit(sd,sw, sh, maskData);
         
-        if(iw!=sw || ih!=sh){
-            BufferedImage scaleImage = new BufferedImage(sw, sh,BufferedImage.TYPE_BYTE_GRAY);
-            byte [] temp = ((DataBufferByte) scaleImage.getRaster().getDataBuffer()).getData();
-            System.arraycopy(maskData, 0, temp, 0, maskData.length);            
-            scaleImage = getScaledImage(scaleImage, iw, ih);
-            maskData = ((DataBufferByte) scaleImage.getRaster().getDataBuffer()).getData();
+        int imageDim = iw*ih;
+        int maskDim = sw*sh;
+        if(imageDim>maskDim){
+            maskData  = getScaledBytes(maskData, sw, sh, iw, ih);            
+        }else if(maskDim>imageDim){
+            objectData = getScaledBytes(objectData, iw, ih, sw, sh);
+            imageDim = maskDim;
+            iw = sw;
+            ih = sh;
+        }else{
+            //do nothing
         }
         int p = 0;
         
         BufferedImage img = new BufferedImage(iw, ih, BufferedImage.TYPE_INT_ARGB);
         int [] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
         
-        if ((iw * ih) == objectData.length) {
-            for (int i = 0; i < maskData.length; i++) {
-                int a = maskData[i] & 0xff;
-                int r = objectData[p++] & 0xff;
-                int g = r;
-                int b = r;
-                pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                
+        if (imageDim == objectData.length) {
+            int aa = 0,a;            
+            for (int i = 0; i < imageDim; i++) {
+                a = maskData[aa++] & 0xff;
+                int r = objectData[i] & 0xff;
+                pixels[i] = (a << 24) | (r << 16) | (r << 8) | r;
             }
         } else {
-            for (int i = 0; i < maskData.length; i++) {
-                int a = maskData[i] & 0xff;
-                int r = objectData[p++] & 0xff;
-                int g = objectData[p++] & 0xff;
-                int b = objectData[p++] & 0xff;
-                pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+            if(matte!=null){
+                for (int i = 0; i < maskData.length; i++) {
+                    int a = maskData[i] & 0xff;
+                    int r = objectData[p++] & 0xff;
+                    int g = objectData[p++] & 0xff;
+                    int b = objectData[p++] & 0xff;
+                    
+                    if(a!=0){
+                        double k = 255.0/a;
+                        r = (int) ((r-matte[0])*k+matte[0]);
+                        g = (int) ((g-matte[1])*k+matte[1]);
+                        b = (int) ((b-matte[2])*k+matte[2]);
+
+                        r = r <= 0 ? 0 : r >= 255 ? 255 : r | 0;
+                        g = g <= 0 ? 0 : g >= 255 ? 255 : g | 0;
+                        b = b <= 0 ? 0 : b >= 255 ? 255 : b | 0;
+                    }
+                    
+                    pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                }
+            }else{
+                int expected = imageDim*3;
+                if(objectData.length<expected){//odd cases where datastream is not enough
+                    byte temp[] = new byte[expected];
+                    System.arraycopy(objectData, 0, temp, 0, objectData.length);
+                    objectData = temp;
+                }
+                int iter = Math.min(maskData.length, pixels.length);
+                
+                for (int i = 0; i < iter; i++) {
+                    int a = maskData[i] & 0xff;
+                    int r = objectData[p++] & 0xff;
+                    int g = objectData[p++] & 0xff;
+                    int b = objectData[p++] & 0xff;
+                    pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                }
             }
+            
+        }                
+
+        return img;
+    }
+    
+    private static byte[] getScaledBytes(byte[] data, int sw, int sh, int dw, int dh){
+        if(data.length == (sw*sh)){ //gray scale image
+            return rescaleComponent(data, sw, sh, dw, dh);
+        }else{//rgb image
+            int dim = sw*sh;
+            byte[] rr = new byte[dim];
+            byte[] gg = new byte[dim];
+            byte[] bb = new byte[dim];
+            int p = 0;
+            for (int i = 0; i < dim; i++) {
+                rr[i] = data[p++];
+                gg[i] = data[p++];
+                bb[i] = data[p++];
+            }
+            rr = rescaleComponent(rr, sw, sh, dw, dh);
+            gg = rescaleComponent(gg, sw, sh, dw, dh);
+            bb = rescaleComponent(bb, sw, sh, dw, dh);
+            
+            p=0;
+            dim = dw*dh;
+            byte[] temp = new byte[dim*3];
+            for (int i = 0; i < dim; i++) {
+                temp[p++] = rr[i];
+                temp[p++] = gg[i];
+                temp[p++] = bb[i];
+            }
+            return temp;
+        }
+    }
+    
+    private static byte[] rescaleComponent(byte[] data, int sw, int sh, int dw, int dh){
+        if(data.length==1){
+            byte a = data[0];
+            data = new byte[dw*dh];
+            Arrays.fill(data, a);
+            return data;
+        }else if(sh==1){
+            byte[] temp = new byte[2*sw];
+            System.arraycopy(data, 0, temp, 0, sw);
+            System.arraycopy(data, 0, temp, sw, sw);
+            sh = 2;
+            data = temp;
         }
         
-        
-        return img;
+        byte[] temp = new byte[dw * dh];
+        int A, B, C, D, index, yIndex, xr, yr, gray;
+        long x, y = 0, xDiff, yDiff, xDiffMinus, yDiffMinus;
+        int xRatio = ((sw - 1) << 16) / dw;
+        int yRatio = ((sh - 1) << 16) / dh;
+        int offset = 0;
+        for (int i = 0; i < dh; i++) {
+            yr = (int) (y >> 16);
+            yDiff = y - (yr << 16);
+            yDiffMinus = 65536 - yDiff;
+            yIndex = yr * sw;
+            x = 0;
+            for (int j = 0; j < dw; j++) {
+                xr = (int) (x >> 16);
+                xDiff = x - (xr << 16);
+                xDiffMinus = 65536 - xDiff;
+                index = yIndex + xr;
+
+                A = data[index] & 0xff;
+                B = data[index + 1] & 0xff;
+                C = data[index + sw] & 0xff;
+                D = data[index + sw + 1] & 0xff;
+
+                gray = (int) ((A * xDiffMinus * yDiffMinus
+                        + B * xDiff * yDiffMinus
+                        + C * yDiff * xDiffMinus
+                        + D * xDiff * yDiff) >> 32);
+
+                temp[offset++] = (byte) gray;
+
+                x += xRatio;
+            }
+            y += yRatio;
+        }
+        return temp;
     }
     
     static byte[] applySMask(byte[] maskData, final ImageData imageData,final GenericColorSpace decodeColorData, final PdfObject newSMask, final PdfObject XObject) {
@@ -124,8 +270,8 @@ class SMaskDecoder {
         final int maskW=newSMask.getInt(PdfDictionary.Width);
         final int maskH=newSMask.getInt(PdfDictionary.Height);
         final int maskD=newSMask.getInt(PdfDictionary.BitsPerComponent);
-       
-        objectData = MaskDataDecoder.convertData(decodeColorData, objectData, w, h, imageData, d, maskD, maskData);
+        
+        objectData = MaskDataDecoder.convertSmaskData(decodeColorData, objectData, w, h, imageData, d, maskD, maskData, newSMask);
         
         //needs to be 'normalised to 8  bit'
         if(maskD!=8){
@@ -183,7 +329,7 @@ class SMaskDecoder {
     
     private static byte[] upScaleMaskToImage(final int w, final int h, final int maskW, final int maskH, final byte[] objectData, final byte[] maskData) {
         
-        int rgbPtr=0, aPtr=0;
+        int rgbPtr=0, aPtr;
         int i=0;
         float ratioW=(float)maskW/(float)w;
         float ratioH=(float)maskH/(float)h;
@@ -220,7 +366,7 @@ class SMaskDecoder {
     
     private static byte[] upScaleImageToMask(final int w, final int h, final int maskW, final int maskH, final byte[] objectData, final byte[] maskData) {
         
-        int rgbPtr=0, aPtr=0;
+        int rgbPtr, aPtr=0;
         int i=0;
         float ratioW=(float)w/(float)maskW;
         float ratioH=(float)h/(float)maskH;
@@ -307,13 +453,14 @@ class SMaskDecoder {
         return combinedData;
     }
     
-    private static BufferedImage getScaledImage(BufferedImage image, int width, int height) {
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-        double scaleX = (double) width / imageWidth;
-        double scaleY = (double) height / imageHeight;
-        AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
-        AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
-        return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
-    }
+//    private static BufferedImage getScaledImage(BufferedImage image, int width, int height) {
+//        int imageWidth = image.getWidth();
+//        int imageHeight = image.getHeight();
+//        double scaleX = (double) width / imageWidth;
+//        double scaleY = (double) height / imageHeight;
+//        AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
+//        AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
+//        return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
+//    }
+    
 }

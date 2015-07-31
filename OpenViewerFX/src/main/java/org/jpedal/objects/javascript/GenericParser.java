@@ -97,7 +97,8 @@ public class GenericParser implements ExpressionEngine {
             if (debugEngine) {
                 System.out.println("Setting up Java bindings of objects.");
             }
-            docObject = new JSDoc(acroRenderer);
+            docObject = new JSDoc();
+            docObject.setAcroRenderer(acroRenderer);
             context.setAttribute("JSDoc", docObject, ScriptContext.ENGINE_SCOPE);
             context.setAttribute("app", new JSApp(), ScriptContext.ENGINE_SCOPE);
 //			context.setAttribute("event", new JSEvent(), ScriptContext.ENGINE_SCOPE);

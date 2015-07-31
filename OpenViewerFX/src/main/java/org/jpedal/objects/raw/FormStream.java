@@ -595,8 +595,6 @@ public class FormStream {
 	        /**decode the stream*/
 			final byte[] commands=Xobject.getDecodedStream();
 	
-	        //
-			
 			String textString="";
 	        if(commands!=null) {
                 textString = glyphDecoder.decodeStreamIntoObjects(commands, true);
@@ -604,8 +602,6 @@ public class FormStream {
 	        if(textString==null || textString.isEmpty()) {
                 textString = null;
             }
-	
-	        //
 	
 			localStore.flush();
 			

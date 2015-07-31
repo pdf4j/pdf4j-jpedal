@@ -201,8 +201,6 @@ public interface GUIFactory {
 
     Enum getType();
 
-    public void setDragCorner(int mode);    
-   
     public Object getMultiViewerFrames();
         
     public void setBookmarks(boolean alwaysGenerate);
@@ -266,15 +264,11 @@ public interface GUIFactory {
     
     public void setScalingFromExternal(String scale);
     
-    public boolean getDragLeft();
-    
     public boolean getPageTurnScalingAppropriate();
     
     public void resetPageNav();
     
     public void removeSearchWindow(boolean justHide);
-    
-    public boolean getDragTop();
     
     public Map getHotspots();
      
@@ -392,5 +386,9 @@ public interface GUIFactory {
     public double getStartSize();
     
     public void setStartSize(int size);
+
+    public void setDisplayView(int SINGLE_PAGE, int DISPLAY_CENTERED);
+
+    public void removePageListener();
     
 }

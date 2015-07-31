@@ -54,11 +54,10 @@ import javax.swing.SwingUtilities;
 import org.jpedal.*;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.*;
-import static org.jpedal.examples.viewer.Commands.hires;
 import static org.jpedal.examples.viewer.Commands.isPDFLinearized;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.DownloadProgress;
 import org.jpedal.examples.viewer.gui.popups.ErrorDialog;
 import org.jpedal.examples.viewer.utils.FileFilterer;
@@ -72,6 +71,7 @@ import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.OutlineObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 
@@ -232,7 +232,7 @@ public class OpenFile {
 
                         // get any user set dpi
                         final String hiresFlag = System.getProperty("org.jpedal.hires");
-                        if (Commands.hires || hiresFlag != null) {
+                        if (DecoderOptions.hires || hiresFlag != null) {
                             commonValues.setUseHiresImage(true);
                         }
                         // get any user set dpi
@@ -482,6 +482,10 @@ public class OpenFile {
             final GUIFactory currentGUI, PdfDecoderInt decode_pdf, final PropertiesFile properties,
             final GUIThumbnailPanel thumbnails) {
 
+        currentGUI.removePageListener();
+        
+        currentGUI.setDisplayView(Display.SINGLE_PAGE, decode_pdf.getPageAlignment());
+        
 //        currentGUI.resetNavBar();
 
         final boolean isURL = file.startsWith("http:") || file.startsWith("file:");
@@ -543,7 +547,7 @@ public class OpenFile {
 
         //get any user set dpi
         final String hiresFlag = System.getProperty("org.jpedal.hires");
-        if (Commands.hires || hiresFlag != null) {
+        if (DecoderOptions.hires || hiresFlag != null) {
             commonValues.setUseHiresImage(true);
         }
 
@@ -576,14 +580,14 @@ public class OpenFile {
 
             if (SwingUtilities.isEventDispatchThread()) {
 
-                decode_pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
             } else {
                 final Runnable doPaintComponent = new Runnable() {
 
                     @Override
                     public void run() {
-                        decode_pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                        currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
                     }
                 };
                 SwingUtilities.invokeLater(doPaintComponent);

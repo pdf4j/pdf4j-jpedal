@@ -264,7 +264,7 @@ public class Vector_Object implements Serializable
     }
     ///////////////////////////////////
     /**
-     * return the size
+     * return the size+1 as in last item (so an array of 0 values is 1)
      */
     public final int size()
     {

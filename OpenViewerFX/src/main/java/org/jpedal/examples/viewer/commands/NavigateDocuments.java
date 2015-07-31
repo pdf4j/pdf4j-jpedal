@@ -35,7 +35,7 @@ package org.jpedal.examples.viewer.commands;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;

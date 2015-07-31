@@ -46,14 +46,16 @@ import org.jpedal.*;
 import org.jpedal.examples.viewer.commands.OpenFile;
 import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 //
 import org.jpedal.examples.viewer.utils.*;
+import org.jpedal.examples.viewer.objects.ClientExternalHandler;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.Options;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
+import org.jpedal.objects.acroforms.actions.DefaultActionHandler;
 import org.jpedal.objects.raw.OutlineObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
@@ -157,7 +159,7 @@ public class Viewer implements ViewerInt{
 
         //get any user set dpi
         final String hiresFlag = System.getProperty("org.jpedal.hires");
-        if(Commands.hires || hiresFlag != null) {
+        if(DecoderOptions.hires || hiresFlag != null) {
             commonValues.setUseHiresImage(true);
         }
 
@@ -239,7 +241,7 @@ public class Viewer implements ViewerInt{
 
         //get any user set dpi
         final String hiresFlag = System.getProperty("org.jpedal.hires");
-        if(Commands.hires || hiresFlag != null) {
+        if(DecoderOptions.hires || hiresFlag != null) {
             commonValues.setUseHiresImage(true);
         }
 

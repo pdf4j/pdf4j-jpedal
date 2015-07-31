@@ -77,4 +77,6 @@ public class Info {
     
     public HashMap<Integer,Tile> tilesMap = new HashMap<Integer,Tile>();
     
+    public HashMap<Integer,Integer> cDef = new HashMap<Integer,Integer>();
+    
 }

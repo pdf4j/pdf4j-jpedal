@@ -162,7 +162,7 @@ public class PageFlow {
                 currentGUI.getButtons().alignLayoutMenuOption(Display.SINGLE_PAGE);
                 if (SwingUtilities.isEventDispatchThread()) {
 
-                    decode_pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                    currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
                     currentGUI.getButtons().hideRedundentNavButtons(currentGUI);
                     ((GUI)currentGUI).setSelectedComboIndex(Commands.ROTATION, 0);
@@ -172,7 +172,7 @@ public class PageFlow {
 
                         @Override
                         public void run() {
-                            decode_pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                            currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
                             currentGUI.getButtons().hideRedundentNavButtons(currentGUI);
                             ((GUI)currentGUI).setSelectedComboIndex(Commands.ROTATION, 0);

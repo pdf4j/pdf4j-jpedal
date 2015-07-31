@@ -44,6 +44,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Set;
+import org.jpedal.external.FontHandler;
 
 
 
@@ -58,6 +59,9 @@ public interface DynamicVectorRenderer  {
 
     public void setIsRenderingToImage(boolean b);
 
+    public FontHandler getFontHandler();
+
+    
     enum Mode{PDF,XFA,SMASK}
 
     public static final int TEXT=1;
@@ -88,12 +92,19 @@ public interface DynamicVectorRenderer  {
 
 	public static final int fontBB=24;
 
-	public static final int DELETED_IMAGE =27;
-	public static final int REUSED_IMAGE=29;
-        
-        public static final int BLENDMODE=31;
+    public static final int DELETED_IMAGE = 27;
+    public static final int REUSED_IMAGE = 29;
 
-	public static final int MARKER=200;
+    public static final int BLENDMODE = 31;
+
+    public static final int SAVE_EMBEDDED_FONT = 10;
+    public static final int TEXT_STRUCTURE_OPEN = 40;
+    public static final int TEXT_STRUCTURE_CLOSE = 42;
+
+    public static final int IsSVGMode = 44;
+    public static final int IsTextSelectable = 45;
+    public static final int IsRealText = 46;
+    public static final int MARKER=200;
 
 	/**flag to enable debugging of painting*/
 	public static boolean debugPaint=false;

@@ -129,13 +129,11 @@ public class DecoderResults {
      */
     public String getPageDecodeStatusReport(final int status) {
 
-        if(status==(DecodeStatus.NonEmbeddedCIDFonts)){
+        if(status==DecodeStatus.NonEmbeddedCIDFonts){
             return nonEmbeddedCIDFonts;
         }else {
-            new RuntimeException("Unknown parameter");
+            throw new RuntimeException("Unknown parameter");
         }
-
-        return "";
     }
 
 

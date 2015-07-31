@@ -84,15 +84,7 @@ public class SetSecurity {
             throw new RuntimeException("only Bouncy castle currently supported with certificates");
         }
         
-        @SuppressWarnings("UnusedAssignment")
-                byte[] envelopedData=null;
-        
-        //<start-adobe>
-        //Adobe do not use Bouncy castle and only added for that
-        envelopedData=CertificateReader.readCertificate(recipients, certificate, key);
-        
-        //<end-adobe>
-        
-        return envelopedData;
+        return CertificateReader.readCertificate(recipients, certificate, key);
+       
     }
 }

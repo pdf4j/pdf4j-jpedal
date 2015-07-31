@@ -426,7 +426,7 @@ public class SeparationColorSpace extends GenericColorSpace {
     public BufferedImage  JPEG2000ToRGBImage(final byte[] data,int w,int h, final float[] decodeArray, final int pX, final int pY, final int d) throws PdfException{
         
         
-        BufferedImage image=null;
+        BufferedImage image;
         
         try{
            

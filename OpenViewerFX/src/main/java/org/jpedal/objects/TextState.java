@@ -32,12 +32,13 @@
  */
 package org.jpedal.objects;
 
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
 
 /**
  * holds the current text state
  */
-public class TextState
+public class TextState implements Cloneable
 {
 
 
@@ -230,6 +231,12 @@ public class TextState
     @Override
     public final Object clone(){
 
+        try {
+            super.clone();
+        } catch (CloneNotSupportedException ex) {
+            LogWriter.writeLog("Unable to clone "+ex);
+        }
+        
         final TextState ts = new TextState();
 
         ts.writingMode = writingMode;

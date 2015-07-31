@@ -142,7 +142,7 @@ public class CommandParser {
             current =characterStream[dataPointer];
         }
 
-        if(dataPointer==streamSize) //allow for end of stream
+        if(dataPointer>=streamSize) //allow for end of stream
         {
             return dataPointer;
         }
@@ -181,7 +181,7 @@ public class CommandParser {
 
             //move back if ends with / or [
             final int endC=characterStream[end];
-            if(endC==47 || endC==91 || endC=='<') {
+            if(endC==47 || endC==91 || endC=='<' || endC=='%') {
                 end--;
             }
 
@@ -206,8 +206,10 @@ public class CommandParser {
                 opStart[currentOp]=start;
                 opEnd[currentOp]=end;
 
-                //
-
+                if(PdfStreamDecoder.showCommands) {
+                    System.out.println(PdfStreamDecoder.indent + generateOpAsString(currentOp, false) + " (value) " + tokenNumber);
+                }
+                
                 currentOp++;
                 if (currentOp == MAXOPS) {
                     currentOp = 0;
@@ -222,8 +224,10 @@ public class CommandParser {
                //	return streamSize;
 
 
-                //
-
+                if(PdfStreamDecoder.showCommands) {
+                    System.out.println(PdfStreamDecoder.indent + Cmd.getCommandAsString(commandID) + " (Command) " + tokenNumber);
+                }
+                
                 //reorder values so work
                 if(operandCount>0){
 
@@ -426,8 +430,10 @@ public class CommandParser {
             opStart[currentOp]=start;
             opEnd[currentOp]=end;
 
-            //
-
+            if (PdfStreamDecoder.showCommands) {
+                System.out.println(PdfStreamDecoder.indent + generateOpAsString(currentOp, false) + "<<----");
+            }
+            
             currentOp++;
             if (currentOp == MAXOPS) {
                 currentOp = 0;

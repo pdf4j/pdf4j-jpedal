@@ -42,7 +42,7 @@ import org.jpedal.examples.viewer.commands.*;
 import org.jpedal.examples.viewer.gui.GUI.PageCounter;
 import org.jpedal.examples.viewer.gui.generic.GUISearchList;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.*;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.JPedalActionHandler;
@@ -56,13 +56,8 @@ import org.jpedal.utils.*;
  */
 public class Commands {
     
-   
-    
     /** used to store the IE views so we can go back to previous views and store changes */
     protected final ViewStack viewStack = new ViewStack();
-    
-    /**custom hi-res val for JPedal settings*/
-    public static boolean hires = true;
     
     public boolean extractingAsImage;
      
@@ -201,8 +196,6 @@ public class Commands {
     
     //
     
-    // <start-demo><end-demo>
-
     //status values returned by command
     public static final Integer FIRST_DOCUMENT_SEARCH_RESULT_NOW_SHOWN = 1;
     public static final Integer SEARCH_RETURNED_TO_START = 2;
@@ -436,10 +429,20 @@ public class Commands {
                 viewStack.add((Integer) args[0], (Rectangle) args[1], (Integer) args[2]);
                 break;
             case FORWARD:
-                //<start-adobe><end-adobe>
+                //<start-adobe>
+                //go forward to next viewed location
+                if (viewStack.forward() != null) {
+                    decode_pdf.getFormRenderer().getActionHandler().changeTo(null, viewStack.forward().getPage(), viewStack.forward().getLocation(), viewStack.forward().getType(), false);
+                }
+                //<end-adobe>
                 break;
             case BACK:
-                //<start-adobe><end-adobe>
+                //<start-adobe>
+                //go back to last viewed location
+                if (viewStack.back() != null) {
+                    decode_pdf.getFormRenderer().getActionHandler().changeTo(null, viewStack.back().getPage(), viewStack.back().getLocation(), viewStack.back().getType(), false);
+                }
+                //<end-adobe>
                 break;
             case PAGECOUNT:
                 status = PageCount.execute(decode_pdf);

@@ -46,9 +46,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 //<end-adobe>
 
-//<start-adobe><start-thin>
-//<end-thin><end-adobe>
-
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.jpedal.color.DeviceCMYKColorSpace;
@@ -1855,17 +1852,6 @@ public class FormObject extends PdfObject{
             default:
                 throw new RuntimeException("Value not defined in getName(int,mode) in "+this);
         }
-    }
-    
-    public boolean hasKeyArray(final int id) {
-    	switch(id){
-    	case PdfDictionary.Kids:
-            return Kids != null && Kids.length > 0;
-
-            default:
-    		// <start-demo><end-demo>
-    		return false;
-    	}
     }
 
     @Override

@@ -42,7 +42,6 @@ import java.security.cert.Certificate;
 
 public class CertificateReader {
     
-    //<start-adobe>
     public static byte[] readCertificate(final byte[][] recipients, final Certificate certificate, final Key key) {
         
         byte[] envelopedData=null;
@@ -82,7 +81,4 @@ public class CertificateReader {
         
         return envelopedData;
     }
-    
-    //<end-adobe>
-    
 }

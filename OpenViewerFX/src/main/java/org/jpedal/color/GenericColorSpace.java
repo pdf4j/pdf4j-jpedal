@@ -1544,10 +1544,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
              */
             byte[] index=this.getIndexedMap();
             if(index!=null){
-                
-                
-                
-                    
+
                     //make it RGB
                 if(!isIndexConverted()){
                     index=convertIndexToRGB(index);
@@ -1560,11 +1557,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 final ColorModel cm=new IndexColorModel(8, index.length/3, index, 0, false);
                 image = new BufferedImage(cm, ras.createCompatibleWritableRaster(), false, null);
                 image.setData(ras);
-                    
-                
-                
-                    
-                
+
                 //downsample to reduce size if huge
                 image=cleanupImage(image,pX,pY);
                 

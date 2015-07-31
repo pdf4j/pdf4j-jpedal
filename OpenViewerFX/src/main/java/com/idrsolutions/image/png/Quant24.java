@@ -45,8 +45,8 @@ public class Quant24 {
 
     private final long[] vwt, vmr, vmg, vmb;
     private final double[] m2;
-    private final byte[] tag ;
-    
+    private final byte[] tag;
+
     public Quant24() {
         vwt = new long[TableLength];
         vmr = new long[TableLength];
@@ -55,16 +55,16 @@ public class Quant24 {
         m2 = new double[TableLength];
         tag = new byte[TableLength];
     }
-    
-    public byte[] getPalette(byte[] image){
+
+    public byte[] getPalette(int[][] image) {
         int colorCount = 256;
         histogram(image);
         M3d();
         Cube[] cube = new Cube[colorCount];
         buildCube(cube, colorCount);
-        
+
         byte[] palette = new byte[256 * 3];
-        
+
         int z = 0;
         for (int k = 0; k < colorCount; k++) {
 //            mark(cube[k], (byte) k, tag);
@@ -74,31 +74,22 @@ public class Quant24 {
                 palette[z++] = (byte) (volume(cube[k], vmg) / weight);
                 palette[z++] = (byte) (volume(cube[k], vmb) / weight);
 
-            }else{
-                z+=3;
+            } else {
+                z += 3;
             }
         }
         return palette;
     }
-    
-    public byte findMatch(int rgb){
+
+    public byte findMatch(int rgb) {
         int mm = 8 - IndexBits;
-        int r = ((rgb>>16) & 0xff) >> mm;
-        int g = ((rgb>>8) & 0xff) >> mm;
+        int r = ((rgb >> 16) & 0xff) >> mm;
+        int g = ((rgb >> 8) & 0xff) >> mm;
         int b = (rgb & 0xff) >> mm;
 
         int ind = indexify(r + 1, g + 1, b + 1);
 
         return tag[ind];
-    }
-
-    public Object[] quantize(byte[] image) {
-        int colorCount = 256;
-        histogram(image);
-        M3d();
-        Cube[] cube = new Cube[colorCount];
-        buildCube(cube, colorCount);
-        return generateResult(image, colorCount, cube);
     }
 
     private static int indexify(int r, int g, int b) {
@@ -166,25 +157,32 @@ public class Quant24 {
         }
     }
 
-    private void histogram(byte[] image) {
+    private void histogram(int[][] image) {
         int mm = 8 - IndexBits;
-        int i = 0;
-        while (i < image.length) {
-            int b = image[i++] & 0xff;
-            int g = image[i++] & 0xff;
-            int r = image[i++] & 0xff;
+        int h = image.length;
+        int w = image[0].length;
+        int[] temp;
+        int r, g, b;
 
-            int inr = r >> mm;
-            int ing = g >> mm;
-            int inb = b >> mm;
+        for (int y = 0; y < h; y++) {
+            temp = image[y];
+            for (int x = 0; x < w; x++) {
+                int val = temp[x];
+                r = (val >> 16) & 0xff;
+                g = (val >> 8) & 0xff;
+                b = val & 0xff;
+                int inr = r >> mm;
+                int ing = g >> mm;
+                int inb = b >> mm;
 
-            int ind = indexify(inr + 1, ing + 1, inb + 1);
+                int ind = indexify(inr + 1, ing + 1, inb + 1);
 
-            vwt[ind]++;
-            vmr[ind] += r;
-            vmg[ind] += g;
-            vmb[ind] += b;
-            m2[ind] += (r * r) + (g * g) + (b * b);
+                vwt[ind]++;
+                vmr[ind] += r;
+                vmg[ind] += g;
+                vmb[ind] += b;
+                m2[ind] += (r * r) + (g * g) + (b * b);
+            }
         }
     }
 
@@ -357,15 +355,15 @@ public class Quant24 {
         return true;
     }
 
-    private void mark(Cube cube, byte label, byte[] tag) {
-        for (int r = cube.R0 + 1; r <= cube.R1; r++) {
-            for (int g = cube.G0 + 1; g <= cube.G1; g++) {
-                for (int b = cube.B0 + 1; b <= cube.B1; b++) {
-                    tag[indexify(r, g, b)] = label;
-                }
-            }
-        }
-    }
+//    private void mark(Cube cube, byte label, byte[] tag) {
+//        for (int r = cube.R0 + 1; r <= cube.R1; r++) {
+//            for (int g = cube.G0 + 1; g <= cube.G1; g++) {
+//                for (int b = cube.B0 + 1; b <= cube.B1; b++) {
+//                    tag[indexify(r, g, b)] = label;
+//                }
+//            }
+//        }
+//    }
 
     private void buildCube(Cube[] cube, int colorCount) {
 
@@ -400,49 +398,56 @@ public class Quant24 {
             }
 
             if (temp <= 0.0) {
-                colorCount = i + 1;
                 break;
             }
         }
     }
 
-    private Object[] generateResult(byte[] image, int colorCount, Cube[] cube) {
-        byte[] palette = new byte[256 * 3];
-
-        int z = 0;
-        for (int k = 0; k < colorCount; k++) {
-            mark(cube[k], (byte) k, tag);
-            double weight = volume(cube[k], vwt);
-            if (weight != 0) {
-                palette[z++] = (byte) (volume(cube[k], vmr) / weight);
-                palette[z++] = (byte) (volume(cube[k], vmg) / weight);
-                palette[z++] = (byte) (volume(cube[k], vmb) / weight);
-
-            } else {
-                palette[z++] = 0;
-                palette[z++] = 0;
-                palette[z++] = 0;
-            }
-        }
-
-        byte[] indexedBytes = new byte[image.length / 3];
-        z = 0;
-        int mm = 8 - IndexBits;
-        for (int i = 0; i < image.length / 3; i++) {
-            int b = (image[z++] & 0xff) >> mm;
-            int g = (image[z++] & 0xff) >> mm;
-            int r = (image[z++] & 0xff) >> mm;
-
-            int ind = indexify(r + 1, g + 1, b + 1);
-
-            indexedBytes[i] = tag[ind];
-        }
-
-        return new Object[]{palette, indexedBytes};
-        
-
-    }
-
+//    public Object[] quantize(int[][] image) {
+//        int colorCount = 256;
+//        histogram(image);
+//        M3d();
+//        Cube[] cube = new Cube[colorCount];
+//        buildCube(cube, colorCount);
+//        return generateResult(image, colorCount, cube);
+//    }
+//    
+//    private Object[] generateResult(int[][] image, int colorCount, Cube[] cube) {
+//        byte[] palette = new byte[256 * 3];
+//
+//        int z = 0;
+//        for (int k = 0; k < colorCount; k++) {
+//            mark(cube[k], (byte) k, tag);
+//            double weight = volume(cube[k], vwt);
+//            if (weight != 0) {
+//                palette[z++] = (byte) (volume(cube[k], vmr) / weight);
+//                palette[z++] = (byte) (volume(cube[k], vmg) / weight);
+//                palette[z++] = (byte) (volume(cube[k], vmb) / weight);
+//
+//            } else {
+//                palette[z++] = 0;
+//                palette[z++] = 0;
+//                palette[z++] = 0;
+//            }
+//        }
+//
+//        byte[] indexedBytes = new byte[image.length / 3];
+//        z = 0;
+//        int mm = 8 - IndexBits;
+//        int ii = image.length / 3;
+//        for (int i = 0; i < ii; i++) {
+//            int b = (image[z++] & 0xff) >> mm;
+//            int g = (image[z++] & 0xff) >> mm;
+//            int r = (image[z++] & 0xff) >> mm;
+//
+//            int ind = indexify(r + 1, g + 1, b + 1);
+//
+//            indexedBytes[i] = tag[ind];
+//        }
+//
+//        return new Object[]{palette, indexedBytes};
+//
+//    }
     private class Cube {
 
         int A0, A1, R0, R1, G0, G1, B0, B1, Volume;

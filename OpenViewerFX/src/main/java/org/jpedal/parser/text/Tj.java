@@ -49,7 +49,8 @@ import org.jpedal.utils.Matrix;
 import org.jpedal.utils.repositories.Vector_Int;
 
 import org.jpedal.external.GlyphTracker;
-//<start-adobe><end-adobe>
+
+import org.jpedal.objects.structuredtext.StructuredContentHandler;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -78,7 +79,8 @@ public class Tj extends BaseDecoder {
 
     private final GlyphData glyphData=new GlyphData();
     
-    //<start-adobe><end-adobe>
+    private GlyphTracker customGlyphTracker;
+    private StructuredContentHandler contentHandler;
     
     /**
      * flag to show some fonts might need hinting turned on to display properly
@@ -202,7 +204,8 @@ public class Tj extends BaseDecoder {
         this.currentTextState=currentTextState;
         this.currentFontData=currentFontData;
         
-        //<start-adobe><end-adobe>
+        this.customGlyphTracker=parserOptions.getCustomGlyphTracker();
+        this.contentHandler=parserOptions.getContentHandler();
         
         isTabRemapped = currentFontData.getDiffMapping(9)!=null;
         isCRRemapped = currentFontData.getDiffMapping(10)!=null;
@@ -231,7 +234,6 @@ public class Tj extends BaseDecoder {
             fontSize = -fontSize;
         }
         
-        //<start-adobe>
         //will be null if no content
         if (current_value != null && parserOptions.isPageContent()){
             
@@ -246,8 +248,9 @@ public class Tj extends BaseDecoder {
                 }
             }
 
-            //
-            if (parserOptions.isTextExtracted()) {
+            if(contentHandler!=null) {
+                contentHandler.setText(current_value, x1, y1, x2, y2);
+            } else if (parserOptions.isTextExtracted()) {
                 
                 /**
                  * save item and add in graphical elements
@@ -266,7 +269,6 @@ public class Tj extends BaseDecoder {
                         glyphData.getTextLength(), currentColor, glyphData.isXMLExtraction());
             }
         }
-        //<end-adobe>
         
         return tjTextValue;
     }
@@ -429,15 +431,22 @@ public class Tj extends BaseDecoder {
 
             //read next value ignoring spaces, tabs etc
             i=CharReader.getNextValue(i,stream,glyphData,isCID);
-            
+           
             /**either handle glyph, process leading or handle a deliminator*/
             if (glyphData.isText()) { //process if still in text
-                
+            
                 lastTextChar = glyphData.getRawChar(); //remember last char so we can avoid a rollon at end if its a space
                 
                 //convert escape or turn index into correct glyph allow for stream
                 if (glyphData.getOpenChar() == 60) {
-                    i = HexTextUtils.getHexValue(stream, i,glyphData, currentFontData, parserOptions);
+                   
+                    //check /PDFdata/test_data/baseline_screens/14jan/ASTA invoice - $275.pdf  if you alter this code
+                    if (isCID && !currentFontData.isFontSubstituted()  && currentFontData.isFontEmbedded && ( stream[i]!='0')){
+                        i=HexTextUtils.getHexCIDValue(stream, i,glyphData, currentFontData, parserOptions);
+                    }else{
+                        i = HexTextUtils.getHexValue(stream, i,glyphData, currentFontData, parserOptions);
+                    }
+                    
                 }else if (lastTextChar == 92 && !isCID) {
                     i = EscapedTextUtils.getEscapedValue(i, stream,glyphData, currentFontData,streamLength,parserOptions, current);
                 } else if (isCID){  //could be nonCID cid
@@ -447,9 +456,9 @@ public class Tj extends BaseDecoder {
                 }
                 
                 //Handle extracting CID Identity fonts
-                if (!currentFontData.hasToUnicode() &&
+                if (isHTML && !currentFontData.hasToUnicode() &&
                         currentFontData.getFontType() == StandardFonts.CIDTYPE0 &&
-                        currentFontData.getGlyphData().isIdentity() && isHTML){
+                        currentFontData.getGlyphData().isIdentity()){
                     
                     //Check if proper char has been stored instead
                     int charToUse=(int)glyphData.getRawChar();
@@ -580,12 +589,7 @@ public class Tj extends BaseDecoder {
                 glyphData.setSpacingAdded(0);
                 
                
-                 //Spot remapped tab and Strip out in html as causes issue in HTML
-                if(isHTML && isTabRemapped && glyphData.getUnicodeValue().equals("\t")){
-                 
-                // Checks whether invisible text should be drawn
-                
-                }else if ((parserOptions.isRenderText()  && (Tmode!=GraphicsState.INVISIBLE || isHTML)) || 
+                if ((parserOptions.isRenderText()  && (Tmode!=GraphicsState.INVISIBLE || isHTML)) || 
                         (Tmode==GraphicsState.CLIPTEXT && parserOptions.isRenderClipText())){
                     
                     if(javaFont!=null && parserOptions.isPrinting() && (textPrint==PdfDecoderInt.STANDARDTEXTSTRINGPRINT ||
@@ -645,7 +649,10 @@ public class Tj extends BaseDecoder {
                 glyphData.addToWidth(currentWidth); //also increases text count
                 lastWidth = glyphData.getWidth(); //increase width by current char
                 
-                //<start-adobe><end-adobe>
+                //track for user if required
+                if(customGlyphTracker!=null){
+                    customGlyphTracker.addGlyph(Trm, glyphData.getRawInt(), glyphData.getDisplayValue(), glyphData.getUnicodeValue());
+                }
                 
                 //add unicode value to our text data with embedded width
                 if(parserOptions.isTextExtracted()) {
@@ -757,14 +764,18 @@ public class Tj extends BaseDecoder {
             textData = null;
         }
         
-        //
+        if (PdfStreamDecoder.showCommands){
+            if(textData==null) {
+                System.out.println("no data-------------");
+            } else{
+                System.out.println(" data="+x1+ ' ' +y1+ ',' +x2+ ' ' +y2+ ' ' + org.jpedal.grouping.PdfGroupingAlgorithms.removeHiddenMarkers(textData + "<<"));
+            }
+        }
         
         return textData;
     }
     
     private void renderText(final float currentWidth, final int type, final int Tmode, final float multiplyer, final boolean isTextShifted) throws RuntimeException {
-        //&&
-        //(!currentFontData.isFontSubstituted() || !glyphData.displayValue.startsWith("&#"))){
         
         //get glyph if not CID
         String charGlyph="notdef";
@@ -779,9 +790,23 @@ public class Tj extends BaseDecoder {
             
             PdfGlyph glyph;
             
-            //
-            {
+            /**
+             * store info needed to create glyph on first render or create now
+             */
+            if(parserOptions.generateGlyphOnRender() && !parserOptions.renderDirectly()){
+                if(glyphData.isfirstTime()){
+                    glyph=new MarkerGlyph(Trm[0][0], Trm[0][1], Trm[1][0], Trm[1][1], currentFontData.getBaseFontName());
+                    
+                    current.checkFontSaved(glyph, currentFontData.getBaseFontName(),currentFontData);
+                    glyphData.setFirstTime(false);
+                    
+                }
                 
+                currentFontData.setValuesForGlyph(rawInt, charGlyph, glyphData.getDisplayValue(),currentFontData.getEmbeddedChar(rawInt));
+                glyph=new UnrendererGlyph(Trm[2][0], Trm[2][1],rawInt,currentWidth);
+                
+            }else{ //render now 
+               
                 glyph= glyphs.getEmbeddedGlyph( factory,charGlyph , Trm, rawInt, glyphData.getDisplayValue(), currentWidth, currentFontData.getEmbeddedChar(rawInt));
                 
                 if (glyph instanceof TTGlyph){
@@ -894,9 +919,7 @@ public class Tj extends BaseDecoder {
                                 glyphShape.getBounds().getHeight()>0){
                             
                             gs.addClip(glyphShape);
-                            
-                            //current.drawClip(gs,null,false);
-
+                           
                         }
                     }
                 }else {
@@ -930,11 +953,9 @@ public class Tj extends BaseDecoder {
             if(LogWriter.isOutput()) {
                 LogWriter.writeLog("Exception: " + e.getMessage());
             }
-            //
             
             errorTracker.addPageFailureMessage("Exception " + e + " on embedded font renderer");
             
-            //
         }
     }
     
@@ -1039,8 +1060,6 @@ public class Tj extends BaseDecoder {
         if(fontSize==0) {
             fontSize = 1;
         }
-        
-        // <start-demo><end-demo>
         
         glyphData.setFontSize(fontSize);
         
@@ -1186,7 +1205,8 @@ public class Tj extends BaseDecoder {
                     hh = fontHeight;
                     break;
                 case PdfData.HORIZONTAL_RIGHT_TO_LEFT :
-                    //
+                    System.out.println("THIS TEXT DIRECTION HAS NOT BEEN IMPLEMENTED YET (Right to Left)");
+                    
                     break;
                 case PdfData.VERTICAL_TOP_TO_BOTTOM :
                     fontHeight = (ww/h);

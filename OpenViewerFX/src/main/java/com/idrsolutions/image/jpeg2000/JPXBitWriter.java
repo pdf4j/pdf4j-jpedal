@@ -51,14 +51,14 @@ public class JPXBitWriter {
     }
     
     public void writeUShort(int value){
-        final byte b[] = new byte[]{(byte) (value >> 8), (byte) value};
+        final byte b[] = {(byte) (value >> 8), (byte) value};
         for (int i = 0; i < b.length; i++) {
             writeByte(b[i]);
         }
     }
 
     public void writeUInt(long value) {
-        final byte b[] = new byte[]{(byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value};
+        final byte b[] = {(byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value};
         for (int i = 0; i < b.length; i++) {
             writeByte(b[i]);
         }

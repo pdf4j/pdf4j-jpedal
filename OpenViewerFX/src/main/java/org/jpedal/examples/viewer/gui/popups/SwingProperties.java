@@ -100,6 +100,60 @@ import org.mozilla.javascript.ScriptRuntime;
 
 public class SwingProperties extends JPanel {
     
+    final private int TRUE_HASH = "true".hashCode();
+
+    /**
+     * Gets the boolean value of a property and loads it into a JCheckBox
+     *
+     * @param comp JCheckbox to show the data.
+     * @param elementName Property name to be loaded.
+     */
+    private void loadBooleanValue(final JCheckBox comp, final String elementName) {
+        final String value = properties.getValue(elementName).toLowerCase();
+        comp.setSelected(!value.isEmpty() && value.hashCode() == TRUE_HASH);
+    }
+
+    /**
+     * Gets the boolean value of a property and loads it into a JCheckBox
+     *
+     * @param comp CheckNode to show the data.
+     * @param elementName Property name to be loaded.
+     */
+    private void loadBooleanValue(final CheckNode comp, final String elementName) {
+        final String value = properties.getValue(elementName).toLowerCase();
+        comp.setSelected(!value.isEmpty() && value.hashCode() == TRUE_HASH);
+    }
+
+    /**
+     * Gets the String value of a property and loads it into a JTextField
+     *
+     * @param comp JTextfield to show the data.
+     * @param elementName Property name to be loaded.
+     */
+    private void loadStringValue(JTextField comp, final String elementName) {
+        String propValue = properties.getValue(elementName);
+        if (propValue != null && !propValue.isEmpty()) {
+            comp.setText(propValue);
+        }
+    }
+
+    /**
+     * Gets the String value of a property and loads it into a JTextField
+     *
+     * @param comp JTextfield to show the data.
+     * @param elementName Property name to be loaded.
+     * @param defaultText Default text to be used if property value not found or
+     * empty.
+     */
+    private void loadStringValue(JTextField comp, final String elementName, final String defaultText) {
+        String propValue = properties.getValue(elementName);
+        if (propValue != null && !propValue.isEmpty()) {
+            comp.setText(propValue);
+        } else {
+            comp.setText(defaultText);
+        }
+    }
+
     public SwingProperties(final GUIFactory currentGUI){
         speech = (Speech)currentGUI.getPdfDecoder().getExternalHandler(Options.SpeechEngine);
         showPreferenceWindow(currentGUI);
@@ -392,20 +446,12 @@ final JPanel viewBGColor = new JPanel();
 //        highlightTextColor.setToolTipText(Messages.getMessage("PdfPreferences.highlightText.toolTip"));
         
         //Set up the properties window gui components
-        String propValue = properties.getValue("resolution");
-        if(!propValue.isEmpty()) {
-            resolution = new JTextField(propValue);
-        } else {
-            resolution = new JTextField(72);
-        }
+        resolution = new JTextField();
+        loadStringValue(resolution, "resolution", "72");
         resolution.setToolTipText(Messages.getMessage("PdfPreferences.resolutionInput.toolTip"));
         
-        propValue = properties.getValue("maxmultiviewers");
-        if(!propValue.isEmpty()) {
-            maxMultiViewers = new JTextField(propValue);
-        } else {
-            maxMultiViewers = new JTextField(20);
-        }
+        maxMultiViewers = new JTextField();
+        loadStringValue(maxMultiViewers, "maxmultiviewers", "20");
         maxMultiViewers.setToolTipText(Messages.getMessage("PdfPreferences.maxMultiViewer.toolTip"));
         
         
@@ -886,45 +932,13 @@ final JPanel viewBGColor = new JPanel();
             /**
              * Set values from Properties file
              */
-            String propValue = properties.getValue("resolution");
-            if(!propValue.isEmpty()) {
-                resolution.setText(propValue);
-            }
+            loadStringValue(resolution, "resolution");
             
-            propValue = properties.getValue("useHinting");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                useHinting.setSelected(true);
-            } else {
-                useHinting.setSelected(false);
-            }
-            
-            propValue = properties.getValue("autoScroll");
-            if(propValue.equals("true")) {
-                autoScroll.setSelected(true);
-            } else {
-                autoScroll.setSelected(false);
-            }
-            
-            propValue = properties.getValue("confirmClose");
-            if(propValue.equals("true")) {
-                confirmClose.setSelected(true);
-            } else {
-                confirmClose.setSelected(false);
-            }
-            
-            propValue = properties.getValue("automaticupdate");
-            if(propValue.equals("true")) {
-                update.setSelected(true);
-            } else {
-                update.setSelected(false);
-            }
-            
-            propValue = properties.getValue("openLastDocument");
-            if(propValue.equals("true")) {
-                openLastDoc.setSelected(true);
-            } else {
-                openLastDoc.setSelected(false);
-            }
+            loadBooleanValue(useHinting, "useHinting");
+            loadBooleanValue(autoScroll, "autoScroll");
+            loadBooleanValue(confirmClose, "confirmClose");
+            loadBooleanValue(update, "automaticupdate");
+            loadBooleanValue(openLastDoc, "openLastDocument");
             
             final JPanel panel = makePanel(Messages.getMessage("PdfPreferences.GeneralTitle"));
             
@@ -1045,30 +1059,15 @@ final JPanel viewBGColor = new JPanel();
             /**
              * Set values from Properties file
              */
-            String propValue = properties.getValue("enhancedViewerMode");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                enhancedViewer.setSelected(true);
-            } else {
-                enhancedViewer.setSelected(false);
-            }
+            loadBooleanValue(enhancedViewer, "enhancedViewerMode");
+            loadBooleanValue(border, "borderType");
+            loadBooleanValue(enhancedFacing, "enhancedFacingMode");
+            loadBooleanValue(thumbnailScroll, "previewOnSingleScroll");
             
-            propValue = properties.getValue("borderType");
-            if(!propValue.isEmpty()) {
-                if (Integer.parseInt(propValue) == 1) {
-                    border.setSelected(true);
-                } else {
-                    border.setSelected(false);
-                }
-            }
+            loadStringValue(pageInsets, "pageInsets", "25");
             
-            propValue = properties.getValue("pageInsets");
-            if(propValue!=null && !propValue.isEmpty()) {
-                pageInsets.setText(propValue);
-            } else {
-                pageInsets.setText("25");
-            }
             
-            propValue = properties.getValue("startView");
+            String propValue = properties.getValue("startView");
             if(!propValue.isEmpty()){
                 int mode = Integer.parseInt(propValue);
                 if(mode<Display.SINGLE_PAGE || mode>Display.PAGEFLOW) {
@@ -1076,20 +1075,6 @@ final JPanel viewBGColor = new JPanel();
                 }
                 
                 pageLayout.setSelectedIndex(mode-1);
-            }
-            
-            propValue = properties.getValue("enhancedFacingMode");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                enhancedFacing.setSelected(true);
-            } else {
-                enhancedFacing.setSelected(false);
-            }
-            
-            propValue = properties.getValue("previewOnSingleScroll");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                thumbnailScroll.setSelected(true);
-            } else {
-                thumbnailScroll.setSelected(false);
             }
             
             final JPanel panel = makePanel(Messages.getMessage("PdfPreferences.PageDisplayTitle"));
@@ -1190,298 +1175,205 @@ final JPanel viewBGColor = new JPanel();
             return panel;
         }
         
+        private void loadCreateInterfaceSettings() {
+            
+            loadBooleanValue(rightClick, "allowRightClick");
+            loadBooleanValue(scrollwheelZoom, "allowScrollwheelZoom");
+            loadBooleanValue(liveSearchResuts, "updateResultsDuringSearch");
+            loadBooleanValue(constantTabs, "consistentTabBar");
+            loadBooleanValue(showMouseSelectionBox, "showMouseSelectionBox");
+            
+            loadStringValue(windowTitle, "windowTitle");
+            loadStringValue(maxMultiViewers, "maxmultiviewers");
+            
+            loadStringValue(iconLocation, "iconLocation", "/org/jpedal/examples/viewer/res/");
+            loadStringValue(sideTabLength, "sideTabBarCollapseLength", "30");
+                    
+            final String propValue = properties.getValue("searchWindowType");
+            int index = 0;//Default value
+            if (!propValue.isEmpty()) {
+                index = Integer.parseInt(propValue); //Set from properties
+                if (index >= searchStyle.getItemCount()) { //If invalid, set to default
+                    index = 0;
+                }
+            }
+            searchStyle.setSelectedIndex(index);
+            
+        }
+    
+        private void setLayoutConstraints(GridBagConstraints constraints, Insets insets, int gridX, int gridY, int gridW, int gridH, int weightX, int weightY){
+            constraints.insets = insets;
+            constraints.gridx = gridX;
+            constraints.gridy = gridY;
+            constraints.gridwidth = gridW;
+            constraints.gridheight = gridH;
+            constraints.weightx = weightX;
+            constraints.weighty = weightY;
+        }
         
+        private JScrollPane createAppearanceTab(){
+            final JPanel contentPane = new JPanel();
+            final JScrollPane scrollPane = new JScrollPane(contentPane);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+            contentPane.setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            
+            int gridY = 0;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label = new JLabel(Messages.getMessage("PdfPreferences.GeneralTitle"));
+            label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            label.setFont(label.getFont().deriveFont(Font.BOLD));
+            contentPane.add(label, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(3,5,0,5), 0, gridY, 1, 1, 0, 0);
+            contentPane.add(windowTitleText, c);
+            setLayoutConstraints(c, new Insets(3,5,0,5), 1, gridY, 1, 1, 0, 0);
+            contentPane.add(windowTitle, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
+            contentPane.add(iconLocationText, c);
+            setLayoutConstraints(c, new Insets(5,5,5,5), 1, gridY, 1, 1, 0, 0);
+            contentPane.add(iconLocation, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label5 = new JLabel(Messages.getMessage("PageLayoutViewMenu.SearchLayout"));
+            label5.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(label5, c);
+            setLayoutConstraints(c, new Insets(5,5,5,5), 1, gridY, 1, 1, 1, 0);
+            contentPane.add(searchStyle, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,0,0,5), 0, gridY, 1, 1, 1, 0);
+            contentPane.add(liveSearchResuts, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(10,5,5,5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label4 = new JLabel(Messages.getMessage("PdfPreferences.MaxMultiViewers"));
+            label4.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(label4, c);
+            setLayoutConstraints(c, new Insets(5,5,5,5), 1, gridY, 1, 1, 1, 0);
+            contentPane.add(maxMultiViewers, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(15,5,5,5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label1 = new JLabel(Messages.getMessage("PdfPreferences.SideTab"));
+            label1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            label1.setFont(label1.getFont().deriveFont(Font.BOLD));
+            contentPane.add(label1, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
+            sideTabLengthText.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(sideTabLengthText, c);
+            setLayoutConstraints(c, new Insets(5,5,5,5), 1, gridY, 1, 1, 1, 0);
+            contentPane.add(sideTabLength, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 2, 1, 1, 0);
+            constantTabs.setMargin(new Insets(0,0,0,0));
+            constantTabs.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(constantTabs, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 2, 1, 1, 1);
+            contentPane.add(Box.createVerticalGlue(), c);
+            
+            return scrollPane;
+        }
+        
+        private JScrollPane createMouseTab(){
+            final JPanel contentPane = new JPanel();
+            final JScrollPane scrollPane = new JScrollPane(contentPane);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+            contentPane.setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            
+            int gridY = 0;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label3 = new JLabel(Messages.getMessage("PdfPreferences.GeneralTitle"));
+            label3.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            label3.setFont(label3.getFont().deriveFont(Font.BOLD));
+            contentPane.add(label3, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 2, 1, 0, 0);
+            rightClick.setMargin(new Insets(0,0,0,0));
+            rightClick.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(rightClick, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 2, 1, 0, 0);
+            scrollwheelZoom.setMargin(new Insets(0,0,0,0));
+            scrollwheelZoom.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(scrollwheelZoom, c);
+            
+            gridY++;            
+            setLayoutConstraints(c, new Insets(0,0,0,5), 0, gridY, 1, 1, 0, 0);
+            contentPane.add(showMouseSelectionBox, c);
+            
+            gridY++;            
+            setLayoutConstraints(c, new Insets(0,0,0,5), 0, gridY, 1, 1, 1, 0);
+            contentPane.add(Box.createVerticalGlue(), c);
+            
+            return scrollPane;
+        }
+        
+        private JScrollPane createSpeechTab(){
+            
+            final JPanel contentPane = new JPanel();
+            final JScrollPane scrollPane = new JScrollPane(contentPane);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+            contentPane.setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            
+            int gridY = 0;
+            setLayoutConstraints(c, new Insets(5, 0, 0, 5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label6 = new JLabel(Messages.getMessage("PdfPreferences.GeneralTitle"));
+            label6.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            label6.setFont(label6.getFont().deriveFont(Font.BOLD));
+            contentPane.add(label6, c);
+            
+            gridY++;
+            voiceSelect = new JComboBox(speech.listVoices());
+            setLayoutConstraints(c, new Insets(5, 0, 0, 5), 0, gridY, 1, 1, 0, 0);
+            final JLabel label7 = new JLabel(Messages.getMessage("PdfPreferences.Voice"));
+            label7.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            contentPane.add(label7, c);
+            voiceSelect.setSelectedItem(properties.getValue("voice"));
+            setLayoutConstraints(c, new Insets(5, 0, 0, 0), 1, gridY, 1, 1, 1, 0);
+            contentPane.add(voiceSelect, c);
+
+            gridY++;
+            setLayoutConstraints(c, new Insets(5, 0, 0, 0), 0, gridY, 1, 1, 1, 1);
+            contentPane.add(Box.createVerticalGlue(), c);
+            
+            return scrollPane;
+        }
         
         /*
-         * Creates a pane holding all Interface settings (e.g Search Style, icons, etc)
+         * Creates a contentPane holding all Interface settings (e.g Search Style, icons, etc)
          */
         private JPanel createInterfaceSettings(){
             
-            /**
-             * Set values from Properties file
-             */
-            String propValue = properties.getValue("allowRightClick");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                rightClick.setSelected(true);
-            } else {
-                rightClick.setSelected(false);
-            }
-            
-            propValue = properties.getValue("allowScrollwheelZoom");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                scrollwheelZoom.setSelected(true);
-            } else {
-                scrollwheelZoom.setSelected(false);
-            }
-            
-            propValue = properties.getValue("windowTitle");
-            if (propValue!=null && !propValue.isEmpty()) {
-                windowTitle.setText(propValue);
-            }
-            
-            propValue = properties.getValue("iconLocation");
-            if(propValue!=null && !propValue.isEmpty()) {
-                iconLocation.setText(propValue);
-            } else {
-                iconLocation.setText("/org/jpedal/examples/viewer/res/");
-            }
-            
-            propValue = properties.getValue("searchWindowType");
-            if(!propValue.isEmpty()){
-                final int index = Integer.parseInt(propValue);
-                if(index < searchStyle.getItemCount()) {
-                    searchStyle.setSelectedIndex(Integer.parseInt(propValue));
-                } else {
-                    searchStyle.setSelectedIndex(0);
-                }
-            }else {
-                searchStyle.setSelectedIndex(0);
-            }
-            
-            propValue = properties.getValue("updateResultsDuringSearch");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                liveSearchResuts.setSelected(true);
-            } else {
-                liveSearchResuts.setSelected(false);
-            }
-            
-            propValue = properties.getValue("maxmultiviewers");
-            if (propValue != null && !propValue.isEmpty()) {
-                maxMultiViewers.setText(propValue);
-            }
-            
-            propValue = properties.getValue("sideTabBarCollapseLength");
-            if(propValue!=null && !propValue.isEmpty()) {
-                sideTabLength.setText(propValue);
-            } else {
-                sideTabLength.setText("30");
-            }
-            
-            propValue = properties.getValue("consistentTabBar");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                constantTabs.setSelected(true);
-            } else {
-                constantTabs.setSelected(false);
-            }
-            
-            propValue = properties.getValue("showMouseSelectionBox");
-            if(!propValue.isEmpty() && propValue.equalsIgnoreCase("true")) {
-                showMouseSelectionBox.setSelected(true);
-            } else {
-                showMouseSelectionBox.setSelected(false);
-            }
+            //Set values from Properties file
+            loadCreateInterfaceSettings();
             
             final JPanel panel = makePanel(Messages.getMessage("PdfPreferences.InterfaceTitle"));
             
             final JTabbedPane tabs = new JTabbedPane();
             
-            final JPanel pane = new JPanel();
-            final JScrollPane scroll = new JScrollPane(pane);
-            scroll.setBorder(BorderFactory.createEmptyBorder());
-            pane.setLayout(new GridBagLayout());
-            GridBagConstraints c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH;
+            tabs.add(Messages.getMessage("PdfPreferences.AppearanceTab"), createAppearanceTab());
             
-            c.insets = new Insets(5,5,5,5);
-            c.gridwidth = 1;
-            c.gridy = 0;
-            c.weighty = 0;
-            c.weightx = 0;
-            c.gridx = 0;
-            final JLabel label = new JLabel(Messages.getMessage("PdfPreferences.GeneralTitle"));
-            label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            label.setFont(label.getFont().deriveFont(Font.BOLD));
-            pane.add(label, c);
+            tabs.add(Messages.getMessage("PdfPreferences.Mouse"), createMouseTab());
             
-            c.gridy++;
-            
-            c.insets = new Insets(3,5,0,5);
-            c.gridwidth=1;
-            c.gridx=0;
-            pane.add(windowTitleText, c);
-            c.gridx = 1;
-            pane.add(windowTitle, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(5,5,5,5);
-            c.gridwidth = 1;
-            c.gridx = 0;
-            pane.add(iconLocationText, c);
-            c.gridx = 1;
-            pane.add(iconLocation, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(5,5,5,5);
-            c.gridx = 0;
-            final JLabel label5 = new JLabel(Messages.getMessage("PageLayoutViewMenu.SearchLayout"));
-            label5.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane.add(label5, c);
-            
-            c.insets = new Insets(5,5,5,5);
-            c.weightx = 1;
-            c.gridx = 1;
-            pane.add(searchStyle, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(5,0,0,5);
-            c.gridx = 0;
-            pane.add(liveSearchResuts, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(10,5,5,5);
-            c.weighty = 0;
-            c.weightx = 0;
-            c.gridx = 0;
-            final JLabel label4 = new JLabel(Messages.getMessage("PdfPreferences.MaxMultiViewers"));
-            label4.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane.add(label4, c);
-            c.insets = new Insets(5,5,5,5);
-            c.weightx = 1;
-            c.gridx = 1;
-            pane.add(maxMultiViewers, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(15,5,5,5);
-            c.gridwidth = 1;
-            c.weighty = 0;
-            c.weightx = 0;
-            c.gridx = 0;
-            final JLabel label1 = new JLabel(Messages.getMessage("PdfPreferences.SideTab"));
-            label1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            label1.setFont(label1.getFont().deriveFont(Font.BOLD));
-            pane.add(label1, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(5,5,5,5);
-            c.gridwidth = 1;
-            c.gridx = 0;
-            sideTabLengthText.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane.add(sideTabLengthText, c);
-            
-            c.insets = new Insets(5,5,5,5);
-            c.weightx = 1;
-            c.gridx = 1;
-            pane.add(sideTabLength, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(5,5,5,5);
-            c.gridwidth = 2;
-            c.gridx = 0;
-            constantTabs.setMargin(new Insets(0,0,0,0));
-            constantTabs.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane.add(constantTabs, c);
-            
-            c.gridy++;
-            
-            c.weighty = 1;
-            c.gridx = 0;
-            pane.add(Box.createVerticalGlue(), c);
-            //pane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(0.3f,0.5f,1f), 1), "Display Settings"));
-            
-            tabs.add(Messages.getMessage("PdfPreferences.AppearanceTab"), scroll);
-            
-            
-            final JPanel pane2 = new JPanel();
-            final JScrollPane scroll2 = new JScrollPane(pane2);
-            scroll2.setBorder(BorderFactory.createEmptyBorder());
-            pane2.setLayout(new GridBagLayout());
-            c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH;
-            
-            
-            c.insets = new Insets(5,5,5,5);
-            c.gridwidth = 1;
-            c.gridy = 0;
-            c.weighty = 0;
-            c.weightx = 0;
-            c.gridx = 0;
-            final JLabel label3 = new JLabel(Messages.getMessage("PdfPreferences.GeneralTitle"));
-            label3.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            label3.setFont(label3.getFont().deriveFont(Font.BOLD));
-            pane2.add(label3, c);
-            
-            c.gridy++;
-            
-            c.gridwidth = 2;
-            c.gridx = 0;
-            rightClick.setMargin(new Insets(0,0,0,0));
-            rightClick.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane2.add(rightClick, c);
-            
-            c.gridy++;
-            
-            c.gridwidth = 2;
-            c.gridx = 0;
-            scrollwheelZoom.setMargin(new Insets(0,0,0,0));
-            scrollwheelZoom.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane2.add(scrollwheelZoom, c);
-            
-            c.gridy++;
-            
-            c.insets = new Insets(0,0,0,5);
-            c.gridwidth = 1;
-            c.gridx = 0;
-            pane2.add(showMouseSelectionBox, c);
-            
-            c.gridy++;
-            
-            c.weighty = 1;
-            c.gridx = 0;
-            pane2.add(Box.createVerticalGlue(), c);
-            //pane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(0.3f,0.5f,1f), 1), "Display Settings"));
-            
-            tabs.add(Messages.getMessage("PdfPreferences.Mouse"), scroll2);
-            
-            final JPanel pane3 = new JPanel();
-            final JScrollPane scroll3 = new JScrollPane(pane3);
-            scroll3.setBorder(BorderFactory.createEmptyBorder());
-            pane3.setLayout(new GridBagLayout());
-            c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH;
-            
-            
-            c.insets = new Insets(5,0,0,5);
-            c.gridwidth = 1;
-            c.gridy = 0;
-            c.weighty = 0;
-            c.weightx = 0;
-            c.gridx = 0;
-            final JLabel label6 = new JLabel(Messages.getMessage("PdfPreferences.GeneralTitle"));
-            label6.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            label6.setFont(label6.getFont().deriveFont(Font.BOLD));
-            pane3.add(label6, c);
-            
-            //Checks that freetts is available in order to make combo box.
-            if(speech!=null) {
-                
-                voiceSelect = new JComboBox(speech.listVoices());
-                c.gridy++;
-                final JLabel label7 = new JLabel(Messages.getMessage("PdfPreferences.Voice"));
-                label7.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-                pane3.add(label7, c);
-                
-                voiceSelect.setSelectedItem(properties.getValue("voice"));
-                c.insets = new Insets(5,0,0,0);
-                c.weightx = 1;
-                c.gridx = 1;
-                pane3.add(voiceSelect, c);
-                
-                c.gridy++;
-                
-                c.weighty = 1;
-                c.gridx = 0;
-                
-                pane3.add(Box.createVerticalGlue(), c);
-                //pane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(0.3f,0.5f,1f), 1), "Display Settings"));
-                
-                tabs.add(Messages.getMessage("PdfPreferences.Speech"), scroll3);
+            if(speech!=null) { //Checks that freetts is available in order to make combo box.
+                tabs.add(Messages.getMessage("PdfPreferences.Speech"), createSpeechTab());
             }
             
             panel.add(tabs, BorderLayout.CENTER);
@@ -1495,14 +1387,11 @@ final JPanel viewBGColor = new JPanel();
          */
         private JPanel createPrintingSettings(){
             
-            String propValue = properties.getValue("useHiResPrinting");
-            if(!propValue.isEmpty() && propValue.equals("true")) {
-                HiResPrint.setSelected(true);
-            } else {
-                HiResPrint.setSelected(false);
-            }
+            loadBooleanValue(HiResPrint, "useHiResPrinting");
             
-            propValue = properties.getValue("defaultPrinter");
+            loadStringValue(printerBlacklist, "printerBlacklist");
+            
+            String propValue = properties.getValue("defaultPrinter");
             if (propValue!=null && !propValue.isEmpty()) {
                 defaultPrinter.setSelectedItem(propValue);
             } else {
@@ -1512,11 +1401,6 @@ final JPanel viewBGColor = new JPanel();
                 } else {
                     defaultPrinter.setSelectedItem("System Default");
                 }
-            }
-            
-            propValue = properties.getValue("printerBlacklist");
-            if(propValue!=null && !propValue.isEmpty()) {
-                printerBlacklist.setText(propValue);
             }
             
             propValue = properties.getValue("defaultDPI");
@@ -1531,7 +1415,6 @@ final JPanel viewBGColor = new JPanel();
                     }
                 }
             }
-            
             
             final JPanel panel = makePanel(Messages.getMessage("PdfPreferences.PrintingTitle"));
             
@@ -1653,17 +1536,9 @@ final JPanel viewBGColor = new JPanel();
                 }
             });
             
-            final String hComposite = properties.getValue("highlightComposite");
-            if(!hComposite.isEmpty()) {
-                highlightComposite.setText(hComposite);
-            }
+            loadStringValue(highlightComposite, "highlightComposite");
             
-            final String invertHighlights = properties.getValue("invertHighlights");
-            if(!invertHighlights.isEmpty() && invertHighlights.equalsIgnoreCase("true")) {
-                invertHighlight.setSelected(true);
-            } else {
-                invertHighlight.setSelected(false);
-            }
+            loadBooleanValue(invertHighlight, "invertHighlights");
             
 //            final JButton hTextButton = new JButton(Messages.getMessage("PdfPreferences.ChangeHighlightTextColor"));
 //            hTextButton.addActionListener(new ActionListener(){
@@ -1780,19 +1655,8 @@ final JPanel viewBGColor = new JPanel();
                 }
             });
             
-            final String changeTextAndLineart = properties.getValue("changeTextAndLineart");
-            if(!changeTextAndLineart.isEmpty() && changeTextAndLineart.equalsIgnoreCase("true")) {
-                changeTextAndLineArt.setSelected(true);
-            } else {
-                changeTextAndLineArt.setSelected(false);
-            }
-            
-            final String replaceTextCol = properties.getValue("replaceDocumentTextColors");
-            if(!replaceTextCol.isEmpty() && replaceTextCol.equalsIgnoreCase("true")) {
-                replaceDocTextCol.setSelected(true);
-            } else {
-                replaceDocTextCol.setSelected(false);
-            }
+            loadBooleanValue(changeTextAndLineArt, "changeTextAndLineart");
+            loadBooleanValue(replaceDocTextCol, "replaceDocumentTextColors");
             
             /**
              * Dependent of invert value, set highlight options to enabled / disabled
@@ -1843,14 +1707,7 @@ final JPanel viewBGColor = new JPanel();
                 }
             });
             
-            
-            
-            final String replaceDisplayCol = properties.getValue("replacePdfDisplayBackground");
-            if(!replaceDisplayCol.isEmpty() && replaceDisplayCol.equalsIgnoreCase("true")) {
-                replaceDisplayBGCol.setSelected(true);
-            } else {
-                replaceDisplayBGCol.setSelected(false);
-            }
+            loadBooleanValue(replaceDisplayBGCol, "replacePdfDisplayBackground");
             
             /**
              * Dependent of invert value, set highlight options to enabled / disabled
@@ -2165,11 +2022,6 @@ final JPanel viewBGColor = new JPanel();
         
         private boolean removeOption(final String name){
             
-            //Remove export menu not available as Itext no longer used
-            if(name.equals("ExportMenu") || name.equals("PagetoolsMenu")){
-                return true;
-            }
-            
             //
 			//Remove help button as it is not in use in gpl version
 			if(name.equals("Helpbutton")){
@@ -2209,13 +2061,7 @@ final JPanel viewBGColor = new JPanel();
                             newLeaf.setEnabled(true);
                             //Set to reversedMessage for saving of preferences
                             reverseMessage.put(Messages.getMessage("PdfCustomGui."+name), name);
-                            final String propValue = properties.getValue(name);
-                            //Set if should be selected
-                            if(!propValue.isEmpty() && propValue.equals("true")){
-                                newLeaf.setSelected(true);
-                            }else{
-                                newLeaf.setSelected(false);
-                            }
+                            loadBooleanValue(newLeaf, name);
                             
                             //If has child nodes
                             if(nodes.item(i).hasChildNodes()){
@@ -2237,8 +2083,8 @@ final JPanel viewBGColor = new JPanel();
         
         
         /**
-         * Creates a pane showing which extensions are enabled
-         * @return pane
+         * Creates a contentPane showing which extensions are enabled
+         * @return contentPane
          */
         private JPanel createExtensionsPane() {
             final JPanel panel = makePanel(Messages.getMessage("PdfPreferences.ExtensionsTitle"));

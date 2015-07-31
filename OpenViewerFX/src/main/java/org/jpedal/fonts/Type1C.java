@@ -40,7 +40,6 @@ import org.jpedal.fonts.glyph.T1Glyphs;
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
 import org.jpedal.fonts.glyph.objects.T1GlyphNumber;
 import org.jpedal.fonts.objects.FontData;
-import org.jpedal.fonts.tt.conversion.FontWriter;
 
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.io.ObjectStore;
@@ -2633,12 +2632,26 @@ public class Type1C extends Type1{
             return b;
         }
         else if(key>=3072 && key<=3110){
-            b = FontWriter.setNextInt16(key);
+            b = setNextInt16(key);
             return b;
         }
         return b;
         
     }
+    
+    /**
+     * turn int back into byte[2]
+     **/
+    static final byte[] setNextInt16(final int value){
+
+        final byte[] returnValue=new byte[2];
+
+        for(int i=0;i<2;i++){
+            returnValue[i]= (byte) ((value>>(8*(1-i)))& 255);
+        }
+        return returnValue;
+    }
+
     
     public Object getKeyValue(final int key){
         

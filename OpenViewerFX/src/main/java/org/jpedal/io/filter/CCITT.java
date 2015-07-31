@@ -83,8 +83,11 @@ public class CCITT extends BaseFilter implements PdfFilter {
 
         final byte[] data;
 
-        final int K= decodeParms.getInt(PdfDictionary.K);
-
+        int K= 0;
+        if(decodeParms!=null){
+            K = decodeParms.getInt(PdfDictionary.K);
+        }
+        
         //new CCITT decoder - encodes runs of black or white pixels
         //always assumes white to start
         org.jpedal.io.filter.ccitt.CCITTDecoder ccitt=null;

@@ -254,7 +254,9 @@ public class PdfFilteredReader {
                     	if(LogWriter.isOutput()) {
                             LogWriter.writeLog("Exception " + ee + " in " + getFilterName(filterType) + " decompression");
                         }
-
+                        
+                        ee.printStackTrace();
+                        
                         if(resetDataToNull) {
                             data = null;
                         }

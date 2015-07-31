@@ -198,6 +198,15 @@ public class Jpeg2000Decoder {
                                 if (debug) {
                                     System.err.println("has CDef box");
                                 }
+                                int nDef = reader.readShort();
+                                for (int i = 0; i < nDef;i++) {
+                                    int key = reader.readShort();
+                                    int type = reader.readShort();
+                                    int val = reader.readShort();
+                                    if(type == 0){
+                                        info.cDef.put(key, val);
+                                    }
+                                }
                                 reader.setPosition((int) (start + tLen));
                                 break;
                             case Boxes.RES:
@@ -316,7 +325,7 @@ public class Jpeg2000Decoder {
                     info.siz = siz;
                     if (debug) {
                         System.out.println("Width " + info.imageWidth + " Height " + info.imageHeight);
-                        System.out.println("SIZ info : " + info.siz.toString());
+                        System.out.println("SIZ info : " + info.siz);
                     }
 
                     break;
@@ -343,7 +352,7 @@ public class Jpeg2000Decoder {
                     }
                     info.cod = cod;
                     if (debug) {
-                        System.out.println("info.cod : \n" + info.cod.toString());
+                        System.out.println("info.cod : \n" + info.cod);
                     }
                     break;
                 case Markers.COC:
@@ -375,7 +384,7 @@ public class Jpeg2000Decoder {
                             break;
                         case 1:
                             qcd.hasScalar = false;
-                            final byte[] temp = new byte[]{reader.readByte(), reader.readByte()};
+                            final byte[] temp = {reader.readByte(), reader.readByte()};
                             br = new JPXBitReader(temp);
                             final int eB = br.readBits(5);
                             final int muB = br.readBits(11);
@@ -388,7 +397,7 @@ public class Jpeg2000Decoder {
                             qcd.exponentB = new int[NB];
                             qcd.mantissaB = new int[NB];
                             for (int i = 0; i < NB; i++) {
-                                final byte[] tt = new byte[]{reader.readByte(), reader.readByte()};
+                                final byte[] tt = {reader.readByte(), reader.readByte()};
                                 br = new JPXBitReader(tt);
                                 qcd.exponentB[i] = br.readBits(5);
                                 qcd.mantissaB[i] = br.readBits(11);
@@ -398,7 +407,7 @@ public class Jpeg2000Decoder {
 
                     info.qcd = qcd;
                     if (debug) {
-                        System.out.println("info.qcd : \n" + info.qcd.toString());
+                        System.out.println("info.qcd : \n" + info.qcd);
                     }
                     break;
                 case Markers.QCC:
@@ -505,11 +514,11 @@ public class Jpeg2000Decoder {
                             }
                         }
                         if (debug) {
-                            System.err.println("Contains Tile COD " + cod.toString());
+                            System.err.println("Contains Tile COD " + cod);
                         }
                         tile.cod = cod;
                         if (debug) {
-                            System.out.println("tile.cod : \n" + cod.toString());
+                            System.out.println("tile.cod : \n" + cod);
                         }
                         break;
                     case Markers.QCD:
@@ -536,7 +545,7 @@ public class Jpeg2000Decoder {
                                 break;
                             case 1:
                                 qcd.hasScalar = false;
-                                final byte[] temp = new byte[]{reader.readByte(), reader.readByte()};
+                                final byte[] temp = {reader.readByte(), reader.readByte()};
                                 br = new JPXBitReader(temp);
                                 final int eB = br.readBits(5);
                                 final int muB = br.readBits(11);
@@ -549,7 +558,7 @@ public class Jpeg2000Decoder {
                                 qcd.exponentB = new int[NB];
                                 qcd.mantissaB = new int[NB];
                                 for (int i = 0; i < NB; i++) {
-                                    byte[] tt = new byte[]{reader.readByte(), reader.readByte()};
+                                    byte[] tt = {reader.readByte(), reader.readByte()};
                                     br = new JPXBitReader(tt);
                                     qcd.exponentB[i] = br.readBits(5);
                                     qcd.mantissaB[i] = br.readBits(11);
@@ -557,7 +566,7 @@ public class Jpeg2000Decoder {
                                 break;
                         }
                         if (debug) {
-                            System.err.println("Contains Tile QCD " + qcd.toString());
+                            System.err.println("Contains Tile QCD " + qcd);
                         }
                         tile.qcd = qcd;
                         break;
@@ -625,6 +634,9 @@ public class Jpeg2000Decoder {
                 break;
             case Markers.CPRL:
                 System.err.print("This progression order not supported");
+                break;
+            default:
+                System.err.println("Unknown progression order found");
                 break;
         }
 
@@ -1005,10 +1017,10 @@ public class Jpeg2000Decoder {
                     }
                 }
             }
-
+                
             resultImages.add(result);
         }
-
+        
         info.tilesMap.clear();
 
         byte[] mainData = null;
@@ -1105,19 +1117,18 @@ public class Jpeg2000Decoder {
             double y0, y1, y2;
             double r, g, b;
             if (tile.cod.multiCompTransform != 0) {
-                final float[] y0items = transformedTiles[0].floatItems;
-                final float[] y1items = transformedTiles[1].floatItems;
-                final float[] y2items = transformedTiles[2].floatItems;
+                final float[] y0items = getMappedComponent(transformedTiles, 0, info);
+                final float[] y1items = getMappedComponent(transformedTiles, 1, info);
+                final float[] y2items = getMappedComponent(transformedTiles, 2, info);
 
                 shift = (info.siz.precisionInfo[0][0] + 1) - 8;
                 offset = (128 << shift) + 0.5f;
                 max = 255 * (1 << shift);
 
                 final int alpha01 = componentsCount - 3;
-
-                if (shift > 0) {
-                    if (tile.cod.transformation == 0) {
-                        for (int j = 0; j < y0items.length; j++, pos += alpha01) {
+                
+                if (tile.cod.transformation == 0) {
+                    for (int j = 0; j < y0items.length; j++, pos += alpha01) {
                             y0 = y0items[j] + offset;
                             y1 = y1items[j];
                             y2 = y2items[j];
@@ -1127,63 +1138,58 @@ public class Jpeg2000Decoder {
                             out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
                             out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
                             out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
-                        }
-                    } else {
-                        final int yLen = y0items.length;
-                        for (int j = 0; j < yLen; j++, pos += alpha01) {
-                            y0 = y0items[j] + offset;
-                            y1 = y1items[j];
-                            y2 = y2items[j];
-                            g = (y0 - (((int) (y2 + y1)) >> 2));
-                            r = g + y2;
-                            b = g + y1;
-                            out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
-                            out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
-                            out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
-                        }
                     }
                 } else {
-                    if (tile.cod.transformation == 0) {
-                        final int yLen = y0items.length;
-                        for (int j = 0; j < yLen; j++, pos += alpha01) {
-                            y0 = y0items[j] + offset;
-                            y1 = y1items[j];
-                            y2 = y2items[j];
-                            r = (y0 + 1.402 * y2);
-                            g = (y0 - 0.34413 * y1 - 0.71414 * y2);
-                            b = (y0 + 1.772 * y1);
-                            out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : (int) r);
-                            out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : (int) g);
-                            out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : (int) b);
-                        }
-                    } else {
-                        final int yLen = y0items.length;
-                        for (int j = 0; j < yLen; j++, pos += alpha01) {
+                    final int yLen = y0items.length;
+                    for (int j = 0; j < yLen; j++, pos += alpha01) {
                             y0 = y0items[j] + offset;
                             y1 = y1items[j];
                             y2 = y2items[j];
                             g = (y0 - (((int) (y2 + y1)) >> 2));
                             r = g + y2;
                             b = g + y1;
-                            out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : (int) r);
-                            out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : (int) g);
-                            out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : (int) b);
-                        }
+                            out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
+                            out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
+                            out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
                     }
                 }
+                
 
             } else { // no multi-component transform
-                for (int c = 0; c < componentsCount; c++) {
-                    final float[] items = transformedTiles[c].floatItems;
-                    shift = (info.siz.precisionInfo[c][0] + 1) - 8;
+                
+                if (info.enumerateCS == Info.CS_SYCC && componentsCount == 3) {
+                    final float[] y0items = getMappedComponent(transformedTiles, 0, info);
+                    final float[] y1items = getMappedComponent(transformedTiles, 1, info);
+                    final float[] y2items = getMappedComponent(transformedTiles, 2, info);
+                    shift = (info.siz.precisionInfo[0][0] + 1) - 8;
                     offset = (128 << shift) + 0.5f;
-                    max = (int) (127.5f * (1 << shift));
-                    min = -max;
-                    pos = c;
-                    for (int j = 0; j < items.length; j++) {
-                        final float val = items[j];
-                        out[pos] = (byte) (val <= min ? 0 : val >= max ? 255 : ((int) (val + offset)) >> shift);
-                        pos += componentsCount;
+                    max = 255 * (1 << shift);
+                    final int yLen = y0items.length;
+                    for (int j = 0; j < yLen; j++) {
+                        y0 = y0items[j] + offset;
+                        y1 = y1items[j];
+                        y2 = y2items[j];
+                        r = (y0 + 1.402 * y2);
+                        g = (y0 - 0.34413 * y1 - 0.71414 * y2);
+                        b = (y0 + 1.772 * y1);
+                        out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
+                        out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
+                        out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
+                    }
+
+                }else{
+                    for (int c = 0; c < componentsCount; c++) {
+                        final float[] items = transformedTiles[c].floatItems;
+                        shift = (info.siz.precisionInfo[c][0] + 1) - 8;
+                        offset = (128 << shift) + 0.5f;
+                        max = (int) (127.5f * (1 << shift));
+                        min = -max;
+                        pos = c;
+                        for (int j = 0; j < items.length; j++) {
+                            final float val = items[j];
+                            out[pos] = (byte) (val <= min ? 0 : val >= max ? 255 : ((int) (val + offset)) >> shift);
+                            pos += componentsCount;
+                        }
                     }
                 }
             }
@@ -1218,6 +1224,18 @@ public class Jpeg2000Decoder {
                 sc.byteItems = null;
             }
             return image;
+        }
+    }
+    
+    private static float[] getMappedComponent(SubbandCoefficient[] arr, int keyVal, Info info){
+        if(info.cDef.isEmpty()){
+            return arr[keyVal].floatItems;
+        }else{
+            if(info.cDef.containsKey(keyVal)){
+                return arr[info.cDef.get(keyVal)-1].floatItems;
+            }else{
+                return arr[keyVal].floatItems;
+            }
         }
     }
 
@@ -1269,8 +1287,52 @@ public class Jpeg2000Decoder {
         SubbandCoefficient result = trns.getInversed(subcos, comp.x0, comp.y0);
         result.x = comp.x0;
         result.y = comp.y0;
+        
+        int sw = result.width;
+        int sh = result.height;
+        int dw = result.width*siz.precisionInfo[c][1];
+        int dh = result.height*siz.precisionInfo[c][1];
+        if(sw!=dw || sh!=dh){
+            result.floatItems = applyBilinearScaling(result.floatItems, sw, sh, dw, dh);
+        }
         return result;
+    }
+    
+    private static float[] applyBilinearScaling(float[] data, int sw, int sh, int dw, int dh) {
+        
+        if(sh == 1) {
+            float[] temp = new float[2 * sw];
+            System.arraycopy(data, 0, temp, 0, sw);
+            System.arraycopy(data, 0, temp, sw, sw);
+            sh = 2;
+            data = temp;
+        }
 
+        float[] temp = new float[dw*dh] ;
+        float A, B, C, D;
+        int x, y, index;
+        float xRatio = ((float) (sw - 1)) / dw;
+        float yRatio = ((float) (sh - 1)) / dh;
+        float xDiff, yDiff;
+        int offset = 0;
+        for (int i = 0; i < dh; i++) {
+            for (int j = 0; j < dw; j++) {
+                x = (int) (xRatio * j);
+                y = (int) (yRatio * i);
+                xDiff = (xRatio * j) - x;
+                yDiff = (yRatio * i) - y;
+                index = y * sw + x;
+
+                A = data[index];
+                B = data[index + 1];
+                C = data[index + sw];
+                D = data[index + sw + 1];
+
+                temp[offset++] = (A * (1 - xDiff) * (1 - yDiff) + B * (xDiff) * (1 - yDiff)
+                        + C * (yDiff) * (1 - xDiff) + D * (xDiff * yDiff));
+            }
+        }
+        return temp;
     }
 
     private static void sendForPassing(float[] coefficients, int resWidth, TileBand subband, float delta, int mb, boolean reversible) {
@@ -1426,7 +1488,6 @@ public class Jpeg2000Decoder {
                 model = new ComponentColorModel(cSpace, true, false, 1, DataBuffer.TYPE_BYTE);
                 ras = model.createCompatibleWritableRaster(width, height);
                 return new BufferedImage(model, ras, false, null);
-
         }
         return null;
     }

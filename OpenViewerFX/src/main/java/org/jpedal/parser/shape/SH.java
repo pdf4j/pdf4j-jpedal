@@ -118,19 +118,18 @@ public class SH {
             if(gs.CTM[0][0]==0 && gs.CTM[0][1]>0 && gs.CTM[1][0]>0 && gs.CTM[1][1]==0 && current.getMode().equals(DynamicVectorRenderer.Mode.SMASK)){
                shading.setRenderingType(DynamicVectorRenderer.CREATE_SMASK);
             }
-            
-            if(shading!=null){
-                /**
-                 * shade the current clip
-                 */
-                gs.setFillType(GraphicsState.FILL);
-                gs.setNonstrokeColor(shading);
 
-                //track colorspace use
-                cache.put(PdfObjectCache.ColorspacesUsed, newColorSpace.getID(),"x");
+            /**
+             * shade the current clip
+             */
+            gs.setFillType(GraphicsState.FILL);
+            gs.setNonstrokeColor(shading);
 
-                current.drawShape(shadeShape,gs, Cmd.F) ;
-            }
+            //track colorspace use
+            cache.put(PdfObjectCache.ColorspacesUsed, newColorSpace.getID(), "x");
+
+            current.drawShape(shadeShape, gs, Cmd.F);
+
         }catch(final Exception e){
             //tell user and log
             if(LogWriter.isOutput()) {

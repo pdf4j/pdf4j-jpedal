@@ -40,7 +40,7 @@ import javax.swing.JMenuItem;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.commands.SaveForm;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.*;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;

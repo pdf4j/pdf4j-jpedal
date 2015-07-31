@@ -34,6 +34,7 @@ package org.jpedal.parser.image;
 
 import com.idrsolutions.pdf.color.shading.BitReader;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.*;
 import org.jpedal.PdfDecoderInt;
@@ -60,6 +61,9 @@ import org.jpedal.render.RenderUtils;
 import org.jpedal.utils.LogWriter;
 
 public class ImageDecoder extends BaseDecoder{
+    
+    //Allow print to use transparency in printing instead of removing it
+    public static boolean allowPrintTransparency = false;
     
     final PdfImageData pdfImages;
     
@@ -218,7 +222,7 @@ public class ImageDecoder extends BaseDecoder{
         //add filename to make it unique
         image_name = parserOptions.getFileName()+ '-' + image_name;
         
-        //  System.out.println("XObject="+XObject+" "+XObject.getObjectRefAsString());
+//          System.out.println("XObject="+XObject+" "+XObject.getObjectRefAsString());
         PdfObject newSMask=XObject.getDictionary(PdfDictionary.SMask);
         final PdfObject newMask=XObject.getDictionary(PdfDictionary.Mask);
         ImageData imageData=new ImageData(XObject, objectData,ImageCommands.XOBJECT);
@@ -267,11 +271,13 @@ public class ImageDecoder extends BaseDecoder{
                     ///WE NEED TO CONVERT JPG to raw DATA in smask as well
                     ImageData smaskImageData=new ImageData(newSMask, null,ImageCommands.XOBJECT);
                     smaskImageData.getFilter(newSMask);
+                    GenericColorSpace maskColorSpace = setupXObjectColorspace(newSMask, smaskImageData);
                     byte[] maskData =currentPdfFile.readStream(newSMask,true,true,false, false,false, newSMask.getCacheName(currentPdfFile.getObjectReader()));
                     
-                    if(imageData.isJPX() && smaskImageData.isJBIG()){
-                        return SMaskDecoder.applyJPX_JBIG_Smask(imageData, smaskImageData, maskData, newSMask);
-                    }else{
+                    
+                    if(1==1){
+                        return SMaskDecoder.applyJPX_JBIG_Smask(imageData, smaskImageData, maskData,XObject, newSMask, decodeColorData, maskColorSpace);
+                    }else{ // old method
                         maskData = MaskDataDecoder.getSMaskData(maskData,smaskImageData, newSMask,setupXObjectColorspace(newSMask, smaskImageData));
                         objectData=SMaskDecoder.applySMask(maskData,imageData,decodeColorData, newSMask,XObject);
                     }
@@ -279,10 +285,11 @@ public class ImageDecoder extends BaseDecoder{
                 }else{ //mask
                     
                    byte[] index=decodeColorData.getIndexedMap();
+                   int[] maskArray=newMask.getIntArray(PdfDictionary.Mask);
        
                     if(index!=null){
                         index=decodeColorData.convertIndexToRGB(index);
-                        int[] maskArray=newMask.getIntArray(PdfDictionary.Mask);
+                        
                         if(maskArray!=null){
                             return geIndexedMaskImage(index, imageData, maskArray);
                         }
@@ -296,6 +303,9 @@ public class ImageDecoder extends BaseDecoder{
                     }
                     ///WE NEED TO CONVERT JPG to raw DATA in mask as well
                     ImageData maskImageData=new ImageData(newMask, objectData,ImageCommands.XOBJECT);
+                    if(maskArray!=null){
+                        return MaskDataDecoder.applyMaskArray(imageData, maskArray);
+                    }                        
                     
                     byte[] maskData= currentPdfFile.readStream(newMask, true, true, false, false, false, newMask.getCacheName(currentPdfFile.getObjectReader()));
                     
@@ -495,7 +505,9 @@ public class ImageDecoder extends BaseDecoder{
         
         //Set flag to allow tunring on/off transparency optimisations in printing
         String value = System.getProperty("org.jpedal.printTransparency");
-        this.allowPrintTransparency = isPrinting && value != null && value.equalsIgnoreCase("true");
+        if(value!=null){
+            ImageDecoder.allowPrintTransparency = isPrinting && value.equalsIgnoreCase("true");
+        }
     }
     
     /**
@@ -1014,7 +1026,7 @@ public class ImageDecoder extends BaseDecoder{
         if (image != null) {
             
             image = addOverPrint(decodeColorData,  data, image, imageData);
-            
+
             if(image==null) {
                 return null;
             }
@@ -1067,10 +1079,34 @@ public class ImageDecoder extends BaseDecoder{
             image=newImage;
         }
         
+        if (imageMask && gs.nonstrokeColorSpace.getColor().isTexture()) {  //case 19095 vistair
+            
+            float mm[][] = gs.CTM;
+            AffineTransform affine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
+                        
+            BufferedImage temp = ((PatternColorSpace)gs.nonstrokeColorSpace).getRawImage(w,h,affine);
+            BufferedImage scrap = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            
+            if(temp!=null){
+                TexturePaint tp = new TexturePaint(temp, new Rectangle(0,0,temp.getWidth(),temp.getHeight()));
+                Graphics2D g2 = scrap.createGraphics();
+                g2.setPaint(tp);
+                Rectangle rect = new Rectangle(0,0,w,h);
+                g2.fill(rect);
+            }
+           
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    if (image.getRGB(x, y) == -16777216) { //255 0 0 0
+                        int pRGB = scrap.getRGB(x, y);
+                        image.setRGB(x, y, pRGB);
+                    }
+                }
+            }
+        }
+        
         return image;
     }
-    
-    private boolean allowPrintTransparency = false;
     
     private BufferedImage makeMaskImage(int h, int w, BufferedImage image, int d, byte[] data, boolean isDownsampled, final ImageData imageData, final boolean imageMask, GenericColorSpace decodeColorData, final byte[] maskCol, final String name) {
         /** create an image from the raw data*/
@@ -1089,7 +1125,7 @@ public class ImageDecoder extends BaseDecoder{
             
             image=null;
         }else {
-            image = MaskDecoder.createMaskImage(isDownsampled, isPrinting, gs, isType3Font, current,data, image, w, h, imageData, imageMask, d, decodeColorData, maskCol, name);
+            image = MaskDecoder.createMaskImage(isDownsampled, (isPrinting && !allowPrintTransparency), gs, isType3Font, current,data, image, w, h, imageData, imageMask, d, decodeColorData, maskCol, name);
         }
         return image;
     }

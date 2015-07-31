@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -45,12 +46,11 @@ import javax.imageio.ImageIO;
 import org.jpedal.*;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
-import static org.jpedal.examples.viewer.Commands.hires;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.commands.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.DownloadProgress;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
@@ -62,6 +62,7 @@ import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.OutlineObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 
@@ -79,6 +80,10 @@ public class JavaFXOpenFile {
     
     
     public static void executeOpenFile(final Object[] args, final GUIFactory currentGUI, final GUISearchWindow searchFrame, final PropertiesFile properties, final GUIThumbnailPanel thumbnails, final PdfDecoderInt decode_pdf, final Values commonValues) {
+        
+        currentGUI.removePageListener();
+        
+        currentGUI.setDisplayView(Display.SINGLE_PAGE, decode_pdf.getPageAlignment());
         
         //reset value to null
         inputStream = null;
@@ -122,7 +127,7 @@ public class JavaFXOpenFile {
 
                         // get any user set dpi
                         final String hiresFlag = System.getProperty("org.jpedal.hires");
-                        if (Commands.hires || hiresFlag != null) {
+                        if (DecoderOptions.hires || hiresFlag != null) {
                             commonValues.setUseHiresImage(true);
                         }
                         // get any user set dpi
@@ -356,6 +361,103 @@ public class JavaFXOpenFile {
         }
     }
     
+    public static void executeOpenURL(final Object[] args, final Values commonValues, final GUISearchWindow searchFrame,
+            final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final PropertiesFile properties,
+            final GUIThumbnailPanel thumbnails) {
+
+        //reset value
+        inputStream = null;
+
+        if (args == null) {
+            /**
+             * warn user on forms
+             */
+            SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);
+
+//            currentGUI.resetNavBar();
+            
+            final String newFile = selectURL(commonValues, searchFrame, currentGUI, decode_pdf,properties, thumbnails);
+            if (newFile != null) {
+                commonValues.setSelectedFile(newFile);
+                commonValues.setFileIsURL(true);
+            }
+        } else {
+
+            currentGUI.resetNavBar();
+            String newFile = (String) args[0];
+            if (newFile != null) {
+                commonValues.setSelectedFile(newFile);
+                commonValues.setFileIsURL(true);
+
+                boolean failed = false;
+                try {
+                    final URL testExists = new URL(newFile);
+                    final URLConnection conn = testExists.openConnection();
+
+                    if (conn.getContent() == null) {
+                        failed = true;
+                    }
+                } catch (final Exception e) {
+                    failed = true;
+                    //
+                }
+
+                if (failed) {
+                    newFile = null;
+                }
+
+                /**
+                 * decode pdf
+                 */
+                if (newFile != null) {
+
+                    commonValues.setFileSize(0);
+                    currentGUI.setViewerTitle(null);
+
+                    /**
+                     * open the file
+                     */
+                    if (!Values.isProcessing()) {
+
+                        /**
+                         * if running terminate first
+                         */
+                        thumbnails.terminateDrawing();
+
+                        decode_pdf.flushObjectValues(true);
+
+                        // reset the viewableArea before opening a new file
+                        decode_pdf.resetViewableArea();
+
+                        currentGUI.stopThumbnails();
+
+                        //
+
+                        try {
+                            //Set to true to show our default download window
+                            OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
+
+                            while (Values.isProcessing()) {
+                                Thread.sleep(1000);
+
+                            }
+                        } catch (final InterruptedException e) {
+                            // 
+                            
+                            if(LogWriter.isOutput()) {
+                                LogWriter.writeLog("Exception attempting to open file: " + e);
+                            }
+                        }
+                    }
+
+                } else { // no file selected so redisplay old
+                    //
+                    // currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
+                }
+            }
+        }
+    }
+    
     /**
      * checks file can be opened (permission)
      *
@@ -370,7 +472,7 @@ public class JavaFXOpenFile {
 
         //get any user set dpi
         final String hiresFlag = System.getProperty("org.jpedal.hires");
-        if (Commands.hires || hiresFlag != null) {
+        if (DecoderOptions.hires || hiresFlag != null) {
             commonValues.setUseHiresImage(true);
         }
 
@@ -403,7 +505,7 @@ public class JavaFXOpenFile {
 
             if (Platform.isFxApplicationThread()) {
 
-                decode_pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
             } else {
                 //
@@ -755,7 +857,7 @@ public class JavaFXOpenFile {
                     if (test) {
                         final File fileSize = new File(commonValues.getSelectedFile());
                         final byte[] bytes = new byte[(int) fileSize.length()];
-                        FileInputStream fis = null;
+                        FileInputStream fis;
                         try {
                             fis = new FileInputStream(commonValues.getSelectedFile());
                             fis.read(bytes);
@@ -1030,6 +1132,117 @@ public class JavaFXOpenFile {
         
         return isLinear;
         
+    }
+    
+    private static String selectURL( final Values commonValues, final GUISearchWindow searchFrame,
+            final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final PropertiesFile properties,
+            final GUIThumbnailPanel thumbnails) {
+        
+        String selectedFile = currentGUI.showInputDialog(Messages.getMessage("PdfViewerMessage.RequestURL"));
+        
+        //lose any spaces
+        if(selectedFile!=null) {
+            selectedFile = selectedFile.trim();
+        }
+        
+        if ((selectedFile != null) && !selectedFile.trim().startsWith("http://") && !selectedFile.trim().startsWith("https://") && !selectedFile.trim().startsWith("file:/")) { //simon
+            currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.URLMustContain"));
+            selectedFile = null;
+        }
+        
+        if(selectedFile!=null){
+            final boolean isValid = ((selectedFile.endsWith(".pdf"))
+                    || (selectedFile.endsWith(".fdf")) || (selectedFile.endsWith(".tif"))
+                    || (selectedFile.endsWith(".tiff")) || (selectedFile.endsWith(".png"))
+                    || (selectedFile.endsWith(".jpg")) || (selectedFile.endsWith(".jpeg")));
+            
+            
+            if (!isValid) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.NotValidPdfWarning"));
+                selectedFile=null;
+            }
+        }
+        
+        if(selectedFile!=null){
+
+            commonValues.setSelectedFile(selectedFile);
+
+            boolean failed=false;
+            try {
+                final URL testExists=new URL(selectedFile);
+                final URLConnection conn=testExists.openConnection();
+
+                if(conn.getContent()==null) {
+                    failed = true;
+                }
+            } catch (final Exception e) {
+                failed=true;
+
+                if(LogWriter.isOutput()) {
+                    LogWriter.writeLog("Exception in handling URL "+e);
+                }
+            }
+
+            if(failed){
+                selectedFile=null;
+                currentGUI.showMessageDialog("URL "+selectedFile+ ' ' +Messages.getMessage("PdfViewerError.DoesNotExist"));
+            }
+
+        }
+        
+        //ensure immediate redraw of blank screen
+        //decode_pdf.invalidate();
+        //decode_pdf.repaint();
+        
+        /**
+         * decode
+         */
+        if (selectedFile != null ) {
+            try {
+                
+                commonValues.setFileSize(0);
+                
+                /** save path so we reopen her for later selections */
+                //commonValues.setInputDir(new URL(commonValues.getSelectedFile()).getPath());
+                
+                currentGUI.setViewerTitle(null);
+                
+            } catch (final Exception e) {
+                System.err.println(Messages.getMessage("PdfViewerError.Exception")+ ' ' + e + ' ' +Messages.getMessage("PdfViewerError.GettingPaths"));
+            }
+            
+            /**
+             * open the file
+             */
+            if ((selectedFile != null) && (!Values.isProcessing())) {
+                
+                /**
+                 * trash previous display now we are sure it is not needed
+                 */
+                //decode_pdf.repaint();
+                
+                /** if running terminate first */
+                thumbnails.terminateDrawing();
+                
+                decode_pdf.flushObjectValues(true);
+                
+                //reset the viewableArea before opening a new file
+//                decode_pdf.resetViewableArea();
+                
+//                currentGUI.stopThumbnails();
+
+                //
+
+                OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
+
+            }
+            
+        } else { //no file selected so redisplay old
+            //
+            currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
+        }
+        
+        return selectedFile;
     }
     
     //////////////////////////////TEMP JAVAFX////////////////////////////////////////

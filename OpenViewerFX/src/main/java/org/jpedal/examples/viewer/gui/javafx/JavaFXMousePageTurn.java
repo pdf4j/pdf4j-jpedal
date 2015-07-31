@@ -44,6 +44,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.display.Display;
+import org.jpedal.display.DisplayOffsets;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.commands.javafx.JavaFXPageNavigator;
@@ -82,6 +83,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
     private Timer middleDragTimer;
 
     long timeOfLastPageChange;
+    
+    DisplayOffsets offsets;
 
     public JavaFXMousePageTurn(final PdfDecoderFX decode_pdf, final GUIFactory currentGUI,
             final Values commonValues, final Commands currentCommands) {
@@ -91,6 +94,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
         this.commonValues = commonValues;
         this.currentCommands = currentCommands;
 
+        offsets=(DisplayOffsets) decode_pdf.getExternalHandler(Options.DisplayOffsets);
     }
 
     /**
@@ -198,8 +202,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
         if (decode_pdf.getPages().getBoolean(Display.BoolValue.TURNOVER_ON) && decode_pdf.getDisplayView() == Display.FACING) {
             drawingTurnover = false;
 
-            final boolean dragLeft = currentGUI.getDragLeft();
-            final boolean dragTop = currentGUI.getDragTop();
+            final boolean dragLeft = offsets.getDragLeft();
+            final boolean dragTop = offsets.getDragTop();
 
             if (lastPress + 200 > System.currentTimeMillis()) {
                 if (dragLeft) {
@@ -252,14 +256,14 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                 decode_pdf.setCursor(Cursor.CLOSED_HAND);
 
                 //update coords
-                if (currentGUI.getDragLeft()) {
-                    if (currentGUI.getDragTop()) {
+                if (offsets.getDragLeft()) {
+                    if (offsets.getDragTop()) {
                         decode_pdf.setUserOffsets((int) e.getX(), (int) e.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_LEFT);
                     } else {
                         decode_pdf.setUserOffsets((int) e.getX(), (int) e.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_LEFT);
                     }
                 } else {
-                    if (currentGUI.getDragTop()) {
+                    if (offsets.getDragTop()) {
                         decode_pdf.setUserOffsets((int) e.getX(), (int) e.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_RIGHT);
                     } else {
                         decode_pdf.setUserOffsets((int) e.getX(), (int) e.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_RIGHT);
@@ -321,7 +325,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                     }
 
                 } else {
-                    if (currentGUI.getDragTop()) {
+                    if (offsets.getDragTop()) {
                         corner.setY(corner.getY() - pageH);
                     }
                     testFall(corner, cursor, false);
@@ -354,7 +358,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                     }
 
                 } else {
-                    if (currentGUI.getDragTop()) {
+                    if (offsets.getDragTop()) {
                         corner.setY(corner.getY() - pageH);
                     }
                     testFall(corner, cursor, true);
@@ -363,7 +367,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
 
         }
 
-        //<start-adobe>
+        
         //Update cursor position if over page in single mode
 //
 //            int[] flag = new int[2];
@@ -416,7 +420,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
 //                flag[1] = 0;
 //            }
 //            currentGUI.setMultibox(flag);
-        //<end-adobe>
+       
         if (decode_pdf.getExternalHandler(Options.UniqueAnnotationHandler) != null) {
             final int[] pos = updateXY((int)e.getX(), (int)e.getY(), decode_pdf, commonValues);
             checkLinks(false, decode_pdf.getIO(), pos[0], pos[1]);
@@ -595,7 +599,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
         final float pageW = width;
 
         if (!testLeft) {
-            if (!currentGUI.getDragLeft()) {
+            if (!offsets.getDragLeft()) {
                 //reset cursor
                 decode_pdf.setCursor(Cursor.DEFAULT);
 
@@ -622,10 +626,10 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                         if (!fallBack && cursor.getX() <= corner.getX()) {
                             cursor.setX(corner.getX() + 1);
                         }
-                        if (!currentGUI.getDragTop() && cursor.getY() >= corner.getY()) {
+                        if (!offsets.getDragTop() && cursor.getY() >= corner.getY()) {
                             cursor.setY(corner.getY() - 1);
                         }
-                        if (currentGUI.getDragTop() && cursor.getY() <= corner.getY()) {
+                        if (offsets.getDragTop() && cursor.getY() <= corner.getY()) {
                             cursor.setY(corner.getY() + 1);
                         }
 
@@ -636,8 +640,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                         //Loop through animation
                         while ((fallBack && cursor.getX() <= corner.getX())
                                 || (!fallBack && cursor.getX() >= corner.getX())
-                                || (!currentGUI.getDragTop() && cursor.getY() <= corner.getY())
-                                || (currentGUI.getDragTop() && cursor.getY() >= corner.getY())) {
+                                || (!offsets.getDragTop() && cursor.getY() <= corner.getY())
+                                || (offsets.getDragTop() && cursor.getY() >= corner.getY())) {
 
                             //amount to move this time
                             double xMove = velocity * distX * 0.002;
@@ -653,7 +657,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
 
                             cursor.setX(cursor.getX() + xMove);
                             cursor.setY(cursor.getY() + yMove);
-                            if (currentGUI.getDragTop()) {
+                            if (offsets.getDragTop()) {
                                 decode_pdf.setUserOffsets((int) cursor.getX(), (int) cursor.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_RIGHT);
                             } else {
                                 decode_pdf.setUserOffsets((int) cursor.getX(), (int) cursor.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_RIGHT);
@@ -700,7 +704,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                 previewTurnover = false;
             }
         } else {
-            if (previewTurnover && currentGUI.getDragLeft()) {
+            if (previewTurnover && offsets.getDragLeft()) {
                 //reset cursor
                 decode_pdf.setCursor(Cursor.DEFAULT);
 
@@ -727,10 +731,10 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                         if (fallBack && cursor.getX() <= corner.getX()) {
                             cursor.setX(corner.getX() + 1);
                         }
-                        if (!currentGUI.getDragTop() && cursor.getY() >= corner.getY()) {
+                        if (!offsets.getDragTop() && cursor.getY() >= corner.getY()) {
                             cursor.setY(corner.getY() - 1);
                         }
-                        if (currentGUI.getDragTop() && cursor.getY() <= corner.getY()) {
+                        if (offsets.getDragTop() && cursor.getY() <= corner.getY()) {
                             cursor.setY(corner.getY() + 1);
                         }
 
@@ -741,8 +745,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                         //Loop through animation
                         while ((!fallBack && cursor.getX() <= corner.getX())
                                 || (fallBack && cursor.getX() >= corner.getX())
-                                || (!currentGUI.getDragTop() && cursor.getY() <= corner.getY())
-                                || (currentGUI.getDragTop() && cursor.getY() >= corner.getY())) {
+                                || (!offsets.getDragTop() && cursor.getY() <= corner.getY())
+                                || (offsets.getDragTop() && cursor.getY() >= corner.getY())) {
 
                             //amount to move this time
                             double xMove = velocity * distX * 0.002;
@@ -758,7 +762,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
 
                             cursor.setX(cursor.getX() + xMove);
                             cursor.setY(cursor.getY() + yMove);
-                            if (currentGUI.getDragTop()) {
+                            if (offsets.getDragTop()) {
                                 decode_pdf.setUserOffsets((int) cursor.getX(), (int) cursor.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_TOP_LEFT);
                             } else {
                                 decode_pdf.setUserOffsets((int) cursor.getX(), (int) cursor.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_LEFT);

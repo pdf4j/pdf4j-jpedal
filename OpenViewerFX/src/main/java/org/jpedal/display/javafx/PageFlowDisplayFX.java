@@ -49,7 +49,7 @@ import org.jpedal.display.PageFlowFX;
 import org.jpedal.display.PageOffsets;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.JavaFxGUI;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.exception.PdfException;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.objects.acroforms.AcroRenderer;
@@ -69,7 +69,7 @@ public class PageFlowDisplayFX implements Display {
         
         fxGUI = (JavaFxGUI)currentGUI;
         
-        pageFlowFX = new PageFlowFX(pdf,true);
+        pageFlowFX = new PageFlowFX(pdf, true);
         
         //Update page number on navbar
         pageFlowFX.getPageNumber().addListener(new ChangeListener() {
@@ -117,14 +117,14 @@ public class PageFlowDisplayFX implements Display {
 
             if (Platform.isFxApplicationThread()) {
 
-                pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
             } else {
                 final Runnable doPaintComponent = new Runnable() {
 
                     @Override
                     public void run() {
-                        pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                        currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
                     }
                 };
                 Platform.runLater(doPaintComponent);

@@ -83,7 +83,7 @@ public class D4 {
         return new int[]{closest.argb, found};
     }
 
-    public static byte[] process(byte[] colorPalette, byte[] trns, byte[] bgrData, int h, int w) {
+    public static byte[] process(byte[] colorPalette, byte[] trns, int[][] image, int h, int w) {
 
         int p = 0;
         D4[] palette = new D4[256];
@@ -95,17 +95,6 @@ public class D4 {
             palette[i] = new D4(a, r, g, b);
         }
 
-        int[][] image = new int[h][w];
-        p = 0;
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                int a = bgrData[p++] & 0xff;
-                int b = bgrData[p++] & 0xff;
-                int g = bgrData[p++] & 0xff;
-                int r = bgrData[p++] & 0xff;
-                image[y][x] = (a << 24) | (r << 16) | (g << 8) | b;
-            }
-        }
 
         byte[] indexedPixels = new byte[h * w];
         p = 0;

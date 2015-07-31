@@ -59,7 +59,7 @@ import org.jpedal.examples.viewer.commands.javafx.*;
 
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.PrinterInt;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
@@ -223,6 +223,9 @@ public class JavaFXCommands extends Commands {
                     break;
                 case OPENFILE:
                     JavaFXOpenFile.executeOpenFile(args, currentGUI, searchFrame, properties, thumbnails, decode_pdf, commonValues);
+                    break;
+                case OPENURL:
+                    JavaFXOpenFile.executeOpenURL(args, commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
                     break;
                 case RSS:
                     JavaFXRSSyndication.execute(args);

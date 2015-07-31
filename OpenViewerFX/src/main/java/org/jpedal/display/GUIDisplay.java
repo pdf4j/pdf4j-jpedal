@@ -45,12 +45,6 @@ import org.jpedal.exception.PdfException;
 import org.jpedal.external.Options;
 import org.jpedal.external.RenderChangeListener;
 
-//<start-adobe>
-//<start-thin><start-server>
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
-//<end-server><end-thin>
-//<end-adobe>
-
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.parser.DecoderOptions;
@@ -117,11 +111,8 @@ public class GUIDisplay implements Display{
     /** Holds the x,y,w,h of the current highlighted image, null if none */
     private int[] highlightedImage;
     
-    //<start-adobe><start-thin><start-server>
     protected GUIThumbnailPanel thumbnails;
-    //<end-server><end-thin> <end-adobe>
     
-
     /** Keep a record of cumulative offsets for SINGLE_PAGE mode*/
     public int[] pageOffsetH, pageOffsetW;
 
@@ -221,8 +212,6 @@ public class GUIDisplay implements Display{
     @Override
     public void setObjectValue(final int type, final Object newHandler) {
 
-        //<start-thin><start-adobe><start-server>
-
         //set value
         switch(type){
             case Options.RenderChangeListener:
@@ -232,9 +221,6 @@ public class GUIDisplay implements Display{
             default:
                 throw new RuntimeException("setObjectValue does not take value "+type);
         }
-        
-        //<end-server><end-adobe><end-thin>
-
     }
     
     @Override
@@ -464,14 +450,12 @@ public class GUIDisplay implements Display{
 
     }
     
-    //<start-adobe><start-thin><start-server>
     @Override
     public void setThumbnailPanel(final GUIThumbnailPanel thumbnails) {
         this.thumbnails=thumbnails;
 
     }
-    //<end-server><end-thin><end-adobe>
-
+    
     @Override
     public void stopGeneratingPage(){
 
@@ -484,7 +468,7 @@ public class GUIDisplay implements Display{
     @Override
     public int getYCordForPage(final int page){
         int[] yReached=multiDisplayOptions.getyReached();
-        int[] pageH=multiDisplayOptions.getPageH();
+        //int[] pageH=multiDisplayOptions.getPageH();
         
         if (yReached != null) {
         	//Prevent Continous Facing mode from shifting forward a page
@@ -846,7 +830,6 @@ public class GUIDisplay implements Display{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    //<start-adobe>
     /**
      * Deprecated on 07/07/2014
      * Please use setViewableArea(int[] viewport) instead.
@@ -882,8 +865,7 @@ public class GUIDisplay implements Display{
     public AffineTransform setViewableArea(final int[] viewport) throws PdfException{
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    //<end-adobe>
-
+    
     @Override
     public void drawFacing(final Rectangle visibleRect) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

@@ -355,7 +355,7 @@ public class CMAP extends Table {
         final boolean debugMapping=false;//(index==223);
 
         if(debugMapping) {
-            System.out.println(glyph + " fontMapping=" + fontMapping + " index=" + index+" "+remapType4);
+            System.out.println(glyph + " fontMapping=" + fontMapping + " index=" + index+ ' ' +remapType4);
         }
 
         /**convert index if needed*/
@@ -374,10 +374,12 @@ public class CMAP extends Table {
             } 
         }
 
-        int value=-1;
+        int value = -1;
 
-        //if no cmap use identity
-        if(format==0){
+        //exception found in Itext
+        if (rawIndex == 128 && endCode != null && "Euro".equals(glyph)) {
+            value = getFormat4Value(8364, value);
+        } else if (format == 0) { //if no cmap use identity
 
             //hack
             if(index>255) {
@@ -389,10 +391,7 @@ public class CMAP extends Table {
                 value = glyphIndexToChar[formatToUse][index2];
             }
 
-            //exception found in Itext
-            if(rawIndex==128 && endCode!=null && "Euro".equals(glyph)) {
-                value = getFormat4Value(8364, value);
-            }
+            
 
         }else if(format==4){
 
@@ -570,7 +569,7 @@ public class CMAP extends Table {
                     i=count;
                     
                     if(encodingDebug) {
-                            System.out.println("case2 fontMapping=" + fontMapping + " formatToUse=" + formatToUse+" "+platformSpecificID[formatToUse]+" "+ platformID[formatToUse]+" "+hasEncoding+" "+fontEncoding+" "+wasCase2);
+                            System.out.println("case2 fontMapping=" + fontMapping + " formatToUse=" + formatToUse+ ' ' +platformSpecificID[formatToUse]+ ' ' + platformID[formatToUse]+ ' ' +hasEncoding+ ' ' +fontEncoding+ ' ' +wasCase2);
                     }
                 }
             }          
@@ -588,7 +587,7 @@ public class CMAP extends Table {
                     i=count;
                     
                     if(encodingDebug) {
-                        System.out.println("case4 fontMapping=" + fontMapping + " formatToUse=" + formatToUse+" "+platformSpecificID[formatToUse]+" "+ platformID[formatToUse]+" "+hasEncoding+" "+fontEncoding);
+                        System.out.println("case4 fontMapping=" + fontMapping + " formatToUse=" + formatToUse+ ' ' +platformSpecificID[formatToUse]+ ' ' + platformID[formatToUse]+ ' ' +hasEncoding+ ' ' +fontEncoding);
                     }
                     
                     if(platformSpecificID[formatToUse]==3 && platformID[formatToUse]==0 && (hasEncoding || fontEncoding==StandardFonts.STD)){

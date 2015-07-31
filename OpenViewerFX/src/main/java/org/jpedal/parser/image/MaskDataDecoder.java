@@ -33,6 +33,9 @@
 
 package org.jpedal.parser.image;
 
+import com.idrsolutions.pdf.color.shading.BitReader;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.JPEGDecoder;
@@ -88,6 +91,86 @@ class MaskDataDecoder {
         
         return objectData;
     }
+    
+    static BufferedImage applyMaskArray(ImageData imageData, int[] maskArray){
+        int bitDepth = imageData.getDepth();
+//        int negate = 8-bitDepth;
+        int nComp = maskArray.length/2;
+        int dim = imageData.getWidth()*imageData.getHeight();
+        
+        BufferedImage img = new BufferedImage(imageData.getWidth(), imageData.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        int output[] = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+        byte [] data = imageData.getObjectData();
+        int r,g,b,t,c,m,y,k;
+        boolean isMask;
+        
+        switch(bitDepth){
+            case 1:
+            case 2:
+            case 4:
+                BitReader reader = new BitReader(data, true);
+                for (int i = 0; i < dim; i++) {
+                    
+                    if(nComp == 1){
+                       t = reader.getPositive(bitDepth);
+                       isMask = t >= maskArray[0] && t<=maskArray[1];
+                       if(!isMask){
+                           t ^= 0xff;
+                           output[i] = (255 << 24) | (t << 16) | (t << 8) | t;
+                       }
+                    }else{ //assume number of components is 3 at the moment we can fix in future;
+                       r = reader.getPositive(bitDepth);
+                       g = reader.getPositive(bitDepth);
+                       b = reader.getPositive(bitDepth);
+                       
+                       isMask = r >= maskArray[0] && r<=maskArray[1] 
+                               && g >= maskArray[2] && g<=maskArray[3]
+                               && b >= maskArray[4] && b<=maskArray[5];
+                       
+                       if(!isMask){
+                           r ^= 0xff;
+                           g ^= 0xff;
+                           b ^= 0xff;
+                           output[i] = (255 << 24) | (r << 16) | (g << 8) | b;
+                       }
+                    }
+                }                
+                break;
+            case 8:
+                int p = 0;
+                
+                if(nComp ==1){
+                    for (int i = 0; i < dim; i++) {         
+                        t = data[p++]&0xff;
+                        isMask = t >= maskArray[0] && t<=maskArray[1];
+                        if(!isMask){
+                            output[i] = (255 << 24) | (t << 16) | (t << 8) | t;
+                        }
+                    }
+                }else if(nComp==3){
+                    for (int i = 0; i < dim; i++) {
+                        r = data[p++]&0xff;
+                        g = data[p++]&0xff;
+                        b = data[p++]&0xff;
+
+                        isMask = r >= maskArray[0] && r<=maskArray[1] 
+                                && g >= maskArray[2] && g<=maskArray[3]
+                                && b >= maskArray[4] && b<=maskArray[5];
+
+                        if(!isMask){
+                            output[i] = (255 << 24) | (r << 16) | (g << 8) | b;
+                        }
+                    }
+                }else if(nComp==4){
+                    //
+                }
+                break;
+        }
+        return img;
+        
+    }
+
+    
     
     static byte[] applySMask(byte[] maskData, final ImageData imageData,final GenericColorSpace decodeColorData, final PdfObject newSMask, final PdfObject XObject) {
         
@@ -204,6 +287,44 @@ class MaskDataDecoder {
         return objectData;
     }
 
+    static byte[] convertSmaskData(final GenericColorSpace decodeColorData, byte[] objectData, int w, int h, final ImageData imageData, int d, final int maskD, byte[] maskData, PdfObject smask) {
+        
+        byte[] index=decodeColorData.getIndexedMap();
+       
+        if(index!=null){
+            index=decodeColorData.convertIndexToRGB(index);
+            objectData=ColorSpaceConvertor.convertIndexToRGBByte(index, w, h, imageData.getCompCount(), imageData.getDepth(), objectData, false, false);
+        }else if(decodeColorData.getID()==ColorSpaces.CalRGB){
+        }else if(decodeColorData.getID()==ColorSpaces.DeviceRGB){
+            
+            if(d==8){ //baseline_screens/adobe/PP_download.pdf is actually 4 bit
+                check4BitData(objectData);
+            }
+            
+            float [] decodeArr = smask.getFloatArray(PdfDictionary.Decode);
+        
+            if(decodeArr!=null && decodeArr[0]==1 && decodeArr[1]==0){ // data inverted refer to dec2011/example.pdf
+                for (int i = 0; i < maskData.length; i++) {
+                    maskData[i]^= 0xff;
+                }
+            }
+        }else if(decodeColorData.getID()==ColorSpaces.DeviceGray && imageData.isJPX()){
+            
+            if(maskData!=null && maskD==1){
+                for(int ii=0;ii<maskData.length;ii++){
+                    maskData[ii]=(byte) (maskData[ii]^255);
+                }
+            }
+        }else if(!imageData.isDCT() && !imageData.isJPX()){
+            
+            //convert the data to rgb (last parameter is used in CalRGB so left in to make method same in all)
+            objectData=decodeColorData.dataToRGBByteArray(objectData,w,h,false);
+            
+            //System.out.println(maskColorSpace.getParameterConstant(PdfDictionary.ColorSpace)+" "+newSMask.getObjectRefAsString());
+            
+        }
+        return objectData;
+    }
     
     static byte[] convertData(final GenericColorSpace decodeColorData, byte[] objectData, int w, int h, final ImageData imageData, int d, final int maskD, byte[] maskData) {
         
@@ -264,7 +385,7 @@ class MaskDataDecoder {
     
     private static byte[] upScaleMaskToImage(final int w, final int h, final int maskW, final int maskH, final byte[] objectData, final byte[] maskData) {
         
-        int rgbPtr=0, aPtr=0;
+        int rgbPtr=0, aPtr;
         int i=0;
         float ratioW=(float)maskW/(float)w;
         float ratioH=(float)maskH/(float)h;
@@ -301,7 +422,7 @@ class MaskDataDecoder {
     
     private static byte[] upScaleImageToMask(final int w, final int h, final int maskW, final int maskH, final byte[] objectData, final byte[] maskData) {
         
-        int rgbPtr=0, aPtr=0;
+        int rgbPtr, aPtr=0;
         int i=0;
         float ratioW=(float)w/(float)maskW;
         float ratioH=(float)h/(float)maskH;

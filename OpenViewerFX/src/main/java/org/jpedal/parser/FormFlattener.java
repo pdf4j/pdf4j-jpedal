@@ -44,9 +44,8 @@ import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import org.jpedal.render.output.OutputDisplay;
+import org.jpedal.render.DynamicVectorRenderer;
 
 public class FormFlattener {
     /**
@@ -106,7 +105,7 @@ public class FormFlattener {
                 imgObj=(PdfObject)otherValues.get(defaultState);
             }else {
                 if(otherValues!=null && !otherValues.isEmpty()){
-                    final Iterator keys=otherValues.keySet().iterator();
+                    /**final Iterator keys=otherValues.keySet().iterator();
                     final PdfObject val;
                     final String key;
                     //while(keys.hasNext()){
@@ -114,6 +113,8 @@ public class FormFlattener {
                     val=(PdfObject)otherValues.get(key);
                     //System.out.println("key="+key+" "+val.getName(PdfDictionary.AS));
                     imgObj = val;
+                    /**/
+                    imgObj=(PdfObject) otherValues.entrySet().iterator().next();
                     //}
                 }
             }
@@ -433,7 +434,7 @@ public class FormFlattener {
                 pdfStreamDecoder.current.drawImage(pdfStreamDecoder.parserOptions.getPageNumber(), image, pdfStreamDecoder.gs, false, form.getObjectRefAsString(), 0, -3);
             
                 //add to SVG as external image if needed
-                if(pdfStreamDecoder.current.getBooleanValue(OutputDisplay.IsSVGMode)){
+                if(pdfStreamDecoder.current.getBooleanValue(DynamicVectorRenderer.IsSVGMode)){
                     pdfStreamDecoder.current.drawImage(pdfStreamDecoder.parserOptions.getPageNumber(), image, pdfStreamDecoder.gs, false, form.getObjectRefAsString(), 0, -2);            
                 }
             

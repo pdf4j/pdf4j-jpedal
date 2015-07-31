@@ -50,6 +50,7 @@ import org.jpedal.color.PdfPaint;
 import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.exception.PdfException;
+import org.jpedal.external.FontHandler;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.io.ColorSpaceConvertor;
@@ -93,10 +94,10 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     protected int currentItem = -1;
     
     //Used purely to keep track of rendering for colour change functionality
-    static protected int itemToRender = -1;
+    protected static int itemToRender = -1;
     
   //used to track end of PDF page in display
-    static protected int endItem=-1;
+  protected static int endItem=-1;
 
     /**raw page rotation*/
     protected int pageRotation;
@@ -156,8 +157,8 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     /**background color*/
     protected Color backgroundColor = Color.WHITE;
-    static protected Color textColor;
-    static protected int colorThresholdToReplace = 255;
+    protected static Color textColor;
+    protected static int colorThresholdToReplace = 255;
     
     protected boolean changeLineArtAndText;
 
@@ -483,7 +484,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     void renderImage(final AffineTransform imageAf, BufferedImage image, final float alpha,
 	    final GraphicsState currentGraphicsState, final float x, final float y, final int optionsApplied) {
-
+        
     final boolean renderDirect = (currentGraphicsState != null);
 
 	if (image == null || g2==null) {
@@ -1637,5 +1638,10 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             return a;
         }
         return clip;
+    }
+    
+    @Override
+    public FontHandler getFontHandler(){
+        return null;
     }
 }

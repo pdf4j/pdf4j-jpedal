@@ -78,10 +78,11 @@ public class BrokenRefTable {
             if (line.contains(" obj")) {
 
                 pointer = line.indexOf(' ');
-                if (pointer > -1) {
+                
+                if (pointer > 0) {
                     offset.storeObjectOffset(Integer.parseInt(line.substring(0, pointer)), i, 1, false, true);
                 }
-
+                
             } else if (line.contains("/Root")) {
 
                 final int start = line.indexOf("/Root") + 5;

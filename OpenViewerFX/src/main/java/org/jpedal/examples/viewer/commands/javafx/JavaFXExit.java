@@ -41,7 +41,7 @@ import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.Viewer;
 import org.jpedal.examples.viewer.commands.SaveForm;
 import org.jpedal.examples.viewer.gui.GUI;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;

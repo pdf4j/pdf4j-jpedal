@@ -32,7 +32,6 @@
  */
 package org.jpedal.utils;
 
-
 public abstract class SwingWorker {
     private Object value;  // see getValue(), setValue()
     //private Thread thread;

@@ -64,7 +64,7 @@ public class PDFObjectToImage {
         
         final ObjectStore localStore = new ObjectStore();
         
-        final DynamicVectorRenderer glyphDisplay=new ImageDisplay(0,false,20,localStore,null);
+        final DynamicVectorRenderer glyphDisplay=new ImageDisplay(0,false,20,localStore);
         
         glyphDisplay.setMode(DynamicVectorRenderer.Mode.SMASK);
         

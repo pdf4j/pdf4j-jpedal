@@ -315,12 +315,9 @@ public class JavaFXButtons implements GUIButtons{
         
         int i = 1;
 
-        final Iterator<CheckMenuItem> menuOptions = layoutGroup.iterator();
-
         //cycle set correct value to true, else false
-        while (menuOptions.hasNext()) {
-            CheckMenuItem item = menuOptions.next();
-            item.setSelected(i==mode);
+        for (CheckMenuItem item : layoutGroup) {
+            item.setSelected(i == mode);
             i++;
         }
     }

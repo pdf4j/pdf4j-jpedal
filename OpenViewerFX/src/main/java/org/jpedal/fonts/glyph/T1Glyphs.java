@@ -525,7 +525,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
         if (baseFontName != null &&                             //Check right call
                 dynamicVectorRenderer != null &&                    //Check right call
                 (BaseDisplay.isHTMLorSVG(dynamicVectorRenderer))) {     //Just to be safe
-            
+
             dynamicVectorRenderer.saveAdvanceWidth(baseFontName,glyphName,(int)ys);
             
         }
@@ -549,7 +549,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
     private void div() {
 
         final double value=operandsRead[operandReached-2]/operandsRead[operandReached-1];
-        
+
         //operandReached--;
         if(operandReached>0) {
             operandReached--;
@@ -837,7 +837,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
         
         
         /**flush cache if needed*/
-        if(lastTrm[0][0]!=Trm[0][0] || lastTrm[1][0]!=Trm[1][0] || lastTrm[0][1]!=Trm[0][1] || lastTrm[1][1]!=Trm[1][1]){
+        if(Trm!=null && (lastTrm[0][0]!=Trm[0][0] || lastTrm[1][0]!=Trm[1][0] || lastTrm[0][1]!=Trm[0][1] || lastTrm[1][1]!=Trm[1][1])){
             lastTrm=Trm;
             flush();
         }
@@ -1002,7 +1002,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
 
                 //This tests whether the previously saved potential width is an argument of the first operator or
                 //an actual width. If it's an actual width, it's saved.
-                if (nonSubrCommandCount == 0 &&
+                if (is1C() && nonSubrCommandCount == 0 &&
                         nextVal != 10 &&    //callsubr
                         nextVal != 11 &&    //return
                         nextVal != 29) {    //callgsubr
@@ -1040,7 +1040,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
                     if(key==7){ //sbw
                         yy = sbw();
                         operandReached=0; //move to first operator
-                    }else if(allowAll){ //other 2 byte operands
+                    }else if((key == 16 && allowAll) || key != 16){ //other 2 byte operands
                         isFlex = handle2ByteOp(factory, rawInt, key, lastVal, isFlex);
                     }
                 }else if(key==13){ //hsbw (T1 only)

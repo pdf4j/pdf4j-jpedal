@@ -19,6 +19,10 @@ public class EnumeratedSpace {
     }
 
     public byte[] getRGB(byte cyan, byte magenta, byte yellow, byte key) {
+        
+        if((cyan|magenta|yellow|key)==0){
+            return new byte[]{(byte)255,(byte)255,(byte)255};
+        }
 
         if (cyan == oldC && magenta == oldM && yellow == oldY && key == oldK) {
             return new byte[]{red, green, blue};
@@ -95,6 +99,10 @@ public class EnumeratedSpace {
     }
     
     public static int[] getStaticRGB(int cyan,int magenta, int yellow, int key) {
+        if((cyan|magenta|yellow|key)==0){
+            return new int[]{255,255,255};
+        }
+        
         final int cc = cyan << 8;
         final int mm = magenta << 8;
         final int yy = yellow << 8;

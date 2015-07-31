@@ -48,12 +48,13 @@ import org.jpedal.color.PdfPaint;
 import org.jpedal.objects.raw.PdfArrayIterator;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.utils.LogWriter;
 
 /**
  * holds the graphics state as stream decoded
  */
 @SuppressWarnings("MagicConstant")
-public class GraphicsState
+public class GraphicsState implements Cloneable
 {
 
     //hold image co-ords
@@ -436,13 +437,13 @@ public class GraphicsState
                 }
 
                 //smaller values throw a segmentation fault in JVM (not pretty)
-                if(dash[aa]<0.05f){
-                    dash[aa]=0.05f;
+                if(dash[aa]<0.07f){
+                    dash[aa]=0.07f;
                 }
             }
 
             current_stroke = new BasicStroke( w, current_line_cap_style, current_line_join_style, mitre_limit, dash, Math.abs(current_line_dash_phase));
-
+            
         }else{
             current_stroke = new BasicStroke( w, current_line_cap_style, current_line_join_style, mitre_limit );
         }
@@ -797,10 +798,15 @@ public class GraphicsState
     /**
      * custom clone method
      */
-    @SuppressWarnings({"CloneDoesntCallSuperClone"})
     @Override
     public final Object clone(){
 
+        try {
+            super.clone();
+        } catch (CloneNotSupportedException ex) {
+            LogWriter.writeLog("Unable to clone "+ex);
+        }
+        
         final GraphicsState newGS=new GraphicsState();
 
         newGS.x=x;

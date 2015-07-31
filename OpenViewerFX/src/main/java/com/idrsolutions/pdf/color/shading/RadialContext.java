@@ -49,16 +49,9 @@ import org.jpedal.objects.raw.PdfObject;
 
 public class RadialContext implements PaintContext {
 
-    private final int rotation;
-    private final boolean isPrinting;
     private final GenericColorSpace shadingColorSpace;
     private final float[] background;
     private final PdfObject shadingObj;
-    private final int pageHeight;
-    private final int cropX;
-    private final float scaling;
-    private final int offX;
-    private final int offY;
     private final PDFFunction[] function;
     private final float[] coords;
     private boolean[] extended = {false, false};
@@ -68,18 +61,11 @@ public class RadialContext implements PaintContext {
     private final Color colorT0, colorT1;
     
 
-    RadialContext(AffineTransform xForm, boolean isPrinting, GenericColorSpace shadingColorSpace, float[] background, PdfObject shading, float[][] matrix, int cropX, int cropH, float scaling, int offX, int offY, PDFFunction[] function) {
+    RadialContext(AffineTransform xForm, boolean isPrinting, GenericColorSpace shadingColorSpace, float[] background, PdfObject shading, float[][] matrix,PDFFunction[] function) {
 
-        this.rotation = ShadingUtils.getRotationFromAffine(xForm);
-        this.isPrinting = isPrinting;
         this.shadingColorSpace = shadingColorSpace;
         this.background = background;
         this.shadingObj = shading;
-        this.pageHeight = cropH;
-        this.cropX = cropX;
-        this.scaling = scaling;
-        this.offX = offX;
-        this.offY = offY;
         this.function = function;
         float[] src = shading.getFloatArray(PdfDictionary.Coords);
         final boolean[] extension = shadingObj.getBooleanArray(PdfDictionary.Extend);
@@ -101,34 +87,43 @@ public class RadialContext implements PaintContext {
         PathIterator iter;
         GeneralPath gp;//path for coords
         double[] temp = new double[6];
-        Point2D point0, point1;
+        Point2D pointXY0, pointXY1, temp0, temp1;
 
         gp = new GeneralPath();
         gp.moveTo(coords[0], coords[1]);
         gp.lineTo(coords[0] + coords[2], coords[1]);
         iter = gp.getPathIterator(affine);
         iter.currentSegment(temp);
-        x0 = (float) temp[0];
-        y0 = (float) temp[1];
-        point0 = new Point2D.Float(x0, y0);
+        pointXY0 = new Point2D.Double(temp[0], temp[1]);
         iter.next();
         iter.currentSegment(temp);
-        point1 = new Point2D.Float((float) temp[0], (float) temp[1]);
-        r0 = (float) point0.distance(point1);
+        temp0 = new Point2D.Double(temp[0],temp[1]);
 
         gp = new GeneralPath();
         gp.moveTo(coords[3], coords[4]);
         gp.lineTo(coords[3] + coords[5], coords[4]);
         iter = gp.getPathIterator(affine);
         iter.currentSegment(temp);
-        x1 = (float) temp[0];
-        y1 = (float) temp[1];
-        point0 = new Point2D.Float(x1, y1);
+        pointXY1 = new Point2D.Double(temp[0], temp[1]);
         iter.next();
         iter.currentSegment(temp);
-        point1 = new Point2D.Float((float) temp[0], (float) temp[1]);
-        r1 = (float) point0.distance(point1);
-
+        temp1 = new Point2D.Double(temp[0],temp[1]);
+                
+        Point2D[] points = new Point2D[4];
+        points[0] = pointXY0;
+        points[1] = pointXY1;
+        points[2] = temp0;
+        points[3] = temp1;
+        xForm.transform(points, 0,points, 0, 4);
+        
+        x0 = (float) points[0].getX();
+        y0 = (float) points[0].getY();
+        x1 = (float) points[1].getX();
+        y1 = (float) points[1].getY();
+        
+        r0 = (float) points[0].distance(points[2]);
+        r1 = (float) points[1].distance(points[3]);
+        
         colorT0 = calculateColor(t0);
         colorT1 = calculateColor(t1);
 
@@ -179,7 +174,7 @@ public class RadialContext implements PaintContext {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
 //                float[] xy = PixelFactory.convertPhysicalToPDF(isPrinting, x, y, offX, offY, (1f / scaling), startX, startY, cropX, pageHeight);
-                float[] xy = ShadingUtils.getPixelPDF(isPrinting, rotation, x, y, startX, startY, offX, offY, cropX, pageHeight, scaling);
+                float[] xy = {x+startX,y+startY};//ShadingUtils.getPixelPDF(isPrinting, rotation, x, y, startX, startY, offX, offY, cropX, pageHeight, scaling);
                 Color result = null;
 
                 float[] qr = quadraticEquate(xy[0], xy[1]);

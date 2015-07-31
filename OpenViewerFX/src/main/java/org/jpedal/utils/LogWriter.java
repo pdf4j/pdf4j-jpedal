@@ -69,29 +69,6 @@ public class LogWriter
     private static final Set<String> filterValues = getFilterSet();
     
     /**
-     * reset logfile
-     */
-    public static final void resetLogFile()
-    {
-        if( log_name != null )
-        {
-            //write message
-            final PrintWriter log_file;
-            try
-            {
-                log_file = new PrintWriter( new FileWriter( log_name, false ) );
-                log_file.println(TimeNow.getTimeNow()+" Running Storypad");
-                log_file.flush();
-                log_file.close();
-            }
-            catch( final Exception e )
-            {
-                System.err.println( "Exception " + e + " attempting to write to log file " + log_name );
-            }
-        }
-    }
-    
-    /**
      * Creates a set of filter values from JVM argument -Dorg.jpedal.inclusiveLogFilters.
      * The arguments are passed in as comma-separated values.
      *

@@ -138,11 +138,6 @@ public class FileAccess {
         
     }
     
-    //
-    
-    
-    /**/
-
     public boolean isFileViewable(final PdfObjectReader currentPdfFile) {
         if (currentPdfFile != null){
             final PdfFileReader objectReader=currentPdfFile.getObjectReader();
@@ -310,7 +305,7 @@ public class FileAccess {
     /**
      * get page count of current PDF file
      */
-    int getPageCount() {
+    public int getPageCount() {
         return pageCount;
     }
 

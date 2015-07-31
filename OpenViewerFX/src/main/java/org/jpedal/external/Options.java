@@ -184,5 +184,11 @@ public class Options {
     public static final int SpeechEngine = 32;
     
     public static final int JavaFX_ADDITIONAL_OBJECTS = 33;
+    
+    public static final int FileAccess = 35;
+    
+    public static final int DisplayOffsets = 37;
+    
+    public static final int AdditionalHandler = 39;
 
 }

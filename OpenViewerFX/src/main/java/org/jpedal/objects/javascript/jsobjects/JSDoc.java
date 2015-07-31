@@ -49,12 +49,8 @@ public class JSDoc {
 
 	//public Object ADBE = null;
 
-	public JSDoc(final AcroRenderer acro) {
-		setAcroRenderer(acro);
-	}
-	public JSDoc() {
-
-	}
+	public JSDoc() {}
+    
 	public void setAcroRenderer(final AcroRenderer acro) {
 		acroRenderer = acro;
 		if(acro != null) {

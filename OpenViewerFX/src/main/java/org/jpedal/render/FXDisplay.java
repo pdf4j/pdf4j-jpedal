@@ -43,10 +43,7 @@ import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.FillRule;
-import javafx.scene.shape.Path;
 import javafx.scene.shape.*;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
@@ -73,12 +70,6 @@ import java.util.ArrayList;
 
 
 public class FXDisplay extends GUIDisplay {
-    
-    /**
-     * temporary development flag - please do not use
-     */
-    public static boolean useCanvas=false;
-    
     
     final Group pdfContent = new Group();
 
@@ -462,7 +453,7 @@ public class FXDisplay extends GUIDisplay {
                 t.getTransforms().setAll(Transform.affine(Trm[0][0]*r,Trm[0][1]*r,Trm[1][0]*r,Trm[1][1]*r,Trm[2][0],Trm[2][1]));          
             }
             
-            final float[] transform=new float[]{Trm[0][0],Trm[1][0],Trm[0][1],Trm[1][1],Trm[2][0],Trm[2][1]};
+            final float[] transform= {Trm[0][0],Trm[1][0],Trm[0][1],Trm[1][1],Trm[2][0],Trm[2][1]};
             
             final Shape clip = gs.getFXClippingShape();
         
@@ -496,7 +487,7 @@ public class FXDisplay extends GUIDisplay {
             setFXParams(path,gs.getTextRenderType(),gs, textColor!=null);
             setBlendMode(gs, path);
             
-            final float[] transform=new float[]{Trm[0][0],Trm[1][0],Trm[0][1],Trm[1][1],Trm[2][0],Trm[2][1]};
+            final float[] transform= {Trm[0][0],Trm[1][0],Trm[0][1],Trm[1][1],Trm[2][0],Trm[2][1]};
            
             final Shape clip = gs.getFXClippingShape();
         
@@ -591,36 +582,36 @@ public class FXDisplay extends GUIDisplay {
             case PdfDictionary.Multiply:
                 n.setBlendMode(BlendMode.MULTIPLY);
                 break;
-//            case PdfDictionary.Screen:
-//                n.setBlendMode(BlendMode.SCREEN);
-//                break;
+            case PdfDictionary.Screen:
+                n.setBlendMode(BlendMode.SCREEN);
+                break;
             case PdfDictionary.Overlay:
                 n.setBlendMode(BlendMode.OVERLAY);
                 break;
-//            case PdfDictionary.Darken:
-//                n.setBlendMode(BlendMode.DARKEN);
-//                break;
-//            case PdfDictionary.Lighten:
-//                n.setBlendMode(BlendMode.LIGHTEN);
-//                break;
-//            case PdfDictionary.ColorDodge:
-//                n.setBlendMode(BlendMode.COLOR_DODGE);
-//                break;
-//            case PdfDictionary.ColorBurn:
-//                n.setBlendMode(BlendMode.COLOR_BURN);
-//                break;
-//            case PdfDictionary.HardLight:
-//                n.setBlendMode(BlendMode.HARD_LIGHT);
-//                break;
-//            case PdfDictionary.SoftLight:
-//                n.setBlendMode(BlendMode.SOFT_LIGHT);
-//                break;
-//            case PdfDictionary.Difference:
-//                n.setBlendMode(BlendMode.DIFFERENCE);
-//                break;
-//            case PdfDictionary.Exclusion:
-//                n.setBlendMode(BlendMode.EXCLUSION);
-//                break;
+            case PdfDictionary.Darken:
+                n.setBlendMode(BlendMode.DARKEN);
+                break;
+            case PdfDictionary.Lighten:
+                n.setBlendMode(BlendMode.LIGHTEN);
+                break;
+            case PdfDictionary.ColorDodge:
+                n.setBlendMode(BlendMode.COLOR_DODGE);
+                break;
+            case PdfDictionary.ColorBurn:
+                n.setBlendMode(BlendMode.COLOR_BURN);
+                break;
+            case PdfDictionary.HardLight:
+                n.setBlendMode(BlendMode.HARD_LIGHT);
+                break;
+            case PdfDictionary.SoftLight:
+                n.setBlendMode(BlendMode.SOFT_LIGHT);
+                break;
+            case PdfDictionary.Difference:
+                n.setBlendMode(BlendMode.DIFFERENCE);
+                break;
+            case PdfDictionary.Exclusion:
+                n.setBlendMode(BlendMode.EXCLUSION);
+                break;
             default:
                 n.setBlendMode(null);
                 break;
@@ -678,7 +669,7 @@ public class FXDisplay extends GUIDisplay {
             background.getElements().add(new LineTo(xx+ (int) (w * scaling), yy));
             background.getElements().add(new LineTo(xx, yy));
             
-            background.setFill(new Color((float)(backgroundColor.getRed()/255.0f), (float)(backgroundColor.getGreen()/255.0f), (float)(backgroundColor.getBlue()/255.0f), 1.0f));
+            background.setFill(new Color(backgroundColor.getRed()/255.0f, backgroundColor.getGreen()/255.0f, backgroundColor.getBlue()/255.0f, 1.0f));
            addToScene(background);
         }
     }

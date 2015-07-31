@@ -48,7 +48,7 @@ import java.io.*;
  */
 public class JpegEncoder {
 
-    private static final int[] sampleFrequency = new int[]{1, 1, 1};
+    private static final int[] sampleFrequency = {1, 1, 1};
 
     private static final int[] TableNumber = {0, 1, 1};
 

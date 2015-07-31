@@ -49,6 +49,8 @@ public interface CustomIO {
 
     boolean isOutputOpen();
 
+    void setCompressImages(boolean compressImages);
+
     void setupOutput(String path, boolean append, String encodingUsed) throws FileNotFoundException, UnsupportedEncodingException;
     
     void setupOutput(OutputStream stream, boolean append, String encodingUsed) throws FileNotFoundException, UnsupportedEncodingException;

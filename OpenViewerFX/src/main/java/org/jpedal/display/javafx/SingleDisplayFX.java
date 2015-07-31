@@ -55,7 +55,6 @@ import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.render.FXDisplay;
-import org.jpedal.render.FXDisplayCanvas;
 import org.jpedal.text.TextLines;
 
 /**
@@ -189,12 +188,8 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
     public void disableScreen() {
         if (currentDisplay != null) {
             
-            final Group FXpane;
-            if(FXDisplay.useCanvas){
-                FXpane= ((FXDisplayCanvas) currentDisplay).getFXPane();
-            }else{
-                FXpane = ((FXDisplay) currentDisplay).getFXPane();
-            }
+            final Group FXpane = ((FXDisplay) currentDisplay).getFXPane();
+           
             if (pdf.getChildren().contains(FXpane)) {
 
                 final int count = pdf.getChildren().size();
@@ -210,13 +205,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
     public void paintPage(final Pane box, final AcroRenderer formRenderer, final TextLines textLines) {
         final boolean debugPane=false;
 
-        final Group fxPane;
-        if(FXDisplay.useCanvas){
-            fxPane=((FXDisplayCanvas)currentDisplay).getFXPane(pageData.getCropBoxWidth(pageNumber),pageData.getCropBoxHeight(pageNumber));
-            
-        }else{
-            fxPane=((FXDisplay)currentDisplay).getFXPane();
-        }
+        final Group fxPane=((FXDisplay)currentDisplay).getFXPane();
         
         //if(crw>0 && crh>0 && !pdf.getChildren().contains(FXpane)){
         if(displayView==SINGLE_PAGE){
@@ -333,11 +322,6 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
             int[] singlePageSize=pdf.getMaximumSize();
             pdf.setMinSize(singlePageSize[0], singlePageSize[1]);
         
-             //will update display
-            final JavaFxGUI customFXHandle=(JavaFxGUI) pdf.getExternalHandler(Options.MultiPageUpdate);
-            if(customFXHandle != null){
-                customFXHandle.scaleAndRotate();
-            }
         }
     }   
     
@@ -395,7 +379,6 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         return cursorBoxOnScreen;
     }
     
-    //<start-adobe>
     
     Rectangle cursorRect;
     final Pane cursorBoxPane = new Pane();
@@ -416,8 +399,8 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
 
             final int cropX = pageData.getCropBoxX(pageNumber);
             final int cropY = pageData.getCropBoxY(pageNumber);
-            final int cropW = pageData.getCropBoxWidth(pageNumber);
-            final int cropH = pageData.getCropBoxHeight(pageNumber);
+           // final int cropW = pageData.getCropBoxWidth(pageNumber);
+            //final int cropH = pageData.getCropBoxHeight(pageNumber);
 
             //allow for odd crops and correct
 //            if (y > 0 && y < (cropY)) {
@@ -442,7 +425,9 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
 //                h = cropY + cropH - y;
 //            }
             
-            h -= cropY;
+            
+            y -= cropY;
+            x -= cropX;
             cursorBoxOnScreen = new int[]{x, y, w, h};
             
             if(DecoderOptions.showMouseBox){
@@ -467,8 +452,6 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
             }
         }
     }
-    //<end-adobe>
-
     
     @Override
     public java.awt.Rectangle getDisplayedRectangle() {

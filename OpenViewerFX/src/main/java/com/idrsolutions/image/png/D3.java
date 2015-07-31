@@ -78,7 +78,7 @@ public class D3 {
         return new int[]{closest.rgb, found};
     }
 
-    public static byte[] process(byte[] colorPalette, byte[] bgrData, int h, int w) {
+    public static byte[] process(byte[] colorPalette, int[][] image, int h, int w) {
 
         int p = 0;
         D3[] palette = new D3[256];
@@ -87,17 +87,6 @@ public class D3 {
             int g = colorPalette[p++] & 0xff;
             int b = colorPalette[p++] & 0xff;
             palette[i] = new D3(r, g, b);
-        }
-
-        int[][] image = new int[h][w];
-        p = 0;
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                int b = bgrData[p++] & 0xff;
-                int g = bgrData[p++] & 0xff;
-                int r = bgrData[p++] & 0xff;
-                image[y][x] = (r << 16) | (g << 8) | b;
-            }
         }
 
         byte[] indexedPixels = new byte[h * w];

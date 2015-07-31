@@ -103,7 +103,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
            
         }
         /**flush cache if needed*/
-        if((lastTrm[0][0]!=Trm[0][0])|(lastTrm[1][0]!=Trm[1][0])|
+        if(Trm!=null && (lastTrm[0][0]!=Trm[0][0])|(lastTrm[1][0]!=Trm[1][0])|
                 (lastTrm[0][1]!=Trm[0][1])|(lastTrm[1][1]!=Trm[1][1])){
             lastTrm=Trm;
             flush();

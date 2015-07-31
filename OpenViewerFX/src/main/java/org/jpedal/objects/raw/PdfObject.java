@@ -90,7 +90,7 @@ public class PdfObject implements Cloneable{
     
     private int BitsPerComponent=-1, BitsPerCoordinate=-1, BitsPerFlag=-1, Count, FormType=-1, Length=-1,Length1=-1,Length2=-1,Length3=-1,Rotate=-1,verticesPerRow=-1; //-1 shows unset
     
-    private float[] ArtBox, BBox, BleedBox, CropBox, Decode,Domain, Matrix, MediaBox, Range, TrimBox;
+    private float[] ArtBox, BBox, BleedBox, CropBox, Decode,Domain, Matrix, Matte, MediaBox, Range, TrimBox;
     
     protected  PdfObject ColorSpace, DecodeParms, Encoding,Function,
             Resources,Shading, SMask;
@@ -767,6 +767,9 @@ public class PdfObject implements Cloneable{
             case PdfDictionary.Matrix:
                 return deepCopy(Matrix);
                 
+            case PdfDictionary.Matte:
+                return deepCopy(Matte);
+                
             case PdfDictionary.MediaBox:
                 return deepCopy(MediaBox);
                 
@@ -866,6 +869,10 @@ public class PdfObject implements Cloneable{
                 
             case PdfDictionary.Matrix:
                 Matrix=value;
+                break;
+                
+            case PdfDictionary.Matte:
+                Matte=value;
                 break;
                 
             case PdfDictionary.MediaBox:
@@ -1447,11 +1454,8 @@ public class PdfObject implements Cloneable{
     }
     
     public PdfObject duplicate() {
-        final PdfObject copy = new PdfObject();
-        
-        // <start-demo><end-demo>
-        
-        return copy;
+
+        return new PdfObject();
     }
     
     @Override

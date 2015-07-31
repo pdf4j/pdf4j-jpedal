@@ -43,16 +43,11 @@ import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.parser.Cmd;
-import org.jpedal.render.output.FontRasterizer;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
 public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
 
-    final FontRasterizer fontRasterizer;
-
-    public ImageDisplay(final int pageNumber, final boolean addBackground, final int defaultSize, final ObjectStore newObjectRef, final FontRasterizer fontRasterizer) {
-
-        this.fontRasterizer=fontRasterizer;
+    public ImageDisplay(final int pageNumber, final boolean addBackground, final int defaultSize, final ObjectStore newObjectRef) {
 
         type = DynamicVectorRenderer.DISPLAY_IMAGE;
 
@@ -70,77 +65,33 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
     public final int drawImage(final int pageNumber, final BufferedImage image, final GraphicsState gs, final boolean alreadyCached, final String name, final int optionsApplied, final int previousUse) {
 
         //track objects
-
         int iw = (int) gs.CTM[0][0];
         if (iw < 0) {
             iw = -iw;
-        }
-
-        if (iw == 0) {
+        } else if (iw == 0) {
             iw = (int) gs.CTM[0][1];
-        }
-        if (iw < 0) {
-            iw = -iw;
-        }
 
+            if (iw < 0) {
+                iw = -iw;
+            }
+        }
 
         int ih = (int) gs.CTM[1][1];
         if (ih < 0) {
             ih = -ih;
-        }
-
-        if (ih == 0) {
+        } else if (ih == 0) {
             ih = (int) gs.CTM[1][0];
-        }
-        if (ih < 0) {
-            ih = -ih;
+
+            if (ih < 0) {
+                ih = -ih;
+            }
         }
 
         final int[] rectParams = {(int) gs.CTM[2][0], (int) gs.CTM[2][1], iw, ih};
         areas.addElement(rectParams);
 
-//        if(trackOutlines){
-//            if(gs.CTM[2][1]>=0 && gs.CTM[0][0]>0 && gs.CTM[1][1]>0){    //gs.CTM[2][0]>=0 &&
-//
-//                Rectangle rect=new Rectangle((int) gs.CTM[2][0], (int) gs.CTM[2][1], iw, ih);
-//
-//                int x1=(int) gs.CTM[2][0];
-//                int y1=(int) gs.CTM[2][1];
-//                int x2=x1+iw;
-//                int y2=y1+ih;
-//
-//                if(x1<0){
-//                    x1=0;
-//                }
-//
-//                if(y1<0){
-//                    y1=0;
-//                }
-//
-//                if(gs.getClippingShape()!=null){
-//
-//                    Rectangle clip=gs.getClippingShape().getBounds();
-//
-//                    if(x1<clip.x)
-//                        x1=clip.x;
-//                    if(y1<clip.y)
-//                        y1=clip.y;
-//                    if(x2> clip.getMaxX())
-//                        x2=(int)clip.getMaxX();
-//                    if(y2> clip.getMaxY())
-//                        y2=(int)clip.getMaxY();
-//                }
-//
-//                imageAndShapeAreas.addElement(new Rectangle(x1,y1,x2-x1,y2-y1));
-//                ///System.out.println("2Image="+new Rectangle(x1,y1,x2-x1,y2-y1)+" "+this+" "+gs.CTM[0][0]+" "+gs.CTM[1][1]);
-//
-//            }else
-//                imageAndShapeAreas.addElement(null);
-//        }
-
         blendMode=gs.getBMValue();
 
-        //if(g2!=null)
         renderImage(null, image, gs.getAlpha(GraphicsState.FILL), gs, gs.x, gs.y, optionsApplied);
 
         return -1;
@@ -172,14 +123,6 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
                                  final Object javaGlyph, final int type, final GraphicsState gs, final double[] textTransform, final String glyf, final PdfFont currentFontData, final float glyfWidth) {
 
         blendMode=gs.getBMValue();
-
-        /**
-         * check if we should put ignore this font
-         */
-        final boolean rasterizeFont = fontRasterizer != null && fontRasterizer.isFontRasterized(currentFontData.getTruncatedName());
-        if (fontRasterizer != null && !rasterizeFont) {
-            return;
-        }
 
         AffineTransform at = null;
         if(textTransform!=null) //can actually be null at line 199 

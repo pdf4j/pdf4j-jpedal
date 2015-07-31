@@ -72,6 +72,8 @@ public abstract class MultiPageDecoder {
 
     private final Semaphore semaphore=new Semaphore(1);
 
+    final GUIFactory gui;
+    
     //used to redraw multiple pages
     private Thread worker;
      
@@ -104,10 +106,13 @@ public abstract class MultiPageDecoder {
     
     final DecoderOptions options;
     
-    public MultiPageDecoder(final PdfDecoderInt pdf,final PdfPageData pageData,final MultiPagesDisplay display, final MultiDisplayOptions multiDisplayOptions, 
+    DisplayOffsets offsets;
+    
+    public MultiPageDecoder(final GUIFactory gui,final PdfDecoderInt pdf,final PdfPageData pageData,final MultiPagesDisplay display, final MultiDisplayOptions multiDisplayOptions, 
             final DynamicVectorRenderer currentDisplay, final int pageNumber,final FileAccess fileAccess, 
             final PdfObjectReader io, final AcroRenderer formRenderer,final DecoderOptions options) {
        
+        this.gui=gui;
         this.pdf=pdf;
         this.pageData=pageData;
        
@@ -117,6 +122,8 @@ public abstract class MultiPageDecoder {
         this.currentPdfFile=io;
         this.formRenderer=formRenderer;
         this.options=options;
+        
+        offsets=(DisplayOffsets) pdf.getExternalHandler(Options.DisplayOffsets);
         
         /**cache current page*/
         if(currentDisplay!=null) {
@@ -153,14 +160,13 @@ public abstract class MultiPageDecoder {
 
         //Store the image to be used instead of filling the borders with white
         if (displayView==FACING && multiDisplayOptions.isTurnoverOn()) {
-            final GUIFactory gui = (GUIFactory)pdf.getExternalHandler(Options.GUIContainer);
-            final int lp;
+             final int lp;
             if (multiDisplayOptions.isSeparateCover()) {
                 lp = (oldPN / 2) * 2;
             } else {
                 lp = oldPN - (1 - (oldPN & 1));
             }
-            if (gui.getDragLeft()) {
+            if (offsets.getDragLeft()) {
                 facingDragTempLeftImg = facingDragCachedImages[0];
                 facingDragTempLeftNo = lp-2;
                 facingDragTempRightImg = facingDragCachedImages[1];
@@ -436,7 +442,8 @@ public abstract class MultiPageDecoder {
             if(pdf.getSpecialMode()!= SpecialOptions.NONE &&
                     pdf.getSpecialMode()!= SpecialOptions.SINGLE_PAGE &&
                     page!=pdf.getPageCount()) {
-                //
+              
+                formRenderer.createDisplayComponentsForPage(page + 1, current);
             }
             
             
@@ -482,8 +489,11 @@ public abstract class MultiPageDecoder {
         currentDisplay.setHiResImageForDisplayMode(pdf.isHiResScreenDisplay());
 
         int val=0;
-        //<start-adobe><start-thin><end-thin><end-adobe>
-
+        
+        if(pdf.getDisplayView()==Display.CONTINUOUS && pdf.getDisplayView()==Display.CONTINUOUS_FACING) {
+            val = 1;
+        }
+        
         final PdfStreamDecoder current;
 
         //
@@ -657,7 +667,7 @@ public abstract class MultiPageDecoder {
             //update page number
             if(newPage!=-1)// && customSwingHandle!=null)
             {
-                pdf.updatePageNumberDisplayed(newPage);//( (org.jpedal.gui.GUIFactory) customSwingHandle).setPage(newPage);
+                gui.setPage(newPage);//( (org.jpedal.gui.GUIFactory) customSwingHandle).setPage(newPage);
             }
         }
 
@@ -696,7 +706,7 @@ public abstract class MultiPageDecoder {
         final int[] pageH = multiDisplayOptions.getPageH();
         final int ry=display.getRy();
         final int rh=display.getRh();
-        final int insetH=display.getInsetH();
+        //final int insetH=display.getInsetH();
         
         final boolean debug=false;
         int largestH = 0;
@@ -706,12 +716,11 @@ public abstract class MultiPageDecoder {
             
             int pageTop=yReached[i];
             int pageBottom=yReached[i]+pageH[i];
-            int viewTop=ry;
             int viewBottom=ry+rh;
             if(debug){
-                System.out.println(insetH+" "+i+" "+" pageTop="+pageTop+" pageBottom="+pageBottom+" viewTop="+viewTop +" viewBottom="+ viewBottom);
+                System.out.println(display.getInsetH()+" "+i+ ' ' +" pageTop="+pageTop+" pageBottom="+pageBottom+" viewTop="+ ry +" viewBottom="+ viewBottom);
             }
-            if( pageTop<=viewBottom && pageBottom>=viewTop){
+            if( pageTop<=viewBottom && pageBottom>= ry){
                 //in view
                 
                 if(debug){
@@ -762,7 +771,7 @@ public abstract class MultiPageDecoder {
             }
             
             if(debug){
-                System.out.println(i+" reached "+yReached[i]+" "+ry);
+                System.out.println(i+" reached "+yReached[i]+ ' ' +ry);
             }
         }
         

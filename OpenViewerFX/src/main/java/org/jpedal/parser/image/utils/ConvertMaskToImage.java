@@ -43,8 +43,7 @@ public class ConvertMaskToImage {
 
     public static BufferedImage convert(PdfObject newSMask, PdfObjectReader currentPdfFile) {
         BufferedImage image;
-        byte opacity = (byte) 255;
-        byte d0 = 0, d1 = (byte) 255;
+        byte opacity, d0 = 0, d1 = (byte) 255;
 
         /**
          * get opacity if not default

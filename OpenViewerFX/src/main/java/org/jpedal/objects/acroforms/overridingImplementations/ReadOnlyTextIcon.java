@@ -81,7 +81,7 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
     private boolean textChanged;
     private String preFontStream="",betweenFontAndTextStream="",afterTextStream="",text="";
     
-    private String fontName="",fontSize="",fontCommand="";
+    private String fontName="",fontSize="12",fontCommand="";
     
     /** our full command Stream*/
     private String fullCommandString;
@@ -651,14 +651,19 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             
             if(fontStr.isEmpty()) //use defined DA and remove any whitespace at front (ORIGINAL version)
             {
-                fontStr = DA.trim();
+                //first file since we wrote this code in 2004 where the DA stream has contained more than a font and needs rest of data stripped off
+                int ptr=DA.indexOf('/');
+                if(ptr<0){
+                    ptr=0;
+                }
+                //end of new code
+                fontStr = DA.substring(ptr).trim();
             } else{//get font name from DA but use original fontsize
                 final String fontname=DA.substring(0, DA.indexOf(' '));
                 final String fontsize=fontStr.substring(fontStr.indexOf(' '), fontStr.length());
                 fontStr=fontname+fontsize;
                 fontStr = fontStr.trim();
             }
-            
         }
         
         //do not think we need but here for completeness

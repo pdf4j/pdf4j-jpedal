@@ -1107,9 +1107,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
                     /**
                      * File Menu.
                      */
-                    case Commands.OPENURL:
-                        openUrl.setDisable(debug);
-                        break;
                     case Commands.FIND:
                         find.setDisable(debug);
                         break;
@@ -1140,7 +1137,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
             }
         }else{
             separateCover.setDisable(debug);
-            openUrl.setDisable(debug);
             reSaveAsForms.setDisable(debug);
             signPDF.setDisable(debug);
             print.setDisable(debug);

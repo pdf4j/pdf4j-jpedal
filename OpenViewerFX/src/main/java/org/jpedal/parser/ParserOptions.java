@@ -39,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.jpedal.objects.layers.PdfLayerList;
 
-//<start-adobe><end-adobe>
+import org.jpedal.objects.structuredtext.StructuredContentHandler;
 
 public class ParserOptions {
 
@@ -72,8 +72,8 @@ public class ParserOptions {
     
     protected float samplingUsed=-1;
 
-    //<start-adobe><end-adobe>
-
+    protected org.jpedal.objects.structuredtext.StructuredContentHandler contentHandler;
+    
     private int textPrint;
 
     /**clip if we render directly*/
@@ -231,8 +231,14 @@ public class ParserOptions {
         textPrint=value;
     }
 
-    //<start-adobe><end-adobe>
+    public StructuredContentHandler getContentHandler() {
+        return contentHandler;
+    }
 
+    public void setContentHandler(final StructuredContentHandler contentHandler) {
+        this.contentHandler=contentHandler;
+    }
+    
     public boolean renderDirectly() {
         return renderDirectly;
     }
@@ -301,9 +307,9 @@ public class ParserOptions {
     }
 
     boolean hasContentHandler() {
-        //<start-adobe></end-fx><end-adobe>
-        return false;
-        /**/
+        
+        return contentHandler!=null;
+        
     }
 
     /**

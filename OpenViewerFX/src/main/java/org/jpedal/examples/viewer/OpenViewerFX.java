@@ -43,6 +43,9 @@ import org.jpedal.*;
 import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.examples.viewer.gui.javafx.*;
 import org.jpedal.examples.viewer.utils.*;
+import org.jpedal.examples.viewer.objects.ClientExternalHandler;
+import org.jpedal.external.Options;
+import org.jpedal.objects.acroforms.actions.JavaFXDefaultActionHandler;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
@@ -166,7 +169,6 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
                     + "Also check you have a file in org.jpedal.international.messages to support Locale=" + java.util.Locale.getDefault());
         }
         
-
         //
 
         decode_pdf = new PdfDecoderFX();
@@ -174,6 +176,10 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
         thumbnails = new JavaFXThumbnailPanel(decode_pdf);
 
         currentGUI = new JavaFxGUI(stage, decode_pdf, commonValues, thumbnails, properties);
+        
+        decode_pdf.addExternalHandler(new JavaFXDefaultActionHandler(currentGUI), Options.FormsActionHandler);
+        decode_pdf.addExternalHandler(new ClientExternalHandler(), Options.AdditionalHandler);
+        
         if(GUI.debugFX) {
             System.out.println("OpenViewerFX init()");
         }

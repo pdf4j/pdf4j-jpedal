@@ -38,7 +38,6 @@ import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.GUIModes;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.ExternalHandlers;
-import org.jpedal.external.Options;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.PdfPageData;
@@ -50,8 +49,6 @@ import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.swing.PDFtoImageConvertorSwing;
 import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
-import org.jpedal.render.output.FontRasterizer;
-import org.jpedal.render.output.OutputDisplay;
 
 /**
  *
@@ -113,21 +110,27 @@ public abstract class PDFtoImageConvertor {
          
         final PdfObject Resources=pdfObject.getDictionary(PdfDictionary.Resources);
 
-        FontRasterizer fontRasterizer=null;
+        imageDisplay=getDisplay(pageIndex, localStore);
         
-        //allow us to insert our own version (ie HTML)
-        final Object customDVR=externalHandlers.getExternalHandler(Options.CustomOutput);
-        
-        if(customDVR!=null){
-            
-            final OutputDisplay htmlDVR=(OutputDisplay) customDVR;
-            fontRasterizer=(FontRasterizer) htmlDVR.getObjectValue(OutputDisplay.FontsToRasterizeInTextMode);
+        if(!BaseDisplay.isHTMLorSVG(imageDisplay)){
+        	
+        	if(options.getPageColor()!=null) {
+                imageDisplay.setValue(DynamicVectorRenderer.ALT_BACKGROUND_COLOR, options.getPageColor().getRGB());
+            }
+        	
+            if(options.getTextColor()!=null){
+            	imageDisplay.setValue(DynamicVectorRenderer.ALT_FOREGROUND_COLOR, options.getTextColor().getRGB());
+                
+                if(options.getChangeTextAndLine()) {
+                	imageDisplay.setValue(DynamicVectorRenderer.FOREGROUND_INCLUDE_LINEART, 1);
+                } else {
+                	imageDisplay.setValue(DynamicVectorRenderer.FOREGROUND_INCLUDE_LINEART, 0);
+                }
+                
+                imageDisplay.setValue(DynamicVectorRenderer.COLOR_REPLACEMENT_THRESHOLD, options.getReplacementColorThreshold());
+            }
         }
         
-        imageDisplay=getDisplay(pageIndex, localStore, fontRasterizer);
-        
-      //
-
         final PdfStreamDecoder currentImageDecoder;
 
         //
@@ -275,7 +278,7 @@ public abstract class PDFtoImageConvertor {
         
     }
 
-    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore, final FontRasterizer fontRasterizer) {
+    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore) {
         throw new UnsupportedOperationException(this+" Code should never be called ");
     }
     

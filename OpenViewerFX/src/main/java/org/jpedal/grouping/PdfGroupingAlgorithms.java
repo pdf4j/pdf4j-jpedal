@@ -505,7 +505,7 @@ public class PdfGroupingAlgorithms {
 		
 		//set values
 		for (int i = 0; i < count; i++) {
-
+            
 			//extract values
 			//character_spacing = pdf_data.f_character_spacing[i];
 			//raw = pdf_data.contents[i];
@@ -518,21 +518,38 @@ public class PdfGroupingAlgorithms {
 			final int mode=pdf_data.f_writingMode[i];
 
 			boolean accepted = false;
-			
-			final float height = y1-y2;
+			float height;
+            
+            switch (mode) {
+                case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                    height = y1-y2;
+                    if ((((minX < x1 && x1 < maxX) || (minX < x2 && x2 < maxX)) || //Area contains the x1 or x2 coords
+                            ((x1 < minX && minX < x2) || (x1 < maxX && maxX < x2)) //Area is within the x1 and x2 coords
+                            )
+                            && (minY < y2 + (height / 4) && y2 + (height * 0.75) < maxY) //Area also contains atleast 3/4 of the text y coords
+                            ) {
+                        accepted = true;
+                    }
+                    break;
+                case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                    height = x2-x1;
+                    if ((((minY < y1 && y1 < maxY) || (minY < y2 && y2 < maxY)) || //Area contains the x1 or x2 coords
+                            ((y2 < minY && minY < y1) || (y2 < maxY && maxY < y1)) //Area is within the x1 and x2 coords
+                            )
+                            && (minX < x1 + (height / 4) && x1 + (height * 0.75) < maxX) //Area also contains atleast 3/4 of the text y coords
+                            ) {
+                        accepted = true;
+                    }
+                    break;
+            }
 			//if at least partly in the area, process
-			if(
-					(
-					((minX<x1 && x1<maxX) ||(minX<x2 && x2<maxX)) || //Area contains the x1 or x2 coords
-					((x1<minX && minX<x2) ||(x1<maxX && maxX<x2)) //Area is within the x1 and x2 coords
-					) &&
-					(minY<y2+(height/4) && y2+(height*0.75)<maxY) //Area also contains atleast 3/4 of the text y coords
-					){
-				accepted=true;
-			}
+			
 			
 			if(accepted){
-				content[currentPoint] = new StringBuilder(pdf_data.contents[i]);
+                
+                content[currentPoint] = new StringBuilder(pdf_data.contents[i]);
 
 				fontSize[currentPoint] = pdf_data.f_end_font_size[i];
 				writingMode[currentPoint]=pdf_data.f_writingMode[i];
@@ -581,8 +598,17 @@ public class PdfGroupingAlgorithms {
 						f_y1[currentPoint] = xCoord;
 					}
 					
-					
-					if(minX<xCoord && (xCoord+width)<maxX){
+                    boolean storeValues = false;
+					if ((mode==PdfData.HORIZONTAL_LEFT_TO_RIGHT || mode==PdfData.HORIZONTAL_RIGHT_TO_LEFT)){
+                        if(minX<xCoord && (xCoord+width)<maxX){
+                            storeValues = true;
+                        }
+                    }else{
+                        if(minY<xCoord && (xCoord+width)<maxY){
+                            storeValues = true;
+                        }
+                    }
+					if(storeValues){
 						startTags.append(MARKER);
 						startTags.append(xCoord); //Add X Coord
 						
@@ -3169,7 +3195,7 @@ public class PdfGroupingAlgorithms {
                         //System.out.println("j2=="+j2);
 						i=items[j2];
 
-						if(!isUsed[i] && c!=i){
+						if(!isUsed[i] && c!=i && this.writingMode[c]==this.writingMode[i]){
 
 							//amount of variation in bottom of text
 							//int baseLineDifference = (int) (f_y2[i] - f_y2[c]);
@@ -4260,7 +4286,7 @@ public class PdfGroupingAlgorithms {
                         if (includeHTMLtags) {
                             foundTerm = "<b>" + foundTerm + "</b>";
                         }
-
+                        
                         if (needToFindTeaser) {
                             findTeaser(foundTerm, teaserFinder, termStarts, termEnds, resultTeasers);
                         }
@@ -4298,15 +4324,15 @@ public class PdfGroupingAlgorithms {
         //Portions of text to perform the search on and find teasers
         String searchText;
 
-				//Merge all text into one with \n line separators
+		//Merge all text into one with \n line separators
         //This will allow checking for multi line split results
         StringBuilder str = new StringBuilder();
         for (int i = 0; i != content.length; i++) {
             if (content[i] != null && mode == this.writingMode[i]) {
-                str.append(content[i]).append('\n');
+                    str.append(content[i]).append('\n');
             }
         }
-
+        
         //Remove double spaces, replacing them with single spaces
         searchText = removeDuplicateSpaces(str.toString());
 
@@ -4390,17 +4416,23 @@ public class PdfGroupingAlgorithms {
             //Point in line is equal to or greater than start of the term.
             //Store coords and mark start as found.
             if (!startFound && pointInLine >= termStarts) {
-                resultStart = new int[]{(int) currentX, (int) f_y1[lineCounter]};
+                int currentY = (int) f_y1[lineCounter];
+                if(valuesSwapped){
+                    currentY = (int) f_x2[lineCounter];
+                }
+                resultStart = new int[]{(int) currentX, currentY};
                 startFound = true;
             }
-
-									//End of term not found yet.
+            						//End of term not found yet.
             //Point in line is equal to or greater than end of the term.
             //Store coords and mark end as found.
             if (!endFound && pointInLine >= termEnds) {
-
-                storeResultsCoords(valuesSwapped, mode, resultCoords, resultStart[0], resultStart[1], (currentX + width), f_y2[lineCounter], 0.0f);
-
+                int currentY = (int) f_y2[lineCounter];
+                if(valuesSwapped){
+                    currentY = (int) f_x1[lineCounter];
+                }
+                storeResultsCoords(valuesSwapped, mode, resultCoords, resultStart[0], resultStart[1], (currentX + width), currentY, 0.0f);
+                
                 endFound = true;
             }
 
@@ -4448,6 +4480,9 @@ public class PdfGroupingAlgorithms {
             for (int i = 0; i != resultTeasers.size(); i++) {
                 multipleTermTeasers.add(resultTeasers.elementAt(i));
             }
+            //Prevent issue this not getting cleared between writing modes 
+            //resulting in duplicate teasers
+            resultTeasers.clear();
         } else {
             //Store all teasers to be retrieved by getTeaser() method
             teasers = resultTeasers.get();
@@ -4482,14 +4517,14 @@ public class PdfGroupingAlgorithms {
     }
     
     private void findTeaser(String teaser, Matcher teaserFinder, int termStarts, int termEnds, Vector_String resultTeasers){
-       
+        
         if (teaserFinder.find()) {
             //Get a teaser if found and set the search term to bold is allowed
             if (teaserFinder.start() < termStarts && teaserFinder.end() > termEnds) {
 
                 //replace default with found teaser
                 teaser = teaserFinder.group();
-
+                
                 if (includeHTMLtags) {
                     //Calculate points to add bold tags
                     final int teaseStarts = termStarts - teaserFinder.start();
@@ -4502,6 +4537,7 @@ public class PdfGroupingAlgorithms {
                 }
             }
         }
+        
         //Store teaser
         resultTeasers.addElement(teaser);
     }

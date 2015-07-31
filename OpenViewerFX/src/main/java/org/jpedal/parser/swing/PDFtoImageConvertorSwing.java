@@ -47,8 +47,6 @@ import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.*;
 
-import org.jpedal.render.output.FontRasterizer;
-
 public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
 
 
@@ -58,8 +56,8 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
     }
 
     @Override
-    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore, final FontRasterizer fontRasterizer) {
-        return imageDisplay = new ImageDisplay(pageIndex,true, 5000, localStore, fontRasterizer);
+    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore) {
+        return imageDisplay = new ImageDisplay(pageIndex,true, 5000, localStore);
         
     }
 

@@ -149,8 +149,7 @@ public class JPedalBorderFactory {
 
             insideBorder=new DashBorder(current_stroke,borderColor);
             break;
-            
-            // <start-demo><end-demo>
+           
         }
         
         /** if an X in the BS then thats out XFABorder-
@@ -169,7 +168,7 @@ public class JPedalBorderFactory {
 	        	case PdfDictionary.R:
 	        		outsideBorder = xfaBorder;//correct on compare
 	        		break;
-	        		// <start-demo><end-demo>
+	        		
 //	        	case PdfDictionary.L:
 //	        		outsideBorder = insideBorder;//to check
 //	        		insideBorder = xfaBorder;

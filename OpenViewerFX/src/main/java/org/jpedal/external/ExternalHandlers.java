@@ -42,14 +42,12 @@ import org.jpedal.render.DynamicVectorRenderer;
 
 import java.util.Map;
 import org.jpedal.display.GUIModes;
-//<start-adobe><start-thin><start-server>
-import org.jpedal.examples.viewer.gui.FXAdditionalData;
-import org.jpedal.io.Speech;
 
-//<end-server><end-thin><end-adobe>
 public class ExternalHandlers {
     
     FormFactory userFormFactory;
+    
+    AdditonalHandler additionalHandler;
     
     /**default renderer for acroforms*/
     private AcroRenderer formRenderer;
@@ -69,23 +67,15 @@ public class ExternalHandlers {
     
     private Object userExpressionEngine;
     
-    //<start-adobe><start-thin><start-server>
-    /**Used in JavaFX to display additional objects if decoding with transition*/
-    private FXAdditionalData additionaValuesforPage=null; 
-    private Speech speech; 
-    //<end-server><end-thin><end-adobe>
-    
     //
     
     final private boolean useXFA=false;   
      /**/
     
-    
     /**
      * needs to be accessed in several locations so declared here
      */
     private Javascript javascript;
-    
     
     //custom class for flagging painting
     RenderChangeListener customRenderChangeListener;
@@ -96,10 +86,6 @@ public class ExternalHandlers {
 
     private boolean alwaysUseXFA;
 
-    //<start-adobe><start-thin><start-server>
-    AnnotationHandler annotationHandler;// =new ExampleAnnotationHandler();
-    //<end-server><end-thin><end-adobe>
-    
     private Map jpedalActionHandlers;
     
     //<start-server>
@@ -114,25 +100,13 @@ public class ExternalHandlers {
     
     private CustomMessageHandler customMessageHandler;
     
-    // [AWI] Used when the UI is ready for Keyboard input (used for touchscreens with virtual keyboards).
-    
-    //<start-server><start-thin><start-adobe>
-    private JPedalActionHandler keyboardHandler;
-    //<end-adobe><end-thin><end-server>
-    
     //copy for callback
     Object swingGUI;
-    
-    private boolean isServer;
     
     private Enum modeSelected=GUIModes.SWING;
 
     public ExternalHandlers(){}
-    
-    public ExternalHandlers(final boolean isServer) {
-        this.isServer=isServer;
-    }
-
+   
     public ExternalHandlers(final GUIModes mode) {
         this.modeSelected=mode;
     }
@@ -163,6 +137,12 @@ public class ExternalHandlers {
         
         switch (type) {
 
+            case Options.AdditionalHandler:
+                
+                additionalHandler=(AdditonalHandler) newHandler;
+                
+                break;
+                
             case Options.USE_XFA_IN_LEGACY_MODE:
                 //
                 break;
@@ -264,17 +244,6 @@ public class ExternalHandlers {
                 //
                 //                break;
                 //
-                //            //<start-thin><start-adobe>
-                //            case Options.SwingMouseHandler:
-                //                if(formRenderer != null){
-                //                    formRenderer.getActionHandler().setMouseHandler((SwingMouseListener) newHandler);
-                //                }
-                //                break;
-                //
-                //            case Options.ThumbnailHandler:
-                //                pages.setThumbnailPanel((org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel) newHandler);
-                //                break;
-                //            //<end-adobe><end-thin>
                 //
             case Options.JPedalActionHandler:
                 jpedalActionHandlers = (Map) newHandler;
@@ -294,37 +263,17 @@ public class ExternalHandlers {
                 break;
                 //<end-server>
                 
-            //<start-adobe><start-thin><start-server>
-            case Options.SpeechEngine:
-                if ( newHandler instanceof Speech ) {
-                    speech = (Speech)newHandler;
-                }
-                break;
-            case Options.JavaFX_ADDITIONAL_OBJECTS:
-                additionaValuesforPage = (FXAdditionalData)newHandler;
-                break;    
-            //<end-server><end-thin><end-adobe>
-                
             case Options.CustomOutput:
                 customDVR = (DynamicVectorRenderer) newHandler;
                 break;
                 
-                //<start-adobe><start-thin><start-server>
-            case Options.UniqueAnnotationHandler:
-                annotationHandler =(AnnotationHandler) newHandler;
-                break;
-            
-            /* [AWI] Used when the UI is ready for Keyboard input (used for touchscreens with virtual keyboards). */
-            case Options.KeyboardReadyHandler:
-                if ( newHandler instanceof JPedalActionHandler ) {
-                    keyboardHandler = (JPedalActionHandler)newHandler;
-                }
-                break;
-            
-                 //<end-server><end-thin><end-adobe>
+             
             default:
-                throw new IllegalArgumentException("Unknown type="+type);
-                
+                if(additionalHandler!=null){
+                    additionalHandler.addExternalHandler(newHandler,type);
+                }else{
+                    throw new IllegalArgumentException("Unknown type="+type);
+                }
         }
     }
     
@@ -338,7 +287,7 @@ public class ExternalHandlers {
     public Object getExternalHandler(final int type) {
         
         switch (type) {
-            
+             
             case Options.FormFactory:
                 return formRenderer.getFormFactory();
             
@@ -367,14 +316,6 @@ public class ExternalHandlers {
             case Options.CustomPrintHintingHandler:
                 return customPrintHintingHandler;
                 //<end-server>
-            
-            //<start-adobe><start-thin><start-server>
-            case Options.SpeechEngine:
-                return speech;
-            
-            case Options.JavaFX_ADDITIONAL_OBJECTS:
-                return additionaValuesforPage;
-            //<end-server><end-thin><end-adobe>
             
             case Options.ShapeTracker:
                 return customShapeTracker;
@@ -421,21 +362,13 @@ public class ExternalHandlers {
             case Options.JPedalActionHandlers:
                 return jpedalActionHandlers;
             
-                //<start-server><start-adobe><start-thin>
-            case Options.UniqueAnnotationHandler:
-                return annotationHandler;
-                
-
-            /* [AWI] Used when the UI is ready for Keyboard input (used for touchscreens with virtual keyboards). */
-            case Options.KeyboardReadyHandler:
-                return keyboardHandler;
-
-                //<end-thin><end-adobe><end-server>
-                
+            
             default:
                 
                 if(type==Options.UniqueAnnotationHandler){
                     return null;
+                }else if(additionalHandler!=null){
+                    return additionalHandler.getExternalHandler(type);    
                 }else {
                     throw new IllegalArgumentException("Unknown type " + type);
                 }
@@ -491,20 +424,6 @@ public class ExternalHandlers {
         final FormFactory userFormFactory= this.userFormFactory;
         if(userFormFactory!=null) {
             formRenderer.setFormFactory(userFormFactory);
-        }
-        
-        /**
-         * hard-code to flatten for if in non-forms/XFA html release
-         */
-        final boolean isForm=formRenderer.getFormFactory()!=null &&
-                (formRenderer.getFormFactory().getType()==FormFactory.HTML || formRenderer.getFormFactory().getType()==FormFactory.SVG);
-        //
-        if(isForm){
-        //   formRenderer.getCompData().setRasterizeForms(true);          
-        }else
-        /**/
-        if(isServer && !isForm){ //isForm handles case of XFA/forms version where we do not want enabled and
-            //
         }
         
         /**

@@ -58,8 +58,8 @@ public class IncQuadTree {
                 lev.items[j] = def;
             }
             nodeList[i] = lev;
-            width = width%2 == 0 ? width/2 : (width+1)/2;
-            height = height%2 == 0 ? height/2 : (height+1)/2;
+            width = (width + 1) >> 1;
+            height = (height + 1) >> 1;
         }
     }
 

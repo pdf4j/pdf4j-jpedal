@@ -36,8 +36,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-// <start-demo><end-demo>
-
 import org.jpedal.color.DeviceCMYKColorSpace;
 
 import org.jpedal.objects.acroforms.actions.SwingDownIconListener;
@@ -74,251 +72,260 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
      */
     public SwingFormFactory() {}
     
+    
+    private JButton setupAnnotationButton(final FormObject form){
+        //point where testActions breaks - ignore this halting error as it is within the testActions flag.
+        final JButton but = new JButton();
+        
+        setupButton(but, form);
+        setupUniversalFeatures(but, form);
+        
+        return but;
+    }
+    
+    private JButton createAnntoationHighlight(final FormObject form) {
+        JButton but = setupAnnotationButton(form);
+        but.setBackground(new Color(0, 0, 0, 0));
+        but.setIcon(new FixImageIcon(form, PopupFactory.getIcon(form), 0));
+        return but;
+    }
+    
+    private JButton createAnnotationFreeText(final FormObject form){
+        JButton but = setupAnnotationButton(form);
+
+        but.setText("<html>" + form.getTextStreamValue(PdfDictionary.Contents) + "</html>");
+
+        final Font font = new Font("TimesRoman", Font.PLAIN, 12);
+        form.setTextSize(12);
+        but.setFont(font);
+
+        form.setFontName("TimesRoman");
+        form.setTextFont(font);
+        return but;
+    }
+                    
+    private JButton createAnnotationText(final FormObject form){
+        JButton but = setupAnnotationButton(form);
+
+        final int rot = pageData.getRotation(form.getPageNumber());
+
+        final BufferedImage commentIcon = PopupFactory.getIcon(form);
+
+        if (commentIcon != null) {
+            //Ensure sized correctly
+            final float[] rect = form.getFloatArray(PdfDictionary.Rect);
+            // rect[0] = rect[0];
+            rect[1] = rect[3] - commentIcon.getHeight();
+            rect[2] = rect[0] + commentIcon.getWidth();
+            //   rect[3] = rect[3];
+            form.setFloatArray(PdfDictionary.Rect, rect);
+        }
+        but.setIcon(new FixImageIcon(form, commentIcon, rot));
+
+        return but;
+    }
+    
+    private JComponent createAnnotationPopup(final FormObject form) {
+    
+        JComponent comp = (JComponent) getPopupComponent(form, pageData.getCropBoxWidth(form.getPageNumber()));
+        form.setGUIComponent(comp, FormFactory.SWING);
+        //set visibility
+        comp.setVisible(form.getBoolean(PdfDictionary.Open));
+
+        return comp;
+
+    }
+    
+    private JButton createAnnotationUnderline(final FormObject form) {
+        JButton but = setupAnnotationButton(form);
+        Color color = getAnnotationColor(form);
+        but.setBounds(form.getBoundingRectangle());
+
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+
+        final BufferedImage icon = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
+        final Graphics g = icon.getGraphics();
+                    //        			g.setColor(Color.blue);
+        //        			g.fillRect(0,0, icon.getWidth(), icon.getHeight());
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
+                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
+                //Adjust y for display
+                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+                final Rectangle rh = new Rectangle(x, y, width, height);
+
+                try {
+                    g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+                    g.fillRect(rh.x, rh.y, rh.width, rh.height);
+                    g.setColor(color);
+                    g.fillRect(rh.x, rh.y + rh.height - 1, rh.width, 1);
+                    but.setBackground(new Color(0, 0, 0, 0));
+                    but.setIcon(new FixImageIcon(form, icon, 0));
+                } catch (final Exception e) {
+                    //tell user and log
+                    if (LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
+                    }
+                    //
+                }
+            }
+        }
+        return but;
+    }
+    
+    private JButton createAnnotationInk(final FormObject form) {
+        JButton but = setupAnnotationButton(form);
+
+        //we need this bit
+        but.setToolTipText(form.getTextStreamValue(PdfDictionary.Contents));
+
+        final Object[] InkListArray = form.getObjectArray(PdfDictionary.InkList);
+
+        //resize ink size if entire ink is not contained
+        final float[] r = scanInkListTree(InkListArray, form, null);
+        form.setFloatArray(PdfDictionary.Rect, new float[]{r[0], r[1], r[2], r[3]});
+
+        //Create image to draw to
+        final BufferedImage icon1 = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
+        scanInkListTree(InkListArray, form, icon1.getGraphics());
+
+        //Add image to button
+        but.setBackground(new Color(0, 0, 0, 0));
+        but.setIcon(new FixImageIcon(form, icon1, 0));
+
+        return but;
+    }
+    
+    private JButton createAnnotationStrikeOut(final FormObject form) {
+        JButton but = setupAnnotationButton(form);
+
+        Color color = getAnnotationColor(form);
+
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+
+        final BufferedImage icon = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
+        final Graphics g = icon.getGraphics();
+                    //        			g.setColor(Color.blue);
+        //        			g.fillRect(0,0, icon.getWidth(), icon.getHeight());
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
+                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
+                //Adjust y for display
+                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+                final Rectangle rh = new Rectangle(x, y, width, height);
+
+                try {
+                    g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+                    g.fillRect(0, 0, rh.width, rh.height);
+                    g.setColor(color);
+                    g.fillRect(rh.x, rh.y + (rh.height / 2), rh.width, 1);
+                    but.setBackground(new Color(0, 0, 0, 0));
+                    but.setIcon(new FixImageIcon(form, icon, 0));
+                } catch (final Exception e) {
+                    //tell user and log
+                    if (LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
+                    }
+                    //
+                }
+            }
+        }
+
+        return but;
+    }
+    
+    private Color getAnnotationColor(final FormObject form){
+        final float[] formColor = form.getFloatArray(PdfDictionary.C);
+        Color color = new Color(0);
+        if (formColor != null) {
+            switch (formColor.length) {
+                case 0:
+                    //Should not happen. Do nothing. Annotation is transparent
+                    break;
+                case 1:
+                    //DeviceGrey colorspace
+                    color = new Color(formColor[0], formColor[0], formColor[0], 1.0f);
+                    break;
+                case 3:
+                    //DeviceRGB colorspace
+                    color = new Color(formColor[0], formColor[1], formColor[2], 1.0f);
+                    break;
+                case 4:
+                    //DeviceCMYK colorspace
+                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
+                    cmyk.setColor(formColor, 4);
+
+                    final int r;
+                    final int g;
+                    final int b;
+                    final int rgb = cmyk.getColor().getRGB();
+                    r = (rgb >> 16) & 255;
+                    g = (rgb >> 8) & 255;
+                    b = (rgb) & 255;
+
+                    color = new Color(r, g, b, 1);
+
+                    break;
+                default:
+                    break;
+            }
+        }
+        return color;
+    }
+    
     /**
      * setup annotations display with popups, etc
      */
     @Override
     public Object annotationButton(final FormObject form) {
         
-        //point where testActions breaks - ignore this halting error as it is within the testActions flag.
-        final JButton but = new JButton();
-        JComponent comp=null;  //alternative if we use popup
-        
-        setupButton(but, form);
-        setupUniversalFeatures(but, form);
-        
         final int subtype=form.getParameterConstant(PdfDictionary.Subtype);
         
-        final boolean newAnnots = true;
-        
+        //Special case that does not return a button so handle separately.
+        if(subtype == PdfDictionary.Popup){
+            return createAnnotationPopup(form);
+        }
         /**
          * @kieran - there are several types of annotation (Underline, highlight, Ink).
          *
          * We implemented them by adding a button and putting the content on the button's image
          * We had not added others as no example. Can you use the text example to add for missing values?
          */
-        switch(subtype){
-            
-            case PdfDictionary.Popup:
-            	
-                comp = (JComponent) getPopupComponent(form,pageData.getCropBoxWidth(form.getPageNumber()));
-                //comp.setBounds(but.getBounds());
-                
-                form.setGUIComponent(comp, FormFactory.SWING);
-                
-                //set visibility
-                comp.setVisible(form.getBoolean(PdfDictionary.Open));
-                
-                break;
-                
-            case PdfDictionary.Text:/* a sticky note which displays a popup when open. */
-            	
-                final int rot = pageData.getRotation(form.getPageNumber());
-                
-                final BufferedImage commentIcon =PopupFactory.getIcon(form);
-                
-                if(commentIcon!=null){
-                    //Ensure sized correctly
-                    final float[] rect = form.getFloatArray(PdfDictionary.Rect);
-                    rect[0] = rect[0];
-                    rect[1] = rect[3]-commentIcon.getHeight();
-                    rect[2] = rect[0]+commentIcon.getWidth();
-                    rect[3] = rect[3];
-                    form.setFloatArray(PdfDictionary.Rect, rect);
-                }
-                but.setIcon(new FixImageIcon(form,commentIcon,rot));
-                break;
-                
-            case PdfDictionary.FreeText:/* we only have 11dec/itext_sample.pdf as example) */
-                
-                but.setText("<html>"+form.getTextStreamValue(PdfDictionary.Contents)+"</html>");
-                
-                final Font font=new Font("TimesRoman", Font.PLAIN, 12);
-                form.setTextSize(12);
-                but.setFont(font);
-                
-                form.setFontName("TimesRoman");
-                form.setTextFont(font);
-                break;
-                
-            case PdfDictionary.Highlight :
-                if(newAnnots){
-                    but.setBackground(new Color(0, 0, 0, 0));
-                    but.setIcon(new FixImageIcon(form, PopupFactory.getIcon(form), 0));
-                }
-                break;
-            case PdfDictionary.Underline :
-                if(newAnnots){
-                    but.setBounds(form.getBoundingRectangle());
-                    
-                    final float[] underlineColor = form.getFloatArray(PdfDictionary.C);
-                    Color c1 = new Color(0);
-                    if(underlineColor!=null){
-                        switch(underlineColor.length){
-                            case 0:
-                                //Should not happen. Do nothing. Annotation is transparent
-                                break;
-                            case 1:
-                                //DeviceGrey colorspace
-                                c1 = new Color(underlineColor[0],underlineColor[0],underlineColor[0],1.0f);
-                                break;
-                            case 3:
-                                //DeviceRGB colorspace
-                                c1 = new Color(underlineColor[0],underlineColor[1],underlineColor[2],1.0f);
-                                break;
-                            case 4:
-                                //DeviceCMYK colorspace
-                                final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
-                                cmyk.setColor(underlineColor, 4);
-                                c1 = new Color(cmyk.getColor().getRGB());
-                                
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    
-                    float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-                    if(quad==null){
-                        quad = form.getFloatArray(PdfDictionary.Rect);
-                    }
-                    
-                    final BufferedImage icon = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
-                    final Graphics g = icon.getGraphics();
-                    //        			g.setColor(Color.blue);
-                    //        			g.fillRect(0,0, icon.getWidth(), icon.getHeight());
-                    if(quad.length>=8) {
-                        for (int hi = 0; hi != quad.length; hi += 8) {
-                            final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                            int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                            //Adjust y for display
-                            y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                            final int width = (int) (quad[hi + 2] - quad[hi]);
-                            final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-                            final Rectangle rh = new Rectangle(x, y, width, height);
-
-                            try {
-                                g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-                                g.fillRect(rh.x, rh.y, rh.width, rh.height);
-                                g.setColor(c1);
-                                g.fillRect(rh.x, rh.y + rh.height - 1, rh.width, 1);
-                                but.setBackground(new Color(0, 0, 0, 0));
-                                but.setIcon(new FixImageIcon(form, icon, 0));
-                            } catch (final Exception e) {
-                                //tell user and log
-                                if (LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception: " + e.getMessage());
-                                }
-                                //
-                            }
-                        }
-                    }
-                }
-                break;
-                
-            case PdfDictionary.Ink:
-                if(!form.isAppearanceUsed()){
-                    
-                    //we need this bit
-                    but.setToolTipText(form.getTextStreamValue(PdfDictionary.Contents));
-                    
-                    final Object[] InkListArray = form.getObjectArray(PdfDictionary.InkList);
-                    
-                    //resize ink size if entire ink is not contained
-                    final float[] r = scanInkListTree(InkListArray, form, null);
-                    form.setFloatArray(PdfDictionary.Rect, new float[]{r[0], r[1], r[2], r[3]});
-                    
-                    //Create image to draw to
-                    final BufferedImage icon1 = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
-                    scanInkListTree(InkListArray, form, icon1.getGraphics());
-                    
-                    //Add image to button
-                    but.setBackground(new Color(0,0,0,0));
-                    but.setIcon(new FixImageIcon(form,icon1,0));
-                    //dummy code so kieran can see to implement
-                    //            		but.setBackground(Color.CYAN);
-                    //            		but.setOpaque(true);
-                }
-                break;
-                
-            case PdfDictionary.StrickOut :
-                if(newAnnots){
-                    
-                    final float[] strikeColor = form.getFloatArray(PdfDictionary.C);
-                    Color c2 = new Color(0);
-                    if(strikeColor!=null){
-                        switch(strikeColor.length){
-                            case 0:
-                                //Should not happen. Do nothing. Annotation is transparent
-                                break;
-                            case 1:
-                                //DeviceGrey colorspace
-                                c2 = new Color(strikeColor[0],strikeColor[0],strikeColor[0],1.0f);
-                                break;
-                            case 3:
-                                //DeviceRGB colorspace
-                                c2 = new Color(strikeColor[0],strikeColor[1],strikeColor[2],1.0f);
-                                break;
-                            case 4:
-                                //DeviceCMYK colorspace
-                                final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
-                                cmyk.setColor(strikeColor, 4);
-                                c2 = new Color(cmyk.getColor().getRGB());
-                                
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    
-                    float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-                    if(quad==null){
-                        quad = form.getFloatArray(PdfDictionary.Rect);
-                    }
-                    
-                    final BufferedImage icon = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
-                    final Graphics g = icon.getGraphics();
-                    //        			g.setColor(Color.blue);
-                    //        			g.fillRect(0,0, icon.getWidth(), icon.getHeight());
-                    if(quad.length>=8) {
-                        for (int hi = 0; hi != quad.length; hi += 8) {
-                            final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                            int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                            //Adjust y for display
-                            y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                            final int width = (int) (quad[hi + 2] - quad[hi]);
-                            final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-                            final Rectangle rh = new Rectangle(x, y, width, height);
-
-                            try {
-                                g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-                                g.fillRect(0, 0, rh.width, rh.height);
-                                g.setColor(c2);
-                                g.fillRect(rh.x, rh.y + (rh.height / 2), rh.width, 1);
-                                but.setBackground(new Color(0, 0, 0, 0));
-                                but.setIcon(new FixImageIcon(form, icon, 0));
-                            } catch (final Exception e) {
-                                //tell user and log
-                                if (LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception: " + e.getMessage());
-                                }
-                                //
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                //
-                break;
+        // If we're using the icon from the AP Stream, this section isn't used
+        if(!form.isAppearanceUsed()){
+            switch(subtype){
+                case PdfDictionary.Text:/* a sticky note which displays a popup when open. */
+                    return createAnnotationText(form);
+                case PdfDictionary.FreeText:/* we only have 11dec/itext_sample.pdf as example) */
+                    return createAnnotationFreeText(form);
+                case PdfDictionary.Highlight :
+                    return createAnntoationHighlight(form);
+                case PdfDictionary.Underline :
+                    return createAnnotationUnderline(form);
+                case PdfDictionary.Ink:
+                    return createAnnotationInk(form);
+                case PdfDictionary.StrickOut :
+                    return createAnnotationStrikeOut(form);
+                default:
+                    //
+                    break;
+            }
         }
         
-        //return popup or button
-        if(comp==null){
-            return but;
-        }else{
-            return comp;
-        }
+        //If none of the above, just setup button
+        return setupAnnotationButton(form);
     }
     
     static float[] curveInk(final float[] points){

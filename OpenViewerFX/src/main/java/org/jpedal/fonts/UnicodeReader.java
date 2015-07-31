@@ -34,7 +34,7 @@ package org.jpedal.fonts;
 
 import org.jpedal.utils.LogWriter;
 
-public class UnicodeReader {
+class UnicodeReader {
     
     private static final int[] powers={1,16,256,256*16};
     

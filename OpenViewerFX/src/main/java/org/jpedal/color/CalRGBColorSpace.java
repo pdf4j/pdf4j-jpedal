@@ -52,10 +52,14 @@ public class CalRGBColorSpace extends  GenericColorSpace{
     
     private int r,g,b;
     
-    private static final double[][] xyzrgb = {
-        {  3.240449, -1.537136, -0.498531 },
-        { -0.969265,  1.876011,  0.041556 },
-        {  0.055643, -0.204026,  1.057229 }};
+//    private static final double[][] xyzrgb = {
+//        {  3.240449, -1.537136, -0.498531 },
+//        { -0.969265,  1.876011,  0.041556 },
+//        {  0.055643, -0.204026,  1.057229 }};
+    
+    private static double cs00 = 3.240449, cs01 = -1.537136, cs02 = -0.498531;
+    private static double cs10 = -0.969265, cs11 = 1.876011, cs12 = 0.041556;
+    private static double cs20 = 0.055643, cs21 = -0.204026, cs22 = 1.057229;
     
     /**cache for values to stop recalculation*/
     private float lastC=-255,lastI=-255,lastE=-255;
@@ -203,14 +207,14 @@ public class CalRGBColorSpace extends  GenericColorSpace{
             final double Z = Ma[2] * ag + Ma[5] * bg + Ma[8] * cg;
             
             // convert XYZ to RGB, including gamut mapping and gamma correction
-            final double rawR = xyzrgb[0][0] * X + xyzrgb[0][1] * Y + xyzrgb[0][2] * Z;
-            final double rawG = xyzrgb[1][0] * X + xyzrgb[1][1] * Y + xyzrgb[1][2] * Z;
-            final double rawB = xyzrgb[2][0] * X + xyzrgb[2][1] * Y + xyzrgb[2][2] * Z;
+            final double rawR = cs00 * X + cs01 * Y + cs02 * Z;
+            final double rawG = cs10 * X + cs11 * Y + cs12 * Z;
+            final double rawB = cs20 * X + cs21 * Y + cs22 * Z;
             
             // compute the white point adjustment
-            final double kr = 1 / ((xyzrgb[0][0] * W[0]) + (xyzrgb[0][1] * W[1]) + (xyzrgb[0][2] * W[2]));
-            final double kg = 1 / ((xyzrgb[1][0] * W[0]) + (xyzrgb[1][1] * W[1]) + (xyzrgb[1][2] * W[2]));
-            final double kb = 1 / ((xyzrgb[2][0] * W[0]) + (xyzrgb[2][1] * W[1]) + (xyzrgb[2][2] * W[2]));
+            final double kr = 1 / (cs00 * W[0] + cs01 * W[1] + cs02 * W[2]);
+            final double kg = 1 / (cs10 * W[0] + cs11 * W[1] + cs12 * W[2]);
+            final double kb = 1 / (cs20 * W[0] + cs21 * W[1] + cs22 * W[2]);
             
             // compute final values based on
             r = (int) (255 * Math.pow(clip(rawR * kr), 0.5));
@@ -231,7 +235,7 @@ public class CalRGBColorSpace extends  GenericColorSpace{
     
     static double clip(final double v) {
         if(v>1) {
-            return 1d;
+            return 1.0;
         } else {
             return v;
         }

@@ -38,6 +38,7 @@ package com.idrsolutions.image.jpeg2000;
 public class EntropyDecoder {
 
     private final byte[] stream;
+    private final int maxLen;
     private final int dataEnd;
     private int bp;
     private int ch;
@@ -47,6 +48,7 @@ public class EntropyDecoder {
 
     public EntropyDecoder(byte[] stream, int offset, int len) {
         this.stream = stream;
+        this.maxLen = stream.length;
         bp = offset;
         dataEnd = len;
         ch = stream[offset] & 0xff;
@@ -61,7 +63,7 @@ public class EntropyDecoder {
     }
 
     private void byteIn() {
-        if (bp<stream.length && (stream[bp] & 0xff) == 0xFF) {
+        if (bp<maxLen && (stream[bp] & 0xff) == 0xFF) {
             final int b1 = stream[bp + 1] & 0xff;
             if (b1 > 0x8F) {
                 cl += 0xFF00;
@@ -88,9 +90,6 @@ public class EntropyDecoder {
         int cx_mps = contexts[pos] & 1;
         
         final int qe_ = LUT.QE[cx_idx];
-        final int nmps_ = LUT.NMPS[cx_idx];
-        final int nlps_ = LUT.NLPS[cx_idx];
-        final int switch_ = LUT.SWITCHML[cx_idx];
 
         int d;
         a -= qe_;
@@ -100,14 +99,14 @@ public class EntropyDecoder {
             if (a < qe_) {
                 a = qe_;
                 d = cx_mps;
-                cx_idx = nmps_;
+                cx_idx = LUT.NMPS[cx_idx];
             } else {
                 a = qe_;
                 d = 1 ^ cx_mps;
-                if (switch_ == 1) {
+                if (LUT.SWITCHML[cx_idx] == 1) {
                     cx_mps = d;
                 }
-                cx_idx = nlps_;
+                cx_idx = LUT.NLPS[cx_idx];
             }
         } else {
             ch -= qe_;
@@ -117,13 +116,13 @@ public class EntropyDecoder {
 
             if (a < qe_) {
                 d = 1 ^ cx_mps;
-                if (switch_ == 1) {
+                if (LUT.SWITCHML[cx_idx] == 1) {
                     cx_mps = d;
                 }
-                cx_idx = nlps_;
+                cx_idx = LUT.NLPS[cx_idx];
             } else {
                 d = cx_mps;
-                cx_idx = nmps_;
+                cx_idx = LUT.NMPS[cx_idx];
             }
         }
         do {

@@ -382,8 +382,8 @@ public class StandardFonts {
                         
                     }else if (values.countTokens() == 4) {
                         hexVal=values.nextToken();
-                        //noinspection UnusedAssignment
-                        char_value = values.nextToken();
+                        
+                        values.nextToken(); //ignore in this case
                         NAME = values.nextToken();
                         VAL = values.nextToken();
                         

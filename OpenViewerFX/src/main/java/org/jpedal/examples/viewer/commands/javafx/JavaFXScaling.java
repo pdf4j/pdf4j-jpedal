@@ -56,9 +56,9 @@ public class JavaFXScaling {
                 currentGUI.scaleAndRotate();
                 
                 //we need to switch modes and bck to avoid issues with listeners
-                decode_pdf.setDisplayView(Display.SINGLE_PAGE,alignment);
+                currentGUI.setDisplayView(Display.SINGLE_PAGE,alignment);
                 currentGUI.scrollToPage(pageNumber);
-                decode_pdf.setDisplayView(mode,alignment);
+                currentGUI.setDisplayView(mode,alignment);
                 
             }
         } else {

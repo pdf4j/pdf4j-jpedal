@@ -709,7 +709,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
         
         final Display pages= decode_pdf.getPages();
         
-        //<start-adobe
+       
             final int[] flag = new int[2];
             
             flag[0] = GUI.CURSOR;
@@ -780,8 +780,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
             
         currentGUI.setMultibox(flag);
 
-        //<end-adobe>
-        
         final float scaling=currentGUI.getScaling();
         final int inset= GUI.getPDFDisplayInset();
         final int rotation=currentGUI.getRotation();
@@ -837,7 +835,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
     
     @SuppressWarnings("unused")
     private Point getPageCoordsInSingleDisplayMode(double x, double y, final int page){
-        //<start-adobe>
+        
             final int[] flag = new int[2];
             
             flag[0] = GUI.CURSOR;
@@ -879,7 +877,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
             
             currentGUI.setMultibox(flag);
         
-        //<end-adobe>
         
         final float scaling=currentGUI.getScaling();
         final int inset= GUI.getPDFDisplayInset();
@@ -937,8 +934,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
     
     @SuppressWarnings("unused")
     private Point getPageCoordsInFacingDisplayMode(double x, double y){
-        //<start-adobe>
-
+        
         final int[] flag = new int[2];
         flag[0] = GUI.CURSOR;
         
@@ -985,8 +981,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
         
         currentGUI.setMultibox(flag);
     
-        //<end-adobe>
-        
         scaling=currentGUI.getScaling();
         final int inset= GUI.getPDFDisplayInset();
         final int rotation=currentGUI.getRotation();
@@ -1043,7 +1037,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
     
     @SuppressWarnings("unused")
     private Point getPageCoordsInContinuousFacingDisplayMode(double x, double y, int page){
-        //<start-adobe>
         
         final Display pages= decode_pdf.getPages();
         
@@ -1135,8 +1128,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
             
             currentGUI.setMultibox(flag);
             
-        
-        //<end-adobe>
         
         
         final float scaling=currentGUI.getScaling();

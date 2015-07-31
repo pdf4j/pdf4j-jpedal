@@ -47,7 +47,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 

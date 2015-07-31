@@ -817,24 +817,14 @@ public class JSFunction {
 			final String valStr = ".value";
 			final int VALUE = 1;
 			
-			int whatToCall = -1;
 			if(arg.indexOf(valStr,finish+1)!=-1){
-				whatToCall = VALUE;
-				finish  = arg.indexOf(valStr,finish+1)+valStr.length();
-			}
+                            finish  = arg.indexOf(valStr,finish+1)+valStr.length();
+			
+                            final FormObject field = acro.getFormObject(name);
 
-			final FormObject field = acro.getFormObject(name);
-
-            switch (whatToCall) {
-            case 1:
-                arg = arg.substring(0,start) + field.getValue() +arg.substring(finish);
-                break;
-
-            default:
-                // <start-demo><end-demo>
-                break;
-            }
-
+                            arg = arg.substring(0,start) + field.getValue() +arg.substring(finish);
+                
+                        }
 		}
 		
 		//check for * / + - %

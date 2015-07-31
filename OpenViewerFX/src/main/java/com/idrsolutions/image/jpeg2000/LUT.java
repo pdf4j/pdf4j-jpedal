@@ -85,7 +85,7 @@ public class LUT {
         0, 0, 0, 0, 0, 0, 0
     };
     
-    public static final byte[] ContextLL = new byte[]{
+    public static final byte[] ContextLL = {
         0, 5, 8, 0, 3, 7, 8, 0, 4, 7,
         8, 0, 0, 0, 0, 0, 1, 6, 8, 0,
         3, 7, 8, 0, 4, 7, 8, 0, 0, 0,
@@ -96,7 +96,7 @@ public class LUT {
         8, 0, 4, 7, 8
     };
 
-    public static final byte[] ContextHL = new byte[]{
+    public static final byte[] ContextHL = {
         0, 3, 4, 0, 5, 7, 7, 0, 8, 8,
         8, 0, 0, 0, 0, 0, 1, 3, 4, 0,
         6, 7, 7, 0, 8, 8, 8, 0, 0, 0,
@@ -107,7 +107,7 @@ public class LUT {
         7, 0, 8, 8, 8
     };
 
-    public static final byte[] ContextHH = new byte[]{
+    public static final byte[] ContextHH = {
         0, 1, 2, 0, 1, 2, 2, 0, 2, 2,
         2, 0, 0, 0, 0, 0, 3, 4, 5, 0,
         4, 5, 5, 0, 5, 5, 5, 0, 0, 0,

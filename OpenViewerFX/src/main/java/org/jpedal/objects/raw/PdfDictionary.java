@@ -564,6 +564,8 @@ public class PdfDictionary {
     public static final int Mask=489767739;
 
     public static final int Matrix=1145198201;
+    
+    public static final int Matte=826557522;
 
     public static final int max=4010312;
 
@@ -1863,6 +1865,9 @@ public class PdfDictionary {
 
             case Matrix:
                 return VALUE_IS_FLOAT_ARRAY;
+            
+            case Matte:
+                return VALUE_IS_FLOAT_ARRAY;
 
             case max:
                 return VALUE_IS_FLOAT;
@@ -2043,8 +2048,12 @@ public class PdfDictionary {
             	return PdfDictionary.VALUE_IS_DICTIONARY;
 
             case Perms:
-                return VALUE_IS_VARIOUS;
-
+                if(type==Page){
+                    return VALUE_IS_DICTIONARY;
+                }else{
+                    return VALUE_IS_VARIOUS;
+                }
+            
             case Prev:
                 if(type==PdfDictionary.Outlines) {
                     return VALUE_IS_UNREAD_DICTIONARY;
@@ -2481,6 +2490,6 @@ public class PdfDictionary {
     }
     
     public static void main(String args[]){
-        System.out.print(stringToInt("Compatible"));
+        System.out.println(stringToInt("Matte"));
     }
 }

@@ -32,9 +32,6 @@
  */
 package org.jpedal.display;
 
-//<start-thin><start-adobe><start-server>
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
-//<end-server><end-adobe><end-thin>
 import org.jpedal.render.DynamicVectorRenderer;
 
 import java.awt.*;
@@ -120,7 +117,6 @@ public interface Display {
 
     public void drawCursor(Graphics g, float scaling);
 
-    //<start-adobe>
     /**
      * Deprecated on 07/07/2014
      * Please use setViewableArea(int[] viewport) instead.
@@ -130,8 +126,7 @@ public interface Display {
     AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
     
     AffineTransform setViewableArea(int[] viewport) throws PdfException;
-    //<end-adobe>
-
+    
     void drawFacing(Rectangle visibleRect);
     
     public enum BoolValue {
@@ -170,10 +165,8 @@ public interface Display {
 
     int getXCordForPage(int currentPage);
 
-	//<start-thin><start-adobe><start-server>
 	void setThumbnailPanel(GUIThumbnailPanel thumbnails);
-	//<end-server><end-adobe><end-thin>
-
+	
 	void setScaling(float scaling);
 
 	@SuppressWarnings("UnusedDeclaration")

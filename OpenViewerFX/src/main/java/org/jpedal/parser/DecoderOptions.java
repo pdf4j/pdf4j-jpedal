@@ -84,6 +84,9 @@ public class DecoderOptions {
     //allow user to override code
     @SuppressWarnings("CanBeFinal")
     public static JPedalHelper Helper;//new org.jpedal.examples.ExampleHelper();
+    
+    /**custom hi-res val for JPedal settings*/
+    public static boolean hires = true;
 
     /**amount we scroll screen to make visible*/
     public int scrollInterval=10;
@@ -469,7 +472,14 @@ public class DecoderOptions {
                 }
 
             }else if(key.equals(JPedalSettings.IMAGE_HIRES)){
-                //<start-adobe><end-adobe>
+                
+                if(rawValue instanceof Boolean){
+
+                    hires = (Boolean)rawValue;
+                }else {
+                    throw new PdfException("JPedalSettings.IMAGE_HIRES expects a Boolean value");
+                }
+               
             }else if(key.equals(JPedalSettings.EXTRACT_AT_BEST_QUALITY_MAXSCALING)){
 
                 if(rawValue instanceof Integer){

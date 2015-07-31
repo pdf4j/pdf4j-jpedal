@@ -87,15 +87,8 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
     public JavaFXFormFactory() {
     }
     
-    /**
-     * setup annotations display with popups, etc
-     */
-    @Override
-    public Object annotationButton(final FormObject form) {
-        
-        //point where testActions breaks - ignore this halting error as it is within the testActions flag.
+    private Button setupAnnotationButton(final FormObject form){
         final Button but = new Button();
-        Pane comp=null;  //alternative if we use popup
         final StringBuilder buttonStyle = new StringBuilder(200);
         final JavaFXControlListener controlListener = new JavaFXControlListener(but);
         
@@ -105,10 +98,290 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
         setupButton(but,form, controlListener);
         setupUniversalFeatures(but, form, buttonStyle, controlListener);
         
+        but.setStyle(buttonStyle.toString());
+        
+        return but;
+    }
+    
+    private Button createAnntoationHighlight(final FormObject form) {
+        Button but = setupAnnotationButton(form);
+        Color color = getAnnotationColor(form);
+
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+
+        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        final SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
+                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
+                //Adjust y for display
+                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+
+                try {
+                    gc.setFill(color);
+                    gc.fillRect(x, y, width, height);
+                    but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
+                } catch (final Exception e) {
+                    //tell user and log
+                    if (LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
+                    }
+                    //
+                }
+            }
+        }
+        
+        return but;
+    }
+    
+    private Button createAnnotationFreeText(final FormObject form){
+        Button but = setupAnnotationButton(form);
+        but.setText(form.getTextStreamValue(PdfDictionary.Contents));
+        return but;
+    }
+                    
+    private Button createAnnotationText(final FormObject form){
+        Button but = setupAnnotationButton(form);
+        String name = form.getTextStreamValue(PdfDictionary.Name);
+        BufferedImage commentIcon = getAnnotationTextIcon(form, name);
+        
+        //Ensure sized correctly
+        final float[] rect = form.getFloatArray(PdfDictionary.Rect);
+        rect[1] = rect[3] - commentIcon.getHeight();
+        rect[2] = rect[0] + commentIcon.getWidth();
+        form.setFloatArray(PdfDictionary.Rect, rect);
+
+        but.setGraphic(new JavaFXImageIcon(but, form, commentIcon, 0));
+
+        return but;
+    }
+    
+    private Pane createAnnotationPopup(final FormObject form) {
+        
+        Pane comp = (Pane) getPopupComponent(form, pageData.getCropBoxWidth(form.getPageNumber()));
+        form.setGUIComponent(comp, FormFactory.JAVAFX);
+        comp.setVisible(form.getBoolean(PdfDictionary.Open));
+        
+        return comp;
+
+    }
+    
+    private Button createAnnotationUnderline(final FormObject form) {
+        Button but = setupAnnotationButton(form);
+        Color color = getAnnotationColor(form);
+
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+
+        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        // Snapshot uses a white background unless specified otherwise
+        final SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
+                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
+                //Adjust y for display
+                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+
+                try {
+                    gc.setFill(new Color(0, 0, 0, 0));
+                    gc.fillRect(x, y, width, height);
+                    gc.setFill(color);
+                    gc.fillRect(x, y + height - 1, width, 1);
+
+                    but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
+                } catch (final Exception e) {
+                    //tell user and log
+                    if (LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
+                    }
+                    //
+                }
+            }
+        }
+        return but;
+    }
+    
+    private Button createAnnotationInk(final FormObject form) {
+        Button but = setupAnnotationButton(form);
+
+        //we need this bit
+        but.setTooltip(new Tooltip(form.getTextStreamValue(PdfDictionary.Contents)));
+
+        final Object[] InkListArray = form.getObjectArray(PdfDictionary.InkList);
+
+        //resize ink size if entire ink is not contained
+        final float[] r = scanInkListTree(InkListArray, form, null);
+        form.setFloatArray(PdfDictionary.Rect, new float[]{r[0], r[1], r[2], r[3]});
+
+        //Create canvas to draw to
+        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        // Snapshot uses a white background unless specified otherwise
+        final SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        scanInkListTree(InkListArray, form, gc);
+
+        but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
+
+        return but;
+    }
+    
+    private Button createAnnotationStrikeOut(final FormObject form) {
+        Button but = setupAnnotationButton(form);
+        
+        Color color = getAnnotationColor(form);
+
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+
+        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        // Snapshot uses a white background unless specified otherwise
+        final SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
+                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
+                //Adjust y for display
+                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+
+                try {
+                    gc.setFill(Color.TRANSPARENT);
+                    gc.fillRect(0, 0, width, height);
+                    gc.setFill(color);
+                    gc.fillRect(x, y + (height / 2), width, 1);
+                    but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
+                } catch (final Exception e) {
+                    //tell user and log
+                    if (LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
+                    }
+                    //
+                }
+            }
+        }
+
+        return but;
+    }
+    
+    private Color getAnnotationColor(final FormObject form){
+        final float[] formColor = form.getFloatArray(PdfDictionary.C);
+        Color color = Color.TRANSPARENT;
+        if (formColor != null) {
+            switch (formColor.length) {
+                case 0:
+                    //Should not happen. Do nothing. Annotation is transparent
+                    break;
+                case 1:
+                    //DeviceGrey colorspace
+                    color = new Color(formColor[0], formColor[0], formColor[0], 1.0f);
+                    break;
+                case 3:
+                    //DeviceRGB colorspace
+                    color = new Color(formColor[0], formColor[1], formColor[2], 1.0f);
+                    break;
+                case 4:
+                    //DeviceCMYK colorspace
+                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
+                    cmyk.setColor(formColor, 4);
+
+                    final int r;
+                    final int g;
+                    final int b;
+                    final int rgb = cmyk.getColor().getRGB();
+                    r = (rgb >> 16) & 255;
+                    g = (rgb >> 8) & 255;
+                    b = (rgb) & 255;
+
+                    color = new Color(r, g, b, 1);
+
+                    break;
+                default:
+                    break;
+            }
+        }
+        return color;
+    }
+    
+    private BufferedImage getAnnotationTextIcon(final FormObject form, String name){
+        BufferedImage commentIcon = null;
+        if (name == null) {
+            name = "Note";
+        }
+        /* Name of the icon image to use for the icon of this annotation
+         * - predefined icons are needed for names:-
+         * Comment, Key, Note, Help, NewParagraph, Paragraph, Insert
+         */
+        try {
+            if (name.equals("Comment")) {
+                // If the button doesn't have an AP Image attached, use local graphic
+                commentIcon = ImageIO.read(getClass().getResource("/org/jpedal/objects/acroforms/res/comment.png"));
+            } else {
+                commentIcon = ImageIO.read(getClass().getResource("/org/jpedal/objects/acroforms/res/note.png"));
+            }
+        } catch (final Exception e) {
+            //tell user and log
+            if (LogWriter.isOutput()) {
+                LogWriter.writeLog("Exception: " + e.getMessage());
+            }
+        }
+
+        //Set color of annotation
+        final float[] col = form.getFloatArray(PdfDictionary.C);
+        if (col != null) {
+
+            final PdfPaint c = new PdfColor(col[0], col[1], col[2]);
+            final int rgb = c.getRGB();
+
+            //Replace default color with specified color
+            for (int x = 0; x != commentIcon.getWidth(); x++) {
+                for (int y = 0; y != commentIcon.getHeight(); y++) {
+
+                    //Checks for yellow (R255,G255,B000) and replaces with color
+                    if (commentIcon.getRGB(x, y) == -256) {
+                        commentIcon.setRGB(x, y, rgb);
+                    }
+                }
+            }
+        }
+        
+        return commentIcon;
+    }
+    /**
+     * setup annotations display with popups, etc
+     */
+    @Override
+    public Object annotationButton(final FormObject form) {
+        
         final int subtype=form.getParameterConstant(PdfDictionary.Subtype);
         
-        final boolean newAnnots = true;
-        
+        //Special case that does not return a button so handle separately.
+        if(subtype == PdfDictionary.Popup){
+            return createAnnotationPopup(form);
+        }
         /**
          * @kieran - there are several types of annotation (Underline, highlight, Ink).
          *
@@ -116,342 +389,28 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
          * We had not added others as no example. Can you use the text example to add for missing values?
          */
         // If we're using the icon from the AP Stream, this section isn't used
-        if(!form.isAppearanceUsed() || subtype == PdfDictionary.Popup){
+        if(!form.isAppearanceUsed()){
             switch(subtype){
-
-                case PdfDictionary.Popup:
-
-                    comp = (Pane) getPopupComponent(form,pageData.getCropBoxWidth(form.getPageNumber()));
-                    //comp.setBounds(but.getBounds());
-
-                    form.setGUIComponent(comp, FormFactory.JAVAFX);
-
-                    //set visibility
-                    comp.setVisible(form.getBoolean(PdfDictionary.Open));
-
-                    break;
-
                 case PdfDictionary.Text:/* a sticky note which displays a popup when open. */
-                    String name = form.getTextStreamValue(PdfDictionary.Name);
-                    BufferedImage commentIcon = null;
-                    if(name==null){
-                        name = "Note";
-                    }
-                    /* Name of the icon image to use for the icon of this annotation
-                     * - predefined icons are needed for names:-
-                     * Comment, Key, Note, Help, NewParagraph, Paragraph, Insert
-                     */
-                    try {
-                        if(name.equals("Comment")){
-                            // If the button doesn't have an AP Image attached, use local graphic
-                            commentIcon = ImageIO.read(getClass().getResource("/org/jpedal/objects/acroforms/res/comment.png"));
-                        }else{
-                            commentIcon = ImageIO.read(getClass().getResource("/org/jpedal/objects/acroforms/res/note.png"));
-                        }
-                    } catch (final Exception e){
-                        //tell user and log
-                        if(LogWriter.isOutput()){
-                            LogWriter.writeLog("Exception: "+e.getMessage());
-                        }
-                    }
-
-                    //Set color of annotation
-                    final float[] col = form.getFloatArray(PdfDictionary.C);
-                    if(col!=null){
-                        
-                        final PdfPaint c = new PdfColor(col[0], col[1], col[2]);
-                        final int rgb = c.getRGB();
-                        
-                        //Replace default color with specified color
-                        for(int x=0; x!=commentIcon.getWidth(); x++){
-                            for(int y=0; y!=commentIcon.getHeight(); y++){
-
-                                //Checks for yellow (R255,G255,B000) and replaces with color
-                                if(commentIcon.getRGB(x, y)==-256){
-                                    commentIcon.setRGB(x, y, rgb);
-                                }
-                            }
-                        }
-                    }
-
-                    //Ensure sized correctly
-                    final float[] rect = form.getFloatArray(PdfDictionary.Rect);
-                    rect[1] = rect[3]-commentIcon.getHeight();
-                    rect[2] = rect[0]+commentIcon.getWidth();
-                    form.setFloatArray(PdfDictionary.Rect, rect);
-
-                    but.setGraphic(new JavaFXImageIcon(but,form,commentIcon,0));
-
-                    break;
-
+                    return createAnnotationText(form);
                 case PdfDictionary.FreeText:/* we only have 11dec/itext_sample.pdf as example) */
-
-                    but.setText(form.getTextStreamValue(PdfDictionary.Contents));
-
-                    break;
-
+                    return createAnnotationFreeText(form);
                 case PdfDictionary.Highlight :
-                    if(newAnnots){
-                        final float[] f = form.getFloatArray(PdfDictionary.C);
-                        Color c = Color.TRANSPARENT;
-                        if(f!=null){
-                            switch(f.length){
-                                case 0:
-                                    //Should not happen. Do nothing. Annotation is transparent
-                                    break;
-                                case 1:
-                                    //DeviceGrey colorspace
-                                    c = new Color(f[0],f[0],f[0],0.5);
-                                    break;
-                                case 3:
-                                    //DeviceRGB colorspace
-                                    c = new Color(f[0],f[1],f[2],0.5);
-                                    break;
-                                case 4:
-                                    //DeviceCMYK colorspace
-                                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
-                                    cmyk.setColor(f, 4);
-                                    final int r;
-                                    final int g;
-                                    final int b;
-                                    final int rgb=cmyk.getColor().getRGB();
-                                    r = (rgb >> 16) & 255;
-                                    g = (rgb >> 8) & 255;
-                                    b = (rgb) & 255;
-                                    
-                                    c = new Color(r,g,b,0.5);
-
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-                        if(quad==null){
-                            quad = form.getFloatArray(PdfDictionary.Rect);
-                        }
-
-                        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
-                        final GraphicsContext gc = canvas.getGraphicsContext2D();
-                        final SnapshotParameters params = new SnapshotParameters();
-                        params.setFill(Color.TRANSPARENT);
-
-                        if(quad.length>=8) {
-                            for (int hi = 0; hi != quad.length; hi += 8) {
-                                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                                //Adjust y for display
-                                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                                final int width = (int) (quad[hi + 2] - quad[hi]);
-                                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-
-                                try {
-                                    gc.setFill(c);
-                                    gc.fillRect(x, y, width, height);
-                                    but.setGraphic(new JavaFXImageIcon(but,form,canvas.snapshot(params, null),0));
-                                } catch (final Exception e) {
-                                    //tell user and log
-                                    if (LogWriter.isOutput()) {
-                                        LogWriter.writeLog("Exception: " + e.getMessage());
-                                    }
-                                    //
-                                }
-                            }
-                        }
-                    }
-                    break;
+                    return createAnntoationHighlight(form);
                 case PdfDictionary.Underline :
-                    if(newAnnots){
-                        final float[] f = form.getFloatArray(PdfDictionary.C);
-                        Color c = Color.TRANSPARENT;
-                        if(f!=null){
-                            switch(f.length){
-                                case 0:
-                                    //Should not happen. Do nothing. Annotation is transparent
-                                    break;
-                                case 1:
-                                    //DeviceGrey colorspace
-                                    c = new Color(f[0],f[0],f[0],1);
-                                    break;
-                                case 3:
-                                    //DeviceRGB colorspace
-                                    c = new Color(f[0],f[1],f[2],1);
-                                    break;
-                                case 4:
-                                    //DeviceCMYK colorspace
-                                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
-                                    cmyk.setColor(f, 4);
-                                    final int r;
-                                    final int g;
-                                    final int b;
-                                    final int rgb=cmyk.getColor().getRGB();
-                                    r = (rgb >> 16) & 255;
-                                    g = (rgb >> 8) & 255;
-                                    b = (rgb) & 255;
-                                    
-                                    c = new Color(r,g,b,1);
-
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-                        if(quad==null){
-                            quad = form.getFloatArray(PdfDictionary.Rect);
-                        }
-
-                        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
-                        final GraphicsContext gc = canvas.getGraphicsContext2D();
-                        // Snapshot uses a white background unless specified otherwise
-                        final SnapshotParameters params = new SnapshotParameters();
-                        params.setFill(Color.TRANSPARENT);
-                        
-                        if(quad.length>=8) {
-                            for (int hi = 0; hi != quad.length; hi += 8) {
-                                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                                //Adjust y for display
-                                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                                final int width = (int) (quad[hi + 2] - quad[hi]);
-                                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-
-                                try {
-                                    gc.setFill(new Color(0, 0, 0, 0));
-                                    gc.fillRect(x, y, width, height);
-                                    gc.setFill(c);
-                                    gc.fillRect(x, y + height - 1, width, 1);
-
-                                    but.setGraphic(new JavaFXImageIcon(but,form,canvas.snapshot(params, null),0));
-                                } catch (final Exception e) {
-                                    //tell user and log
-                                    if (LogWriter.isOutput()) {
-                                        LogWriter.writeLog("Exception: " + e.getMessage());
-                                    }
-                                    //
-                                }
-                            }
-                        }
-                    }
-                    break;
-
+                    return createAnnotationUnderline(form);
                 case PdfDictionary.Ink:
-                    if(!form.isAppearanceUsed()){
-
-                        //we need this bit
-                        but.setTooltip(new Tooltip(form.getTextStreamValue(PdfDictionary.Contents)));
-
-                        final Object[] InkListArray = form.getObjectArray(PdfDictionary.InkList);
-
-                        //resize ink size if entire ink is not contained
-                        final float[] r = scanInkListTree(InkListArray, form, null);
-                        form.setFloatArray(PdfDictionary.Rect, new float[]{r[0], r[1], r[2], r[3]});
-
-                        //Create canvas to draw to
-                        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
-                        final GraphicsContext gc = canvas.getGraphicsContext2D();
-                        // Snapshot uses a white background unless specified otherwise
-                        final SnapshotParameters params = new SnapshotParameters();
-                        params.setFill(Color.TRANSPARENT);
-                        scanInkListTree(InkListArray, form, gc);
-                        
-                        but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
-                        
-                    }
-                    break;
-
+                    return createAnnotationInk(form);
                 case PdfDictionary.StrickOut :
-                    if(newAnnots){
-
-                        final float[] strikeColor = form.getFloatArray(PdfDictionary.C);
-                        Color c2 = Color.TRANSPARENT;
-                        if(strikeColor!=null){
-                            switch(strikeColor.length){
-                                case 0:
-                                    //Should not happen. Do nothing. Annotation is transparent
-                                    break;
-                                case 1:
-                                    //DeviceGrey colorspace
-                                    c2 = new Color(strikeColor[0],strikeColor[0],strikeColor[0],1.0f);
-                                    break;
-                                case 3:
-                                    //DeviceRGB colorspace
-                                    c2 = new Color(strikeColor[0],strikeColor[1],strikeColor[2],1.0f);
-                                    break;
-                                case 4:
-                                    //DeviceCMYK colorspace
-                                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
-                                    cmyk.setColor(strikeColor, 4);
-                                    
-                                    final int r;
-                                    final int g;
-                                    final int b;
-                                    final int rgb=cmyk.getColor().getRGB();
-                                    r = (rgb >> 16) & 255;
-                                    g = (rgb >> 8) & 255;
-                                    b = (rgb) & 255;
-                                    
-                                    c2 = new Color(r,g,b,1);
-                                    
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-                        if(quad==null){
-                            quad = form.getFloatArray(PdfDictionary.Rect);
-                        }
-
-                        final Canvas canvas = new Canvas(form.getBoundingRectangle().width, form.getBoundingRectangle().height);
-                        final GraphicsContext gc = canvas.getGraphicsContext2D();
-                        // Snapshot uses a white background unless specified otherwise
-                        final SnapshotParameters params = new SnapshotParameters();
-                        params.setFill(Color.TRANSPARENT);
-                        
-                        if(quad.length>=8) {
-                            for (int hi = 0; hi != quad.length; hi += 8) {
-                                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                                //Adjust y for display
-                                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                                final int width = (int) (quad[hi + 2] - quad[hi]);
-                                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-
-                                try {
-                                    gc.setFill(Color.TRANSPARENT);
-                                    gc.fillRect(0, 0, width, height);
-                                    gc.setFill(c2);
-                                    gc.fillRect(x, y + (height / 2), width, 1);
-                                    but.setGraphic(new JavaFXImageIcon(but,form,canvas.snapshot(params, null),0));
-                                } catch (final Exception e) {
-                                    //tell user and log
-                                    if (LogWriter.isOutput()) {
-                                        LogWriter.writeLog("Exception: " + e.getMessage());
-                                    }
-                                    //
-                                }
-                            }
-                        }
-                    }
-                    break;
+                    return createAnnotationStrikeOut(form);
                 default:
                     //
                     break;
             }
         }
         
-        but.setStyle(buttonStyle.toString());
-        
-        //return popup or button
-        if(comp==null){
-            return but;
-        }else{
-            return comp;
-        }
+        //If none of the above, just setup button
+        return setupAnnotationButton(form);
     }
     
     static float[] curveInk(final float[] points){

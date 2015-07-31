@@ -56,6 +56,10 @@ import org.jpedal.utils.LogWriter;
  * @author Simon
  */
 public class JavaFXDefaultActionHandler extends DefaultActionHandler {
+
+    public JavaFXDefaultActionHandler(GUIFactory currentGUI) {
+        super(currentGUI);
+    }
     
     /**
      * this calls the PdfDecoder to open a new page and change to the correct page and location on page,
@@ -74,7 +78,6 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
                 //still the original file, which causes issues. So we have to change file
                 //at the viewer level.
                 
-                //<start-adobe><start-thin><start-server>
                 //added to check the forms save flag to tell the user how to save the now changed pdf file
                 
                 final org.jpedal.gui.GUIFactory gui = ((org.jpedal.examples.viewer.gui.GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
@@ -97,8 +100,6 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
                     }
                 }
                 
-                //<end-server><end-thin><end-adobe>
-                
                 if(page==-1) {
                     page = 1;
                 }
@@ -117,27 +118,22 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
             (decode_pdf.getPageCount()!=1 && (decode_pdf.getDisplayView() != Display.SINGLE_PAGE || (decode_pdf.getDisplayView() == Display.SINGLE_PAGE && decode_pdf.getlastPageDecoded()!=page))))
                 && (page > 0 && page < decode_pdf.getPageCount()+1)) {
                     try {
-                        // <start-demo><end-demo>
                         
-                        //<start-server>
                         final org.jpedal.PdfDecoderFX decode_pdf = (org.jpedal.PdfDecoderFX) this.decode_pdf;
                         
-                        //<start-adobe><start-thin>
+                       
                         //If we are using continuous or continuous facing we need to scroll to the correct page
                         if(decode_pdf.getDisplayView() == Display.CONTINUOUS || decode_pdf.getDisplayView() == Display.CONTINUOUS_FACING){
                            // Display d = ((Display)decode_pdf.getPages());
 //                            decode_pdf.scrollRectToVisible(new Rectangle(d.getXCordForPage(page), d.getYCordForPage(page), decode_pdf.getPdfPageData().getScaledCropBoxWidth(page), decode_pdf.getPdfPageData().getScaledCropBoxHeight(page)));
                         }
-                        //<end-thin><end-adobe><end-server>
                         
                         this.decode_pdf.decodePage(page);
                         
-                        //<start-adobe><start-thin><start-server>
                         //update page number
                         if (page != -1){
-                            decode_pdf.updatePageNumberDisplayed(page);
+                            gui.setPage(page);
                         }
-                        //<end-server><end-thin><end-adobe>
                         
                     } catch (final Exception e) {
                         //tell user and log
@@ -152,7 +148,6 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
                     
                 }
     
-        //<start-adobe><start-thin><start-server>
         if(type!=null){
             //now available via callback
             final Object gui = this.decode_pdf.getExternalHandler(org.jpedal.external.Options.GUIContainer);
@@ -176,7 +171,6 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
             }
         }
         
-        //<start-server>
         final org.jpedal.PdfDecoderFX decode_pdf=(org.jpedal.PdfDecoderFX)this.decode_pdf;
         
         //scroll to 'location'
@@ -204,9 +198,6 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
 //        decode_pdf.revalidate();
 //        decode_pdf.repaint();
         
-        //<end-thin><end-adobe>
-        
-        //<end-server>
     }
     
     @Override
@@ -221,10 +212,22 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
             }
         };
     }
+
     @Override
     protected void setCursor(final int eventType) {
-        
-        //<start-adobe><start-thin><start-server><end-server><end-thin><end-adobe>
+
+        final org.jpedal.PdfDecoderFX decode_pdf = (org.jpedal.PdfDecoderFX) this.decode_pdf;
+
+        if (decode_pdf == null) {
+            //do nothing
+        } else if (eventType == ActionHandler.MOUSEENTERED) {
+            if (GUIDisplay.allowChangeCursor) {
+                decode_pdf.setCursor(javafx.scene.Cursor.HAND);
+            }
+        } else if (eventType == ActionHandler.MOUSEEXITED && GUIDisplay.allowChangeCursor) {
+            decode_pdf.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
+
     }
     
     @Override

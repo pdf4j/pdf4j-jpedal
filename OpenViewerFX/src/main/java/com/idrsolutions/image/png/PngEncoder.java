@@ -45,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.zip.Deflater;
 
 /**
@@ -135,7 +136,7 @@ public class PngEncoder {
         outputStream.write(chunk.getCRCValue());
 
         byte[] pixels = getPixelData(image, bitDepth, nComp, bw, bh);
-        pixels = getDeflatedData(pixels, Deflater.BEST_SPEED);
+        pixels = getDeflatedData(pixels);
 
         byte[] trnsBytes = null;
 
@@ -192,50 +193,78 @@ public class PngEncoder {
         final int bh = image.getHeight();
         final int bw = image.getWidth();
         final int dim = bh * bw;
-        byte[] pixels;
+        
         int[] intPixels;
-        byte[] bgrPixels = null;
-        byte[] abgrPixels = null;
+        byte[] pixels = null;
         byte[] trnsBytes = null;
-        int cc = 0;
         int val;
+        
+        int[][] argb = null;
+        int[][] rgb = null;
+        int[] tempArr;
+        
+        int a,r,g,b,p=0;
 
         switch (type) {
             case BufferedImage.TYPE_3BYTE_BGR:
-                bgrPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                rgb = new int[bh][bw];
+                for (int y = 0; y < bh; y++) {
+                    tempArr = rgb[y]; 
+                    for (int x = 0; x < bw; x++) {
+                        b = pixels[p++]&0xff;
+                        g = pixels[p++]&0xff;
+                        r = pixels[p++]&0xff;
+                        tempArr[x] = (r<<16) | (g<<8) | b ;
+                    }
+                }                
                 break;
             case BufferedImage.TYPE_4BYTE_ABGR:
-                abgrPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                argb = new int[bh][bw];
+                for (int y = 0; y < bh; y++) {
+                    tempArr = argb[y]; 
+                    for (int x = 0; x < bw; x++) {
+                        a = pixels[p++]&0xff;
+                        b = pixels[p++]&0xff;
+                        g = pixels[p++]&0xff;
+                        r = pixels[p++]&0xff;
+                        tempArr[x] = (a<<24) | (r<<16) | (g<<8) | b ;
+                    }
+                }      
                 break;
             case BufferedImage.TYPE_INT_BGR:
-                bgrPixels = new byte[bh * bw * 3];
                 intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-                for (int i = 0; i < intPixels.length; i++) {
-                    val = intPixels[i];
-                    bgrPixels[cc++] = (byte) (val >> 16);
-                    bgrPixels[cc++] = (byte) (val >> 8);
-                    bgrPixels[cc++] = (byte) val;
+                rgb = new int[bh][bw];
+                for (int y = 0; y < bh; y++) {
+                    tempArr = rgb[y]; 
+                    for (int x = 0; x < bw; x++) {
+                        val = intPixels[p++];
+                        b = (val >> 16) & 0xff;
+                        g = (val >> 8) & 0xff;
+                        r = val & 0xff;
+                        tempArr[x] = (r << 16) | (g << 8) | b;
+                    }
                 }
                 break;
             case BufferedImage.TYPE_INT_ARGB:
-                abgrPixels = new byte[bh * bw * 4];
                 intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-                for (int i = 0; i < intPixels.length; i++) {
-                    val = intPixels[i];
-                    abgrPixels[cc++] = (byte) (val >> 24);
-                    abgrPixels[cc++] = (byte) val;
-                    abgrPixels[cc++] = (byte) (val >> 8);
-                    abgrPixels[cc++] = (byte) (val >> 16);
-                }
+                argb = new int[bh][bw];
+                for (int y = 0; y < bh; y++) {
+                    tempArr = argb[y]; 
+                    for (int x = 0; x < bw; x++) {
+                        tempArr[x] = intPixels[p++];
+                    }
+                }    
                 break;
             case BufferedImage.TYPE_INT_RGB:
-                bgrPixels = new byte[bh * bw * 3];
                 intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-                for (int i = 0; i < intPixels.length; i++) {
-                    val = intPixels[i];
-                    bgrPixels[cc++] = (byte) val;
-                    bgrPixels[cc++] = (byte) (val >> 8);
-                    bgrPixels[cc++] = (byte) (val >> 16);
+                rgb = new int[bh][bw];
+                for (int y = 0; y < bh; y++) {
+                    tempArr = rgb[y]; 
+                    for (int x = 0; x < bw; x++) {
+                        tempArr[x] = intPixels[p++];
+                    }
                 }
                 break;
             default:
@@ -243,21 +272,25 @@ public class PngEncoder {
                 return;
         }
 
-        intPixels = null;
-        pixels = null;
-
         final byte[] colorPalette;
         byte[] indexedPixels = new byte[dim + bh];
 
-        if (abgrPixels != null) {
+        if (argb != null) {
 //            adjustAlpha(abgrPixels);
-            Quant32 wu = new Quant32();
-            Object[] obj = wu.getPalette(abgrPixels);
-            wu = null;
-            colorPalette = (byte[]) obj[0];
-            trnsBytes = (byte[]) obj[1];
-            byte[] qBytes = D4.process(colorPalette, trnsBytes, abgrPixels, bh, bw);
-
+            byte[] qBytes;
+            
+            Object[] objs = getIndexedMap(argb);
+            if(objs!=null){
+                qBytes = (byte[]) objs[0];
+                colorPalette = (byte[]) objs[1];          
+                trnsBytes = (byte[]) objs[2];
+            }else{
+                Quant32 wu = new Quant32();
+                Object[] obj = wu.getPalette(argb);
+                colorPalette = (byte[]) obj[0];
+                trnsBytes = (byte[]) obj[1];
+                qBytes = D4.process(colorPalette, trnsBytes, argb, bh, bw);
+            }
             int k = 0;
             int z = 0;
             for (int i = 0; i < bh; i++) {
@@ -268,11 +301,17 @@ public class PngEncoder {
             }
 
         } else {
-
-            Quant24 wu = new Quant24();
-            colorPalette = wu.getPalette(bgrPixels);
-            wu = null;
-            byte[] qBytes = D3.process(colorPalette, bgrPixels, bh, bw);
+            byte[] qBytes;
+            
+            Object[] objs = getIndexedMap(rgb);
+            if(objs!=null){
+                qBytes = (byte[]) objs[0];
+                colorPalette = (byte[]) objs[1];                
+            }else{
+                Quant24 wu = new Quant24();
+                colorPalette = wu.getPalette(rgb);
+                qBytes = D3.process(colorPalette, rgb, bh, bw);
+            }
 
             int k = 0;
             int z = 0;
@@ -281,8 +320,12 @@ public class PngEncoder {
                 for (int j = 0; j < bw; j++) {
                     indexedPixels[z++] = qBytes[k++];
                 }
-            }
+            }            
         }
+        
+        pixels = null;
+        rgb = null;
+        argb = null;
 
         int bitDepth = 8;
         int colType = 3;
@@ -297,7 +340,7 @@ public class PngEncoder {
         outputStream.write(chunk.getData());
         outputStream.write(chunk.getCRCValue());
 
-        pixels = getDeflatedData(indexedPixels, Deflater.BEST_COMPRESSION);
+        pixels = getDeflatedData(indexedPixels);
 
         chunk = PngChunk.createPaleteChunk(colorPalette);
         outputStream.write(chunk.getLength());
@@ -326,9 +369,58 @@ public class PngEncoder {
         outputStream.write(chunk.getData());
         outputStream.write(chunk.getCRCValue());
     }
+    
+    public static Object[] getIndexedMap(int[][] pixel){
+        int h = pixel.length;
+        int w = pixel[0].length;
+        int [] temp;
+        int [] colors = new int[256];
+        int c = 0;
+        int p = 0;
+        int t = 0;
+        
+        byte indexedBytes [] = new byte[h*w];
+        HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();
+        for (int y = 0; y < h; y++) {
+            temp = pixel[y];
+            for (int x = 0; x < w; x++) {
+                int key = temp[x];
+                Integer val = map.get(key);
+                if(val==null){
+                    if(c>255){
+                        return null;
+                    }
+                    map.put(key,c);
+                    colors[c] = key;
+                    indexedBytes[p++] = (byte)c;
+                    c++;
+                    
+                }else{
+                    indexedBytes[p++] = (byte)(int)val;
+                }
+            }
+        }
+        
+        byte[] palette = new byte[c*3];
+        byte[] trns = new byte[c];
+        
+        p = 0;
+        
+        for (int i = 0; i < c; i++) {
+            int val = colors[i];
+            trns[t++] = (byte) ((val >> 24) & 0xff);
+            palette[p++] = (byte) ((val >> 16) & 0xff);
+            palette[p++] = (byte) ((val >> 8) & 0xff);
+            palette[p++] = (byte) (val & 0xff);
+        }        
+        
+        return new Object[]{indexedBytes,palette,trns};
+        
+    }
 
     private static byte[] getPixelData(final BufferedImage buff, final int bitDepth, final int nComp, final int bw, final int bh) throws IOException {
         ColorModel model = buff.getColorModel();
+        int pLen;
         switch (bitDepth) {
             case 1:
             case 2:
@@ -362,11 +454,12 @@ public class PngEncoder {
                 switch (dataBuff.getDataType()) {
                     case DataBuffer.TYPE_BYTE:
                         pixels8 = ((DataBufferByte) buff.getRaster().getDataBuffer()).getData();
+                        pLen = pixels8.length;
                         int col = 0;
                         final ByteBuffer bOut = ByteBuffer.allocate(bw * bh * nComp + bh);
                         switch (buff.getType()) {
                             case BufferedImage.TYPE_3BYTE_BGR:
-                                for (int p = 0; p < pixels8.length; p += nComp) {
+                                for (int p = 0; p < pLen; p += nComp) {
                                     if (col == 0) {
                                         bOut.put((byte) 0);
                                     }
@@ -380,7 +473,7 @@ public class PngEncoder {
                                 return bOut.array();
                             case BufferedImage.TYPE_4BYTE_ABGR:
                             case BufferedImage.TYPE_4BYTE_ABGR_PRE:
-                                for (int p = 0; p < pixels8.length; p += nComp) {
+                                for (int p = 0; p < pLen; p += nComp) {
                                     if (col == 0) {
                                         bOut.put((byte) 0);
                                     }
@@ -393,7 +486,7 @@ public class PngEncoder {
                                 }
                                 return bOut.array();
                             default:
-                                for (int p = 0; p < pixels8.length; p += nComp) {
+                                for (int p = 0; p < pLen; p += nComp) {
                                     if (col == 0) {
                                         bOut.put((byte) 0);
                                     }
@@ -545,8 +638,13 @@ public class PngEncoder {
         return 8;
     }
 
-    private static byte[] getDeflatedData(final byte[] pixels, int deflaterType) throws IOException {
-        final Deflater deflater = new Deflater(deflaterType);
+    private byte[] getDeflatedData(final byte[] pixels) throws IOException {
+        final Deflater deflater;
+        if(compress){
+            deflater= new Deflater(Deflater.BEST_COMPRESSION);
+        }else{
+            deflater= new Deflater(Deflater.BEST_SPEED);
+        }
         deflater.setInput(pixels);
         final int min = Math.min(pixels.length / 2, 4096);
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(min);

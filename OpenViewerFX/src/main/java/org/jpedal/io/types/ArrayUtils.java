@@ -69,6 +69,18 @@ class ArrayUtils {
         }
         return indirect;
     }
+
+
+    static int skipToEndOfRef(int i, final byte[] raw) {
+
+        byte b=raw[i];
+        while(b!=10 && b!=13 && b!=32 && b!=47 && b!=60 && b!=62){
+            i++;
+            b=raw[i];
+        }
+
+        return i;
+    }
     
     static int skipComment(final byte[] raw, int i) {
         

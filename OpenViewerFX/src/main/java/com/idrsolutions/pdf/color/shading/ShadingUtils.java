@@ -187,5 +187,13 @@ public class ShadingUtils {
         rawPath.closePath();
         return rawPath;
     }
+    
+    public static float[] getPdfCoords(AffineTransform inversedAffine, int x, int y, int xStart, int yStart) {
+        float[] ff = new float[2];
+        ff[0] = x + xStart;
+        ff[1] = y + yStart;
+        inversedAffine.transform(ff, 0, ff, 0, 1);
+        return ff;
+    }
 
 }

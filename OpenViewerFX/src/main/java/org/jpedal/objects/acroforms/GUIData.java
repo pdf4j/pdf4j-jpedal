@@ -53,12 +53,8 @@ public class GUIData {
     /**
      * flag to make forms draw as images, not swing components
      */
-    //
-    
-    //
-    protected boolean rasterizeForms = false;
-    /**/
-    
+    protected boolean rasterizeForms;
+   
     /** for if we add a popup to the panel, could be used for adding other objects*/
     protected boolean forceRedraw;
     
@@ -122,9 +118,7 @@ public class GUIData {
     }
     
     public void setRasterizeForms(final boolean inlineForms) {
-        //<start-server>
         rasterizeForms = inlineForms;
-        //<end-server>           
     } 
     
     protected void setListForPage(final int page, final List<FormObject> comps, final boolean isSorted){

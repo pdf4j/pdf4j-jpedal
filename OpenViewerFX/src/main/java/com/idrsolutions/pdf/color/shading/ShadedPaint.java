@@ -130,7 +130,7 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
     
     //
     
-	public void init(final PdfObject Shading, final GenericColorSpace shadingColorSpace, final PdfObjectReader currentPdfFile, final float[][] matrix){
+	private void init(final PdfObject Shading, final GenericColorSpace shadingColorSpace, final PdfObjectReader currentPdfFile, final float[][] matrix){
 
 		/**
 		 * read axial specific values not read in generic
@@ -213,7 +213,7 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
 
         final float[] Coords=Shading.getFloatArray(PdfDictionary.Coords);
         if(Coords!=null){
-
+	
             final int len=Coords.length;
             coords=new float[len];
             System.arraycopy(Coords,0,coords,0,len);
@@ -261,7 +261,7 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
 			final AffineTransform xform, final RenderingHints hints) {
            
 		PaintContext pt;
-
+              
 		//float printScale=1f;
 
 		//@printIssue - creates the paintContext which converts physical pixels into PDF co-ords and
@@ -293,7 +293,7 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
 //		pt = new AxialShadeContext(xform, isPrinting, shadingColorSpace, background, Shading, matrix, cropX, cropH, scaling, offX, offY, function);
 			break;
 		case RADIAL :
-                        pt = new RadialContext(xform,isPrinting,shadingColorSpace, background, Shading, matrix, cropX, cropH, 1f/scaling, offX, offY, function); 
+                        pt = new RadialContext(xform,isPrinting,shadingColorSpace, background, Shading, matrix,function); 
 			//old code stay for the moment;
 //			pt= new RadialContext(isPrinting,offX,offY,cropX,cropH,1f/scaling,isExtended,domain,coords, shadingColorSpace,colorsReversed,background, function);                                           
                       

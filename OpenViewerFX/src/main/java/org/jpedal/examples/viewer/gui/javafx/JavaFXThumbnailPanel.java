@@ -68,7 +68,7 @@ import javafx.util.Duration;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.ThumbnailDecoder;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.gui.generic.GUIThumbnailPanel;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.objects.PdfPageData;
 
 /**

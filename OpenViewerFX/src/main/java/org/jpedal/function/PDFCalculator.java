@@ -30,7 +30,6 @@
  * PDFCalculator.java
  * ---------------
  */
-
 package org.jpedal.function;
 
 import org.jpedal.utils.LogWriter;
@@ -40,62 +39,53 @@ import org.jpedal.utils.LogWriter;
  */
 public class PDFCalculator extends PDFGenericFunction implements PDFFunction {
 
-	final int returnValues;
-	
-        private final PostscriptFactory post ;
+    private final PostscriptFactory post;
 
-	public PDFCalculator(final byte[] stream, final float[] domain, final float[] range) {
+    private final int n;
 
-		super(domain, range);
+    public PDFCalculator(final byte[] stream, final float[] domain, final float[] range) {
 
-		returnValues=range.length/2;
+        super(domain, range);
 
-		post=new PostscriptFactory(stream);
+        post = new PostscriptFactory(stream);
 
-	}
+        n = range.length / 2;
 
-	/**
-	 * Calculate the output values for this point in the shading object. (Only used by Stitching)
-	 * @return returns the shading values for this point
-	 */
-	@Override
+    }
+
+    /**
+     * Calculate the output values for this point in the shading object. (Only
+     * used by Stitching)
+     *
+     * @return returns the shading values for this point
+     */
+    @Override
     public float[] computeStitch(final float[] subinput) {
-		return compute(subinput);
-		
-	}
-	
-	@Override
+        return compute(subinput);
+
+    }
+
+    @Override
     public float[] compute(final float[] values) {
 
-		final float[] output=new float[returnValues];
-		final float[] result=new float[returnValues];
-                
+        final float[] result = new float[n];
 
-		try{
-			
-			post.resetStacks(values);
-			final double[] stack=post.executePostscript();
+        try {
+            post.resetStacks(values);
+            final double[] stack = post.executePostscript();
 
-			if((domain.length / 2)==1){
-				for (int i=0,imax=range.length / 2; i<imax; i++){
-					output[i] = (float)(stack[i]);   // take output from stack
-					result[i]=min(max(output[i],range[i*2]),range[i*2+1]);
-				}
-			}else{
-				for (int i=0,imax=range.length / 2; i<imax; i++){
-					output[i] = (float)(stack[i]);   // take output from stack
-					result[i]=min(max(output[i],range[i*2]),range[i*2+1]);
-				}
-			}
-		
-		}catch(final Exception e){
+            for (int i = 0; i < n; i++) {
+                result[i] = min(max((float) (stack[i]), range[i * 2]), range[i * 2 + 1]);
+            }
+
+        } catch (final Exception e) {
             //tell user and log
-            if(LogWriter.isOutput()) {
+            if (LogWriter.isOutput()) {
                 LogWriter.writeLog("Exception: " + e.getMessage());
             }
             //
-		}
-		
-		return result;
-	}
+        }
+
+        return result;
+    }
 }

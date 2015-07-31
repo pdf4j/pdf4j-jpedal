@@ -291,7 +291,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         
         currentGUI.enableMemoryBar(true, false);
         currentGUI.enableCursor(true, true);
-        currentGUI.setMultibox(new int[]{});
+        currentGUI.setMultibox(new int[]{GUI.CURSOR,1});
         
         switch (mouseMode.getMouseMode()) {
 
@@ -417,7 +417,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         
         currentGUI.enableCursor(true, false);
         currentGUI.enableMemoryBar(true, true);
-        currentGUI.setMultibox(new int[]{});
+        currentGUI.setMultibox(new int[]{GUI.CURSOR,0});
 
         switch (mouseMode.getMouseMode()) {
 

@@ -54,6 +54,9 @@ import org.jpedal.utils.Strip;
  */
 public class ObjectStore {
 
+    /** added by MArk to hunt down bug for Adobe - 21832)*/
+    private static final boolean debugAdobe=false;
+    
     /**list of files to delete*/
     private static final Map undeletedFiles=new HashMap();
 
@@ -327,6 +330,9 @@ public class ObjectStore {
 
         boolean was_error = false;
 
+        if(debugAdobe){
+            System.out.println("Save "+current_image);
+        }
         current_image = removeIllegalFileNameCharacters(current_image);
 
         //if(image.getType()==1)
@@ -433,6 +439,10 @@ public class ObjectStore {
      */
     public final synchronized void flush() {
 
+        if(debugAdobe){
+            System.out.println("Flush files on close");
+        }
+        
         /**
          * flush any image data serialized as bytes
          */
@@ -466,7 +476,10 @@ public class ObjectStore {
 
                 //System.out.println("temp_dir="+temp_dir);
                 final File delete_file = new File(file);
-                //System.out.println("Delete "+file);
+                
+                if(debugAdobe){
+                    System.out.println("Delete "+file);
+                }
                 //delete_file.delete();
 
                 if (delete_file.delete()) {
@@ -474,6 +487,10 @@ public class ObjectStore {
                 } else //bug in Java stops files being deleted
                 {
                     undeletedFiles.put(key, "x");
+                    
+                    if(debugAdobe){
+                        System.out.println("Filed to Delete "+file);
+                    }
                 }
             }
         }
@@ -512,7 +529,7 @@ public class ObjectStore {
                     }
 
                 /*
-
+                
                 //suggested by Manuel to ensure flushes correctly
                 //System.gc();
 

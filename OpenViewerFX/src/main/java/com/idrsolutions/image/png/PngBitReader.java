@@ -48,7 +48,8 @@ public class PngBitReader {
         if (this.hasSmallBits) {
             this.bitset = new BitSet(totalBitLen);
             int c = 0;
-            for (int i = 0; i < data.length; i++) {
+            int dLen = data.length;
+            for (int i = 0; i < dLen; i++) {
                 byte b = data[i];
                 for (int j = 7; j >= 0; j--) {
                     boolean isOn = ((b >> j) & 1) == 1;

@@ -43,6 +43,7 @@ import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -88,12 +89,12 @@ public class FontMappings {
     /**
      * used to remap fonts onto truetype fonts (set internally)
      */
-    public static Map fontSubstitutionLocation = new HashMap();
+    public static Map fontSubstitutionLocation = new ConcurrentHashMap();
     
     /**
      * used to remap fonts onto truetype fonts (set internally)
      */
-    public static Map fontSubstitutionAliasTable = new HashMap();
+    public static Map fontSubstitutionAliasTable = new ConcurrentHashMap();
     
     /**only upload all fonts once*/
     private static boolean fontsSet;
@@ -260,10 +261,10 @@ public class FontMappings {
     public static String addTTDir(final String fontPath, String failed) {
         
         if ( fontSubstitutionTable == null) {
-            fontSubstitutionTable = new HashMap();
-            fontSubstitutionFontID = new HashMap();
-            fontPossDuplicates = new HashMap();
-            fontPropertiesTable = new HashMap();
+            fontSubstitutionTable = new ConcurrentHashMap();
+            fontSubstitutionFontID = new ConcurrentHashMap();
+            fontPossDuplicates = new ConcurrentHashMap();
+            fontPropertiesTable = new ConcurrentHashMap();
         }
         
         final File currentDir = new File(fontPath);
@@ -421,10 +422,10 @@ public class FontMappings {
         String failed = null;
         
         if (FontMappings.fontSubstitutionTable == null) {
-            fontSubstitutionTable = new HashMap();
-            fontSubstitutionFontID = new HashMap();
-            fontPossDuplicates = new HashMap();
-            fontPropertiesTable = new HashMap();
+            fontSubstitutionTable = new ConcurrentHashMap();
+            fontSubstitutionFontID = new ConcurrentHashMap();
+            fontPossDuplicates = new ConcurrentHashMap();
+            fontPropertiesTable = new ConcurrentHashMap();
         }
         
         try {
@@ -668,10 +669,10 @@ public class FontMappings {
     public static void addFontFile(final String currentFont, String fontPath) {
         
         if ( fontSubstitutionTable == null) {
-            fontSubstitutionTable = new HashMap();
-            fontSubstitutionFontID = new HashMap();
-            fontPossDuplicates = new HashMap();
-            fontPropertiesTable = new HashMap();
+            fontSubstitutionTable = new ConcurrentHashMap();
+            fontSubstitutionFontID = new ConcurrentHashMap();
+            fontPossDuplicates = new ConcurrentHashMap();
+            fontPropertiesTable = new ConcurrentHashMap();
         }
         
         //add separator if needed
@@ -924,11 +925,9 @@ public class FontMappings {
         }
     }
     
-    private static ArrayList getDirectoryMatches(final String sDirectoryName)
-            throws IOException {
+    private static ArrayList getDirectoryMatches(String sDirectoryName) throws IOException {
         
-        
-        sDirectoryName.replaceAll("\\.", "/");
+        sDirectoryName=sDirectoryName.replaceAll("\\.", "/");
         
         final URL u = Thread.currentThread().getContextClassLoader().getResource(
                 sDirectoryName);

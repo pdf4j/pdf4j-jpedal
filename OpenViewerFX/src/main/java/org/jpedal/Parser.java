@@ -32,15 +32,12 @@
  */
 package org.jpedal;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jpedal.color.ColorSpaces;
 import org.jpedal.constants.SpecialOptions;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIModes;
@@ -67,9 +64,6 @@ import org.jpedal.parser.fx.*;
 //<end-adobe>
 import org.jpedal.parser.swing.*;
 import org.jpedal.render.*;
-import org.jpedal.render.output.*;
-import org.jpedal.render.output.io.CustomIO;
-import org.jpedal.render.output.io.ImageType;
 import org.jpedal.text.TextLines;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.Vector_Int;
@@ -210,11 +204,8 @@ public class Parser {
 
         //<start-adobe>
         if(externalHandlers.getMode()==GUIModes.JAVAFX){
-            if(FXDisplay.useCanvas){
-                fileAcces.setDVR(new FXDisplayCanvas(1,fileAcces.getObjectStore(),false));
-            }else{
-                fileAcces.setDVR(new FXDisplay(1,fileAcces.getObjectStore(),false));
-            }
+            fileAcces.setDVR(new FXDisplay(1,fileAcces.getObjectStore(),false));
+            
             useJavaFX=true;
         }
         //
@@ -320,7 +311,7 @@ public class Parser {
 
                         backgroundDecoder.setObjectValue(ValueTypes.Name, fileAcces.getFilename());
                         //Display object added but not rendered as renderPage is false (DO NOT REMOVE, BREAKS SEARCH)
-                        backgroundDecoder.setRenderer(new ImageDisplay(fileAcces.getPageNumber(), false, 5000, new ObjectStore(),null));
+                        backgroundDecoder.setRenderer(new ImageDisplay(fileAcces.getPageNumber(), false, 5000, new ObjectStore()));
                         backgroundDecoder.setObjectValue(ValueTypes.ObjectStore,backgroundObjectStoreRef);
                         backgroundDecoder.setObjectValue(ValueTypes.PDFPageData,fileAcces.getPdfPageData());
                         backgroundDecoder.setIntValue(ValueTypes.PageNum, i);
@@ -657,13 +648,11 @@ public class Parser {
         }
 
         //allow us to insert our own version (ie HTML)
-        final Object customDVR=externalHandlers.getExternalHandler(Options.CustomOutput);
+        final DynamicVectorRenderer customDVR = (DynamicVectorRenderer) externalHandlers.getExternalHandler(Options.CustomOutput);
 
         final DynamicVectorRenderer currentDisplay;
 
         final PdfPageData pageData=fileAcces.getPdfPageData();
-
-        BufferedImage thumbnailImage=null, backgroundImage=null, compatabilityImage=null;
 
         //
         {
@@ -948,7 +937,18 @@ public class Parser {
 
         currentDisplay.init(pageData.getMediaBoxWidth(page), pageData.getMediaBoxHeight(page), pageData.getRotation(page),options.getPageColor());
 
-        //
+        if((!BaseDisplay.isHTMLorSVG(currentDisplay))&& (options.getTextColor()!=null)){
+                currentDisplay.setValue(DynamicVectorRenderer.ALT_FOREGROUND_COLOR, options.getTextColor().getRGB());
+
+                if(options.getChangeTextAndLine()) {
+                    currentDisplay.setValue(DynamicVectorRenderer.FOREGROUND_INCLUDE_LINEART, 1);
+                } else {
+                    currentDisplay.setValue(DynamicVectorRenderer.FOREGROUND_INCLUDE_LINEART, 0);
+                }
+
+                currentDisplay.setValue(DynamicVectorRenderer.COLOR_REPLACEMENT_THRESHOLD, options.getReplacementColorThreshold());
+            }
+        
         return current;
     }
 
@@ -982,8 +982,6 @@ public class Parser {
         resultsFromDecode.update(current,true);
     }
 
-    //
-     
      protected PdfObjectReader getIO() {
          return fileAcces.getIO();
      }

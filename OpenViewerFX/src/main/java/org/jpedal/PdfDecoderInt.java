@@ -54,6 +54,7 @@ import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.border.Border;
+import org.jpedal.display.DisplayOffsets;
 import org.jpedal.external.ExternalHandlers;
 import org.jpedal.io.StatusBar;
 import org.jpedal.parser.DecoderOptions;
@@ -63,7 +64,7 @@ public interface PdfDecoderInt {
     /**
      * build number of this version
      */
-    String version = "6.2b26";
+    String version = "6.3.31";
     /**
      * flag to show extraction mode should include any text
      */
@@ -440,12 +441,10 @@ public interface PdfDecoderInt {
     public String getPageDecodeStatusReport(int status);
     
     //<start-adobe>
-    public void setDisplayView(int displayView, int orientation);
+    //public boolean setDisplayView(int displayView, int orientation);
     //<end-adobe>
     
     public String getPDFVersion();
-    
-    public void updatePageNumberDisplayed(int page);
     
     public ExternalHandlers getExternalHandler();
     
@@ -480,4 +479,10 @@ public interface PdfDecoderInt {
     public boolean isBorderPresent();
     
     public void setPreviewThumbnail(final BufferedImage previewImage, final String previewText);
+
+    public Rectangle getVisibleRect();
+
+    public DisplayOffsets getDisplayOffsets();
+
+    public int getTextPrint();
 }

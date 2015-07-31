@@ -85,6 +85,7 @@ public class PageFlowFX extends AnchorPane{
 
         // Setup PDF info
         pdf = pdfDecoder;
+       
         this.isFX =isFX;
         //pageData = pdf.getPdfPageData();
         pageCount = pdf.getPageCount();
@@ -1060,22 +1061,21 @@ public class PageFlowFX extends AnchorPane{
                 }
                 stop();
                 // canvas.stopRenderer(); // No FX equivalent
-                //<start-adobe>
                 if (Platform.isFxApplicationThread()) {
 
-                    pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                  //  currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
                 } else {
                     final Runnable doPaintComponent = new Runnable() {
 
                         @Override
                         public void run() {
-                            pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                          //  currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
                         }
                     };
                     Platform.runLater(doPaintComponent);
                 }
-                //<end-adobe>
+               
 //                pdf.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED); // Commented in Java3D also
                 if (!pageFlowEnding) {
                     pageFlowEnding = true;

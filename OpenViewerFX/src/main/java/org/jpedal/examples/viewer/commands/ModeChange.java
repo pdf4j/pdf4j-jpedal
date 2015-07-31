@@ -58,7 +58,7 @@ class ModeChange {
                           
         if (SwingUtilities.isEventDispatchThread()) {
             
-            decode_pdf.setDisplayView(mode, Display.DISPLAY_CENTERED);
+            currentGUI.setDisplayView(mode, Display.DISPLAY_CENTERED);
             
             chooseMode(decode_pdf, commonValues, currentGUI);
             
@@ -77,7 +77,7 @@ class ModeChange {
                 
                 @Override
                 public void run() {
-                    decode_pdf.setDisplayView(mode, Display.DISPLAY_CENTERED);
+                    currentGUI.setDisplayView(mode, Display.DISPLAY_CENTERED);
                     
                     chooseMode(decode_pdf, commonValues, currentGUI);
                     
@@ -100,7 +100,7 @@ class ModeChange {
                                     
         if (Platform.isFxApplicationThread()) {
             
-            decode_pdf.setDisplayView(mode, Display.DISPLAY_CENTERED);
+            currentGUI.setDisplayView(mode, Display.DISPLAY_CENTERED);
             
             currentGUI.getButtons().hideRedundentNavButtons(currentGUI);
             ((GUI)currentGUI).setSelectedComboIndex(Commands.ROTATION, 0);
@@ -116,7 +116,7 @@ class ModeChange {
                 
                 @Override
                 public void run() {
-                    decode_pdf.setDisplayView(mode, Display.DISPLAY_CENTERED);
+                    currentGUI.setDisplayView(mode, Display.DISPLAY_CENTERED);
                     
                     currentGUI.getButtons().hideRedundentNavButtons(currentGUI);
                     

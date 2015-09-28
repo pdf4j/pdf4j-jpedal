@@ -56,14 +56,13 @@ import org.jpedal.objects.raw.*;
 import org.jpedal.parser.*;
 import org.jpedal.parser.image.data.ImageData;
 import org.jpedal.parser.image.utils.*;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.RenderUtils;
 import org.jpedal.utils.LogWriter;
 
 public class ImageDecoder extends BaseDecoder{
     
     //Allow print to use transparency in printing instead of removing it
-    public static boolean allowPrintTransparency = false;
+    public static boolean allowPrintTransparency;
     
     final PdfImageData pdfImages;
     
@@ -529,7 +528,7 @@ public class ImageDecoder extends BaseDecoder{
             
             ImageTransformerDouble image_transformation=null;
             
-            final boolean isHTML=BaseDisplay.isHTMLorSVG(current);
+            final boolean isHTML=current.isHTMLorSVG();
             
             if(isHTML) {
                 current.drawImage(parserOptions.getPageNumber(), image, gs, false, image_name, optionsApplied, -3);
@@ -1031,7 +1030,7 @@ public class ImageDecoder extends BaseDecoder{
                 return null;
             }
             
-            if(!BaseDisplay.isHTMLorSVG(current) && !parserOptions.renderDirectly() && (finalImagesExtracted || rawImagesExtracted)) {
+            if(!current.isHTMLorSVG() && !parserOptions.renderDirectly() && (finalImagesExtracted || rawImagesExtracted)) {
                 saveImage(name, createScaledVersion, image, "jpg");
             }
         }
@@ -1306,7 +1305,7 @@ public class ImageDecoder extends BaseDecoder{
         final int maxHTMLImageSize=4000;
         if(current.avoidDownSamplingImage() ||
                 (w<maxHTMLImageSize && h<maxHTMLImageSize &&
-                BaseDisplay.isHTMLorSVG(current) &&
+                current.isHTMLorSVG() &&
                 (imageData.getDepth()!=1 || XObject.getRawObjectType()!=PdfDictionary.Mask))){
             imageData.setpX(-1);
             imageData.setpY(1);

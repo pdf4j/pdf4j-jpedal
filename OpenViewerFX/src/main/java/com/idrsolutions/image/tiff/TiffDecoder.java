@@ -32,6 +32,8 @@
  */
 package com.idrsolutions.image.tiff;
 
+import com.idrsolutions.image.jpeg.JpegDecoder;
+import com.idrsolutions.image.jpeg2000.EnumeratedSpace;
 import com.idrsolutions.image.jpeg2000.JPXBitReader;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -40,8 +42,7 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ import java.util.List;
  * </code></pre>
  * <p>
  * Here is an example of how the code can be used to extract all images from
- * multi page tiff file:-
+ * Tiff data which contains multiple Tiff images:-
  * </p>
  * <br>
  * <pre><code>
@@ -67,29 +68,52 @@ import java.util.List;
  *      //insert your bufferimage handling code here;
  * }
  * </code></pre>
+ * <p>
+ * Here is an example of how the code can be used with RandomAccessFile
+ * </p>
+ * <strong>We recommend to use RandomAccessFile constructor for memory efficient
+ * reading<strong>
+ * <br>
+ * <pre><code>
+ * RandomAccessFile raf = new RandomAccessFile("yourFileLocation","r");
+ * TiffDecoder decoder = new TiffDecoder(raf);
+ * for(int i=0;i&lt;decoder.getPageCount();i++){
+ *      BufferedImage decodedImage = decoder.read(i+1);//page number should start with 1;
+ *      //insert your bufferimage handling code here;
+ * }
+ * raf.close();
+ * </code></pre>
  *
  */
 public class TiffDecoder {
 
-    private final ByteBuffer reader;
-    private int pageCount = 0;
+    private final RandomHandler reader;
+    private int pageCount;
     List<IFD> ifds = new ArrayList<IFD>();
 
+    /**
+     * Constructor generates instance from byte data <br/>
+     * For memory efficient reading use other constructor with RandomAccessFile
+     *
+     * @throws Exception
+     */
     public TiffDecoder(byte[] rawTiffData) throws Exception {
-        reader = ByteBuffer.wrap(rawTiffData);
-        int endian = 1;
+        reader = new RandomHandler(rawTiffData);
 
-        int a = reader.get() & 0xff;
-        int b = reader.get() & 0xff;
+        int a = reader.getUint8();
+        int b = reader.getUint8();
         if (a == 77 && b == 77) {
-            reader.order(ByteOrder.BIG_ENDIAN);
+            reader.setByteOrder(RandomHandler.BIGENDIAN);
         } else if (a == 73 && b == 73) {
-            endian = 2;
-            reader.order(ByteOrder.LITTLE_ENDIAN);
+            reader.setByteOrder(RandomHandler.LITTLEENDIAN);
         }
-        int magicNumber = reader.getShort();//42 magic number;
+        int magicNumber = reader.getUint16();//42 magic number;
         if (magicNumber != 42) {
-            throw new Exception("This is not a valid Tiff File");
+            if(magicNumber == 43){
+                throw new Exception("Big Tiff File Support not added");
+            }else{
+                throw new Exception("This is not a valid Tiff File");
+            }
         }
         int ifdOffset = reader.getInt();
 
@@ -102,8 +126,48 @@ public class TiffDecoder {
     }
 
     /**
-     * decodes Tiff image data as BufferedImage. Make NO assumptions about type
-     * of BufferedImage type returned (may change)
+     * Constructor generates instance from RandomAccessFile <br/>
+     * You can use this constructor for memory efficient file reading
+     * <p>
+     * This method does not close random access file after the read operation is
+     * completed; it is the responsibility of the caller to close
+     * RandomAccessFile,
+     * <p>
+     * @param randomAccessFile a random access file where the tiff data is
+     * located
+     * @throws Exception
+     */
+    public TiffDecoder(RandomAccessFile randomAccessFile) throws Exception {
+        reader = new RandomHandler(randomAccessFile);
+
+        int a = reader.getUint8();
+        int b = reader.getUint8();
+        if (a == 77 && b == 77) {
+            reader.setByteOrder(RandomHandler.BIGENDIAN);
+        } else if (a == 73 && b == 73) {
+            reader.setByteOrder(RandomHandler.LITTLEENDIAN);
+        }
+        int magicNumber = reader.getUint16();//42 magic number;
+        if (magicNumber != 42) {
+            if(magicNumber == 43){
+                throw new Exception("Big Tiff File Support not added");
+            }else{
+                throw new Exception("This is not a valid Tiff File");
+            }
+        }
+        int ifdOffset = reader.getInt();
+
+        while (ifdOffset != 0) {
+            IFD ifd = getIFD(reader, ifdOffset);
+            ifds.add(ifd);
+            ifdOffset = ifd.nextIFD;
+            pageCount++;
+        }
+    }
+
+    /**
+     * decodes the first Tiff image as BufferedImage in Tiff file. Make NO
+     * assumptions about type of BufferedImage type returned (may change)
      *
      * @return BufferedImage to read image
      * @throws IOException
@@ -130,15 +194,16 @@ public class TiffDecoder {
         return generateImageFromIFD(reader, ifd);
     }
 
-    private static IFD getIFD(final ByteBuffer reader, int ifdOffset) {
-        reader.position(ifdOffset);
-        int nEntries = reader.getShort();
+    private static IFD getIFD(final RandomHandler reader, int ifdOffset) throws IOException {
+        reader.setPosition(ifdOffset);
+        int nEntries = reader.getUint16();
         IFD ifd = new IFD();
 
         for (int i = 0; i < nEntries; i++) {
-            int fieldName = reader.getShort() & 0xffff;
-            int fieldType = reader.getShort() & 0xffff;
+            int fieldName = reader.getUint16();
+            int fieldType = reader.getUint16();
             int nValues = reader.getInt();
+            int current = 0;
 
 //            System.out.println(fieldName + " " + fieldType + " " + nValues);
             switch (fieldName) {
@@ -146,21 +211,21 @@ public class TiffDecoder {
                     reader.getInt();
                     break;
                 case Tags.SubfileType:
-                    reader.getShort();//read and ignore;
-                    reader.getShort();//read and ignore;
+                    reader.getUint16();//read and ignore;
+                    reader.getUint16();//read and ignore;
                     break;
                 case Tags.ImageWidth:
                     if (fieldType == 3) {
-                        ifd.imageWidth = reader.getShort();
-                        reader.getShort();//read and ignore;
+                        ifd.imageWidth = reader.getUint16();
+                        reader.getUint16();//read and ignore;
                     } else {
                         ifd.imageWidth = reader.getInt();
                     }
                     break;
                 case Tags.ImageHeight:
                     if (fieldType == 3) {
-                        ifd.imageHeight = reader.getShort();
-                        reader.getShort();//read and ignore;
+                        ifd.imageHeight = reader.getUint16();
+                        reader.getUint16();
                     } else {
                         ifd.imageHeight = reader.getInt();
                     }
@@ -168,31 +233,31 @@ public class TiffDecoder {
                 case Tags.BitsPerSample:
                     ifd.bps = new int[nValues];
                     if (nValues == 1) {
-                        ifd.bps[0] = reader.getShort();
-                        reader.getShort();
+                        ifd.bps[0] = reader.getUint16();
+                        reader.getUint16();
                     } else if (nValues == 2) {
-                        ifd.bps[0] = reader.getShort();
-                        ifd.bps[1] = reader.getShort();
+                        ifd.bps[0] = reader.getUint16();
+                        ifd.bps[1] = reader.getUint16();
                     } else {
                         int sampleOffset = reader.getInt();
-                        int current = reader.position();
+                        current = reader.getPosition();
                         ifd.bps = readBitsPerSamples(reader, sampleOffset, nValues);
-                        reader.position(current);
+                        reader.setPosition(current);
                     }
                     break;
                 case Tags.Compression:
-                    ifd.compressionType = reader.getShort() & 0xffff;
-                    reader.getShort();
+                    ifd.compressionType = reader.getUint16();
+                    reader.getUint16();
                     break;
                 case Tags.PhotometricInterpolation:
-                    ifd.photometric = reader.getShort() & 0xffff;
-                    reader.getShort();
+                    ifd.photometric = reader.getUint16();
+                    reader.getUint16();
                     break;
 
                 case Tags.RowsPerStrip:
                     if (fieldType == 3) {
-                        ifd.rowsPerStrip = reader.getShort() & 0xffff;
-                        reader.getShort();//read and ignore;
+                        ifd.rowsPerStrip = reader.getUint16();
+                        reader.getUint16();//read and ignore;
                     } else {
                         ifd.rowsPerStrip = reader.getInt();
                     }
@@ -203,9 +268,9 @@ public class TiffDecoder {
                         ifd.stripOffsets[0] = reader.getInt();
                     } else {
                         int stripOffset = reader.getInt();
-                        int current = reader.position();
-                        ifd.stripOffsets = readStripOffsets(reader, stripOffset, nValues, fieldType);
-                        reader.position(current);
+                        current = reader.getPosition();
+                        ifd.stripOffsets = readOffsets(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(current);
                     }
                     break;
                 case Tags.StripByteCounts:
@@ -214,24 +279,140 @@ public class TiffDecoder {
                         ifd.stripByteCounts[0] = reader.getInt();
                     } else {
                         int stripOffset = reader.getInt();
-                        int current = reader.position();
-                        ifd.stripByteCounts = readStripByteCounts(reader, stripOffset, nValues, fieldType);
-                        reader.position(current);
+                        current = reader.getPosition();
+                        ifd.stripByteCounts = readStripTileByteCounts(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(current);
                     }
                     break;
                 case Tags.SamplesPerPixel:
-                    ifd.samplesPerPixel = reader.getShort();
-                    reader.getShort();
+                    ifd.samplesPerPixel = reader.getUint16();
+                    reader.getUint16();
                     break;
                 case Tags.ColorMap:
                     int cmapOffset = reader.getInt();
-                    int current = reader.position();
+                    current = reader.getPosition();
                     ifd.colorMap = readColorMap(reader, cmapOffset, nValues);
-                    reader.position(current);
+                    reader.setPosition(current);
                     break;
                 case Tags.PlanarConfiguration:
-                    ifd.planarConfiguration = reader.getShort();
-                    reader.getShort();//read and ignore;
+                    ifd.planarConfiguration = reader.getUint16();
+                    reader.getUint16();//read and ignore;
+                    break;
+                case Tags.TileWidth:
+                    if (fieldType == 3) {
+                        ifd.tileWidth = reader.getUint16();
+                        reader.getUint16();//read and ignore;
+                    } else {
+                        ifd.tileWidth = reader.getInt();
+                    }
+                    break;
+                case Tags.TileLength:
+                    if (fieldType == 3) {
+                        ifd.tileLength = reader.getUint16();
+                        reader.getUint16();//read and ignore;
+                    } else {
+                        ifd.tileLength = reader.getInt();
+                    }
+                    break;
+                case Tags.TIleOffsets:
+                    if (nValues == 1) {
+                        ifd.tileOffsets = new int[1];
+                        ifd.tileOffsets[0] = reader.getInt();
+                    } else {
+                        int stripOffset = reader.getInt();
+                        int cur = reader.getPosition();
+                        ifd.tileOffsets = readOffsets(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(cur);
+                    }
+                    break;
+                case Tags.TIleByteCounts:
+                    if (nValues == 1) {
+                        ifd.tileByteCounts = new int[1];
+                        ifd.tileByteCounts[0] = reader.getInt();
+                    } else {
+                        int stripOffset = reader.getInt();
+                        int cur = reader.getPosition();
+                        ifd.tileByteCounts = readStripTileByteCounts(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(cur);
+                    }
+                    break;
+                case Tags.JPEGTables:
+                    int tableOffset = reader.getInt();
+                    int cc = reader.getPosition();
+                    reader.setPosition(tableOffset);
+                    byte[] tableBytes = new byte[nValues];
+                    reader.get(tableBytes);
+                    reader.setPosition(cc);
+                    ifd.jpegTables = new byte[nValues - 2];//remove EOI
+                    System.arraycopy(tableBytes, 0, ifd.jpegTables, 0, nValues - 2);
+                    break;
+                case Tags.JPEGProc:
+                    reader.getInt();
+                    break;
+                case Tags.JPEGInterchangeFormat:
+                    reader.getInt();
+                    break;
+                case Tags.JPEGInterchangeFormatLength:
+                    reader.getInt();
+                    break;
+                case Tags.JPEGRestartInterval:
+                    reader.getInt();
+                    break;
+                case Tags.JPEGLosslessPredictors:
+                    reader.getInt();
+                    break;
+                case Tags.JPEGPointTransforms:
+                    reader.getInt();
+                    break;
+                case Tags.JPEGQTables:
+                    if (nValues == 1) {
+                        ifd.jpegQOffsets = new int[1];
+                        ifd.jpegQOffsets[0] = reader.getInt();
+                    } else {
+                        int stripOffset = reader.getInt();
+                        int cur = reader.getPosition();
+                        ifd.jpegQOffsets = readOffsets(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(cur);
+                    }
+                    break;
+                case Tags.JPEGDCTables:
+                    if (nValues == 1) {
+                        ifd.jpegDCOffsets = new int[1];
+                        ifd.jpegDCOffsets[0] = reader.getInt();
+                    } else {
+                        int stripOffset = reader.getInt();
+                        int cur = reader.getPosition();
+                        ifd.jpegDCOffsets = readOffsets(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(cur);
+                    }
+                    break;
+                case Tags.JPEGACTables:
+                    if (nValues == 1) {
+                        ifd.jpegACOffsets = new int[1];
+                        ifd.jpegACOffsets[0] = reader.getInt();
+                    } else {
+                        int stripOffset = reader.getInt();
+                        int cur = reader.getPosition();
+                        ifd.jpegACOffsets = readOffsets(reader, stripOffset, nValues, fieldType);
+                        reader.setPosition(cur);
+                    }
+                    break;
+                case Tags.ICC:
+                    int iccOffset = reader.getInt();
+                    current = reader.getPosition();
+                    reader.setPosition(iccOffset);
+                    ifd.iccProfile = new byte[nValues];
+                    reader.get(ifd.iccProfile);
+                    reader.setPosition(current);
+                    break;
+                case Tags.YCbCrCoefficients:
+                    reader.getInt();
+                    break;
+                case Tags.YCbCrSubSampling:
+                    reader.getInt();
+                    break;
+                case Tags.YCbCrPositioning:
+                    reader.getInt();
                     break;
                 case Tags.Threshholding:
                     reader.getInt();
@@ -321,7 +502,8 @@ public class TiffDecoder {
                     reader.getInt();
                     break;
                 case Tags.Predictor:
-                    reader.getInt();
+                    ifd.predictor = reader.getUint16();
+                    reader.getUint16();//read and ignore
                     break;
                 case Tags.WhitePoint:
                     reader.getInt();
@@ -330,18 +512,6 @@ public class TiffDecoder {
                     reader.getInt();
                     break;
                 case Tags.HalftoneHints:
-                    reader.getInt();
-                    break;
-                case Tags.TileWidth:
-                    reader.getInt();
-                    break;
-                case Tags.TileLength:
-                    reader.getInt();
-                    break;
-                case Tags.TIleOffsets:
-                    reader.getInt();
-                    break;
-                case Tags.TIleByteCounts:
                     reader.getInt();
                     break;
                 case Tags.SubIFDs:
@@ -366,7 +536,15 @@ public class TiffDecoder {
                     reader.getInt();
                     break;
                 case Tags.SampleFormat:
-                    reader.getInt();
+                    if (nValues == 1) {
+                        ifd.sampleFormat = new int[1];
+                        ifd.sampleFormat[0] = reader.getInt();
+                    } else {
+                        int sampleOffset = reader.getInt();
+                        current = reader.getPosition();
+                        ifd.sampleFormat = readOffsets(reader, sampleOffset, nValues, fieldType);
+                        reader.setPosition(current);
+                    }
                     break;
                 case Tags.SMinSampleValue:
                     reader.getInt();
@@ -389,45 +567,6 @@ public class TiffDecoder {
                 case Tags.Indexed:
                     reader.getInt();
                     break;
-                case Tags.JPEGTables:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGProc:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGInterchangeFormat:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGInterchangeFormatLength:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGRestartInterval:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGLosslessPredictors:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGPointTransforms:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGQTables:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGDCTables:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGACTables:
-                    reader.getInt();
-                    break;
-                case Tags.YCbCrCoefficients:
-                    reader.getInt();
-                    break;
-                case Tags.YCbCrSubSampling:
-                    reader.getInt();
-                    break;
-                case Tags.YCbCrPositioning:
-                    reader.getInt();
-                    break;
                 case Tags.ReferenceBlackWhite:
                     reader.getInt();
                     break;
@@ -443,11 +582,11 @@ public class TiffDecoder {
                 case Tags.Copyright:
                     reader.getInt();
                     break;
-                case Tags.ICC:
-                    reader.getInt();
-                    break;
                 case Tags.Exif_IFD:
-                    reader.getInt();
+                    int exifOffset = reader.getInt();
+//                    current =reader.getPosition();
+//                    IFD exifIFD = getIFD(reader, exifOffset);
+//                    reader.setPosition(current);
                     break;
                 case Tags.ExifVersion:
                     reader.getInt();
@@ -489,325 +628,382 @@ public class TiffDecoder {
         }
         ifd.nextIFD = reader.getInt();
         //some files contains rowsperstrip as zero;
-        if (ifd.rowsPerStrip == 0) {
+        if (ifd.rowsPerStrip == 0 || ifd.rowsPerStrip > ifd.imageHeight) {
             ifd.rowsPerStrip = ifd.imageHeight;
         }
+        
+//        if (ifd.compressionType == Tags.JPEG) {
+//            ifd.jpegQData = new byte[ifd.jpegQOffsets.length][64];
+//            for (int i = 0; i < ifd.jpegQOffsets.length; i++) {
+//                reader.setPosition(ifd.jpegQOffsets[i]);
+//                byte[] temp = new byte[64];
+//                reader.get(temp);
+//                System.arraycopy(temp, 0, ifd.jpegQData[i], 0, 64);
+//            }
+//
+//            //dc
+//            ifd.jpegDCData = new byte[ifd.jpegDCOffsets.length][];
+//            for (int i = 0; i < ifd.jpegDCOffsets.length; i++) {
+//                reader.setPosition(ifd.jpegDCOffsets[i]);
+//                int codeLength = 0;
+//                for (int j = 0; j < 16; j++) {
+//                    codeLength += reader.getUint8();
+//                }
+//                int tableLen = codeLength + 16;
+//                ifd.jpegDCData[i] = new byte[tableLen];
+//                byte temp[] = new byte[tableLen];
+//                reader.setPosition(ifd.jpegDCOffsets[i]);
+//                reader.get(temp);
+//                System.arraycopy(temp, 0, ifd.jpegDCData[i], 0, tableLen);
+//            }
+//
+//            //ac
+//            ifd.jpegACData = new byte[ifd.jpegACOffsets.length][];
+//            for (int i = 0; i < ifd.jpegACOffsets.length; i++) {
+//                reader.setPosition(ifd.jpegACOffsets[i]);
+//                int codeLength = 0;
+//                for (int j = 0; j < 16; j++) {
+//                    codeLength += reader.getUint8();
+//                }
+//                int tableLen = codeLength + 16;
+//                ifd.jpegACData[i] = new byte[tableLen];
+//                byte temp[] = new byte[tableLen];
+//                reader.setPosition(ifd.jpegACOffsets[i]);
+//                reader.get(temp);
+//                System.arraycopy(temp, 0, ifd.jpegACData[i], 0, tableLen);
+//            }
+//        }
         return ifd;
     }
 
-    private static BufferedImage generateImageFromIFD(final ByteBuffer reader, IFD ifd) throws IOException {
+    private static BufferedImage getDataFromStrips(final RandomHandler reader, IFD ifd) throws Exception {
 
-        BufferedImage image = null;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
         final int iw = ifd.imageWidth;
         final int ih = ifd.imageHeight;
-        int balance = ih;
+        final int dim = iw * ih;
+        final boolean isPlanar = ifd.planarConfiguration == 2;
+        final boolean hasPalette = ifd.colorMap != null;
+        int rps = ifd.rowsPerStrip;
+        int bps = ifd.bps[0];
+        int sampleLen = 0;
+        final int stripSamples = isPlanar ? 1 : ifd.bps.length;
+        if (isPlanar) {
+            sampleLen = ifd.bps[0];
+        } else {
+            for (int i = 0; i < ifd.bps.length; i++) {
+                sampleLen += ifd.bps[i];
+            }
+        }
 
-        switch (ifd.compressionType) {
-            case Tags.Uncompressed:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    bos.write(temp);
-                }
-                break;
-            case Tags.CCITT_ID:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    int height = balance < ifd.rowsPerStrip ? balance : ifd.rowsPerStrip;
-                    byte[] output = new byte[(iw * height + 7) / 8];
-                    CCITT fax = new CCITT(ifd.fillOrder, iw, height);
-                    fax.decompress1D(output, temp, 0, height);
-                    bos.write(output);
-                    balance -= ifd.rowsPerStrip;
-                }
-                break;
-            case Tags.Group_3_Fax:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    int height = balance < ifd.rowsPerStrip ? balance : ifd.rowsPerStrip;
-                    byte[] output = new byte[(iw * height + 7) / 8];
-                    CCITT fax = new CCITT(ifd.fillOrder, iw, height);
-                    fax.decompressFax3(output, temp, height);
-                    bos.write(output);
-                    balance -= ifd.rowsPerStrip;
-                }
-                break;
-            case Tags.Group_4_Fax:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    int height = balance < ifd.rowsPerStrip ? balance : ifd.rowsPerStrip;
-                    byte[] output = new byte[(iw * height + 7) / 8];
-                    CCITT fax = new CCITT(ifd.fillOrder, iw, height);
-                    fax.decompressFax4(output, temp, height);
-                    bos.write(output);
-                    balance -= ifd.rowsPerStrip;
-                }
-                break;
-            case Tags.LZW:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    int expectation = calculatePackBitExpectation(ifd, i);
-                    byte[] output = new byte[expectation];
+        List<Tile> tiles = new ArrayList<Tile>();
+        int planarStrip = ifd.stripOffsets.length / ifd.samplesPerPixel;
+        JpegDecoder decoder;
+
+        for (int t = 0; t < ifd.stripOffsets.length; t++) {
+            reader.setPosition(ifd.stripOffsets[t]);
+            byte[] tileData = new byte[ifd.stripByteCounts[t]];
+            reader.get(tileData);
+
+            final int height;
+            if (isPlanar) {
+                int stripMod = t % planarStrip;
+                int balance = ih - (rps * stripMod);
+                height = balance < rps ? balance : rps;
+            } else {
+                int balance = ih - (rps * t);
+                height = balance < rps ? balance : rps;
+            }
+            byte[] output = null;
+            CCITT fax;
+
+            int expectation = ((((iw * sampleLen + 7) / 8) * 8 * height) + 7) / 8;
+
+            switch (ifd.compressionType) {
+                case Tags.Uncompressed:
+                    output = tileData;
+                    break;
+                case Tags.CCITT_ID:
+                    output = new byte[expectation]; //assume bps = 1;
+                    fax = new CCITT(ifd.fillOrder, iw, height);
+                    fax.decompress1D(output, tileData, 0, height);
+                    break;
+                case Tags.Group_3_Fax:
+                    output = new byte[expectation]; //assume bps = 1;
+                    fax = new CCITT(ifd.fillOrder, iw, height);
+                    fax.decompressFax3(output, tileData, height);
+                    break;
+                case Tags.Group_4_Fax:
+                    output = new byte[expectation]; //assume bps = 1;
+                    fax = new CCITT(ifd.fillOrder, iw, height);
+                    fax.decompressFax4(output, tileData, height);
+                    break;
+                case Tags.LZW:
+                    output = new byte[expectation];
                     LZW lzw = new LZW();
-                    lzw.decompress(temp, output);
-                    bos.write(output);
-                }
-                break;
-            case Tags.JPEG:
-                System.err.println("jpeg decompression not implemented yet");
-                break;
-            case Tags.ADOBEDEFLATE:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    byte[] output = Deflate.decompress(temp);
-                    bos.write(output);
-                }
-                break;
-            case Tags.PackBits:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    int expectation = calculatePackBitExpectation(ifd, i);
-                    temp = PackBits.decompress(temp, expectation);
-                    bos.write(temp);
-                }
-                break;
-            case Tags.Deflate:
-                for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                    reader.position(ifd.stripOffsets[i]);
-                    byte temp[] = new byte[ifd.stripByteCounts[i]];
-                    reader.get(temp);
-                    byte[] output = Deflate.decompress(temp);
-                    bos.write(output);
-                }
-                break;
-            default:
-                System.out.println("unrecognized decompression called");
-        }
-
-        byte[] data = bos.toByteArray();
-        bos.reset();
-        int[] intPixels;
-        byte[] bytePixels;
-        int n = 0, bps, shift;
-        int dim = ifd.imageWidth * ifd.imageHeight;
-
-        int r, g, b, a;
-        JPXBitReader bitReader;
-
-        //rgb palette  has to be handled in different way
-        if (ifd.photometric == Tags.RGB_Palette) {
-            System.out.println(ifd.colorMap.length);
-            IndexColorModel indexedCM = new IndexColorModel(ifd.bps[0], ifd.colorMap.length / 3, ifd.colorMap, 0, false);
-            WritableRaster ras = indexedCM.createCompatibleWritableRaster(ifd.imageWidth, ifd.imageHeight);
-            bytePixels = ((DataBufferByte) ras.getDataBuffer()).getData();
-            System.arraycopy(data, 0, bytePixels, 0, bytePixels.length);
-            image = new BufferedImage(indexedCM, ras, false, null);
-            return image;
-        }
-
-        //planar configuration speration mode: contains r full, g full, b full values;
-        if (ifd.planarConfiguration == 2 && ifd.samplesPerPixel > 1) {
-            int nComp = ifd.samplesPerPixel;
-            byte[][] comp = new byte[nComp][dim];
-            int t = 0;
-            for (int i = 0; i < nComp; i++) {
-                System.arraycopy(data, t, comp[i], 0, dim);
-                t += dim;
+                    lzw.decompress(output, tileData, iw, height);
+                    break;
+                case Tags.JPEG:
+                    throw new Exception("Old style jpeg compression is not supported");
+                case Tags.JPEG_TechNote:
+                    if (ifd.jpegTables != null) {
+                        int ifdLen = ifd.jpegTables.length;
+                        byte[] temp = new byte[ifdLen + tileData.length - 2];
+                        System.arraycopy(ifd.jpegTables, 0, temp, 0, ifdLen);
+                        System.arraycopy(tileData, 2, temp, ifdLen, tileData.length - 2);
+                        tileData = temp;
+                    }
+                    decoder = new JpegDecoder();
+                    output = decoder.readComponentsAsRawBytes(tileData);
+                    break;
+                case Tags.PackBits:
+                    int exp = (iw * height * sampleLen + 7) / 8;
+                    output = PackBits.decompress(tileData, exp);
+                    break;
+                case Tags.ADOBEDEFLATE:
+                case Tags.Deflate:
+                    output = Deflate.decompress(tileData);
+                    break;
+                default:
+                    System.err.println("unrecognized compression found");
             }
-            int p = 0;
-            for (int i = 0; i < dim; i++) {
-                for (int j = 0; j < nComp; j++) {
-                    data[p++] = comp[j][i];
+            
+            if (ifd.predictor == 2) {
+                int count;
+                for (int j = 0; j < height; j++) {
+                    count = stripSamples * (j * iw + 1);
+                    for (int i = stripSamples; i < iw * stripSamples; i++) {
+                        output[count] += output[count - stripSamples];
+                        count++;
+                    }
                 }
             }
-        }
 
-        //invert the colors to make white is zero;
-        if (ifd.photometric == Tags.WhiteIsZero) {
-            for (int i = 0; i < data.length; i++) {
-                data[i] = (byte) ((data[n++] & 0xff) ^ 0xff);
+            //invert the colors to make white is zero;
+            int n = 0;
+            if (ifd.photometric == Tags.WhiteIsZero) {
+                for (int i = 0; i < output.length; i++) {
+                    output[i] = (byte) ((output[n++] & 0xff) ^ 0xff);
+                }
             }
-        }
+            //now normalize the tiles
+            Tile tile = new Tile();
+            int bp = 0;
+            int iw8 = (iw * bps * stripSamples) % 8;
 
-        switch (ifd.samplesPerPixel) {            
-            case 0://sometimes this may be 0;
-            case 1:
-                switch (ifd.bps[0]) {
-                    case 0://sometimes this may be 0;
-                    case 1:
-                        image = new BufferedImage(ifd.imageWidth, ifd.imageHeight, BufferedImage.TYPE_BYTE_GRAY);
-                        bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-                        bitReader = new JPXBitReader(data);
-                        n = 0;
-                        bps = ifd.bps[0];
-                        if (ifd.compressionType == Tags.Uncompressed) {
-                            for (int i = 0; i < ih; i++) {
-                                for (int j = 0; j < iw; j++) {
-                                    bytePixels[n++] = (byte) (bitReader.readBits(bps) * 255);
+            if (bps != 8) {
+                tileData = new byte[height * iw * stripSamples];
+                JPXBitReader bitReader = new JPXBitReader(output);
+                if (bps == 1) {
+                    for (int i = 0; i < height; i++) {
+                        for (int j = 0; j < (iw - 1); j++) {
+                            for (int k = 0; k < stripSamples; k++) {
+                                if (hasPalette) {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps));
+                                } else {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps) * 255);
                                 }
-                                int iw8 = (iw * bps) % 8;
-                                if (iw8 != 0) {
-                                    bitReader.readBits(8 - iw8);
-                                }
-                            }
-                        } else {
-                            balance = ih;
-                            for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                                int height = balance < ifd.rowsPerStrip ? balance : ifd.rowsPerStrip;
-                                int dd = height * iw;
-                                for (int z = 0; z < dd; z++) {
-                                    bytePixels[n++] = (byte) (bitReader.readBits(bps) * 255);
-                                }
-                                int iw8 = (dd * bps) % 8;
-                                if (iw8 != 0) {
-                                    bitReader.readBits(8 - iw8);
-                                }
-                                balance -= ifd.rowsPerStrip;
                             }
                         }
-                        break;
-                    case 2:
-                    case 4:
-                    case 6:
-                        image = new BufferedImage(ifd.imageWidth, ifd.imageHeight, BufferedImage.TYPE_BYTE_GRAY);
-                        bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-                        bitReader = new JPXBitReader(data);
-                        n = 0;
-                        bps = ifd.bps[0];
-                        shift = 8 - bps;
-                        if (ifd.compressionType == Tags.Uncompressed) {
-                            for (int i = 0; i < ih; i++) {
-                                for (int j = 0; j < iw; j++) {
-                                    bytePixels[n++] = (byte) (bitReader.readBits(bps) << shift);
+                        if (iw8 != 0) {
+                            bitReader.readBits(8 - iw8);
+                        }
+                    }
+                } else if (bps < 8) {
+                    int shift = 8 - bps;
+                    for (int i = 0; i < height; i++) {
+                        for (int j = 0; j < iw; j++) {
+                            for (int k = 0; k < stripSamples; k++) {
+                                if (hasPalette) {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps));
+                                } else {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps) << shift);
                                 }
-                                int iw8 = (iw * bps) % 8;
-                                if (iw8 != 0) {
-                                    bitReader.readBits(8 - iw8);
-                                }
-                            }
-                        } else {
-                            balance = ih;
-                            for (int i = 0; i < ifd.stripOffsets.length; i++) {
-                                int height = balance < ifd.rowsPerStrip ? balance : ifd.rowsPerStrip;
-                                int dd = height * iw;
-                                for (int z = 0; z < dd; z++) {
-                                    bytePixels[n++] = (byte) (bitReader.readBits(bps) << shift);
-                                }
-                                int iw8 = (dd * bps) % 8;
-                                if (iw8 != 0) {
-                                    bitReader.readBits(8 - iw8);
-                                }
-                                balance -= ifd.rowsPerStrip;
                             }
                         }
-                        break;
-                    case 8:
-                        image = new BufferedImage(ifd.imageWidth, ifd.imageHeight, BufferedImage.TYPE_BYTE_GRAY);
-                        bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-                        System.arraycopy(data, 0, bytePixels, 0, data.length);
-                        break;
-                    case 10:
-                    case 12:
-                    case 14:
-                    case 16:
-                        image = new BufferedImage(ifd.imageWidth, ifd.imageHeight, BufferedImage.TYPE_BYTE_GRAY);
-                        bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-                        bitReader = new JPXBitReader(data);
-                        n = 0;
-                        bps = ifd.bps[0];
-                        shift = bps - 8;
-                        for (int i = 0; i < ih; i++) {
+                        if (iw8 != 0) {
+                            bitReader.readBits(8 - iw8);
+                        }
+                    }
+                } else {
+                    int shift = bps - 8;
+                    int sampleFormat = ifd.sampleFormat[0];
+                    if (hasPalette) {
+                        tileData = new byte[height * iw * 3];
+                        for (int i = 0; i < height; i++) {
                             for (int j = 0; j < iw; j++) {
-                                bytePixels[n++] = (byte) (bitReader.readBits(bps) >> shift);
+                                int v = bitReader.readBits(bps) * 3;
+                                tileData[bp++] = ifd.colorMap[v++];
+                                tileData[bp++] = ifd.colorMap[v++];
+                                tileData[bp++] = ifd.colorMap[v++];
                             }
-                            int iw8 = (iw * bps) % 8;
                             if (iw8 != 0) {
                                 bitReader.readBits(8 - iw8);
                             }
                         }
-                        break;
-                }
-                break;
-            case 2:
-                break;
-            case 3:
-                switch (ifd.photometric) {
-                    case Tags.RGB:
-                        image = new BufferedImage(ifd.imageWidth, ifd.imageHeight, BufferedImage.TYPE_INT_RGB);
-                        intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-
-                        if (needBitReader(ifd.bps)) {
-                            bitReader = new JPXBitReader(data);
-                            for (int i = 0; i < dim; i++) {
-                                r = bitReader.readBits(ifd.bps[0]);
-                                g = bitReader.readBits(ifd.bps[1]);
-                                b = bitReader.readBits(ifd.bps[2]);
-                                intPixels[i] = r << 16 | g << 8 | b;
+                    } else {
+                        for (int i = 0; i < height; i++) {
+                            for (int j = 0; j < iw; j++) {
+                                for (int k = 0; k < stripSamples; k++) {
+                                    if (sampleFormat == 3) {
+                                        tileData[bp++] = (byte) (toFloat(bitReader.readBits(bps), bps) * 255);
+                                    } else {
+                                        tileData[bp++] = (byte) (bitReader.readBits(bps) >> shift);
+                                    }
+                                }
                             }
-                        } else {
-                            for (int i = 0; i < dim; i++) {
-                                r = data[n++] & 0xff;
-                                g = data[n++] & 0xff;
-                                b = data[n++] & 0xff;
-                                intPixels[i] = r << 16 | g << 8 | b;
+                            if (iw8 != 0) {
+                                bitReader.readBits(8 - iw8);
                             }
                         }
+                    }
 
-                        break;
-                    default:
-                        System.err.println("Photometric value " + ifd.photometric + " not implemented yet");
+                }
+            } else {
+                tileData = output;
+            }
+            tile.data = tileData;
+            tiles.add(tile);
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        if (isPlanar) {
+
+            int spp = ifd.samplesPerPixel;
+            byte[][] planars = new byte[spp][dim];
+
+            int n = 0;
+            int iter = tiles.size() / spp;
+
+            for (int s = 0; s < spp; s++) {
+                for (int i = 0; i < iter; i++) {
+                    bos.write(tiles.get(n++).data);
+                }
+                planars[s] = bos.toByteArray();
+                bos.reset();
+            }
+
+            for (int i = 0; i < dim; i++) {
+                for (int s = 0; s < spp; s++) {
+                    bos.write(planars[s][i]);
+                }
+            }
+        } else {
+            for (Tile tile : tiles) {
+                bos.write(tile.data);
+            }
+        }
+
+        BufferedImage image = allocateBufferedImage(ifd);
+        int[] intPixels;
+        byte[] bytePixels;
+        int r, g, b, a, yy, cb, cr, bp = 0;
+        byte c, m, y, k;
+        byte[] data = bos.toByteArray();
+
+        switch (ifd.photometric) {
+            case Tags.YCbCr:
+                intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                for (int i = 0; i < dim; i++) {
+                    yy = data[bp++] & 0xff;
+                    cb = data[bp++] & 0xff;
+                    cr = data[bp++] & 0xff;
+
+                    cb -= 128;
+                    cr -= 128;
+
+                    int u2 = cb >> 2;
+                    int v35 = (cr >> 3) + (cr >> 5);
+
+                    r = yy + cr + (cr >> 2) + v35;
+                    g = yy - (u2 + (cb >> 4) + (cb >> 5)) - ((cr >> 1) + v35 + (cr >> 4));
+                    b = yy + cb + (cb >> 1) + u2 + (cb >> 6);
+
+                    r = r < 0 ? 0 : r > 255 ? 255 : r;
+                    g = g < 0 ? 0 : g > 255 ? 255 : g;
+                    b = b < 0 ? 0 : b > 255 ? 255 : b;
+                    intPixels[i] = r << 16 | g << 8 | b;
                 }
                 break;
-            case 4:
-                switch (ifd.photometric) {
-                    case Tags.RGB:
-                        image = new BufferedImage(ifd.imageWidth, ifd.imageHeight, BufferedImage.TYPE_INT_ARGB);
-                        intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-
-                        if (needBitReader(ifd.bps)) {
-                            bitReader = new JPXBitReader(data);
-                            for (int i = 0; i < dim; i++) {
-                                r = bitReader.readBits(ifd.bps[0]);
-                                g = bitReader.readBits(ifd.bps[1]);
-                                b = bitReader.readBits(ifd.bps[2]);
-                                a = bitReader.readBits(ifd.bps[0]);
-                                intPixels[i] = a << 24 | r << 16 | g << 8 | b;
-                            }
-                        } else {
-                            for (int i = 0; i < dim; i++) {
-                                r = data[n++] & 0xff;
-                                g = data[n++] & 0xff;
-                                b = data[n++] & 0xff;
-                                a = data[n++] & 0xff;
-                                intPixels[i] = a << 24 | r << 16 | g << 8 | b;
-                            }
-                        }
-
-                        break;
-                    default:
-                        System.err.println("Photometric value " + ifd.photometric + " not implemented yet");
+            case Tags.RGB:
+                intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                if (ifd.samplesPerPixel == 3) {
+                    for (int i = 0; i < dim; i++) {
+                        r = data[bp++] & 0xff;
+                        g = data[bp++] & 0xff;
+                        b = data[bp++] & 0xff;
+                        intPixels[i] = r << 16 | g << 8 | b;
+                    }
+                } else { //argb;
+                    for (int i = 0; i < dim; i++) {
+                        r = data[bp++] & 0xff;
+                        g = data[bp++] & 0xff;
+                        b = data[bp++] & 0xff;
+                        a = data[bp++] & 0xff;
+                        intPixels[i] = a << 24 | r << 16 | g << 8 | b;
+                    }
                 }
+                break;
+            case Tags.CMYK:
+                intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                EnumeratedSpace cmyk = new EnumeratedSpace();
+                for (int i = 0; i < dim; i++) {
+                    c = data[bp++];
+                    m = data[bp++];
+                    y = data[bp++];
+                    k = data[bp++];
+                    byte[] rgb = cmyk.getRGB(c, m, y, k);
+                    intPixels[i] = (rgb[0] & 0xff) << 16 | (rgb[1] & 0xff) << 8 | (rgb[2] & 0xff);
+                }
+                break;
+            case Tags.RGB_Palette:
+                if (ifd.bps[0] > 8) {
+                    intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                    for (int i = 0; i < dim; i++) {
+                        r = data[bp++] & 0xff;
+                        g = data[bp++] & 0xff;
+                        b = data[bp++] & 0xff;
+                        intPixels[i] = r << 16 | g << 8 | b;
+                    }
+                } else {
+                    bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                    int min = Math.min(bytePixels.length, data.length);
+                    System.arraycopy(data, 0, bytePixels, 0, min);
+                }
+                break;
+            default:
+                bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                int min = Math.min(bytePixels.length, data.length);
+                System.arraycopy(data, 0, bytePixels, 0, min);
                 break;
         }
 
         return image;
+
     }
 
-    private static int calculatePackBitExpectation(IFD ifd, int current) {
+    private static BufferedImage getImageFromTiles(RandomHandler reader, IFD ifd) throws Exception {
+        //some odd files may not contain tile offsets but contain tile info
+        if (ifd.tileOffsets == null) {
+            ifd.tileOffsets = ifd.stripOffsets;
+        }
+        if (ifd.tileByteCounts == null) {
+            ifd.tileByteCounts = ifd.stripByteCounts;
+        }
+
+        final int iw = ifd.imageWidth;
+        final int ih = ifd.imageHeight;
+        final int tw = ifd.tileWidth;
+        final int th = ifd.tileLength;
+        final boolean isPlanar = ifd.planarConfiguration == 2;
+        int tileComp = isPlanar ? 1 : ifd.samplesPerPixel;
+        final boolean hasPalette = ifd.colorMap != null;
+
+        final int xTiles = (iw + (tw - 1)) / tw;
+        final int yTiles = (ih + (th - 1)) / th;
+        final int totalTiles = ifd.tileOffsets.length;
+
+        int bps = ifd.bps[0];
 
         int sampleLen = 0;
         if (ifd.planarConfiguration == 2) {
@@ -818,55 +1014,375 @@ public class TiffDecoder {
             }
         }
 
-        int rps = ifd.rowsPerStrip;
-        int iw = ifd.imageWidth;
-        int ih = ifd.imageHeight;
-        int totalOffsets = ifd.stripOffsets.length;
-        int totalBits;
-        if (totalOffsets == 1) {
-            totalBits = iw * ih * sampleLen;
-        } else if (current + 1 == totalOffsets) {
-            if (rps == 1) {
-                totalBits = iw * sampleLen;
-            } else {
-                int mod = (ih % rps);
-                if (mod == 0) {
-                    totalBits = rps * iw * sampleLen;
-                } else {
-                    totalBits = mod * iw * sampleLen;
+        final List<Tile> tiles = new ArrayList<Tile>();
+
+        for (int t = 0; t < totalTiles; t++) {
+            reader.setPosition(ifd.tileOffsets[t]);
+            byte[] tileData = new byte[ifd.tileByteCounts[t]];
+            reader.get(tileData);
+            byte[] output = null;
+            CCITT fax;
+            JpegDecoder decoder;
+
+            int expectation = ((((tw * sampleLen + 7) / 8) * 8 * th) + 7) / 8;
+
+            switch (ifd.compressionType) {
+                case Tags.Uncompressed:
+                    output = tileData;
+                    break;
+                case Tags.CCITT_ID:
+                    output = new byte[expectation]; //assume bps = 1;
+                    fax = new CCITT(ifd.fillOrder, tw, th);
+                    fax.decompress1D(output, tileData, 0, th);
+                    break;
+                case Tags.Group_3_Fax:
+                    output = new byte[expectation]; //assume bps = 1;
+                    fax = new CCITT(ifd.fillOrder, tw, th);
+                    fax.decompressFax3(output, tileData, th);
+                    break;
+                case Tags.Group_4_Fax:
+                    output = new byte[expectation]; //assume bps = 1;
+                    fax = new CCITT(ifd.fillOrder, tw, th);
+                    fax.decompressFax4(output, tileData, th);
+                    break;
+                case Tags.LZW:
+                    output = new byte[expectation];
+                    LZW lzw = new LZW();
+                    lzw.decompress(output, tileData, tw, th);
+                    break;
+                case Tags.JPEG:
+                    throw new Exception("Old style jpeg compression is not supported");
+                case Tags.JPEG_TechNote:
+                    if (ifd.jpegTables != null) {
+                        int ifdLen = ifd.jpegTables.length;
+                        byte[] temp = new byte[ifdLen + tileData.length - 2];
+                        System.arraycopy(ifd.jpegTables, 0, temp, 0, ifdLen);
+                        System.arraycopy(tileData, 2, temp, ifdLen, tileData.length - 2);
+                        tileData = temp;
+                    }
+                    decoder = new JpegDecoder();
+                    output = decoder.readComponentsAsRawBytes(tileData);
+                    break;
+                case Tags.PackBits:
+                    int exp = (tw * th * sampleLen + 7) / 8;
+                    output = PackBits.decompress(tileData, exp);
+                    break;
+                case Tags.ADOBEDEFLATE:
+                case Tags.Deflate:
+                    output = Deflate.decompress(tileData);
+                    break;
+                default:
+                    System.err.println("unrecognized compression found");
+            }
+            
+            if (ifd.predictor == 2) {
+                int count;
+                for (int j = 0; j < th; j++) {
+                    count = tileComp * (j * tw + 1);
+                    for (int i = tileComp; i < tw * tileComp; i++) {
+                        output[count] += output[count - tileComp];
+                        count++;
+                    }
                 }
             }
-        } else {
-            totalBits = rps * iw * sampleLen;
-        }
-//        System.out.println(totalBits + " total " + ((totalBits + 7) / 8));
-        return (totalBits + 7) / 8;
-    }
 
-    private static boolean needBitReader(int[] bps) {
-        for (int i = 0; i < bps.length; i++) {
-            if (bps[i] != 8) {
-                return true;
+            //invert the colors to make white is zero;
+            if (ifd.photometric == Tags.WhiteIsZero) {
+                int n = 0;
+                for (int i = 0; i < output.length; i++) {
+                    output[i] = (byte) ((output[n++] & 0xff) ^ 0xff);
+                }
+            }
+
+            Tile tile = new Tile();
+            int iw8 = (tw * bps * tileComp) % 8;
+
+            if (bps != 8) {
+                tileData = new byte[th * tw * tileComp];
+                JPXBitReader bitReader = new JPXBitReader(output);
+                int bp = 0;
+                if (bps == 1) {
+                    for (int i = 0; i < th; i++) {
+                        for (int j = 0; j < tw; j++) {
+                            for (int k = 0; k < tileComp; k++) {
+                                if (hasPalette) {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps));
+                                } else {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps) * 255);
+                                }
+                            }
+                        }
+                        if (iw8 != 0) {
+                            bitReader.readBits(8 - iw8);
+                        }
+                    }
+                } else if (bps < 8) {
+                    int shift = 8 - bps;
+                    for (int i = 0; i < th; i++) {
+                        for (int j = 0; j < tw; j++) {
+                            for (int k = 0; k < tileComp; k++) {
+                                if (hasPalette) {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps));
+                                } else {
+                                    tileData[bp++] = (byte) (bitReader.readBits(bps) << shift);
+                                }
+                            }
+                        }
+                        if (iw8 != 0) {
+                            bitReader.readBits(8 - iw8);
+                        }
+                    }
+                } else {
+                    int shift = bps - 8;
+                    int sampleFormat = ifd.sampleFormat[0];
+
+                    if (hasPalette) {
+                        tileData = new byte[th * tw * 3];
+                        tileComp = 3;
+                        for (int i = 0; i < th; i++) {
+                            for (int j = 0; j < tw; j++) {
+                                int v = bitReader.readBits(bps) * 3;
+                                tileData[bp++] = ifd.colorMap[v++];
+                                tileData[bp++] = ifd.colorMap[v++];
+                                tileData[bp++] = ifd.colorMap[v++];
+                            }
+                            if (iw8 != 0) {
+                                bitReader.readBits(8 - iw8);
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < th; i++) {
+                            for (int j = 0; j < tw; j++) {
+                                for (int k = 0; k < tileComp; k++) {
+                                    if (sampleFormat == 3) {
+                                        tileData[bp++] = (byte) (toFloat(bitReader.readBits(bps), bps) * 255);
+                                    } else {
+                                        tileData[bp++] = (byte) (bitReader.readBits(bps) >> shift);
+                                    }
+                                }
+                            }
+                            if (iw8 != 0) {
+                                bitReader.readBits(8 - iw8);
+                            }
+                        }
+                    }
+
+                }
+            } else {
+                tileData = output;
+            }
+            tile.data = tileData;
+            tiles.add(tile);
+        }
+
+        int p, q, tx, ty, bp;
+
+        int[][] tileDim = new int[th * yTiles][tw * xTiles];
+
+        if (isPlanar) {
+            int tp = 0;
+            int planarTiles = tiles.size() / ifd.samplesPerPixel;
+
+            for (int z = 0; z < ifd.samplesPerPixel; z++) {
+                for (int t = 0; t < planarTiles; t++) {
+                    Tile tile = tiles.get(tp++);
+                    byte[] output = tile.data;
+                    p = t % xTiles;
+                    q = t / xTiles;
+                    tx = p * tw;
+                    ty = q * th;
+                    bp = 0;
+
+                    for (int i = 0; i < th; i++) {
+                        int iPos = ty + i;
+                        for (int j = 0; j < tw; j++) {
+                            int jPos = tx + j;
+                            int value = (output[bp++] & 0xff);
+                            tileDim[iPos][jPos] = (tileDim[iPos][jPos] << 8) | value;
+                        }
+                    }
+                }
+            }
+
+        } else {
+            for (int t = 0; t < tiles.size(); t++) {
+                Tile tile = tiles.get(t);
+                byte[] output = tile.data;
+                p = t % xTiles;
+                q = t / xTiles;
+                tx = p * tw;
+                ty = q * th;
+                bp = 0;
+
+                for (int i = 0; i < th; i++) {
+                    int iPos = ty + i;
+                    for (int j = 0; j < tw; j++) {
+                        int jPos = tx + j;
+                        int value = 0;
+                        for (int k = tileComp; k > 0; k--) {
+                            value |= ((output[bp++] & 0xff) << (8 * (k - 1)));
+                        }
+                        tileDim[iPos][jPos] = value;
+                    }
+                }
             }
         }
-        return false;
+
+        if (ifd.samplesPerPixel == 4 && ifd.photometric == Tags.RGB) { // convert : rgba data >> argb data
+            for (int i = 0; i < tileDim.length; i++) {
+                for (int j = 0; j < tileDim[0].length; j++) {
+                    int value = tileDim[i][j];
+                    int r = value >> 24 & 0xff;
+                    int g = value >> 16 & 0xff;
+                    int b = value >> 8 & 0xff;
+                    int a = value & 0xff;
+                    tileDim[i][j] = a << 24 | r << 16 | g << 8 | b;
+                }
+            }
+        }
+
+        BufferedImage image = allocateBufferedImage(ifd);
+        bp = 0;
+        byte c, m, y, k;
+        int yy, cb, cr, r, g, b;
+        int[] intPixels;
+
+        switch (ifd.photometric) {
+            case Tags.YCbCr:
+                intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                for (int i = 0; i < ih; i++) {
+                    for (int j = 0; j < iw; j++) {
+                        int val = tileDim[i][j];
+                        yy = (val >> 16) & 0xff;
+                        cb = (val >> 8) & 0xff;
+                        cr = val & 0xff;
+
+                        cb -= 128;
+                        cr -= 128;
+
+                        int u2 = cb >> 2;
+                        int v35 = (cr >> 3) + (cr >> 5);
+
+                        r = yy + cr + (cr >> 2) + v35;
+                        g = yy - (u2 + (cb >> 4) + (cb >> 5)) - ((cr >> 1) + v35 + (cr >> 4));
+                        b = yy + cb + (cb >> 1) + u2 + (cb >> 6);
+
+                        r = r < 0 ? 0 : r > 255 ? 255 : r;
+                        g = g < 0 ? 0 : g > 255 ? 255 : g;
+                        b = b < 0 ? 0 : b > 255 ? 255 : b;
+                        intPixels[bp++] = r << 16 | g << 8 | b;
+                    }
+                }
+                break;
+            case Tags.RGB:
+                intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                for (int i = 0; i < ih; i++) {
+                    for (int j = 0; j < iw; j++) {
+                        intPixels[bp++] = tileDim[i][j];
+                    }
+                }
+                break;
+            case Tags.CMYK:
+                intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                EnumeratedSpace cmyk = new EnumeratedSpace();
+                for (int i = 0; i < ih; i++) {
+                    for (int j = 0; j < iw; j++) {
+                        int val = tileDim[i][j];
+                        c = (byte) (val >> 24 & 0xff);
+                        m = (byte) (val >> 16 & 0xff);
+                        y = (byte) (val >> 8 & 0xff);
+                        k = (byte) (val & 0xff);
+                        byte[] rgb = cmyk.getRGB(c, m, y, k);
+                        intPixels[bp++] = (rgb[0] & 0xff) << 16 | (rgb[1] & 0xff) << 8 | (rgb[2] & 0xff);
+                    }
+                }
+                break;
+            case Tags.RGB_Palette:
+                if (ifd.bps[0] > 8) {
+                    intPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                    for (int i = 0; i < ih; i++) {
+                        for (int j = 0; j < iw; j++) {
+                            intPixels[bp++] = tileDim[i][j];
+                        }
+                    }
+                } else {
+                    byte[] bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                    for (int i = 0; i < ih; i++) {
+                        for (int j = 0; j < iw; j++) {
+                            bytePixels[bp++] = (byte) tileDim[i][j];
+                        }
+                    }
+                }
+                break;
+            default:
+                byte[] bytePixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                for (int i = 0; i < ih; i++) {
+                    for (int j = 0; j < iw; j++) {
+                        bytePixels[bp++] = (byte) tileDim[i][j];
+                    }
+                }
+                break;
+        }
+        return image;
+
     }
 
-    private static int[] readBitsPerSamples(final ByteBuffer reader, int offset, int nSamples) {
-        reader.position(offset);
+    private static BufferedImage generateImageFromIFD(final RandomHandler reader, IFD ifd) throws Exception {
+
+        if (ifd.tileWidth != 0) {
+            return getImageFromTiles(reader, ifd);
+        } else {
+            return getDataFromStrips(reader, ifd);
+        }
+
+    }
+
+    private static BufferedImage allocateBufferedImage(IFD ifd) {
+        int imageWidth = ifd.imageWidth;
+        int imageHeight = ifd.imageHeight;
+        if (ifd.photometric == Tags.RGB_Palette) {
+            if (ifd.bps[0] > 8) {
+                return new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+            } else {
+                IndexColorModel indexedCM = new IndexColorModel(8, ifd.colorMap.length / 3, ifd.colorMap, 0, false);
+                WritableRaster ras = indexedCM.createCompatibleWritableRaster(ifd.imageWidth, ifd.imageHeight);
+                return new BufferedImage(indexedCM, ras, false, null);
+            }
+        }
+
+        switch (ifd.samplesPerPixel) {
+            case 0:
+            case 1:
+            case 2:
+                return new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_BYTE_GRAY);
+            case 3:
+                return new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+            case 4:
+                if (ifd.photometric == Tags.CMYK) {
+                    return new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+                } else {
+                    return new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+                }
+            default:
+                return new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+        }
+    }
+
+    private static int[] readBitsPerSamples(final RandomHandler reader, int offset, int nSamples) throws IOException {
+        reader.setPosition(offset);
         int temp[] = new int[nSamples];
         for (int i = 0; i < nSamples; i++) {
-            temp[i] = reader.getShort();
+            temp[i] = reader.getUint16();
         }
         return temp;
     }
 
-    private static int[] readStripOffsets(final ByteBuffer reader, int offset, int nOffsets, int fieldType) {
-        reader.position(offset);
+    private static int[] readOffsets(final RandomHandler reader, int offset, int nOffsets, int fieldType) throws IOException {
+        reader.setPosition(offset);
         int temp[] = new int[nOffsets];
         if (fieldType == 3) {
             for (int i = 0; i < nOffsets; i++) {
-                temp[i] = reader.getShort() & 0xff;
+                temp[i] = reader.getUint16();
             }
         } else {
             for (int i = 0; i < nOffsets; i++) {
@@ -876,12 +1392,12 @@ public class TiffDecoder {
         return temp;
     }
 
-    private static int[] readStripByteCounts(final ByteBuffer reader, int offset, int nCount, int fieldType) {
-        reader.position(offset);
+    private static int[] readStripTileByteCounts(final RandomHandler reader, int offset, int nCount, int fieldType) throws IOException {
+        reader.setPosition(offset);
         int temp[] = new int[nCount];
         if (fieldType == 3) {
             for (int i = 0; i < nCount; i++) {
-                temp[i] = reader.getShort() & 0xff;
+                temp[i] = reader.getUint16();
             }
         } else {
             for (int i = 0; i < nCount; i++) {
@@ -891,8 +1407,8 @@ public class TiffDecoder {
         return temp;
     }
 
-    private static byte[] readColorMap(final ByteBuffer reader, int cmapOffset, int nValues) {
-        reader.position(cmapOffset);
+    private static byte[] readColorMap(final RandomHandler reader, int cmapOffset, int nValues) throws IOException {
+        reader.setPosition(cmapOffset);
         int totalColors = nValues / 3;
 
         byte rr[] = new byte[totalColors];
@@ -900,15 +1416,15 @@ public class TiffDecoder {
         byte bb[] = new byte[totalColors];
 
         for (int j = 0; j < totalColors; j++) {
-            int sv = reader.getShort() & 0xffff;
+            int sv = reader.getUint16();
             rr[j] = (byte) (sv >> 8);
         }
         for (int j = 0; j < totalColors; j++) {
-            int sv = reader.getShort() & 0xffff;
+            int sv = reader.getUint16();
             gg[j] = (byte) (sv >> 8);
         }
         for (int j = 0; j < totalColors; j++) {
-            int sv = reader.getShort() & 0xffff;
+            int sv = reader.getUint16();
             bb[j] = (byte) (sv >> 8);
         }
 
@@ -926,4 +1442,105 @@ public class TiffDecoder {
         return pageCount;
     }
 
+    private static float toFloat(int hbits, int bps) {
+        if (bps == 16) {
+            int mant = hbits & 0x03ff;
+            int exp = hbits & 0x7c00;
+            if (exp == 0x7c00) {
+                exp = 0x3fc00;
+            } else if (exp != 0) {
+                exp += 0x1c000;
+                if (mant == 0 && exp > 0x1c400) {
+                    return Float.intBitsToFloat((hbits & 0x8000) << 16 | exp << 13 | 0x3ff);
+                }
+            } else if (mant != 0) {
+                exp = 0x1c400;
+                do {
+                    mant <<= 1;
+                    exp -= 0x400;
+                } while ((mant & 0x400) == 0);
+                mant &= 0x3ff;
+            }
+            return Float.intBitsToFloat((hbits & 0x8000) << 16 | (exp | mant) << 13);
+        } else {
+            return Float.intBitsToFloat(hbits);
+        }
+
+    }
+
+//    may be useful in future
+//    private static byte[] generateOldJPEGFile(IFD ifd, byte[] data, int tw, int th, int tComp) throws IOException {
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        //SOI
+//        writeShort(bos, Markers.SOI);
+//
+//        //SOF
+//        writeShort(bos, Markers.SOF0); // support only baseline now
+//        int frameLen = 8 + 3 * tComp;
+//        writeShort(bos, frameLen);
+//        bos.write(ifd.bps[0]);
+//        writeShort(bos, th);
+//        writeShort(bos, tw);
+//        bos.write(tComp);
+//        for (int i = 0; i < tComp; i++) {
+//            bos.write(i);
+//            bos.write((ifd.jpegFrequency[i] << 4) + ifd.jpegFrequency[i]);
+//            bos.write(i); //planar should be handled differently
+//        }
+//
+//        //DQT        
+//        for (int i = 0; i < ifd.jpegQOffsets.length; i++) {
+//            writeShort(bos, Markers.DQT);
+//            int dqtLen = 2 + 1 + 64;
+//            writeShort(bos, dqtLen);
+//            bos.write(i);
+//            bos.write(ifd.jpegQData[i]);
+//        }
+//
+//        //DHT - DC
+//        for (int i = 0; i < ifd.jpegDCOffsets.length; i++) {
+//            writeShort(bos, Markers.DHT);
+//            int dhtLen = 3 + ifd.jpegDCData[i].length;
+//            writeShort(bos, dhtLen);
+//            bos.write(i);
+//            bos.write(ifd.jpegDCData[i]);
+//        }
+//
+//        //DHT - AC
+//        for (int i = 0; i < ifd.jpegACOffsets.length; i++) {
+//            writeShort(bos, Markers.DHT);
+//            int dhtLen = 3 + ifd.jpegACData[i].length;
+//            writeShort(bos, dhtLen);
+//            bos.write( 16 + i);
+//            bos.write(ifd.jpegACData[i]);
+//        }
+//        
+//        //SOS
+//        writeShort(bos, Markers.SOS);
+//        int scanLen = 6 + 2 * tComp;
+//        writeShort(bos, scanLen);
+//        bos.write(tComp);
+//        for (int i = 0; i < tComp; i++) {
+//            bos.write(i);
+//            int dcac = i == 0 ? i : (16 + i);
+//            bos.write(dcac);
+//        }
+//        System.out.println(data.length);
+//        
+//        bos.write(0);
+//        bos.write(63);        
+//        bos.write(0);
+//        //write data
+//        bos.write(data);
+//        //EOI
+//        writeShort(bos, Markers.EOI);
+//        bos.close();
+//        System.out.println(bos.toByteArray().length);
+//        return bos.toByteArray();
+//    }
+//
+//    private static void writeShort(OutputStream out, int value) throws IOException {
+//        out.write((byte) (value >> 8));
+//        out.write((byte) value);
+//    }
 }

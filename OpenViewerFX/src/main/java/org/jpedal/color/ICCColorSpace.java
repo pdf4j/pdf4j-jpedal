@@ -60,7 +60,7 @@ extends GenericColorSpace {
     private final int[] a1,b1,c1;
     
     private final Map cache=new HashMap();
-    private float[] prevFloat = null;
+    private float[] prevFloat;
     
     /**
      * reset any defaults if reused

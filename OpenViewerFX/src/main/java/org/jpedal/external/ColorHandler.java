@@ -41,8 +41,8 @@ import java.awt.image.BufferedImage;
 public interface ColorHandler {
 
     //allow user to control how color set when rendering (ie to produce grayscale or bw)
-    public void setPaint(Graphics2D g2, PdfPaint textFillCol, int pageNumber, boolean isPrinting);
+    void setPaint(Graphics2D g2, PdfPaint textFillCol, int pageNumber, boolean isPrinting);
 
     //allow user to process images before drawn (ie to convert to bw or grayscale)
-    public BufferedImage processImage(BufferedImage image, int pageNumber, boolean isPrinting);
+    BufferedImage processImage(BufferedImage image, int pageNumber, boolean isPrinting);
 }

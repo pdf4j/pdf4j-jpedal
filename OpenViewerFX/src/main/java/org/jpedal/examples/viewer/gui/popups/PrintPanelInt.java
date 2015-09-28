@@ -39,50 +39,50 @@ import org.jpedal.examples.viewer.paper.MarginPaper;
 
 public interface PrintPanelInt{
 
-    public void resetDefaults(String[] printersList, String defaultPrinter, int pageCount, int currentPage);
+    void resetDefaults(String[] printersList, String defaultPrinter, int pageCount, int currentPage);
     
-    public PrinterResolution getResolution();
+    PrinterResolution getResolution();
     
     /**
      * return range as SetOfIntegerSytax
      * - if you try to do something silly like print all
      *  even pages in rage 1-1 you will get null returned
      */
-   public SetOfIntegerSyntax getPrintRange();
+    SetOfIntegerSyntax getPrintRange();
     
-    public int getCopies();
+    int getCopies();
     
     /** return setting for type of scaling to use 
      * PAGE_SCALING_NONE,PAGE_SCALING_FIT_TO_PRINTER_MARGINS,PAGE_SCALING_REDUCE_TO_PRINTER_MARGINS
      *see org.jpedal.objects.contstants.PrinterOptions for all values
      */
-    public int getPageScaling();
+    int getPageScaling();
     
-    public String getPrinter();
+    String getPrinter();
     
-    public boolean okClicked();
+    boolean okClicked();
 
-    public boolean isAutoRotateAndCenter();
+    boolean isAutoRotateAndCenter();
     
-    public boolean isPaperSourceByPDFSize();
+    boolean isPaperSourceByPDFSize();
     
-    public boolean isPrintingCurrentView();
+    boolean isPrintingCurrentView();
     
-    public String[] getAvailablePaperSizes();
+    String[] getAvailablePaperSizes();
     
     /**return selected Paper*/
-    public MarginPaper getSelectedPaper();
+    MarginPaper getSelectedPaper();
     
     /**return printers default orientation*/
-    public int getSelectedPrinterOrientation();
+    int getSelectedPrinterOrientation();
     
-    public boolean isPagesReversed();
+    boolean isPagesReversed();
 
-	public boolean isOddPagesOnly();
+	boolean isOddPagesOnly();
 
-	public boolean isEvenPagesOnly();
+	boolean isEvenPagesOnly();
 
-    public boolean isMonochrome();
+    boolean isMonochrome();
     
-    public boolean isVisible();
+    boolean isVisible();
 }

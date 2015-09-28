@@ -39,9 +39,10 @@ import java.util.List;
  *
  */
 public class Tile {
-    
+
     public COD cod;
     public QCD qcd;
+    public QCD[] qcc;
     public int index;
     public int partIndex;
     public int partCount;
@@ -51,9 +52,9 @@ public class Tile {
     public int ty1;
     public byte[] data;
     public Progression progress;
-    
+
     public List<TileComponent> components = new ArrayList<TileComponent>();
-    
+
     public double getWidth() {
         return (tx1 - tx0);
     }
@@ -61,5 +62,5 @@ public class Tile {
     public double getHeight() {
         return (ty1 - ty0);
     }
-    
-}
+
+    }

@@ -50,7 +50,7 @@ public class PdfLayerList {
     private String padding ="";
 
     //used in tree as unique separator
-    public static final String deliminator=""+(char)65535;
+    public static final char deliminator=(char)65535;
 
     private final Map layerNames=new LinkedHashMap();
 

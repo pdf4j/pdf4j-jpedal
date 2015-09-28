@@ -44,20 +44,20 @@ import org.jpedal.objects.layers.PdfLayerList;
 @SuppressWarnings({"UnusedParameters", "UnusedDeclaration"})
 public interface ActionHandler {
 
-    public static final int MOUSEPRESSED = 1;
-    public static final int MOUSERELEASED = 2;
-    public static final int MOUSECLICKED = 3;
-    public static final int MOUSEENTERED = 4;
-    public static final int MOUSEEXITED = 5;
+    int MOUSEPRESSED = 1;
+    int MOUSERELEASED = 2;
+    int MOUSECLICKED = 3;
+    int MOUSEENTERED = 4;
+    int MOUSEEXITED = 5;
 
-    public static final int FOCUS_EVENT = 6;
+    int FOCUS_EVENT = 6;
 
-    public static final int TODO = -1;
+    int TODO = -1;
 
-    public static final int NOMESSAGE = 0;
-    public static final int REJECTKEY = 1;
-    public static final int STOPPROCESSING = 2;
-    public static final int VALUESCHANGED = 3;
+    int NOMESSAGE = 0;
+    int REJECTKEY = 1;
+    int STOPPROCESSING = 2;
+    int VALUESCHANGED = 3;
 
 
     /**
@@ -66,49 +66,49 @@ public interface ActionHandler {
      * @param formObject - Actual formObject containing data
      * @param eventType - type of event (Keystroke, focus)
      */
-    public void A(Object e, FormObject formObject, int eventType);
+    void A(Object e, FormObject formObject, int eventType);
 
     /**
      * E action when cursor enters active area
      * @param e Object contained by the action
      * @param formObject - Actual formObject containing data
      */
-    public void E(Object e, FormObject formObject);
+    void E(Object e, FormObject formObject);
 
     /**
      * X action when cursor exits active area
      * @param e Object contained by the action
      * @param formObject - Actual formObject containing data
      */
-    public void X(Object e, FormObject formObject);
+    void X(Object e, FormObject formObject);
 
     /**
      * D action when cursor button pressed inside active area
      * @param e Object contained by the action
      * @param formObj - Actual formObject containing data
      */
-    public void D(Object e, FormObject formObj);
+    void D(Object e, FormObject formObj);
 
     /**
      * U action when cursor button released inside active area
      * @param e Object contained by the action
      * @param formObj - Actual formObject containing data
      */
-    public void U(Object e, FormObject formObj);
+    void U(Object e, FormObject formObj);
 
     /**
      * Fo action on input focus
      * @param e Object contained by the action
      * @param formObj - Actual formObject containing data
      */
-    public void Fo(Object e, FormObject formObj);
+    void Fo(Object e, FormObject formObj);
 
     /**
      * Bl action when input focus lost
      * @param e Object contained by the action
      * @param formObj - Actual formObject containing data
      */
-    public void Bl(Object e, FormObject formObj);
+    void Bl(Object e, FormObject formObj);
 
     /**
      * PO action when page containing is opened,
@@ -116,35 +116,35 @@ public interface ActionHandler {
      * @param pdfObject - of the opening page
      * @param type  - the type of action
      */
-    public void PO(PdfObject pdfObject,int type);
+    void PO(PdfObject pdfObject, int type);
 
     /**
      * O action when page containing is opened,
      * @param pdfObject - of the opening page
      * @param type  - the type of action
      */
-    public void O(PdfObject pdfObject,int type);
+    void O(PdfObject pdfObject, int type);
 
     /**
      * PC action when page is closed
      * @param pdfObject - of the opening page
      * @param type  - the type of action
      */
-    public void PC(PdfObject pdfObject,int type);
+    void PC(PdfObject pdfObject, int type);
 
     /**
      * PV action on viewing containing page
      * @param pdfObject - of the opening page
      * @param type  - the type of action
      */
-    public void PV(PdfObject pdfObject,int type);
+    void PV(PdfObject pdfObject, int type);
 
     /**
      * PI action when no longer visible in viewer
      * @param pdfObject - of the opening page
      * @param type  - the type of action
      */
-    public void PI(PdfObject pdfObject,int type);
+    void PI(PdfObject pdfObject, int type);
 
     /**
      * K action on - [javascript]
@@ -156,13 +156,13 @@ public interface ActionHandler {
      * @param actionID - integer value of the actionID
      * @return the action
      */
-    public int K(Object e, FormObject formObject,int actionID);
+    int K(Object e, FormObject formObject, int actionID);
 
     /**
      * F the display formatting of the field (e.g 2 decimal places) [javascript]
      * @param formObject - Actual formObject containing data
      */
-    public void F(FormObject formObject);
+    void F(FormObject formObject);
 
     /**
      * V action when fields value is changed [javascript]
@@ -170,16 +170,16 @@ public interface ActionHandler {
      * @param formObject - Actual formObject containing data
      * @param actionID - integer value of the actionID
      */
-    public void V(Object e,FormObject formObject,int actionID);
+    void V(Object e, FormObject formObject, int actionID);
 
     /**
      * C action when another field changes (recalculate this field) [javascript]
      * should not be called other than from internal methods to action changes on other fields.
      * @param formObject - Actual formObject containing data
      */
-    public void C(FormObject formObject);
+    void C(FormObject formObject);
 
-    public PdfDecoderInt getPDFDecoder();
+    PdfDecoderInt getPDFDecoder();
     
     /**
      * creates a returns an action listener that will change the down icon for each click
@@ -202,18 +202,18 @@ public interface ActionHandler {
      * setup hand cursor when hovering and reset, on exiting
      * @return hand cursor
      */
-    public Object setHoverCursor();
+    Object setHoverCursor();
 
-    public void init(PdfDecoderInt panel, Javascript javascript, AcroRenderer defaultAcroRenderer);
+    void init(PdfDecoderInt panel, Javascript javascript, AcroRenderer defaultAcroRenderer);
     
     //void setPageAccess(int pageHeight, int insetH);
 
-	public PdfLayerList getLayerHandler();
+	PdfLayerList getLayerHandler();
 
-	public void changeTo(String file, int page, Object location, Integer type,boolean storeView);
+	void changeTo(String file, int page, Object location, Integer type, boolean storeView);
 
 
     //allow Swing client to plug into Dest handling code returning page as may change
     @SuppressWarnings("UnusedReturnValue")
-    public int gotoDest(PdfObject aobj, int mouseclicked, int dest);
+    int gotoDest(PdfObject aobj, int mouseclicked, int dest);
 }

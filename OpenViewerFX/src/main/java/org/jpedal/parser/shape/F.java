@@ -46,7 +46,6 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.*;
 import org.jpedal.parser.image.PDFObjectToImage;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
 public class F {
@@ -198,7 +197,7 @@ public class F {
 //                        {0,(float)currentShape.getBounds2D().getHeight(),1},
 //                        {(float)currentShape.getBounds2D().getX(),(float)currentShape.getBounds2D().getY(),0}})+" "+current);
                     //lock down to specific case
-                    if(BaseDisplay.isHTMLorSVG(current) && currentDrawShape.getSegmentCount()==7 && cache.groupObj==null && current.hasObjectsBehind(new float[][]{{(float)currentShape.getBounds2D().getWidth(),0,1},
+                    if(current.isHTMLorSVG() && currentDrawShape.getSegmentCount()==7 && cache.groupObj==null && current.hasObjectsBehind(new float[][]{{(float)currentShape.getBounds2D().getWidth(),0,1},
                         {0,(float)currentShape.getBounds2D().getHeight(),1},
                         {(float)currentShape.getBounds2D().getX(),(float)currentShape.getBounds2D().getY(),0}})) { //avoid anything with potential transparency
                         //System.out.println("ADD "+currentShape.getBounds());

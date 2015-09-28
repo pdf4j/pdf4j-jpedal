@@ -239,18 +239,7 @@ public class TextStream {
                     i--;
                     return i;
                 }
-                
-                if(debugFastCode){
-                    System.out.println(padding+"i="+i+" Reading Text from String="+new String(raw)+ '<');
-                    
-                    System.out.println("-->>");
-                    for(int zz=i;zz<raw.length;zz++){
-                        System.out.print((char)raw[zz]);
-                    }
-                    System.out.println("<<--");
-                }
-                
-                //System.out.println("raw["+i+"]="+(char)raw[i]);
+
                 //get next key to see if indirect
                 final boolean isRef=raw[i]!='<' && raw[i]!='(';
                 

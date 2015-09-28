@@ -52,7 +52,7 @@ public class ClientExternalHandler implements AdditonalHandler{
     private JPedalActionHandler keyboardHandler;
     
     /**Used in JavaFX to display additional objects if decoding with transition*/
-    private FXAdditionalData additionaValuesforPage=null; 
+    private FXAdditionalData additionaValuesforPage;
     
     private Speech speech; 
     

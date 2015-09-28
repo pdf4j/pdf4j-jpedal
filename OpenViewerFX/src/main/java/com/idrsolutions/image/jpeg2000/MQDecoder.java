@@ -85,7 +85,7 @@ public final class MQDecoder {
         0, 0, 0, 0, 0, 0, 0
     };
 
-    int bpst;
+    //int bpst;
     int bp;
     int c;
     int b;

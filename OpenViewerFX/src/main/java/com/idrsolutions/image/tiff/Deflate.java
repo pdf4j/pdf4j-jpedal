@@ -33,11 +33,14 @@
 package com.idrsolutions.image.tiff;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 public class Deflate {
-    
-    public static byte[] decompress(byte[] compressedData){
+
+    public static byte[] decompress(byte[] compressedData) {
         Inflater decompressor = new Inflater();
         decompressor.setInput(compressedData);
         ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
@@ -47,11 +50,33 @@ public class Deflate {
                 int count = decompressor.inflate(buf);
                 bos.write(buf, 0, count);
                 bos.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (IOException ex) {
+                writeLog("Exception: " + ex.getMessage());
+            } catch (DataFormatException ex) {
+                writeLog("Exception: " + ex.getMessage());
             }
-        }        
+        }
         return bos.toByteArray();
     }
+
+    public static byte[] compress(final byte[] pixels) throws IOException {
+        final Deflater deflater;
+        deflater = new Deflater(Deflater.BEST_SPEED);
+        deflater.setInput(pixels);
+        final int min = Math.min(pixels.length / 2, 4096);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(min);
+        deflater.finish();
+        final byte[] buffer = new byte[min];
+        while (!deflater.finished()) {
+            final int count = deflater.deflate(buffer);
+            outputStream.write(buffer, 0, count);
+        }
+        deflater.end();
+        outputStream.close();
+        return outputStream.toByteArray();
+    }
     
+    private static void writeLog(final String msg) {
+        System.out.println(msg);
+    }
 }

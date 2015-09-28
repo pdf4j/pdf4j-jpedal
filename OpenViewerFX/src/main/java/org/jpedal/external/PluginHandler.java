@@ -36,6 +36,6 @@ package org.jpedal.external;
 public interface PluginHandler {
 
     //allow user to update Plugin when new file loaded
-    public void setFileName(String name);
+    void setFileName(String name);
 
 }

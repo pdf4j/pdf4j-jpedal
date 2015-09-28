@@ -43,36 +43,36 @@ import org.jpedal.color.PdfPaint;
  */
 public interface PdfGlyph {
 
-    public abstract int getGlyphNumber();
+    int getGlyphNumber();
 
-    public abstract void setGlyphNumber(int no);
+    void setGlyphNumber(int no);
 
-    public static int FontBB_X=1;
-    public static int FontBB_Y=2;
-    public static int FontBB_WIDTH=3;
-    public static int FontBB_HEIGHT=4;
+    int FontBB_X=1;
+    int FontBB_Y=2;
+    int FontBB_WIDTH=3;
+    int FontBB_HEIGHT=4;
 
     /**draw the glyph*/
-	public abstract void render(int text_fill_type, Graphics2D g2, float scaling,boolean isFormGlyph);
+	void render(int text_fill_type, Graphics2D g2, float scaling, boolean isFormGlyph);
 
 	/**
 	 * return max possible glyph width in absolute units
 	 */
-	public abstract float getmaxWidth();
+	float getmaxWidth();
 
 	/**
 	 * used by type3 glyphs to set colour if required
 	 */
-	public abstract void setT3Colors(PdfPaint strokeColor, PdfPaint nonstrokeColor, boolean lockColours);
+	void setT3Colors(PdfPaint strokeColor, PdfPaint nonstrokeColor, boolean lockColours);
 
 	/**
 	 * see if we ignore colours for type 3 font
 	 */
-	public abstract boolean ignoreColors();
+	boolean ignoreColors();
 
-	public abstract Area getShape();
+	Area getShape();
 
-	public abstract void setWidth(float width);
+	void setWidth(float width);
 
     /**
      * retrun fontBounds paramter where type is a contant in PdfGlyh
@@ -83,7 +83,7 @@ public interface PdfGlyph {
 
     void setStrokedOnly(boolean b);
 
-    public boolean containsBrokenData();
+    boolean containsBrokenData();
 
-    public Path getPath();
+    Path getPath();
 }

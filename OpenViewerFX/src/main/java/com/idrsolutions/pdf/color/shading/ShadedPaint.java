@@ -97,13 +97,13 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
 
 	private boolean[] isExtended=new boolean[2];
 	private boolean colorsReversed;
-	private float scaling;
-	private int cropX;
+	public float scaling;
+	public int cropX;
 	
-	private int textX,textY;
-	private int cropH;
+	public int textX,textY;
+	public int cropH;
 	private float[] background;
-	private boolean isPrinting;
+	public boolean isPrinting;
         private boolean isFromSH;
 
     private HashMap patchShades;
@@ -128,7 +128,7 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
 
 	}
     
-    //
+    public ShadedPaint(){}
     
 	private void init(final PdfObject Shading, final GenericColorSpace shadingColorSpace, final PdfObjectReader currentPdfFile, final float[][] matrix){
 
@@ -278,8 +278,6 @@ public class ShadedPaint implements PdfPaint,Paint, Serializable {
 			offY=(int) xform.getTranslateY();
 			scaling=(float)xform.getScaleY();
 		}
-        
-        //
         
 		switch(type){
 		case FUNCTION :

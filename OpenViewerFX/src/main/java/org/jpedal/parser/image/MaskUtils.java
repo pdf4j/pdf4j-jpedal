@@ -188,7 +188,7 @@ public class MaskUtils {
 //        }
         
         //separate call needed to paint image on thumbnail or background image in HTML/SVG
-        if(BaseDisplay.isHTMLorSVG(current)){
+        if(current.isHTMLorSVG()){
             current.drawImage(parserOptions.getPageNumber(),image,gs1,false,name,PDFImageProcessing.IMAGE_INVERTED, -3);
             
             gs1.CTM[1][1]=-gs1.CTM[1][1];

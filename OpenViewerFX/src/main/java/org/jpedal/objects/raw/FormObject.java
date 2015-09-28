@@ -32,7 +32,6 @@
  */
 package org.jpedal.objects.raw;
 
-//
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -237,8 +236,6 @@ public class FormObject extends PdfObject{
 
 	protected int Flags;
 	
-	//
-
 	/**
      * Filters the MK command and its properties
      * <p/>
@@ -4096,22 +4093,5 @@ public class FormObject extends PdfObject{
 	public int[] getMatteBorderDetails(){
 		return matteDetails;
 	}
-	
-	//
-    /**
-    int XFA=0;
-    int FDF=1;
-    int ANNOT=2;
-
-    int source=-1;
-
-    public void setSource(int source){
-        this.source=source;
-    }
-
-    public int getSource(){
-        return source;
-    }
-     */
 }
 

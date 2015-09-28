@@ -33,7 +33,6 @@
 package org.jpedal.examples.viewer.commands.javafx;
 
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.gui.GUIFactory;
 
@@ -55,10 +54,10 @@ public class JavaFXScaling {
                 final int pageNumber=commonValues.getCurrentPage();
                 currentGUI.scaleAndRotate();
                 
-                //we need to switch modes and bck to avoid issues with listeners
-                currentGUI.setDisplayView(Display.SINGLE_PAGE,alignment);
+                    //we need to switch modes and bck to avoid issues with listeners
+//                currentGUI.setDisplayView(Display.SINGLE_PAGE,alignment);
                 currentGUI.scrollToPage(pageNumber);
-                currentGUI.setDisplayView(mode,alignment);
+//                currentGUI.setDisplayView(mode,alignment);
                 
             }
         } else {

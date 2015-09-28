@@ -40,7 +40,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jpedal.constants.SpecialOptions;
 import org.jpedal.display.Display;
-import org.jpedal.display.GUIModes;
 import org.jpedal.display.PageOffsets;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.ColorHandler;
@@ -59,10 +58,7 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 //<start-adobe><end-adobe>
 import org.jpedal.parser.*;
-//<start-adobe>
-import org.jpedal.parser.fx.*;
-//<end-adobe>
-import org.jpedal.parser.swing.*;
+
 import org.jpedal.render.*;
 import org.jpedal.text.TextLines;
 import org.jpedal.utils.LogWriter;
@@ -148,7 +144,7 @@ public class Parser {
     private int indent;
 
     private int specialMode;
-    private boolean useJavaFX;
+    private final boolean useJavaFX;
     private boolean warnOnceOnForms;
     private PdfObject structTreeRootObj;
     //<start-adobe><end-adobe>
@@ -202,13 +198,11 @@ public class Parser {
         this.res=res;
         this.resultsFromDecode=resultsFromDecode;
 
-        //<start-adobe>
-        if(externalHandlers.getMode()==GUIModes.JAVAFX){
-            fileAcces.setDVR(new FXDisplay(1,fileAcces.getObjectStore(),false));
-            
-            useJavaFX=true;
-        }
-        //
+        useJavaFX=externalHandlers.isJavaFX();
+        
+        //setup Swing of FX display depending on mode (External Handler can be FX of Swing)
+        externalHandlers.setDVR(fileAcces);
+        
     }
 
     //
@@ -296,13 +290,7 @@ public class Parser {
 
                         final ObjectStore backgroundObjectStoreRef = new ObjectStore();
 
-                        final PdfStreamDecoder backgroundDecoder;
-
-                        //
-                            //needs to be out of loop as we can get flattened forms on pages with no content
-                            backgroundDecoder = new PdfStreamDecoder(getIO(), options.useHiResImageForDisplay(),res.getPdfLayerList());
-                            //
-
+                        final PdfStreamDecoder backgroundDecoder=formRenderer.getStreamDecoder(getIO(), options.useHiResImageForDisplay(),res.getPdfLayerList(),false);
 
                         backgroundDecoder.setParameters(true, false, 0, extractionMode,false,useJavaFX);
 
@@ -367,16 +355,8 @@ public class Parser {
 
             if (currentPageOffset != null || externalHandlers.getFormRenderer().isXFA()) {
 
-                final PDFtoImageConvertor  pdfToImageConvertor;
-                //<start-adobe>
-                if(useJavaFX) {
-                    pdfToImageConvertor = new PDFtoImageConvertorFX(multiplyer, options);
-                } else
-                //<end-adobe>
-                {
-                    pdfToImageConvertor = new PDFtoImageConvertorSwing(multiplyer, options);
-                }
-
+                final PDFtoImageConvertor pdfToImageConvertor=externalHandlers.getConverter(multiplyer, options);
+                
                 image = pdfToImageConvertor.convert(resultsFromDecode, displayRotation, res, externalHandlers,renderMode,pageData,externalHandlers.getFormRenderer(),scaling,getIO(),pageIndex, imageIsTransparent, currentPageOffset);
 
                 //Check for exceptions in TrueType hinting and re decode if neccessary
@@ -791,26 +771,23 @@ public class Parser {
                         formRenderer.getFormFactory().indexAllKids();
                         
                         //critical we enable this code in standard mode to render forms
-                        //
+                        if (!formRenderer.useXFA()) {
                         
-                        if (currentDisplay.getType() == DynamicVectorRenderer.CREATE_HTML || currentDisplay.getType() == DynamicVectorRenderer.CREATE_SVG) {
-                            
-                            java.util.List[] formsOrdered = formRenderer.getCompData().getFormList(true);
-                            
-                            //get unsorted components and iterate over forms
-                            for (Object nextVal : formsOrdered[page]) {
-                                
-                                if (nextVal != null) {
+                            if (currentDisplay.getType() == DynamicVectorRenderer.CREATE_HTML || currentDisplay.getType() == DynamicVectorRenderer.CREATE_SVG) {
 
-                                    FormFlattener.drawFlattenedForm(current,(org.jpedal.objects.raw.FormObject) nextVal, true, (PdfObject) formRenderer.getFormResources()[0]);
-                                    
+                                java.util.List[] formsOrdered = formRenderer.getCompData().getFormList(true);
+
+                                //get unsorted components and iterate over forms
+                                for (Object nextVal : formsOrdered[page]) {
+
+                                    if (nextVal != null) {
+
+                                        formRenderer.getFormFlattener().drawFlattenedForm(current,(org.jpedal.objects.raw.FormObject) nextVal, true, (PdfObject) formRenderer.getFormResources()[0]);
+
+                                    }
                                 }
                             }
                         }
-                         /**/
-                        
-                        //
-
                         
                         if(specialMode!= SpecialOptions.NONE &&
                                 specialMode!= SpecialOptions.SINGLE_PAGE &&
@@ -893,25 +870,22 @@ public class Parser {
         PdfObject Resources=pdfObject.getDictionary(PdfDictionary.Resources);
 
         /** read page or next pages */
-
-        //
-
+        if(formRenderer.isXFA() && formRenderer.useXFA()){
+            current = formRenderer.getStreamDecoder(getIO(), options.useHiResImageForDisplay(), res.getPdfLayerList(), false);
+            Resources=(PdfObject) formRenderer.getFormResources()[0];//XFA in Acroforms
+        }else{
+            
             //needs to be out of loop as we can get flattened forms on pages with no content
-            current = new PdfStreamDecoder(getIO(), options.useHiResImageForDisplay(),res.getPdfLayerList());
+            current = formRenderer.getStreamDecoder(getIO(), options.useHiResImageForDisplay(),res.getPdfLayerList(),false);
 
             if(!warnOnceOnForms){
                 warnOnceOnForms=true; //not used in XFA at present but set for consistency
             }
-            //
-        if(warnOnceOnForms){//used in this file already
-        }else if(formRenderer.isXFA()){
-            warnOnceOnForms=true;
-            System.out.println("[WARNING] This file contains XFA forms that are not supported by this version of JPDF2HTML5. To convert into functional HTML forms and display non-legacy mode page content, JPDF2HTML5 Forms Edition must be used.");
-        }else if(formRenderer.hasFormsOnPage(page)){
-            warnOnceOnForms=true;
-            System.out.println("[WARNING] This file contains form components that have been rasterized. To convert into functional HTML forms, JPDF2HTML5 Forms Edition must be used.");
         }
-        /**/
+        
+        if(!warnOnceOnForms){
+            warnOnceOnForms=formRenderer.showFormWarningMessage(page);
+        }
         
         /** set hires mode or not for display */
         current.setXMLExtraction(options.isXMLExtraction());
@@ -937,7 +911,7 @@ public class Parser {
 
         currentDisplay.init(pageData.getMediaBoxWidth(page), pageData.getMediaBoxHeight(page), pageData.getRotation(page),options.getPageColor());
 
-        if((!BaseDisplay.isHTMLorSVG(currentDisplay))&& (options.getTextColor()!=null)){
+        if((!currentDisplay.isHTMLorSVG())&& (options.getTextColor()!=null)){
                 currentDisplay.setValue(DynamicVectorRenderer.ALT_FOREGROUND_COLOR, options.getTextColor().getRGB());
 
                 if(options.getChangeTextAndLine()) {

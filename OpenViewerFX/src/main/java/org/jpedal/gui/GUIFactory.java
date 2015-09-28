@@ -50,9 +50,9 @@ import org.jpedal.examples.viewer.utils.PropertiesFile;
 @SuppressWarnings("UnusedDeclaration")
 public interface GUIFactory {
 
-    public int BUTTONBAR = 0;
-    public int NAVBAR = 1;
-    public int PAGES = 2;
+    int BUTTONBAR = 0;
+    int NAVBAR = 1;
+    int PAGES = 2;
     
     
     //<start-demo><end-demo>
@@ -61,47 +61,47 @@ public interface GUIFactory {
     /**
      * flag used to show opening of multiple PDFs
      */
-    public static final Integer MULTIPAGE = 1;
+    Integer MULTIPAGE = 1;
 
     /**
      * access to command object
      */
-    public org.jpedal.examples.viewer.Commands getCommand();
+    org.jpedal.examples.viewer.Commands getCommand();
     
     /**
      * align rotation combo box to default for page
      */
-    public void resetRotationBox();
+    void resetRotationBox();
 
     /**
      * main method to initialise Swing specific code and create GUI display
      */
-    public void init(Commands currentCommands, Object currentPrinter);
+    void init(Commands currentCommands, Object currentPrinter);
 
     /**
      * set title or over-ride with message
      */
-    public void setViewerTitle(String title);
+    void setViewerTitle(String title);
 
     /**
      * set all 3 combo boxes to isEnabled(value)
      */
-    public void resetComboBoxes(boolean value);
+    void resetComboBoxes(boolean value);
 
     /**
      * zoom into page
      */
-    public void scaleAndRotate();
+    void scaleAndRotate();
 
     /**
      * get current rotation
      */
-    public int getRotation();
+    int getRotation();
 
     /**
      * get current scaling
      */
-    public float getScaling();
+    float getScaling();
 
     /**
      * get inset between edge of JPanel and PDF page
@@ -110,18 +110,18 @@ public interface GUIFactory {
     /**
      * read value from rotation box and apply - called by combo listener
      */
-    public void rotate();
+    void rotate();
 
     /**
      * toggle state of autoscrolling on/off
      */
-    public void toogleAutoScrolling();
+    void toogleAutoScrolling();
 
     //	<start-thin>
-    public void setupThumbnailPanel();
+    void setupThumbnailPanel();
     //	<end-thin>
     
-    public void setAutoScrolling(boolean autoScroll);
+    void setAutoScrolling(boolean autoScroll);
     /**
      * remove outlines and flag for redraw
      */
@@ -129,266 +129,266 @@ public interface GUIFactory {
     /**
      * flush list of pages decoded
      */
-    public void setNoPagesDecoded();
+    void setNoPagesDecoded();
 
     /**
      * set text displayed in cursor co-ordinates box
      */
-    public void setCoordText(String string);
+    void setCoordText(String string);
 
     /**
      * set page number at bottom of screen
      */
-    public void setPageNumber();
+    void setPageNumber();
 
     //
 
     /**
      * allow access to root frame if required
      */
-    public Object getFrame();
+    Object getFrame();
 
-    public void resetNavBar();
+    void resetNavBar();
 
-    public void showMessageDialog(String message1);
+    void showMessageDialog(String message1);
     
-    public int showMessageDialog(Object message1,Object[] options, int selectedChoice);
+    int showMessageDialog(Object message1, Object[] options, int selectedChoice);
 
-    public void showMessageDialog(Object message, String title, int type);
+    void showMessageDialog(Object message, String title, int type);
 
-    public String showInputDialog(Object message, String title, int type);
+    String showInputDialog(Object message, String title, int type);
 
-    public String showInputDialog(String message);
+    String showInputDialog(String message);
 
-    public void showMessageDialog(Object info);
+    void showMessageDialog(Object info);
 
-    public int showConfirmDialog(String message, String message2, int option);
+    int showConfirmDialog(String message, String message2, int option);
 
-    public int showOverwriteDialog(String file, boolean yesToAllPresent);
+    int showOverwriteDialog(String file, boolean yesToAllPresent);
 
-    public void showFirstTimePopup();
+    void showFirstTimePopup();
 
-    public int showConfirmDialog(Object message, String title, int optionType, int messageType);
+    int showConfirmDialog(Object message, String title, int optionType, int messageType);
 
     /**
      * show if user has set auto-scrolling on or off - if on moves at edge of
      * panel to show more
      */
-    public boolean allowScrolling();
+    boolean allowScrolling();
 
     /**
      * show is user has set the option to have exit confirmed with a dialog
      */
-    public boolean confirmClose();
+    boolean confirmClose();
 
     /**
      * message to show in status object
      */
-    public void updateStatusMessage(String message);
+    void updateStatusMessage(String message);
 
-    public void resetStatusMessage(String message);
+    void resetStatusMessage(String message);
 
     /**
      * set current status value 0 -100
      */
-    public void setStatusProgress(int size);
+    void setStatusProgress(int size);
 
-    public Object printDialog(String[] printersList, String defaultPrinter);
+    Object printDialog(String[] printersList, String defaultPrinter);
 
-    public void setQualityBoxVisible(boolean visible);
+    void setQualityBoxVisible(boolean visible);
 
-    public void setPage(int newPage);
+    void setPage(int newPage);
 
     Enum getType();
 
-    public Object getMultiViewerFrames();
+    Object getMultiViewerFrames();
         
-    public void setBookmarks(boolean alwaysGenerate);
+    void setBookmarks(boolean alwaysGenerate);
     
-    public String getBookmark(String bookmark);
+    String getBookmark(String bookmark);
 
-    public void alterProperty(String value, boolean show);
+    void alterProperty(String value, boolean show);
     
-    public SwingCursor getGUICursor();
+    SwingCursor getGUICursor();
 
-    public void setRotationFromExternal(int rotation);
+    void setRotationFromExternal(int rotation);
     
-    public void setResults(GUISearchList results);
+    void setResults(GUISearchList results);
     
-    public void setMultibox(int[] flags);
+    void setMultibox(int[] flags);
     
     /**
     * This method returns the object that stores and handles the various preferences for the viewer.
     * The returned object can be used to get property values and set them.
     * @return The PropertiesFile object currently in use by the viewer.
     */
-    public PropertiesFile getProperties();
+    PropertiesFile getProperties();
     
-    public void snapScalingToDefaults(float newScaling);
+    void snapScalingToDefaults(float newScaling);
     
-    public Object getVerticalScrollBar();
+    Object getVerticalScrollBar();
     
-    public String getPropertiesFileLocation();
+    String getPropertiesFileLocation();
     
-    public boolean isSingle();
+    boolean isSingle();
     
-    public Object getPageContainer();
+    Object getPageContainer();
     
-    public PaperSizes getPaperSizes();
+    PaperSizes getPaperSizes();
     
-    public void setPropertiesFileLocation(String file);
+    void setPropertiesFileLocation(String file);
     
     /**
     * return comboBox or nul if not (QUALITY, SCALING or ROTATION
     * @param ID
     * @return
     */
-    public GUICombo getCombo(int ID);
+    GUICombo getCombo(int ID);
     
     /**
     * Method to enable / disable search options on the toolbar.
     */
-    public void enableSearchItems(boolean enabled);
+    void enableSearchItems(boolean enabled);
     
-    public Object getDisplayPane();
+    Object getDisplayPane();
     
-    public void reinitialiseTabs(boolean showVisible);
+    void reinitialiseTabs(boolean showVisible);
     
-    public void scrollToPage(int page);
+    void scrollToPage(int page);
     
-    public Object getStatusBar();
+    Object getStatusBar();
     
-    public void setTabsNotInitialised(boolean b);
+    void setTabsNotInitialised(boolean b);
    
-    public void selectBookmark();
+    void selectBookmark();
     
-    public void setScalingFromExternal(String scale);
+    void setScalingFromExternal(String scale);
     
-    public boolean getPageTurnScalingAppropriate();
+    boolean getPageTurnScalingAppropriate();
     
-    public void resetPageNav();
+    void resetPageNav();
     
-    public void removeSearchWindow(boolean justHide);
+    void removeSearchWindow(boolean justHide);
     
-    public Map getHotspots();
+    Map getHotspots();
      
-     public void setSearchText(Object searchText);
+     void setSearchText(Object searchText);
      
-     public void stopThumbnails();
+     void stopThumbnails();
      
-     public Object getThumbnailPanel();
+     Object getThumbnailPanel();
      
-     public Object getOutlinePanel();
+     Object getOutlinePanel();
      
-     public void setDownloadProgress(String message,int percentage);
+     void setDownloadProgress(String message, int percentage);
      
-     public void reinitThumbnails();
+     void reinitThumbnails();
      
-     public Object getThumbnailScrollBar();
+     Object getThumbnailScrollBar();
      
-     public void setThumbnailScrollBarVisibility(boolean v);
+     void setThumbnailScrollBarVisibility(boolean v);
      
-     public void setThumbnailScrollBarValue(int pageNum);
+     void setThumbnailScrollBarValue(int pageNum);
      
-     public Object getSideTabBar();
+     Object getSideTabBar();
      
-     public int getSplitDividerLocation();
+     int getSplitDividerLocation();
      
-     public void dispose();
+     void dispose();
      
-     public void rescanPdfLayers();
+     void rescanPdfLayers();
      
-     public void setRootContainer(Object rawValue);
+     void setRootContainer(Object rawValue);
      
-     public void setSearchFrame(GUISearchWindow searchFrame);
+     void setSearchFrame(GUISearchWindow searchFrame);
      
-     public void searchInTab(GUISearchWindow searchFrame);
+     void searchInTab(GUISearchWindow searchFrame);
      
-     public void setDisplayMode(Integer mode);
+     void setDisplayMode(Integer mode);
      /**
       * @return a boolean commandInThread
       */
-     public boolean isCommandInThread();
+     boolean isCommandInThread();
      
      /**
       * @param b
       * assigns commandInThread to b
       */
-     public void setCommandInThread(boolean b);
+     void setCommandInThread(boolean b);
      
      /**
       * @return a boolean executingCommand
       */
-     public boolean isExecutingCommand();
+     boolean isExecutingCommand();
      
      /**
       * @param b
       * assigns executingCommand to b
       */
-     public void setExecutingCommand(boolean b);
+     void setExecutingCommand(boolean b);
 
-    public PdfDecoderInt getPdfDecoder();
+    PdfDecoderInt getPdfDecoder();
     
-    public GUIButtons getButtons();
+    GUIButtons getButtons();
     
-    public Values getValues();
+    Values getValues();
     
-    public void setScrollBarPolicy(ScrollPolicy pol);
+    void setScrollBarPolicy(ScrollPolicy pol);
     
-    public GUIMenuItems getMenuItems();
+    GUIMenuItems getMenuItems();
     
-    public void decodePage();
+    void decodePage();
 
-    public RecentDocumentsFactory getRecentDocument();
+    RecentDocumentsFactory getRecentDocument();
     
-    public void setRecentDocument();
+    void setRecentDocument();
 
-    public void openFile(String fileToOpen);
+    void openFile(String fileToOpen);
     
-    public void open(String fileName);
+    void open(String fileName);
     
-    public void enablePageCounter(PageCounter value, boolean enabled, boolean visibility);
+    void enablePageCounter(PageCounter value, boolean enabled, boolean visibility);
     
-    public void setPageCounterText(PageCounter value, String text);
+    void setPageCounterText(PageCounter value, String text);
     
-    public Object getPageCounter(PageCounter value);
+    Object getPageCounter(PageCounter value);
     
-    public void updateTextBoxSize();
+    void updateTextBoxSize();
     
-    public String getTitles(String title);
+    String getTitles(String title);
     
-    public void enableStatusBar(boolean enabled, boolean visible);
+    void enableStatusBar(boolean enabled, boolean visible);
     
-    public void enableCursor(boolean enabled, boolean visible);
+    void enableCursor(boolean enabled, boolean visible);
     
-    public void enableMemoryBar(boolean enabled, boolean visible);
+    void enableMemoryBar(boolean enabled, boolean visible);
     
-    public void enableNavigationBar(boolean enabled, boolean visible);
+    void enableNavigationBar(boolean enabled, boolean visible);
     
-    public void enableDownloadBar(boolean enabled, boolean visible);
+    void enableDownloadBar(boolean enabled, boolean visible);
     
-    public int getSidebarTabCount();
+    int getSidebarTabCount();
     
-    public String getSidebarTabTitleAt(int pos);
+    String getSidebarTabTitleAt(int pos);
     
-    public void removeSidebarTabAt(int pos);
+    void removeSidebarTabAt(int pos);
 
-    public double getDividerLocation();
+    double getDividerLocation();
     
-    public float scaleToVisible(float left, float right, float top, float bottom);
+    float scaleToVisible(float left, float right, float top, float bottom);
     
-    public int getDropShadowDepth();
+    int getDropShadowDepth();
     
-    public void setPannable(boolean pan);
+    void setPannable(boolean pan);
     
-    public void setupSplitPaneDivider(int size, boolean visibility);
+    void setupSplitPaneDivider(int size, boolean visibility);
     
-    public double getStartSize();
+    double getStartSize();
     
-    public void setStartSize(int size);
+    void setStartSize(int size);
 
-    public void setDisplayView(int SINGLE_PAGE, int DISPLAY_CENTERED);
+    void setDisplayView(int SINGLE_PAGE, int DISPLAY_CENTERED);
 
-    public void removePageListener();
+    void removePageListener();
     
 }

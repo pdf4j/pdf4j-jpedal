@@ -47,7 +47,6 @@ import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.swing.PDFtoImageConvertorSwing;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
 /**
@@ -112,7 +111,7 @@ public abstract class PDFtoImageConvertor {
 
         imageDisplay=getDisplay(pageIndex, localStore);
         
-        if(!BaseDisplay.isHTMLorSVG(imageDisplay)){
+        if(!imageDisplay.isHTMLorSVG()){
         	
         	if(options.getPageColor()!=null) {
                 imageDisplay.setValue(DynamicVectorRenderer.ALT_BACKGROUND_COLOR, options.getPageColor().getRGB());
@@ -131,12 +130,7 @@ public abstract class PDFtoImageConvertor {
             }
         }
         
-        final PdfStreamDecoder currentImageDecoder;
-
-        //
-            currentImageDecoder = new PdfStreamDecoder(currentPdfFile); 
-            
-            //
+        final PdfStreamDecoder currentImageDecoder = formRenderer.getStreamDecoder(currentPdfFile,true,null,true);
         
         currentImageDecoder.setParameters(true, true, renderMode, PdfDecoderInt.TEXT,false,externalHandlers.getMode().equals(GUIModes.JAVAFX));
 
@@ -224,29 +218,24 @@ public abstract class PDFtoImageConvertor {
                 formRenderer.createDisplayComponentsForPage(pageIndex,currentImageDecoder);
             }
             
-            if(!formRenderer.getCompData().formsRasterizedForDisplay()){
-                
+            if (!formRenderer.getCompData().formsRasterizedForDisplay()) {
 
-                //
-                
-                java.util.List[] formsOrdered=formRenderer.getCompData().getFormList(true);
-                
-                //get unsorted components and iterate over forms
-                for (Object nextVal : formsOrdered[pageIndex]) {
+                if (!formRenderer.useXFA()) {
 
-                    if (nextVal !=null) {
+                    java.util.List[] formsOrdered = formRenderer.getCompData().getFormList(true);
 
-                        FormFlattener.drawFlattenedForm(currentImageDecoder,(org.jpedal.objects.raw.FormObject) nextVal, false, (PdfObject)formRenderer.getFormResources()[0]);
-				     
+                    //get unsorted components and iterate over forms
+                    for (Object nextVal : formsOrdered[pageIndex]) {
+
+                        if (nextVal != null) {
+                            formRenderer.getFormFlattener().drawFlattenedForm(currentImageDecoder, (org.jpedal.objects.raw.FormObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
+                        }
                     }
+                    
+                } else {
+                    formRenderer.getCompData().renderFormsOntoG2(image.getGraphics(), pageIndex, 0, displayRotation, null, null, pageData.getMediaBoxHeight(pageIndex));
                 }
-                /**/
-				
-				/**
-            	//
-                formRenderer.getCompData().renderFormsOntoG2(image.getGraphics(),pageIndex, 0, displayRotation,null, null, pageData.getMediaBoxHeight(pageIndex));
-                /**/
-            }else if(!isFX){
+            } else if (!isFX){
                 
                 final java.util.List[] formsOrdered=formRenderer.getCompData().getFormList(true);
                 
@@ -254,8 +243,8 @@ public abstract class PDFtoImageConvertor {
                 for (final Object nextVal : formsOrdered[pageIndex]) {
                     
                     if (nextVal !=null) {
-                        
-                        FormFlattener.drawFlattenedForm(currentImageDecoder, (org.jpedal.objects.raw.FormObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
+                       
+                        formRenderer.getFormFlattener().drawFlattenedForm(currentImageDecoder, (org.jpedal.objects.raw.FormObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
                         
                     }
                 }

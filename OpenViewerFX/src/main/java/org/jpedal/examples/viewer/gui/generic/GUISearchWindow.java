@@ -39,9 +39,9 @@ import org.jpedal.examples.viewer.Values;
 /**abstract level of search window*/ 
 public interface GUISearchWindow {
 	
-    public static final int SEARCH_EXTERNAL_WINDOW = 0;
-    public static final int SEARCH_TABBED_PANE = 1;
-    public static final int SEARCH_MENU_BAR = 2;
+    int SEARCH_EXTERNAL_WINDOW = 0;
+    int SEARCH_TABBED_PANE = 1;
+    int SEARCH_MENU_BAR = 2;
     
 	//Varible added to allow multiple search style to be implemented
 	//int style = 0;
@@ -72,17 +72,17 @@ public interface GUISearchWindow {
 
 	//boolean isSearching();
 	
-	public int getFirstPageWithResults();
+	int getFirstPageWithResults();
 	
-	public void setWholeWords(boolean wholeWords);
+	void setWholeWords(boolean wholeWords);
 	
-	public void setCaseSensitive(boolean caseSensitive);
+	void setCaseSensitive(boolean caseSensitive);
 	
-	public void setMultiLine(boolean multiLine);
+	void setMultiLine(boolean multiLine);
     
     //    public void setSearchHighlightsOnly(boolean highlightOnly);
         
-    public void setSearchText(String s);
+    void setSearchText(String s);
 	
-    public void setUpdateListDuringSearch(boolean updateListDuringSearch);
+    void setUpdateListDuringSearch(boolean updateListDuringSearch);
 }

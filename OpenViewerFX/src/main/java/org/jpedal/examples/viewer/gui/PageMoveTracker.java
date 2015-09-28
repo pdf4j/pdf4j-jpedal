@@ -43,7 +43,8 @@ import org.jpedal.display.Display;
  */
 public class PageMoveTracker {
     
-    java.util.Timer t2;
+    java.util.Timer t2 = new java.util.Timer();
+    TimerTask listener;
     
     /**
      * fix submitted by Niklas Matthies
@@ -57,13 +58,13 @@ public class PageMoveTracker {
     void startTimer(final Display pages,final int  pageNumber, final FileAccess fileAccess) {
         
         //turn if off if running
-        if (t2 != null) {
-            t2.cancel();
+        if (listener != null) {
+            listener.cancel();
+            t2.purge();
         }
         
         //restart - if its not stopped it will trigger page update
-        final TimerTask listener = new PageListener(pages, pageNumber, fileAccess);
-        t2 = new java.util.Timer();
+        listener = new PageListener(pages, pageNumber, fileAccess);
         t2.schedule(listener, 500);
     }
     
@@ -107,7 +108,7 @@ public class PageMoveTracker {
             }
             
             //Ensure we close this timer task at the end of the task
-            t2.cancel();
+            cancel();
         }
     }
 }

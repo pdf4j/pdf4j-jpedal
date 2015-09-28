@@ -101,7 +101,7 @@ public class GUIDisplay implements Display{
     /**render screen using hardware acceleration*/
     public boolean useAcceleration=true;
     
-    public boolean ignoreScalingForAcceleration=false;
+    public boolean ignoreScalingForAcceleration;
     
     public boolean accelerationAlwaysRedraw;
     

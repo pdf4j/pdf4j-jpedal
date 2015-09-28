@@ -37,7 +37,6 @@ import org.jpedal.PdfDecoderInt;
 import org.jpedal.objects.GraphicsState;
 
 import org.jpedal.parser.gs.GraphicsStates;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
 
@@ -92,7 +91,7 @@ public class BaseDecoder {
 
     public void setRenderer(final DynamicVectorRenderer current) {
         this.current =current;
-        isHTML=BaseDisplay.isHTMLorSVG(current);
+        isHTML=current.isHTMLorSVG();
             
         //flag OCR used
         final boolean isOCR=(parserOptions.getRenderMode() & PdfDecoderInt.OCR_PDF)==PdfDecoderInt.OCR_PDF;

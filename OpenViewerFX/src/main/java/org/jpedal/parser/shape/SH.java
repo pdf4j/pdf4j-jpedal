@@ -48,7 +48,6 @@ import java.awt.*;
 import java.util.Map;
 import org.jpedal.parser.Cmd;
 import org.jpedal.parser.PdfObjectCache;
-import org.jpedal.render.BaseDisplay;
 
 public class SH {
 
@@ -89,7 +88,7 @@ public class SH {
             shadeShape = new Rectangle(pageData.getMediaBoxX(pageNum), pageData.getMediaBoxY(pageNum), pageData.getMediaBoxWidth(pageNum), pageData.getMediaBoxHeight(pageNum));
         }
         
-        if(BaseDisplay.isHTMLorSVG(current)  && cache.groupObj==null && current.hasObjectsBehind(new float[][]{{(float)shadeShape.getBounds2D().getWidth(),0,1},
+        if(current.isHTMLorSVG() && cache.groupObj==null && current.hasObjectsBehind(new float[][]{{(float)shadeShape.getBounds2D().getWidth(),0,1},
                         {0,(float)shadeShape.getBounds2D().getHeight(),1},
                         {(float)shadeShape.getBounds2D().getX(),(float)shadeShape.getBounds2D().getY(),0}})) { //avoid anything with potential transparency
                        // System.out.println("ADD "+shadeShape.getBounds());

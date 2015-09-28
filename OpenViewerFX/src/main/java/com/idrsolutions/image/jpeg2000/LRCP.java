@@ -41,12 +41,11 @@ public class LRCP implements Progression {
     private final int componentsCount;
     private final int maxNL;
     private final Tile tile;
-    private int comp = 0, res = 0, layer = 0, prec = 0;
+    private int comp, res, layer, prec;
 
-    public LRCP(Info info, Tile tile) {
+    public LRCP(Info info, int tileIndex) {
         SIZ siz = info.siz;
-        int tileIndex = tile.index;
-        this.tile = info.tilesMap.get(tileIndex);
+        tile = info.tilesMap.get(tileIndex);
         layersCount = tile.cod.nLayers;
         componentsCount = siz.nComp;
         maxNL = tile.cod.nDecompLevel;

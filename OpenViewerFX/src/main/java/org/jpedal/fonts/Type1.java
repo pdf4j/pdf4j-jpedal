@@ -673,9 +673,12 @@ public class Type1 extends PdfFont {
         
         if (!hasEncoding && !isCID){
             
-            if(StandardFonts.getUnicodeName(mappedChar)!=null){
+            if(StandardFonts.getUnicodeName(mappedChar)!=null) {
                 putMappedChar(charInt, mappedChar);
-            }else{  //needed to convert back for HTML5
+            }else if(!isHex){  //<--possibly needed for glyphs of format aXX when XX is base10 glyf char  (a19, a71)
+           // }else{  //needed to convert back for HTML5
+
+                //System.out.println(mappedChar+" "+charInt+" "+Character.isAlphabetic(charInt)+" "+(char)charInt+" "+this.is1C()+" "+this.isHex+" ");
                 nonStandardMappings.put(mappedChar,charInt);
             }
             
@@ -1085,7 +1088,7 @@ public class Type1 extends PdfFont {
             result = new int[stringValues.length];
             for (j=0; j< stringValues.length; j++) {
                 try {
-                    result[j] = Integer.parseInt(stringValues[j]);
+                    result[j] = Integer.parseInt(stringValues[j].split("\\.")[0]);
                 } catch(final NumberFormatException e) {
 
                     if(LogWriter.isOutput()) {

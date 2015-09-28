@@ -51,7 +51,7 @@ public interface ShapeTracker {
      * @param nonstrokecolor - used for Fills
      * @param strokecolor - used for stroking shape
      */
-    public void addShape(int tokenNumber,int type, Shape currentShape, PdfPaint nonstrokecolor, PdfPaint strokecolor);
+    void addShape(int tokenNumber, int type, Shape currentShape, PdfPaint nonstrokecolor, PdfPaint strokecolor);
 
     /** here is an example
     private class TestShapeTracker implements ShapeTracker {

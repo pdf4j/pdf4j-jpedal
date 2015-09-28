@@ -39,7 +39,6 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfShape;
 import org.jpedal.parser.Cmd;
 import org.jpedal.parser.ParserOptions;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
 public class S {
@@ -114,7 +113,7 @@ public class S {
                 
                 //fix forSwing. (not required in HTML/SVG
                 //Alter to only check bounds <1 instead of <=1 for fedexLabelAM.pdf
-                if(currentShape!=null && currentShape.getBounds().getWidth()<1 && !BaseDisplay.isHTMLorSVG(current)) {// && currentGraphicsState.getLineWidth()<=1.0f){
+                if(currentShape!=null && currentShape.getBounds().getWidth()<1 && !current.isHTMLorSVG()) {// && currentGraphicsState.getLineWidth()<=1.0f){
                     currentShape=currentShape.getBounds2D();
                 }
                 

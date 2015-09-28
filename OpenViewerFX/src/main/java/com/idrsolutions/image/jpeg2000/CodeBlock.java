@@ -104,7 +104,7 @@ public class CodeBlock {
     /**
      *
      */
-    public int Lblock = 0;
+    public int Lblock;
     
     /**
      *

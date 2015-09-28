@@ -41,19 +41,19 @@ public interface JavaFXID {
    /**
 	 * @return the iD
 	 */
-	public abstract int getID();
+   int getID();
 
 	/**
 	 * @param id the iD to set
 	 */
-	public abstract void setID(int id);
+    void setID(int id);
 
-    public abstract void setToolTipText(String text);
+    void setToolTipText(String text);
     
     /**
      * Call this method instead of addActionListener for JavaFX
      * @param eh 
      */
-    public abstract void setOnAction(EventHandler<ActionEvent> eh);
+    void setOnAction(EventHandler<ActionEvent> eh);
     
 }

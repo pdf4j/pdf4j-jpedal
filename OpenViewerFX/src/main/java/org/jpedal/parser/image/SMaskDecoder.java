@@ -35,7 +35,7 @@ package org.jpedal.parser.image;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import org.bouncycastle.util.Arrays;
+import java.util.Arrays;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.JPEGDecoder;
@@ -142,9 +142,9 @@ class SMaskDecoder {
                         g = (int) ((g-matte[1])*k+matte[1]);
                         b = (int) ((b-matte[2])*k+matte[2]);
 
-                        r = r <= 0 ? 0 : r >= 255 ? 255 : r | 0;
-                        g = g <= 0 ? 0 : g >= 255 ? 255 : g | 0;
-                        b = b <= 0 ? 0 : b >= 255 ? 255 : b | 0;
+                        r = r < 0 ? 0 : r > 255 ? 255 : r;
+                        g = g < 0 ? 0 : g > 255 ? 255 : g;
+                        b = b < 0 ? 0 : b > 255 ? 255 : b;
                     }
                     
                     pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
@@ -168,7 +168,7 @@ class SMaskDecoder {
             }
             
         }                
-
+        
         return img;
     }
     

@@ -42,7 +42,6 @@ import java.util.Collections;
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.fonts.glyph.objects.T1GlyphNumber;
 import org.jpedal.fonts.objects.FontData;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.utils.LogWriter;
 
@@ -524,7 +523,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
 
         if (baseFontName != null &&                             //Check right call
                 dynamicVectorRenderer != null &&                    //Check right call
-                (BaseDisplay.isHTMLorSVG(dynamicVectorRenderer))) {     //Just to be safe
+                dynamicVectorRenderer.isHTMLorSVG()) {     //Just to be safe
 
             dynamicVectorRenderer.saveAdvanceWidth(baseFontName,glyphName,(int)ys);
             
@@ -1309,7 +1308,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
     private void saveWidth(final String glyph, final int rawInt, final int potentialWidth) {
         if (baseFontName != null &&                             //Check right call
                 dynamicVectorRenderer != null &&                    //Check right call
-                (BaseDisplay.isHTMLorSVG(dynamicVectorRenderer))) {       //Just to be safe
+                dynamicVectorRenderer.isHTMLorSVG()) {       //Just to be safe
 
             if ("notdef".equals(glyph)) {
                 dynamicVectorRenderer.saveAdvanceWidth(baseFontName, String.valueOf(rawInt),potentialWidth);
@@ -1380,7 +1379,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
         //Pass default widths
         if (baseFontName != null &&                             //Check right call
                 dynamicVectorRenderer != null &&                    //Check right call
-                BaseDisplay.isHTMLorSVG(dynamicVectorRenderer)) {       //Just to be safe
+                dynamicVectorRenderer.isHTMLorSVG()) {       //Just to be safe
             
             //Store the default widths.
             for (int i=0; i<defaultWidthX.length; i++) {

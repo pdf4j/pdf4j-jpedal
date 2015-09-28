@@ -2488,8 +2488,5 @@ public class PdfDictionary {
     	final byte[] bytes = StringUtils.toBytes(value);
 		return PdfDictionary.generateChecksum(0, bytes.length, bytes);
     }
-    
-    public static void main(String args[]){
-        System.out.println(stringToInt("Matte"));
-    }
+
 }

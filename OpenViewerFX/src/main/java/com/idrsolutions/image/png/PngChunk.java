@@ -40,12 +40,12 @@ import java.util.zip.CRC32;
  */
 public class PngChunk {
 
-    public static final byte[] SIGNATURE = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};
-    public static final byte[] IHDR = new byte[]{73, 72, 68, 82};
-    public static final byte[] PLTE = new byte[]{80, 76, 84, 69};
-    public static final byte[] tRNS = new byte[]{116, 82, 78, 83};
-    public static final byte[] IDAT = new byte[]{73, 68, 65, 84};
-    public static final byte[] IEND = new byte[]{73, 69, 78, 68};
+    public static final byte[] SIGNATURE = {-119, 80, 78, 71, 13, 10, 26, 10};
+    public static final byte[] IHDR = {73, 72, 68, 82};
+    public static final byte[] PLTE = {80, 76, 84, 69};
+    public static final byte[] tRNS = {116, 82, 78, 83};
+    public static final byte[] IDAT = {73, 68, 65, 84};
+    public static final byte[] IEND = {73, 69, 78, 68};
 
     private final byte[] length;
     private final byte[] name;

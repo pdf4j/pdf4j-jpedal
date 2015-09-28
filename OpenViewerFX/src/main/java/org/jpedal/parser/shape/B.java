@@ -111,7 +111,9 @@ public class B {
                     current.drawShape(fxPath,gs, Cmd.B);
                 }else{
                     current.drawShape(currentShape,gs, Cmd.B);
-                    current.eliminateHiddenText(currentShape,gs,currentDrawShape.getSegmentCount(), false);
+                    if (current.isHTMLorSVG()) {
+                        current.eliminateHiddenText(currentShape,gs,currentDrawShape.getSegmentCount(), false);
+                    }
                 }
             }
         }

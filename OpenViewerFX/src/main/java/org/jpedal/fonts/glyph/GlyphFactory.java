@@ -78,6 +78,6 @@ public interface GlyphFactory {
 
     int getLSB();
 
-    public boolean useFX();
+    boolean useFX();
 
 }

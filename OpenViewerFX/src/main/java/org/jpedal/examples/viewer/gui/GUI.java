@@ -89,7 +89,7 @@ public abstract class GUI implements GUIFactory {
     protected static int expandedSize=190;
     protected static int collapsedSize=30;
     
-    boolean isJavaFX=false;
+    boolean isJavaFX;
 
     /**
      * Generic ENUMS for setting similar JavaFX and Swing values.
@@ -146,7 +146,7 @@ public abstract class GUI implements GUIFactory {
     protected boolean previewOnSingleScroll =true;
 
     /** Constants for glowing border */
-    protected final int glowThickness = 11;
+    protected static final int glowThickness = 11;
     protected final Color glowOuterColor = new Color(0.0f, 0.0f, 0.0f ,0.0f);
     protected final Color glowInnerColor = new Color(0.8f, 0.75f, 0.45f, 0.8f);
 

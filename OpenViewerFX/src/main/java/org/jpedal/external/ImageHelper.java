@@ -40,14 +40,14 @@ import java.io.IOException;
 
 public interface ImageHelper {
 
-    public BufferedImage read(byte[] data) throws IOException;
+    BufferedImage read(byte[] data) throws IOException;
 
-    public void write(BufferedImage image, String type, String file_name) throws IOException;
+    void write(BufferedImage image, String type, String file_name) throws IOException;
 
-    public BufferedImage read(String file_name);
+    BufferedImage read(String file_name);
 
-    public Raster readRasterFromJPeg(byte[] data) throws IOException;
+    Raster readRasterFromJPeg(byte[] data) throws IOException;
 
-    public BufferedImage JPEG2000ToRGBImage(byte[] data,int w,int h,float[] decodeArray, int pX,int pY) throws PdfException;
+    BufferedImage JPEG2000ToRGBImage(byte[] data, int w, int h, float[] decodeArray, int pX, int pY) throws PdfException;
 
 }

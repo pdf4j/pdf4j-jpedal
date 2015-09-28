@@ -57,9 +57,9 @@ public class CalRGBColorSpace extends  GenericColorSpace{
 //        { -0.969265,  1.876011,  0.041556 },
 //        {  0.055643, -0.204026,  1.057229 }};
     
-    private static double cs00 = 3.240449, cs01 = -1.537136, cs02 = -0.498531;
-    private static double cs10 = -0.969265, cs11 = 1.876011, cs12 = 0.041556;
-    private static double cs20 = 0.055643, cs21 = -0.204026, cs22 = 1.057229;
+    private static final double cs00 = 3.240449, cs01 = -1.537136, cs02 = -0.498531;
+    private static final double cs10 = -0.969265, cs11 = 1.876011, cs12 = 0.041556;
+    private static final double cs20 = 0.055643, cs21 = -0.204026, cs22 = 1.057229;
     
     /**cache for values to stop recalculation*/
     private float lastC=-255,lastI=-255,lastE=-255;

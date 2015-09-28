@@ -31,79 +31,40 @@
  * ---------------
  */
 package org.jpedal.io;
-/**
-import com.sun.media.jai.codec.FileSeekableStream;
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageDecoder;
-*/
-//import org.jpedal.utils.LogWriter;
-
-
-//import java.io.File;
-//import java.io.IOException;
 import java.awt.image.BufferedImage;
-//import java.awt.image.RenderedImage;
+import java.io.RandomAccessFile;
 
 public class TiffHelper {
 
     //private ImageDecoder dec;
 
-    private final int pageCount;
+    private int pageCount;
+    private final String file;
 
     /**
      * setup access to Tif file and also read page count
      */
     public TiffHelper(final String file){
 
-        pageCount=1;
-        /**try{
-            //Get file info
-            final File imgFile = new File(file);
-            final FileSeekableStream s = new FileSeekableStream(imgFile);
-            dec = ImageCodec.createImageDecoder("tiff", s, null);
-            pageCount=dec.getNumPages();
-
-        }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-        }/**/
+        RandomAccessFile raf;
+        this.file = file;
+        
+        //
         
     }
 
     public int getTiffPageCount() {
-
         return pageCount;
     }
 
     public BufferedImage getImage(final int tiffImageToLoad) {
-
-        //BufferedImage img=null;
-        /**
-        try {
-
-            final RenderedImage op = new javax.media.jai.NullOpImage(dec.decodeAsRenderedImage(tiffImageToLoad),
-					null,null,
-					javax.media.jai.OpImage.OP_IO_BOUND
-					);
-
-			img = (javax.media.jai.JAI.create("affine", op, null, new javax.media.jai.InterpolationBicubic(1))).getAsBufferedImage();
-
-            //change to grey as default
-			//Removed as forced all tiffs into grey scale
-//            img= ColorSpaceConvertor.convertColorspace(img, BufferedImage.TYPE_BYTE_GRAY);
-            
-        } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-		}
-/**/
-        return null;
+        RandomAccessFile raf;
+        BufferedImage image = null;
+        
+        //
+        
+        return image;
+        
     }
 }
 

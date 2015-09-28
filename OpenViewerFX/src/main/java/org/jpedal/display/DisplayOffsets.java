@@ -33,8 +33,6 @@
 package org.jpedal.display;
 
 import java.awt.Point;
-import org.jpedal.external.ExternalHandlers;
-
 
 public class DisplayOffsets {
 
@@ -49,11 +47,7 @@ public class DisplayOffsets {
     //store cursor position for facing drag
     private int facingCursorX=10000, facingCursorY=10000;
 
-    final ExternalHandlers externalHandlers;
-
-    public DisplayOffsets(final ExternalHandlers externalHandlers) {
-        this.externalHandlers=externalHandlers;
-    }
+    public DisplayOffsets() {}
 
     public void setUserOffsets(final int x, final int y, final int h, final int mode) {
          switch(mode){

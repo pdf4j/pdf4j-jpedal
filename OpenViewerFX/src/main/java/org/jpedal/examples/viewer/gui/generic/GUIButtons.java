@@ -43,22 +43,22 @@ import org.jpedal.gui.GUIFactory;
  */
 public interface GUIButtons {
     
-    public GUIButton getButton(int ID);
+    GUIButton getButton(int ID);
     
-    public void setBackNavigationButtonsEnabled(boolean flag);
+    void setBackNavigationButtonsEnabled(boolean flag);
     
-    public void setForwardNavigationButtonsEnabled(boolean flag);
+    void setForwardNavigationButtonsEnabled(boolean flag);
     
-    public void checkButtonSeparators();
+    void checkButtonSeparators();
     
-    public void setVisible(boolean set);
+    void setVisible(boolean set);
     
-    public void setEnabled(boolean set);
+    void setEnabled(boolean set);
     
-    public void hideRedundentNavButtons(GUIFactory currentGUI);
+    void hideRedundentNavButtons(GUIFactory currentGUI);
     
-    public void alignLayoutMenuOption(int mode);
+    void alignLayoutMenuOption(int mode);
     
-    public void setPageLayoutButtonsEnabled(boolean flag);
+    void setPageLayoutButtonsEnabled(boolean flag);
     
 }

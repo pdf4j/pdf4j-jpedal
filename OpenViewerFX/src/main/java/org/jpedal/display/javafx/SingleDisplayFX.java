@@ -36,6 +36,7 @@ package org.jpedal.display.javafx;
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -143,27 +144,27 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         refreshDisplay();
     }
     
-    private Path getBorder() {
-
-        Path border=null;
-        
-        if(pdf.isBorderPresent() && crw >0 && crh >0){
-            
-            border=getBorder(crw,crh);
-            
-           // if(!FXDisplay.useCanvas){
-          //      border.setFill(Color.WHITE);
-          //  }
-            
-            //Border myBorder=pdf.getBorder();
-            
-//            if((crw >0)&&(crh >0)&&(myBorder!=null)){
-//                myBorder.paintBorder(pdf,g2,crx-myBorder.getBorderInsets(pdf).left, cry-myBorder.getBorderInsets(pdf).bottom, crw+myBorder.getBorderInsets(pdf).left+myBorder.getBorderInsets(pdf).right, crh+myBorder.getBorderInsets(pdf).bottom+myBorder.getBorderInsets(pdf).top);
-//            }
-        }
-        
-        return border;
-    }
+//    private Path getBorder() {
+//
+//        Path border=null;
+//        
+//        if(pdf.isBorderPresent() && crw >0 && crh >0){
+//            
+//            border=getBorder(crw,crh);
+//            
+//           // if(!FXDisplay.useCanvas){
+//          //      border.setFill(Color.WHITE);
+//          //  }
+//            
+//            //Border myBorder=pdf.getBorder();
+//            
+////            if((crw >0)&&(crh >0)&&(myBorder!=null)){
+////                myBorder.paintBorder(pdf,g2,crx-myBorder.getBorderInsets(pdf).left, cry-myBorder.getBorderInsets(pdf).bottom, crw+myBorder.getBorderInsets(pdf).left+myBorder.getBorderInsets(pdf).right, crh+myBorder.getBorderInsets(pdf).bottom+myBorder.getBorderInsets(pdf).top);
+////            }
+//        }
+//        
+//        return border;
+//    }
 
     static Path getBorder(int crw, int crh) {
         
@@ -204,31 +205,14 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
     @Override
     public void paintPage(final Pane box, final AcroRenderer formRenderer, final TextLines textLines) {
         final boolean debugPane=false;
-
+        
         final Group fxPane=((FXDisplay)currentDisplay).getFXPane();
-        
-        //if(crw>0 && crh>0 && !pdf.getChildren().contains(FXpane)){
-        if(displayView==SINGLE_PAGE){
-            pdf.getChildren().clear();
-            
-            final Path border=getBorder();
-        
-            if (border!=null) {
-                 border.setFill(Color.WHITE);
-                pdf.getChildren().addAll(border);
-            }
-        
-        }
-        
+        String pageNumberStr = String.valueOf(pageNumber);
         
         final Rectangle clip = new Rectangle(crx,cry,crw,crh);
         clip.setFill(Color.WHITE);
 
         
-        if(!pdf.getChildren().contains(fxPane)){
-            pdf.getChildren().addAll(fxPane);
-        }
-       
 // Remove box from the current node it belongs to - avoids duplication errors
         if(box != null && box.getParent() != null) {
             ((Group) box.getParent()).getChildren().remove(box);
@@ -237,9 +221,34 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         pdf.setPrefSize(crw, crh);
         
         if(displayView==SINGLE_PAGE){
+            pdf.getChildren().clear();
+            if(!pdf.getChildren().contains(fxPane)){
+                pdf.getChildren().addAll(fxPane);
+            }
+            
             fxPane.setLayoutX(-crx);
             fxPane.setLayoutY(-cry);
         }else{
+                                    
+            Node pagePath = null;
+            
+            for (Node child : pdf.getChildren()) {
+                if(child.getId()!=null && child.getId().equals(pageNumberStr)){
+                    if(child instanceof Path){
+                        pagePath = child;
+                    }
+                }
+            }
+            
+            if(pagePath!=null){
+                pdf.getChildren().remove(pagePath);
+            }      
+            
+            fxPane.setId(pageNumberStr);
+            if(!pdf.getChildren().contains(fxPane)){
+                pdf.getChildren().addAll(fxPane);
+            }
+            
             
             final int[] xReached= multiDisplayOptions.getxReached();
             final int[] yReached= multiDisplayOptions.getyReached();
@@ -316,13 +325,13 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         super.init(scaling,  displayRotation, pageNumber, currentDisplay, isInit);
         
         setPageSize(pageNumber, scaling);
-        
-        if(displayView==SINGLE_PAGE){
-            
-            int[] singlePageSize=pdf.getMaximumSize();
-            pdf.setMinSize(singlePageSize[0], singlePageSize[1]);
-        
-        }
+
+//        if(displayView==SINGLE_PAGE){
+//            
+//            int[] singlePageSize=pdf.getMaximumSize();
+//            pdf.setMinSize(singlePageSize[0], singlePageSize[1]);
+//        
+//        }
     }   
     
     /**
@@ -330,7 +339,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
      */
     @Override
     public void setPageSize(final int pageNumber, final float scaling) {
-
+         
         /**
          *handle clip - crop box values
          */
@@ -389,7 +398,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         if (displayView != Display.SINGLE_PAGE && getPageSize(displayView)[0] == 0 && getPageSize(displayView)[1] == 0) {
             return;
         }
-
+        
         if (newOutlineRectangle != null) {
 
             int x = newOutlineRectangle[0];

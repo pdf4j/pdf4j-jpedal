@@ -62,7 +62,7 @@ public class ObjectStore {
 
     /**do not set unless you know what you are doing*/
     @SuppressWarnings({"WeakerAccess"})
-    public static boolean isMultiThreaded=false;
+    public static boolean isMultiThreaded;
 
     /**debug page cache*/
     private static final boolean debugCache=false;

@@ -15,12 +15,11 @@ import org.jpedal.objects.raw.PdfDictionary;
  */
 public class BlendContext implements CompositeContext {
 
-    private final float alpha;
+//    private final float alpha;
     private final int blendMode;
 
     public BlendContext(int blendMode, float alpha) {
         this.blendMode = blendMode;
-        this.alpha = alpha;
     }
 
     @Override

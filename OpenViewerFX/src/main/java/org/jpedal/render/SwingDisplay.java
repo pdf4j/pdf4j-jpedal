@@ -1322,7 +1322,8 @@ public class SwingDisplay extends GUIDisplay{
         }
     }
 
-    private static Rectangle[] objectAreas;
+    //Should not be static
+    private Rectangle[] objectAreas;
     
     private Rectangle getObjectArea(final double[] afValues1, final int[] fsValues,
             final double[] afValues2, final double[] afValues3, final double[] afValues4,

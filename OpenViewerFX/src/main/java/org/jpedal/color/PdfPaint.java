@@ -36,14 +36,14 @@ import java.awt.Paint;
 
 public interface PdfPaint extends Paint {
 
-    public void setScaling(double cropX, double cropH, float scaling, float textX, float textY);
+    void setScaling(double cropX, double cropH, float scaling, float textX, float textY);
 
-    public boolean isPattern();
+    boolean isPattern();
 
-    public boolean isTexture();
+    boolean isTexture();
 
-    public int getRGB();
+    int getRGB();
 
     //added for HTML conversion
-    public void setRenderingType(int createHtml);
+    void setRenderingType(int createHtml);
 }

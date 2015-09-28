@@ -40,7 +40,7 @@ import java.awt.*;
 @SuppressWarnings("UnusedDeclaration")
 public interface JPedalCustomDrawObject {
 	
-	public static Integer ALLPAGES= 1;
+	Integer ALLPAGES= 1;
 
     /**code to execute when rendering to screen*/
     void paint(Graphics2D g2);

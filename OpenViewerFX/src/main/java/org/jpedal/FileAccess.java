@@ -961,11 +961,10 @@ public class FileAccess {
 
                 // pass handle into renderer
                 if (formRenderer != null) {
-                    formRenderer.openFile(pageCount,options.getInsetW(), options.getInsetH(), pageData, currentPdfFile, res.getPdfObject(PdfResources.AcroFormObj));
+                    pageCount=formRenderer.openFile(pageCount,options.getInsetW(), options.getInsetH(), pageData, currentPdfFile, res.getPdfObject(PdfResources.AcroFormObj));
 
                     //
 
-                    //
                 }
                 
                 pageData.setPageCount(pageCount);

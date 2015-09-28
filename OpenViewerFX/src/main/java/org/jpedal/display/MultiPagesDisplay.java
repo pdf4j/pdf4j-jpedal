@@ -42,20 +42,20 @@ import org.jpedal.render.DynamicVectorRenderer;
 public interface MultiPagesDisplay extends Display {
 
     
-    public int getDisplayRotation();
+    int getDisplayRotation();
 
-    public void setCurrentDisplay(DynamicVectorRenderer currentDisplay);
+    void setCurrentDisplay(DynamicVectorRenderer currentDisplay);
 
-    public int getRx();
+    int getRx();
 
-    public int getRw();
+    int getRw();
 
-    public int getRh();
+    int getRh();
 
-    public int getInsetW();
+    int getInsetW();
 
-    public int getInsetH();
+    int getInsetH();
 
-    public int getRy();
+    int getRy();
 
 }

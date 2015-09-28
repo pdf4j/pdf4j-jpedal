@@ -67,6 +67,8 @@ import org.jpedal.utils.repositories.Vector_Int;
 import org.jpedal.utils.repositories.Vector_Object;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 import java.util.ArrayList;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 
 
 public class FXDisplay extends GUIDisplay {
@@ -75,7 +77,7 @@ public class FXDisplay extends GUIDisplay {
 
    // private final ObservableList children=pdfContent.getChildren();
 
-    private java.util.List collection=new ArrayList(2000);
+    private final java.util.List collection=new ArrayList(2000);
     
     public FXDisplay() {
         init();
@@ -315,30 +317,37 @@ public class FXDisplay extends GUIDisplay {
 //        if(true) return;
         final PatternColorSpace fillCS=(PatternColorSpace)currentGraphicsState.nonstrokeColorSpace;
         //get Image as BufferedImage and convert to javafx WritableImage
-        final BufferedImage imageForPattern = fillCS.getImageForPatternedShape(currentShape);
+        final BufferedImage imageForPattern = fillCS.getImageForPatternedShape(currentGraphicsState,currentShape);
         if(imageForPattern == null) {
             return;
         }
+        Image fxImage = SwingFXUtils.toFXImage(imageForPattern, null);        
+        double iw = fxImage.getWidth();
+        double ih = fxImage.getHeight();        
+//        final double xPos=currentShape.getBoundsInParent().getMinX();
+//        final double yPos=currentShape.getBoundsInParent().getMinY();
+//        double pw = currentShape.getBoundsInLocal().getWidth();
+//        double ph = currentShape.getBoundsInLocal().getHeight();  
+        ImagePattern pattern = new ImagePattern(fxImage, 0, 0, iw, ih,false);
+        currentShape.setStroke(new Color(0, 0, 0, 0));
+        currentShape.setFill(pattern);
+        addToScene(currentShape);
         
-        final WritableImage pattern = SwingFXUtils.toFXImage(imageForPattern, null);
-        final double xPos=currentShape.getBoundsInParent().getMinX();
-        final double yPos=currentShape.getBoundsInParent().getMinY();
-
-        final ImageView patternView  = new ImageView(pattern);
-        patternView.setX(xPos+1);
-        patternView.setY(yPos+1);
-
-        // Set up the clip
-//        currentShape.setFill(Color.BLACK);
-        setFXParams(currentShape, GraphicsState.STROKE, currentGraphicsState, changeLineArtAndText);
-        
-        // Create the outline of the shape
-        // Note - Use current shape to show outline and use outline as clip?
-        final Path outline = new Path(currentShape.getElements());
-        outline.getTransforms().addAll(currentShape.getTransforms());
-        outline.setFill(Color.BLACK);
-        patternView.setClip(outline);
-        
+//        if(true) return;
+//        final PatternColorSpace fillCS=(PatternColorSpace)currentGraphicsState.nonstrokeColorSpace;
+//        //get Image as BufferedImage and convert to javafx WritableImage
+//        final BufferedImage imageForPattern = fillCS.getImageForPatternedShape(currentShape);
+//        if(imageForPattern == null) {
+//            return;
+//        }
+//
+//        final WritableImage pattern = SwingFXUtils.toFXImage(imageForPattern, null);
+//        final double xPos=currentShape.getBoundsInParent().getMinX();
+//        final double yPos=currentShape.getBoundsInParent().getMinY();
+//
+//        final ImageView patternView  = new ImageView(pattern);
+//        patternView.setX(xPos+1);
+//        patternView.setY(yPos+1);        
         //addToScene(patternView, currentShape);
     }
     
@@ -568,10 +577,10 @@ public class FXDisplay extends GUIDisplay {
     public Group getFXPane() {
         
       //  System.out.println("getFXPane "+this);
-        if(collection!=null){
+        if(collection!=null && !collection.isEmpty()){
          //   pdfContent.getChildren().removeAll(collection);
             pdfContent.getChildren().addAll(collection);
-            collection=null;
+            collection.clear();
         }
         return pdfContent;
     }

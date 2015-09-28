@@ -36,28 +36,28 @@ import java.util.Map;
 
 public interface GUISearchList {
 
-    public static final int NO_RESULTS_FOUND = 1;
-    public static final int SEARCH_COMPLETE_SUCCESSFULLY = 2;
-    public static final int SEARCH_INCOMPLETE = 4;
-    public static final int SEARCH_PRODUCED_ERROR = 8;
+    int NO_RESULTS_FOUND = 1;
+    int SEARCH_COMPLETE_SUCCESSFULLY = 2;
+    int SEARCH_INCOMPLETE = 4;
+    int SEARCH_PRODUCED_ERROR = 8;
     
-	public Map getTextPages();
+	Map getTextPages();
 
-	public Map textAreas();
+	Map textAreas();
 	
 	/**
 	 * Find out the current amount of results found
 	 * @return the amount of search results found
 	 */
-	public int getResultCount();
+	int getResultCount();
 	
-	public void setSearchTerm(String term);
+	void setSearchTerm(String term);
 	
-	public String getSearchTerm();
+	String getSearchTerm();
 	
-	public int getSelectedIndex();
+	int getSelectedIndex();
 	
-	public void setSelectedIndex(int index);
+	void setSelectedIndex(int index);
 	
 	//public int getStatus();
 

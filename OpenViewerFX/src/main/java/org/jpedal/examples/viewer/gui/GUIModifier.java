@@ -110,6 +110,19 @@ public class GUIModifier {
      * @param currentGUI The GUI to have the properties loaded into.
      */
     public static void load(final PropertiesFile properties, final GUIFactory currentGUI) {
+
+        String value = properties.getValue("sideTabBarCollapseLength");
+        if (value != null && !value.isEmpty()) {
+            int iValue = Integer.parseInt(value);
+            currentGUI.setStartSize(iValue);
+        }
+
+        value = properties.getValue("sideTabBarExpandLength");
+        if (value != null && !value.isEmpty()) {
+            GUI.expandedSize = Integer.parseInt(value);
+            currentGUI.reinitialiseTabs(false);
+        }
+
         NodeList tags = properties.getChildren("*");
         loadNodeList(tags, currentGUI);
     }

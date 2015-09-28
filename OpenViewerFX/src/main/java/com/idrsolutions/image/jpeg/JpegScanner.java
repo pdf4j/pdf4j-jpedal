@@ -49,11 +49,11 @@ public class JpegScanner {
 
     private int bitPos;
     private int bitBuffer;
-    private int eobrun = 0;
+    private int eobrun;
     private int mcusX;
     private int offset;
     private int successive, sStart, sEnd;
-    private int stateAC = 0, stateNextAC;
+    private int stateAC, stateNextAC;
 
     public JpegScanner(byte[] data) {
         this.data = data;

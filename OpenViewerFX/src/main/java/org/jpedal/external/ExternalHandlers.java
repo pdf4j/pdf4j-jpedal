@@ -32,6 +32,7 @@
  */
 package org.jpedal.external;
 
+import java.awt.image.BufferedImage;
 import org.jpedal.objects.Javascript;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.creation.FormFactory;
@@ -41,7 +42,16 @@ import org.jpedal.parser.ValueTypes;
 import org.jpedal.render.DynamicVectorRenderer;
 
 import java.util.Map;
+import org.jpedal.FileAccess;
 import org.jpedal.display.GUIModes;
+import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.acroforms.creation.SwingFormCreator;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.parser.PDFtoImageConvertor;
+import org.jpedal.parser.swing.PDFtoImageConvertorSwing;
+import org.jpedal.render.SwingDisplay;
+import org.jpedal.utils.LogWriter;
 
 public class ExternalHandlers {
     
@@ -50,7 +60,7 @@ public class ExternalHandlers {
     AdditonalHandler additionalHandler;
     
     /**default renderer for acroforms*/
-    private AcroRenderer formRenderer;
+    AcroRenderer formRenderer;
     
     //Option to append the error thrown due to lack of CID jar to page decode report
     public static boolean throwMissingCIDError;
@@ -67,11 +77,8 @@ public class ExternalHandlers {
     
     private Object userExpressionEngine;
     
-    //
-    
-    final private boolean useXFA=false;   
-     /**/
-    
+    boolean useXFA;
+     
     /**
      * needs to be accessed in several locations so declared here
      */
@@ -105,10 +112,19 @@ public class ExternalHandlers {
     
     private Enum modeSelected=GUIModes.SWING;
 
-    public ExternalHandlers(){}
+    public ExternalHandlers(){
+    
+        if(isXFAPresent){
+            useXFA=true;
+        }
+    }
    
     public ExternalHandlers(final GUIModes mode) {
         this.modeSelected=mode;
+        
+        if(isXFAPresent){
+            useXFA=true;
+        }
     }
     
     public void addHandlers(final PdfStreamDecoder streamDecoder) {
@@ -144,11 +160,15 @@ public class ExternalHandlers {
                 break;
                 
             case Options.USE_XFA_IN_LEGACY_MODE:
-                //
+                
+                alwaysUseXFA=((Boolean)newHandler).booleanValue();
+                
                 break;
 
             case Options.USE_XFA:
-                //
+                
+                useXFA=((Boolean)newHandler).booleanValue();
+                
                 break;
             
             
@@ -413,25 +433,88 @@ public class ExternalHandlers {
         this.javascript=javascript;
     }
     
-    //
+    /**
+     * allow user to explicitly disable XFAsupport in XFA version
+     * Otherwise should not be used
+     * @param useXFA 
+     */
+    public void useXFA(final boolean useXFA) {
+        this.useXFA=useXFA;
+    }
     
-    public void openPdfFile(final Object userExpressionEngine, final boolean useJavaFX) {
+    private static ClassLoader loader;
+    
+    private static boolean isXFAPresent;
+    private static final String xfaClassName="org.jpedal.objects.acroforms.AcroRendererXFA";
         
-        formRenderer = new AcroRenderer(useXFA,useJavaFX);
+    static{
+        loader = ExternalHandlers.class.getClassLoader();
+        final String xfaClassPath="org/jpedal/objects/acroforms/AcroRendererXFA.class";
+        
+        isXFAPresent=loader.getResource(xfaClassPath)!=null;
+        
+    }
+    
+    public void openPdfFile(final Object userExpressionEngine) {
+        
+        initObjects(userExpressionEngine, new SwingFormCreator());
+        
+    }
+    
+    public static BufferedImage decode(PdfObject pdfObject, PdfObjectReader currentPdfFile, PdfObject XObject, int subtype, int width, int height, int offsetImage, float pageScaling) {
+        
+        if(isXFAPresent){
+            
+            try {
+                AcroRenderer formRenderer=(AcroRenderer) loader.loadClass(xfaClassName).newInstance();
+                
+                return formRenderer.decode(pdfObject, currentPdfFile, XObject, subtype, width, height, offsetImage, pageScaling);
+            
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                if(LogWriter.isOutput()){
+                    LogWriter.writeLog("[PDF] Unable to instance XFA "+ex);
+                }
+                
+            }
+            
+        }
+            return null;
+        
 
+    }
+
+    void initObjects(final Object userExpressionEngine1, SwingFormCreator formCreator) {
+        
+        if(isXFAPresent){
+            try {
+                formRenderer=(AcroRenderer) loader.loadClass(xfaClassName).newInstance();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                if(LogWriter.isOutput()){
+                    LogWriter.writeLog("[PDF] Unable to instance XFA "+ex);
+                }
+                
+                formRenderer = new AcroRenderer();
+            }
+          
+        }else{
+          formRenderer = new AcroRenderer();
+        }
+        
+        formRenderer.useXFAIfAvailable(useXFA);
+        
+        formRenderer.init(formCreator);
+        
         formRenderer.alwaysuseXFA(alwaysUseXFA);
-
         final FormFactory userFormFactory= this.userFormFactory;
         if(userFormFactory!=null) {
             formRenderer.setFormFactory(userFormFactory);
         }
-        
         /**
          * setup Javascript object and pass into objects which use it
          */
-        javascript=new Javascript((ExpressionEngine) userExpressionEngine,formRenderer, swingGUI);
-        
-        
+        javascript = new Javascript((ExpressionEngine) userExpressionEngine1, formRenderer, swingGUI);
     }
     
     /**
@@ -447,5 +530,18 @@ public class ExternalHandlers {
      */
     public Enum getMode() {    
         return modeSelected;
+    }
+
+    public boolean isJavaFX() {
+        return false;
+    }
+
+    public void setDVR(FileAccess fileAccess) {
+        fileAccess.setDVR(new SwingDisplay(1, fileAccess.getObjectStore(), false));
+    }
+
+
+    public PDFtoImageConvertor getConverter(float multiplyer, DecoderOptions options) {
+        return new PDFtoImageConvertorSwing(multiplyer, options);
     }
 }

@@ -45,7 +45,7 @@ public interface CustomMessageHandler {
      * @param message
      * @return true if you still want message displayed
      */
-    public boolean showMessage(Object message);
+    boolean showMessage(Object message);
 
     /**example below
     public boolean showMessage(Object message){
@@ -68,7 +68,7 @@ public interface CustomMessageHandler {
      * @return null if you still want input requested and used
      */
     @SuppressWarnings("UnusedParameters")
-    public String requestInput(Object[] args);
+    String requestInput(Object[] args);
 
     /**
     public String requestInput(Object[] args) {
@@ -85,7 +85,7 @@ public interface CustomMessageHandler {
      * @return int value returnd by JOptionPane.showConfirmDialog -1 to popup JPedal menu
      */
     @SuppressWarnings("UnusedParameters")
-    public int requestConfirm(Object[] args);
+    int requestConfirm(Object[] args);
 
     /**
     public int requestConfirm(Object[] args) {

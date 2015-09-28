@@ -299,7 +299,9 @@ public class ImageCommands {
          * get TR function first
          **/
         final PDFFunction[] functions =new PDFFunction[4];
-        
+
+        boolean hasFunction = false;
+
         int total=0;
         
         final byte[][] kidList = TR.getKeyArray(PdfDictionary.TR);
@@ -330,10 +332,15 @@ public class ImageCommands {
             /** setup the translation function */
             if(Function!=null) {
                 functions[count] = FunctionFactory.getFunction(Function, currentPdfFile);
+                hasFunction = true;
             }
             
         }
         
+        if (!hasFunction){
+          return image;
+        }
+
         /**
          * apply colour transform
          */

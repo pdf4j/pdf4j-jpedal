@@ -48,6 +48,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
@@ -100,7 +101,6 @@ import org.jpedal.io.Speech;
 import org.jpedal.objects.javascript.DefaultParser;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.BrowserLauncher;
-import org.jpedal.utils.JavaFXHelper;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 import org.mozilla.javascript.ScriptRuntime;
@@ -199,7 +199,7 @@ public class JavaFXPreferences {
     private static TabPane tabs;
     
     //Text to Speech external handler
-    private static Speech speech = null;
+    private static Speech speech;
     
     private static void init(final GUIFactory currentGUI) {
         speech = (Speech)currentGUI.getPdfDecoder().getExternalHandler(Options.SpeechEngine);
@@ -1062,20 +1062,15 @@ public class JavaFXPreferences {
         contentScrollPane = new ScrollPane();
         title.setText(Messages.getMessage("PdfPreferences.ExtensionsTitle"));
 
-        /**
-         * Setup Title & Main Container.
-         */
+        //Setup Title & Main Container.
         final VBox contentVBox = new VBox();
 
-        /**
-         * Setup Extensions Grid.
-         */
+        //Setup Extensions Grid.
         final GridPane contentGridPane = new GridPane();
         contentGridPane.getColumnConstraints().setAll(new ColumnConstraints(100), new ColumnConstraints(200)); //set width of grid columns
         final Text nameTitle = new Text(Messages.getMessage("PdfPreferences.ExtensionName"));
         final Text bcmailName = new Text("BCMail");
         final Text cidName = new Text("CID");
-        final Text javafxName = new Text("JavaFX");
         final Text jceName = new Text("JCE");
         final Text rhinoName = new Text("Rhino");
         nameTitle.setFont(titleFont);
@@ -1083,51 +1078,145 @@ public class JavaFXPreferences {
         final Text descriptionTitle = new Text(Messages.getMessage("PdfPreferences.ExtensionDescription"));
         final Text bcmailDescr = new Text(Messages.getMessage("PdfExtensions.BCMail.text"));
         final Text cidDescr = new Text(Messages.getMessage("PdfExtensions.CID.text"));
-        final Text javafxDescr = new Text(Messages.getMessage("PdfExtensions.JavaFX.text"));
         final Text jceDescr = new Text(Messages.getMessage("PdfExtensions.JCE.text"));
         final Text rhinoDescr = new Text(Messages.getMessage("PdfExtensions.Rhino.text"));
         descriptionTitle.setFont(titleFont);
 
         final Text versionTitle = new Text(Messages.getMessage("PdfPreferences.ExtensionVersion"));
-        String version = "Unknown Version";
-        String details = "java: " + System.getProperty("java.vendor") + ' ' + System.getProperty("java.version") + '\n';
-        details += "os: " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ' ' + System.getProperty("os.arch") + '\n';
-        details += "jpedal: " + PdfDecoderInt.version + '\n';
+        versionTitle.setFont(titleFont);
+        
+        final Hyperlink bcmailVersion = new Hyperlink();
+        String details = getBCMailVersion(bcmailVersion);
 
-        Hyperlink bcmailVersion;
-        try {
-            final Class bcmailc = Class.forName("org.bouncycastle.jcajce.JcaJceHelper");
-            final String className = bcmailc.getName().replace('.', '/');
-            final String[] paths = bcmailc.getResource('/' + className + ".class").getPath().split("!");
-            final URL file = new URL(paths[0]);
-            final JarFile jar = new JarFile(file.getFile());
-            if (!jar.getManifest().getMainAttributes().getValue("Implementation-Version").isEmpty()) {
-                version = jar.getManifest().getMainAttributes().getValue("Implementation-Version");
+        final Hyperlink cidVersion = new Hyperlink();
+        details += getCidVersion(cidVersion);
+        
+        final Hyperlink jceVersion = new Hyperlink();
+        details += getJCEVersion(jceVersion);
+
+        final Hyperlink rhinoVersion = new Hyperlink();
+        details += getRhinoVersion(rhinoVersion);
+
+        //Setup Copy Details Buttons.
+        final Button copyBtn = createCopyDetailsButton(details);
+
+        /**
+         * Finalise Containers.
+         */
+        contentVBox.setPadding(new Insets(contentGap));
+        contentVBox.setSpacing(contentGap);
+        contentVBox.getChildren().addAll(title, contentGridPane, copyBtn);
+        contentScrollPane.setContent(contentVBox);
+        
+        int y = 0;
+        addLineToExtensionGrid(contentGridPane, nameTitle, descriptionTitle, versionTitle, y);
+        y++;
+        addLineToExtensionGrid(contentGridPane, bcmailName, bcmailDescr, bcmailVersion, y);
+        y++;
+        addLineToExtensionGrid(contentGridPane, cidName, cidDescr, cidVersion, y);
+        y++;
+        addLineToExtensionGrid(contentGridPane, jceName, jceDescr, jceVersion, y);
+        y++;
+        addLineToExtensionGrid(contentGridPane, rhinoName, rhinoDescr, rhinoVersion, y);
+        
+        return contentScrollPane;
+    }
+    
+    private static Button createCopyDetailsButton(String details){
+        //Setup Copy Details Buttons.
+        final Button copyBtn = new Button(Messages.getMessage("PdfPreferences.CopyToClipboard"));
+
+        final String finalDetails = "java: " + System.getProperty("java.vendor") + ' ' + System.getProperty("java.version") + '\n'
+            + "os: " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ' ' + System.getProperty("os.arch") + '\n'
+            + "jpedal: " + PdfDecoderInt.version + '\n' + details;
+        copyBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(final ActionEvent e) {
+                final FXMessageDialog dialog = new FXMessageDialog(null, Modality.APPLICATION_MODAL, Messages.getMessage("PdfExtensions.clipboard"));
+                dialog.show();
+                final Clipboard clipboard = Clipboard.getSystemClipboard();
+                final ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.putString(finalDetails);
+                clipboard.setContent(clipboardContent);
             }
-            bcmailVersion = new Hyperlink(version);
-            details += "bcmail: " + version + '\n';
-        } catch (final Exception e) {
-            bcmailVersion = new Hyperlink(Messages.getMessage("PdfExtensions.getText")+' '+e);
-            bcmailVersion.setOnAction(new EventHandler<ActionEvent>() {
+        });
+        return copyBtn;
+    }
+    
+    private static String getRhinoVersion(final Hyperlink versionNode){
+        String details = "";
+        final java.io.InputStream in = DefaultParser.class.getClassLoader().getResourceAsStream("org/mozilla/javascript/Context.class");
+        if (in != null) {
+            String version = ScriptRuntime.getMessage0("implementation.version");
+            details += "rhino: " + version + '\n';
+
+            String release = "";
+            if (!version.replaceAll("release 1", "").equals(version)) {
+                release = " R1";
+            }
+            if (!version.replaceAll("release 2", "").equals(version)) {
+                release = " R2";
+            }
+
+            version = version.substring(0, 12).replaceAll("[^0-9|.]", "");
+            versionNode.setText(version + release);
+        } else {
+            versionNode.setText(Messages.getMessage("PdfExtensions.getText"));
+
+            versionNode.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(final ActionEvent e) {
                     try {
-                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.BCMail.link"));
+                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.Rhino.link"));
                     } catch (final Exception ex) {
                         ex.printStackTrace();
                     }
                 }
             });
         }
+        return details;
+    }
+    
+    private static String getJCEVersion(final Hyperlink versionNode){
+        String details = "";
+        String version = "Unknown Version";
+        try {
+            final Class jcec = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            final String className = jcec.getName().replace('.', '/');
+            final String[] paths = jcec.getResource('/' + className + ".class").getPath().split("!");
+            final URL file = new URL(paths[0]);
+            final JarFile jar = new JarFile(file.getFile());
+            if (!jar.getManifest().getMainAttributes().getValue("Implementation-Version").isEmpty()) {
+                version = jar.getManifest().getMainAttributes().getValue("Implementation-Version");
+            }
+            versionNode.setText(version);
+            details += "jce: " + version + '\n';
+        } catch (final Exception e) {
+            versionNode.setText(Messages.getMessage("PdfExtensions.getText")+' '+e);
 
-        Hyperlink cidVersion = new Hyperlink();
+            versionNode.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+                    try {
+                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.JCE.link"));
+                    } catch (final Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        }
+        return details;
+    }
+    
+    private static String getCidVersion(final Hyperlink versionNode){
+        String details = "";
         try {
             if (JavaFXPreferences.class.getResourceAsStream("/org/jpedal/res/cid/00_ReadMe.pdf") != null) {
-                cidVersion = new Hyperlink("1.0");
+                versionNode.setText("1.0");
                 details += "cid: 1.0\n";
             } else {
-                cidVersion = new Hyperlink(Messages.getMessage("PdfExtensions.getText"));
-                cidVersion.setOnAction(new EventHandler<ActionEvent>() {
+                versionNode.setText(Messages.getMessage("PdfExtensions.getText"));
+                versionNode.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent e) {
                         try {
@@ -1141,116 +1230,46 @@ public class JavaFXPreferences {
         } catch (final Exception ee) {
             ee.printStackTrace();
         }
+        return details;
+    }
 
-        final Hyperlink javafxVersion;
-        if (JavaFXHelper.isJavaFXAvailable()) {
-            version = JavaFXHelper.getVersion();
-            javafxVersion = new Hyperlink(version.replaceAll("build", "b").replaceAll("[(|)]", ""));
-            details += "javafx: " + version + '\n';
-        } else {
-            javafxVersion = new Hyperlink(Messages.getMessage("PdfExtensions.getText"));
-
-            javafxVersion.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(final ActionEvent e) {
-                    try {
-                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.JavaFX.link"));
-                    } catch (final Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-        }
-
-        Hyperlink jceVersion;
-        version = "Unknown Version";
+    private static String getBCMailVersion(final Hyperlink versionNode){
+        String details = "";
+        String version = "Unknown Version";
         try {
-            final Class jcec = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
-            final String className = jcec.getName().replace('.', '/');
-            final String[] paths = jcec.getResource('/' + className + ".class").getPath().split("!");
+            final Class bcmailc = Class.forName("org.bouncycastle.jcajce.JcaJceHelper");
+            final String className = bcmailc.getName().replace('.', '/');
+            final String[] paths = bcmailc.getResource('/' + className + ".class").getPath().split("!");
             final URL file = new URL(paths[0]);
             final JarFile jar = new JarFile(file.getFile());
             if (!jar.getManifest().getMainAttributes().getValue("Implementation-Version").isEmpty()) {
                 version = jar.getManifest().getMainAttributes().getValue("Implementation-Version");
             }
-            jceVersion = new Hyperlink(version);
-            details += "jce: " + version + '\n';
+            versionNode.setText(version);
+            details += "bcmail: " + version + '\n';
         } catch (final Exception e) {
-            jceVersion = new Hyperlink(Messages.getMessage("PdfExtensions.getText")+' '+e);
-
-            jceVersion.setOnAction(new EventHandler<ActionEvent>() {
+            versionNode.setText(Messages.getMessage("PdfExtensions.getText")+' '+e);
+            versionNode.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(final ActionEvent e) {
                     try {
-                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.JCE.link"));
+                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.BCMail.link"));
                     } catch (final Exception ex) {
                         ex.printStackTrace();
                     }
                 }
             });
         }
-
-        final Hyperlink rhinoVersion;
-        final java.io.InputStream in = DefaultParser.class.getClassLoader().getResourceAsStream("org/mozilla/javascript/Context.class");
-        if (in != null) {
-            version = ScriptRuntime.getMessage0("implementation.version");
-            details += "rhino: " + version + '\n';
-
-            String release = "";
-            if (!version.replaceAll("release 1", "").equals(version)) {
-                release = " R1";
-            }
-            if (!version.replaceAll("release 2", "").equals(version)) {
-                release = " R2";
-            }
-
-            version = version.substring(0, 12).replaceAll("[^0-9|.]", "");
-            rhinoVersion = new Hyperlink(version + release);
-        } else {
-            rhinoVersion = new Hyperlink(Messages.getMessage("PdfExtensions.getText"));
-
-            rhinoVersion.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(final ActionEvent e) {
-                    try {
-                        BrowserLauncher.openURL(Messages.getMessage("PdfExtensions.Rhino.link"));
-                    } catch (final Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-        }
-
-        versionTitle.setFont(titleFont);
-
-        /**
-         * Setup Copy Details Buttons.
-         */
-        final Button copyBtn = new Button(Messages.getMessage("PdfPreferences.CopyToClipboard"));
-
-        final String finalDetails = details;
-        copyBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(final ActionEvent e) {
-                final FXMessageDialog dialog = new FXMessageDialog(null, Modality.APPLICATION_MODAL, Messages.getMessage("PdfExtensions.clipboard"));
-                dialog.show();
-                final Clipboard clipboard = Clipboard.getSystemClipboard();
-                final ClipboardContent clipboardContent = new ClipboardContent();
-                clipboardContent.putString(finalDetails);
-                clipboard.setContent(clipboardContent);
-            }
-        });
-
-        /**
-         * Finalise Containers.
-         */
-        contentVBox.setPadding(new Insets(contentGap));
-        contentVBox.setSpacing(contentGap);
-        contentVBox.getChildren().addAll(title, contentGridPane, copyBtn);
-        contentScrollPane.setContent(contentVBox);
-        return contentScrollPane;
+        
+        return details;
     }
-
+    
+    private static void addLineToExtensionGrid(GridPane contentGridPane, Node name, Node desc, Node value, int y){
+        contentGridPane.add(name, 0, y);
+        contentGridPane.add(desc, 1, y);
+        contentGridPane.add(value, 2, y);
+    }
+    
     private static void updateSettings(final GUIFactory currentGUI) {
 
         /**

@@ -45,10 +45,10 @@ public class TileParser {
     private final byte[] data;
     private final Tile tile;
 
-    private int pos = 0;
-    private boolean skipNextBit = false;
-    private int bufferSize = 0;
-    private int buffer = 0;
+    private int pos;
+    private boolean skipNextBit;
+    private int bufferSize;
+    private int buffer;
     
     public TileParser(byte[] data, Tile tile) {
         this.data = data;

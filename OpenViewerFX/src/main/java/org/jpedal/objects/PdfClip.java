@@ -43,13 +43,13 @@ public interface PdfClip {
      * @param path The path to be added to the clip
      * @return Whether the clip has been changed
      */
-    public boolean updateClip(Object path);
+    boolean updateClip(Object path);
     
     /**
      * Gets the current clipping shape. Must be cast to the appropriate object.
      * @return 
      */
-    public Object getClippingShape();
+    Object getClippingShape();
     
     
 }

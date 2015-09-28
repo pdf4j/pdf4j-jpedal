@@ -55,11 +55,11 @@ import java.util.List;
  */
 public class JpegDecoder {
 
-    private int offset = 0;
+    private int offset;
     private byte[] data;
     private boolean cmykInverted = true;
     private final HashMap<Integer, int[]> qTables = new HashMap<Integer, int[]>();
-    private Info info = null;
+    private Info info;
 
     /**
      * decodes JPEG image data as BufferedImage Make NO assumptions about type

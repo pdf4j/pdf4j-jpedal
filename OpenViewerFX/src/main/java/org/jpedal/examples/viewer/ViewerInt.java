@@ -77,33 +77,33 @@ public interface ViewerInt {
      * Allow user to open PDF file to display
      * @param defaultFile The file that will be displayed 
      */
-    public void openDefaultFile(String defaultFile);
+    void openDefaultFile(String defaultFile);
 
     /**
      *Allow user to open PDF file to display
      * @param defaultFile The file that will be displayed 
      * @param page The page number on with the displayed file will be open
      */
-    public void openDefaultFileAtPage(String defaultFile, int page);
+    void openDefaultFileAtPage(String defaultFile, int page);
     
-    public void setRootContainer(Object rootContainer);
+    void setRootContainer(Object rootContainer);
 
     /**
      * Should be called before setupViewer
      * @param props the set properties
      */
-    public void loadProperties(String props);
+    void loadProperties(String props);
 
     /**
      * initialise and run client (default as Application in own Frame)
      */
-    public void setupViewer();
+    void setupViewer();
     
     /**
      * Have the viewer handle program arguments
      * @param args :: Program arguments passed into the Viewer.
      */
-    public void handleArguments(String[] args);
+    void handleArguments(String[] args);
 
     /**
      * Execute Jpedal functionality from outside of the library using this method.
@@ -121,7 +121,7 @@ public interface ViewerInt {
      *
      */
     @SuppressWarnings("UnusedReturnValue")
-    public Object executeCommand(int commandID, Object[] args);
+    Object executeCommand(int commandID, Object[] args);
 
 
     /**
@@ -138,11 +138,11 @@ public interface ViewerInt {
      * @param newHandler Implementation of interface provided by IDR solutions
      * @param type Defined value into org.jpedal.external.Options class
      */
-    public void addExternalHandler(Object newHandler, int type);
+    void addExternalHandler(Object newHandler, int type);
 
     /**
      * run with caution and only at end of usage if you really need
      */
-    public void dispose();
+    void dispose();
     
 }

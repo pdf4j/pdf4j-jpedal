@@ -43,7 +43,7 @@ public class Jpeg2000Decoder {
      * @throws Exception Provides for different exceptions thrown under java
      * lang package
      */
-    public BufferedImage read(final byte[] jpxRawData) throws Exception  {
+    public BufferedImage read(final byte[] jpxRawData) throws Exception {
         final Info info = new Info();
         final JPXReader reader = new JPXReader(jpxRawData);
         if (Markers.SOC == ((jpxRawData[0] & 0xff) << 8 | (jpxRawData[1] & 0xff))) {
@@ -199,11 +199,11 @@ public class Jpeg2000Decoder {
                                     System.err.println("has CDef box");
                                 }
                                 int nDef = reader.readShort();
-                                for (int i = 0; i < nDef;i++) {
+                                for (int i = 0; i < nDef; i++) {
                                     int key = reader.readShort();
                                     int type = reader.readShort();
                                     int val = reader.readShort();
-                                    if(type == 0){
+                                    if (type == 0) {
                                         info.cDef.put(key, val);
                                     }
                                 }
@@ -327,7 +327,7 @@ public class Jpeg2000Decoder {
                         System.out.println("Width " + info.imageWidth + " Height " + info.imageHeight);
                         System.out.println("SIZ info : " + info.siz);
                     }
-
+                    info.qcc = new QCD[info.siz.nComp];
                     break;
                 case Markers.COD:
                     reader.readUShort();//int LCOD 
@@ -356,6 +356,9 @@ public class Jpeg2000Decoder {
                     }
                     break;
                 case Markers.COC:
+                    if (debug) {
+                        System.err.println("contains coc parameters");
+                    }
                     final int LCOC = reader.readUShort();
                     reader.setPosition(reader.getPosition() + LCOC - 2);
                     break;
@@ -412,7 +415,53 @@ public class Jpeg2000Decoder {
                     break;
                 case Markers.QCC:
                     final int LQCC = reader.readUShort();
-                    reader.setPosition(reader.getPosition() + LQCC - 2);
+                    int cVal = reader.readUByte();
+                    final QCD qcc = new QCD();
+                    final Byte qccQS = reader.readByte();
+                    JPXBitReader qccBR = new JPXBitReader(qccQS);
+                    qcc.guardBits = qccBR.readBits(3);
+                    qcc.quantBits = qccBR.readBits(5);
+                    qcc.hasScalar = false;
+                    final int qccBalance = LQCC - 4;
+                    int qccNB;
+                    switch (qcc.quantBits) {
+                        case 0:
+                            qcc.hasScalar = true;
+                            qccNB = qccBalance;
+                            qcc.exponentB = new int[qccNB];
+                            qcc.mantissaB = new int[qccNB];
+                            for (int i = 0; i < qccNB; i++) {
+                                qccBR = new JPXBitReader(reader.readByte());
+                                qcc.exponentB[i] = qccBR.readBits(5);
+                                qcc.mantissaB[i] = 0;
+                            }
+                            break;
+                        case 1:
+                            qcc.hasScalar = false;
+                            final byte[] temp = {reader.readByte(), reader.readByte()};
+                            qccBR = new JPXBitReader(temp);
+                            final int eB = qccBR.readBits(5);
+                            final int muB = qccBR.readBits(11);
+                            qcc.exponentB = new int[]{eB};
+                            qcc.mantissaB = new int[]{muB};
+                            break;
+                        case 2:
+                            qccNB = qccBalance / 2;
+                            qcc.hasScalar = true;
+                            qcc.exponentB = new int[qccNB];
+                            qcc.mantissaB = new int[qccNB];
+                            for (int i = 0; i < qccNB; i++) {
+                                final byte[] tt = {reader.readByte(), reader.readByte()};
+                                qccBR = new JPXBitReader(tt);
+                                qcc.exponentB[i] = qccBR.readBits(5);
+                                qcc.mantissaB[i] = qccBR.readBits(11);
+                            }
+                            break;
+                    }
+                    if (debug) {
+                        System.out.println("Contains Info QCC " + qcc);
+                    }
+                    info.qcc[cVal] = qcc;
                     break;
                 case Markers.RGN:
                     final int LRGN = reader.readUShort();
@@ -481,6 +530,7 @@ public class Jpeg2000Decoder {
             final Tile tile = new Tile();
             tile.cod = info.cod;
             tile.qcd = info.qcd;
+            tile.qcc = info.qcc;
             tile.index = tileIndex;
             tile.partIndex = indexTilePart;
             tile.partCount = numberTilePart;
@@ -570,8 +620,57 @@ public class Jpeg2000Decoder {
                         }
                         tile.qcd = qcd;
                         break;
-                    case Markers.COC:
                     case Markers.QCC:
+                        final int LQCC = reader.readUShort();
+                        int cVal = reader.readUByte();
+                        final QCD qcc = new QCD();
+                        final Byte qccQS = reader.readByte();
+                        JPXBitReader qccBR = new JPXBitReader(qccQS);
+                        qcc.guardBits = qccBR.readBits(3);
+                        qcc.quantBits = qccBR.readBits(5);
+                        qcc.hasScalar = false;
+                        final int qccBalance = LQCC - 4;
+                        int qccNB;
+                        switch (qcc.quantBits) {
+                            case 0:
+                                qcc.hasScalar = true;
+                                qccNB = qccBalance;
+                                qcc.exponentB = new int[qccNB];
+                                qcc.mantissaB = new int[qccNB];
+                                for (int i = 0; i < qccNB; i++) {
+                                    qccBR = new JPXBitReader(reader.readByte());
+                                    qcc.exponentB[i] = qccBR.readBits(5);
+                                    qcc.mantissaB[i] = 0;
+                                }
+                                break;
+                            case 1:
+                                qcc.hasScalar = false;
+                                final byte[] temp = {reader.readByte(), reader.readByte()};
+                                qccBR = new JPXBitReader(temp);
+                                final int eB = qccBR.readBits(5);
+                                final int muB = qccBR.readBits(11);
+                                qcc.exponentB = new int[]{eB};
+                                qcc.mantissaB = new int[]{muB};
+                                break;
+                            case 2:
+                                qccNB = qccBalance / 2;
+                                qcc.hasScalar = true;
+                                qcc.exponentB = new int[qccNB];
+                                qcc.mantissaB = new int[qccNB];
+                                for (int i = 0; i < qccNB; i++) {
+                                    final byte[] tt = {reader.readByte(), reader.readByte()};
+                                    qccBR = new JPXBitReader(tt);
+                                    qcc.exponentB[i] = qccBR.readBits(5);
+                                    qcc.mantissaB[i] = qccBR.readBits(11);
+                                }
+                                break;
+                        }
+                        if (debug) {
+                            System.out.println("Contains Tile QCC " + qcc);
+                        }
+                        tile.qcc[cVal] = qcc;
+                        break;
+                    case Markers.COC:
                     case Markers.RGN:
                     case Markers.POC:
                     case Markers.PPT:
@@ -618,13 +717,14 @@ public class Jpeg2000Decoder {
         final Tile tile = info.tilesMap.get(tileIndex);
         tile.cod = tile.cod != null ? tile.cod : cur.cod;
         tile.qcd = tile.qcd != null ? tile.qcd : cur.qcd;
+        tile.qcc = tile.qcc != null ? tile.qcc : cur.qcc;
 
         switch (tile.cod.progressionOrder) {
             case Markers.LRCP:
-                tile.progress = new LRCP(info, tile);
+                tile.progress = new LRCP(info, tileIndex);
                 break;
             case Markers.RLCP:
-                tile.progress = new RLCP(info, tile);
+                tile.progress = new RLCP(info, tileIndex);
                 break;
             case Markers.RPCL:
                 System.err.print("This progression order not supported");
@@ -1017,10 +1117,10 @@ public class Jpeg2000Decoder {
                     }
                 }
             }
-                
+
             resultImages.add(result);
         }
-        
+
         info.tilesMap.clear();
 
         byte[] mainData = null;
@@ -1126,37 +1226,37 @@ public class Jpeg2000Decoder {
                 max = 255 * (1 << shift);
 
                 final int alpha01 = componentsCount - 3;
-                
+
                 if (tile.cod.transformation == 0) {
                     for (int j = 0; j < y0items.length; j++, pos += alpha01) {
-                            y0 = y0items[j] + offset;
-                            y1 = y1items[j];
-                            y2 = y2items[j];
-                            r = (y0 + 1.402 * y2);
-                            g = (y0 - 0.34413 * y1 - 0.71414 * y2);
-                            b = (y0 + 1.772 * y1);
-                            out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
-                            out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
-                            out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
+                        y0 = y0items[j] + offset;
+                        y1 = y1items[j];
+                        y2 = y2items[j];
+                        r = (y0 + 1.402 * y2);
+                        g = (y0 - 0.34413 * y1 - 0.71414 * y2);
+                        b = (y0 + 1.772 * y1);
+                        out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
+                        out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
+                        out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
                     }
                 } else {
                     final int yLen = y0items.length;
                     for (int j = 0; j < yLen; j++, pos += alpha01) {
-                            y0 = y0items[j] + offset;
-                            y1 = y1items[j];
-                            y2 = y2items[j];
-                            g = (y0 - (((int) (y2 + y1)) >> 2));
-                            r = g + y2;
-                            b = g + y1;
-                            out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
-                            out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
-                            out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
+                        y0 = y0items[j] + offset;
+                        y1 = y1items[j];
+                        y2 = y2items[j];
+                        g = (y0 - (((int) (y2 + y1)) >> 2));
+                        r = g + y2;
+                        b = g + y1;
+                        out[pos++] = (byte) (r < 0 ? 0 : r > max ? 255 : ((int) r) >> shift);
+                        out[pos++] = (byte) (g < 0 ? 0 : g > max ? 255 : ((int) g) >> shift);
+                        out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
                     }
                 }
-                
+
 
             } else { // no multi-component transform
-                
+
                 if (info.enumerateCS == Info.CS_SYCC && componentsCount == 3) {
                     final float[] y0items = getMappedComponent(transformedTiles, 0, info);
                     final float[] y1items = getMappedComponent(transformedTiles, 1, info);
@@ -1177,7 +1277,7 @@ public class Jpeg2000Decoder {
                         out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
                     }
 
-                }else{
+                } else {
                     for (int c = 0; c < componentsCount; c++) {
                         final float[] items = transformedTiles[c].floatItems;
                         shift = (info.siz.precisionInfo[c][0] + 1) - 8;
@@ -1226,14 +1326,14 @@ public class Jpeg2000Decoder {
             return image;
         }
     }
-    
-    private static float[] getMappedComponent(SubbandCoefficient[] arr, int keyVal, Info info){
-        if(info.cDef.isEmpty()){
+
+    private static float[] getMappedComponent(SubbandCoefficient[] arr, int keyVal, Info info) {
+        if (info.cDef.isEmpty()) {
             return arr[keyVal].floatItems;
-        }else{
-            if(info.cDef.containsKey(keyVal)){
-                return arr[info.cDef.get(keyVal)-1].floatItems;
-            }else{
+        } else {
+            if (info.cDef.containsKey(keyVal)) {
+                return arr[info.cDef.get(keyVal) - 1].floatItems;
+            } else {
                 return arr[keyVal].floatItems;
             }
         }
@@ -1242,7 +1342,7 @@ public class Jpeg2000Decoder {
     private static SubbandCoefficient transformTile(Info info, Tile tile, int c) {
         final SIZ siz = info.siz;
         final TileComponent comp = tile.components.get(c);
-        final QCD qcd = tile.qcd;
+        final QCD qcd = tile.qcc[c] != null ? tile.qcc[c] : tile.qcd;
         final COD cod = tile.cod;
         final int NL = cod.nDecompLevel;
         final int guardBits = qcd.guardBits;
@@ -1287,20 +1387,20 @@ public class Jpeg2000Decoder {
         SubbandCoefficient result = trns.getInversed(subcos, comp.x0, comp.y0);
         result.x = comp.x0;
         result.y = comp.y0;
-        
+
         int sw = result.width;
         int sh = result.height;
-        int dw = result.width*siz.precisionInfo[c][1];
-        int dh = result.height*siz.precisionInfo[c][1];
-        if(sw!=dw || sh!=dh){
+        int dw = result.width * siz.precisionInfo[c][1];
+        int dh = result.height * siz.precisionInfo[c][1];
+        if (sw != dw || sh != dh) {
             result.floatItems = applyBilinearScaling(result.floatItems, sw, sh, dw, dh);
         }
         return result;
     }
-    
+
     private static float[] applyBilinearScaling(float[] data, int sw, int sh, int dw, int dh) {
-        
-        if(sh == 1) {
+
+        if (sh == 1) {
             float[] temp = new float[2 * sw];
             System.arraycopy(data, 0, temp, 0, sw);
             System.arraycopy(data, 0, temp, sw, sw);
@@ -1308,7 +1408,7 @@ public class Jpeg2000Decoder {
             data = temp;
         }
 
-        float[] temp = new float[dw*dh] ;
+        float[] temp = new float[dw * dh];
         float A, B, C, D;
         int x, y, index;
         float xRatio = ((float) (sw - 1)) / dw;

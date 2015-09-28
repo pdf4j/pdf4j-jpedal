@@ -254,7 +254,11 @@ public class FormStream {
     public static BufferedImage decode(final PdfObject formObj, final PdfObjectReader currentPdfFile, final PdfObject XObject, final int subtype,
     		int width, int height, final int offsetImage, final float pageScaling){
     	
-        //
+        //handle XFA differently
+        if(XObject.getObjectType()==PdfDictionary.XFA_APPEARANCE){
+            
+            return ExternalHandlers.decode(formObj, currentPdfFile, XObject, subtype, width, height, offsetImage, pageScaling);
+        }
         
         //NOTE iconRotation kept to keep api but iconRotation is never used and NOT needed
         final boolean useHires=true;

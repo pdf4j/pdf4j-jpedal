@@ -32,26 +32,23 @@
  */
 package org.jpedal.objects.acroforms;
 
-//
-
+import java.awt.image.BufferedImage;
 import org.jpedal.exception.PdfException;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.*;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.acroforms.creation.FormFactory;
-import org.jpedal.objects.acroforms.creation.SwingFormFactory;
 import org.jpedal.objects.acroforms.utils.FormUtils;
 
 import org.jpedal.objects.raw.*;
-import org.jpedal.parser.FormFlattener;
 import org.jpedal.parser.PdfStreamDecoder;
 import org.jpedal.utils.*;
 
 import java.util.*;
-//<start-adobe>
-import org.jpedal.objects.acroforms.javafx.JavaFXData;
-import org.jpedal.objects.acroforms.javafx.JavaFXFormFactory;
-//<end-adobe>
+import org.jpedal.objects.acroforms.creation.SwingFormCreator;
+import org.jpedal.objects.layers.PdfLayerList;
+import org.jpedal.parser.*;
+
 
 /**
  * Provides top level to forms handling, assisted by separate classes to
@@ -63,17 +60,16 @@ import org.jpedal.objects.acroforms.javafx.JavaFXFormFactory;
  */
 public class AcroRenderer{
     
-    private FormObject[] Fforms, Aforms;
+    FormObject[] Fforms, Aforms;
     
     private PdfObject AcroRes;
     
     private float dpi=72f;
     
     private Object[] CO;
-    private PdfArrayIterator fieldList;
+    PdfArrayIterator fieldList;
     private PdfArrayIterator[] annotList;
-    private final HashMap<String,Object> globalMap = new HashMap<String,Object>();
-    
+   
     /**
      * flag to show we ignore forms
      */
@@ -84,10 +80,10 @@ public class AcroRenderer{
     /**
      * creates all GUI components from raw data in PDF and stores in GUIData instance
      */
-    private FormFactory formFactory;
+    public FormFactory formFactory;
     
     /**holder for all data (implementations to support Swing and ULC)*/
-    private GUIData compData;
+    public GUIData compData;
     
     /**holds sig object so we can easily retrieve*/
     private Set<FormObject> sigObject;
@@ -109,17 +105,17 @@ public class AcroRenderer{
     /**
      * number of pages in current PDF document
      */
-    private int pageCount;
+    int pageCount;
     
     /**
      * handle on object reader for decoding objects
      */
-    private PdfObjectReader currentPdfFile;
+    PdfObjectReader currentPdfFile;
     
     /**
      * parses and decodes PDF data into generic data for converting to widgets
      */
-    private FormStream fDecoder;
+    FormStream fDecoder;
     
     /**
      * handles events like URLS, EMAILS
@@ -131,41 +127,35 @@ public class AcroRenderer{
      */
     private Javascript javascript;
     
-    private PdfObject acroObj;
+    PdfObject acroObj;
     
     /*flag to show if XFA or FDF*/
-    private boolean hasXFA;
+    boolean hasXFA;
     private boolean isContainXFAStream;
     
     /**
      * flag to show if we use XFA
      */
-    private final boolean useXFA;
+    private boolean useXFA;
 
     /**
      * allow us to differentiate underlying PDF form type
      */
-    private Enum PDFformType;
+    Enum PDFformType;
     
-    final boolean isJavaFX;
+    private SwingFormCreator formCreator;
 
     /**
      * used to create version without XFA support in XFA version.
      * Should not be used otherwise.
      * @param useXFA 
      */
-    public AcroRenderer(final boolean useXFA, final boolean isJavaFX) {
+    public AcroRenderer(){}
+    
+    public void useXFAIfAvailable(final boolean useXFA) {
 
         this.useXFA=useXFA;
-        this.isJavaFX=isJavaFX;
-        //<start-adobe>
-        if(isJavaFX) {
-            compData = new JavaFXData();
-        } else
-        //<end-adobe>
-        {
-            compData = new SwingData();
-        }
+        
     }
     
     /**
@@ -202,7 +192,7 @@ public class AcroRenderer{
      *
      *
      */
-    public void openFile(final int pageCount, final int insetW, final int insetH, final PdfPageData pageData, final PdfObjectReader currentPdfFile, final PdfObject acroObj) {
+    public int openFile(int pageCount, final int insetW, final int insetH, final PdfPageData pageData, final PdfObjectReader currentPdfFile, final PdfObject acroObj) {
         
         this.pageCount = pageCount;
         //        if(newXFACode){
@@ -266,7 +256,12 @@ public class AcroRenderer{
                 AcroRes=null;
             }
             
-            //
+            /**
+             * choose correct decoder for form data
+             */
+            if (hasXFA && useXFA){
+                processXFAFields(acroObj, currentPdfFile, pageData);
+            }           
             
             //we need to read list if FDF
             //or redo list if Legacy XFA
@@ -278,9 +273,21 @@ public class AcroRenderer{
         
         resetContainers(true);
         
+        return pageCount;
+    }
+
+    /**
+     * empty implementation in non-XFA AcroRenderer
+     * 
+     * @param acroObj1
+     * @param currentPdfFile1
+     * @param pageData1 
+     */
+    void processXFAFields(final PdfObject acroObj1, final PdfObjectReader currentPdfFile1, final PdfPageData pageData1) {
+        throw new RuntimeException("This code (processXFAFields) should never be called");
     }
         
-    private void resolveIndirectFieldList(final boolean resolveParents){
+    void resolveIndirectFieldList(final boolean resolveParents){
 
         //allow for indirect
         while(FfieldCount==1){
@@ -370,10 +377,8 @@ public class AcroRenderer{
 
                 PDFformType=FormTypes.NON_XFA;
 
-                //
-                {
-                    fDecoder = new FormStream();
-                }
+                setupXFADecoder();
+                
             }
         }
         resetContainers(resetToEmpty);
@@ -395,18 +400,8 @@ public class AcroRenderer{
         }
         
         if (formFactory == null) {
-            
-            //<start-adobe>
-            if(isJavaFX) {
-                formFactory = new JavaFXFormFactory();
-            } else
-            //<end-adobe>
-            {
-                formFactory = new SwingFormFactory();
-            }
-            
+            formFactory=formCreator.createFormFactory();
             formFactory.reset(this.getFormResources(), formsActionHandler, pageData,  currentPdfFile);
-            
         } else {
             //to keep customers formfactory usable
             formFactory.reset(this.getFormResources(), formsActionHandler, pageData,  currentPdfFile);
@@ -461,8 +456,10 @@ public class AcroRenderer{
             String objRef;
             int i, count;
             
-            //
-                
+            if(hasXFA && useXFA){
+                xfaFormList=createXFADisplayComponentsForPage(xfaFormList,page);
+            }else{
+            
                 //scan list for all relevant values and add to array if valid
                 //0  = forms, 1 = annots
                 final int decodeToForm = 2;
@@ -572,8 +569,8 @@ public class AcroRenderer{
                             i = processFormObject(page, formsProcessed, formObject, objRef, i, forms);
                         }
                     }
-                }
-                //
+                }             
+            }
             
             final List<FormObject> unsortedForms= new ArrayList<FormObject>();
             final List<FormObject> sortedForms = new ArrayList<FormObject>();
@@ -695,7 +692,7 @@ public class AcroRenderer{
                             try {
                                // current.drawFlattenedForm(formObject,false);
                                 final int type=formFactory.getType();
-                                FormFlattener.drawFlattenedForm(current, formObject, type == FormFactory.HTML || type == FormFactory.SVG, (PdfObject) this.getFormResources()[0]);
+                                getFormFlattener().drawFlattenedForm(current, formObject, type == FormFactory.HTML || type == FormFactory.SVG, (PdfObject) this.getFormResources()[0]);
                             
                             }catch( final PdfException e ){
                                 //tell user and log
@@ -1357,8 +1354,6 @@ public class AcroRenderer{
         return compData.formsRasterizedForDisplay();
     }
     
-    //
-    
     /**
      * get FormObject
      * @param ref
@@ -1390,7 +1385,7 @@ public class AcroRenderer{
         compData.setPageData(compData.pageData, width, height);
     }
 
-    private FormObject convertRefToFormObject(final String objRef, final int page) {
+    FormObject convertRefToFormObject(final String objRef, final int page) {
         
         FormObject formObject = (FormObject) compData.getRawFormData().get(objRef);
         if (formObject == null) {
@@ -1433,5 +1428,73 @@ public class AcroRenderer{
 
     public boolean alwaysuseXFA() {
         return alwaysUseXFA;
+    }
+
+    public void init(SwingFormCreator formCreator) {
+
+        this.formCreator=formCreator;
+        
+        compData=formCreator.getData();
+        
+    }
+
+    public PdfStreamDecoder getStreamDecoder(PdfObjectReader currentPdfFile, boolean isHires, PdfLayerList layer,boolean isFirst) {
+    
+        if(isFirst){
+            return new PdfStreamDecoder(currentPdfFile); 
+        }else{
+            return new PdfStreamDecoder(currentPdfFile, isHires,layer);
+        }
+    }
+    
+    public boolean showFormWarningMessage(int page) {
+        
+        boolean warnOnceOnForms=false;
+        
+        if(isXFA()){
+            warnOnceOnForms=true;
+            System.out.println("[WARNING] This file contains XFA forms that are not supported by this version of JPDF2HTML5. To convert into functional HTML forms and display non-legacy mode page content, JPDF2HTML5 Forms Edition must be used.");
+        }else if(hasFormsOnPage(page)){
+            warnOnceOnForms=true;
+            System.out.println("[WARNING] This file contains form components that have been rasterized. To convert into functional HTML forms, JPDF2HTML5 Forms Edition must be used.");
+        }
+        
+        return warnOnceOnForms;
+    }
+
+    FormObject[] createXFADisplayComponentsForPage(FormObject[] xfaFormList, int page) {
+        throw new UnsupportedOperationException("createXFADisplayComponentsForPage should never be called");
+    }
+
+    void setupXFADecoder() {
+      
+        fDecoder = new FormStream();
+                
+    }
+
+    public HashMap getPageMapXFA() {
+        throw new UnsupportedOperationException("getPageMapXFA should never be called");
+    }
+    
+    public byte[] getXMLContentAsBytes(int dataType) {
+        return null;
+    }
+
+    public void outputJavascriptXFA(String path, String name) {
+        throw new UnsupportedOperationException("outputJavascriptXFA should never be called");
+    }
+
+    public PrintStreamDecoder getStreamDecoderForPrinting(PdfObjectReader currentPdfFile, boolean isHires, PdfLayerList pdfLayerList) {
+        //<start-server><end-server>
+         return null;
+        /**/
+    }
+
+    public BufferedImage decode(PdfObject pdfObject, PdfObjectReader currentPdfFile, PdfObject XObject, int subtype, int width, int height, int offsetImage, float pageScaling) {
+      return null;//
+    }
+
+    public FormFlattener getFormFlattener() {
+        return new FormFlattener();
     }
 }

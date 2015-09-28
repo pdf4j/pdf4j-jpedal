@@ -39,7 +39,7 @@ package org.jpedal.function;
  */
 public interface PDFFunction{
 
-    public float[] compute(float[] values);
-	public float[] computeStitch(float[] subinput);
+    float[] compute(float[] values);
+	float[] computeStitch(float[] subinput);
     
 }

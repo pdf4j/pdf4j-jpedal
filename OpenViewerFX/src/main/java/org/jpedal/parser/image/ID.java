@@ -45,7 +45,6 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.PdfObjectCache;
 import org.jpedal.parser.image.data.ImageData;
-import org.jpedal.render.BaseDisplay;
 
 import java.awt.image.BufferedImage;
 
@@ -227,7 +226,7 @@ public class ID extends ImageDecoder {
 
                 if (image != null){
 
-                    if(BaseDisplay.isHTMLorSVG(current)){
+                    if(current.isHTMLorSVG()){
                         generateTransformedImage(image, image_name);
                     }else if(parserOptions.renderDirectly() || this.useHiResImageForDisplay){
 

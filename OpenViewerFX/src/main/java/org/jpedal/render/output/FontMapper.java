@@ -38,12 +38,12 @@ public interface FontMapper {
      * how to handle fonts
      */
     //public static final int IGNORE = 1;
-    public static final int FAIL_ON_UNMAPPED = 2;
-    public static final int DEFAULT_ON_UNMAPPED = 3;
+    int FAIL_ON_UNMAPPED = 2;
+    int DEFAULT_ON_UNMAPPED = 3;
     //public static final int EMBED_UNKNOWN_AS_IMAGE = 4;
     //public static final int EMBED_UNKNOWN_WITH_FONT = 5;
-    public static final int EMBED_ALL = 6;
-    public static final int EMBED_ALL_EXCEPT_BASE_FAMILIES = 7;
+    int EMBED_ALL = 6;
+    int EMBED_ALL_EXCEPT_BASE_FAMILIES = 7;
 
     String getFont();
 

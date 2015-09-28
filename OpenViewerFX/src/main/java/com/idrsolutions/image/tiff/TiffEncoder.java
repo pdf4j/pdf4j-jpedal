@@ -70,7 +70,7 @@ import java.io.RandomAccessFile;
  */
 public class TiffEncoder {
 
-    private boolean compress = false;
+    private boolean compress;
 
     public TiffEncoder() {
     }
@@ -94,7 +94,7 @@ public class TiffEncoder {
 
         boolean hasAlpha = raw.length > (imageH * imageW * 3);
         if (compress) {
-            raw = performCompression(raw, imageW, imageH, hasAlpha);
+            raw = Deflate.compress(raw);
         }
 
         int offsetIFD = 8;
@@ -132,7 +132,7 @@ public class TiffEncoder {
             byte[] data = getComponentBytes(img);
             boolean hasAlpha = data.length > (img.getWidth() * img.getHeight() * 3);
             if (compress) {
-                data = performCompression(data, img.getWidth(), img.getHeight(), hasAlpha);
+                data = Deflate.compress(data);
             }
             writeContents(bos, data, img.getWidth(), img.getHeight(), endFile, hasAlpha, compress);
             bos.close();
@@ -149,16 +149,15 @@ public class TiffEncoder {
     }
 
     /**
-     * @ return whether pack bit compression
-     *
+     * 
+     * @return whether the compression is applied
      */
     public boolean isCompressed() {
         return compress;
     }
 
     /**
-     * set to use pack bit compression in tiff files
-     *
+     * set to use Deflate compression in tiff files
      * @param compress A boolean value pack bit compression in tiff files
      */
     public void setCompressed(boolean compress) {
@@ -199,7 +198,7 @@ public class TiffEncoder {
 
         boolean hasAlpha = raw.length > (imageH * imageW * 3);
         if (isCompress) {
-            raw = performCompression(raw, imageW, imageH, hasAlpha);
+            raw = Deflate.compress(raw);
         }
 
         int offsetIFD = 8;
@@ -363,7 +362,7 @@ public class TiffEncoder {
         out.write(shortToBytes((short) 259));
         out.write(shortToBytes((short) 3));
         out.write(intToBytes(1));
-        int compressValue = isCompress ? 32773 : 1;
+        int compressValue = isCompress ? Tags.Deflate : 1;
         out.write(shortToBytes((short) compressValue));
         out.write(shortToBytes((short) 0));
 
@@ -450,90 +449,5 @@ public class TiffEncoder {
         return new byte[]{(byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value};
     }
 
-    private static byte[] performCompression(byte[] data, int imageW, int imageH, boolean hasAlpha) throws IOException {
-        int rowByteCount = hasAlpha ? imageW * 4 : imageW * 3;
-        int offset = 0;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        for (int i = 0; i < imageH; i++) {
-            byte temp[] = new byte[rowByteCount];
-            System.arraycopy(data, offset, temp, 0, rowByteCount);
-            offset += rowByteCount;
-            bos.write(compressRow(temp));
-        }
-        bos.close();
-        return bos.toByteArray();
-    }
-
-    private static int getNextDup(byte bytes[], int offset) {
-        if (offset >= bytes.length) {
-            return -1;
-        }
-        byte temp = bytes[offset];
-
-        for (int i = offset + 1; i < bytes.length; i++) {
-            byte b = bytes[i];
-
-            if (b == temp) {
-                return i - 1;
-            }
-
-            temp = b;
-        }
-
-        return -1;
-    }
-
-    private static int getNextRun(byte bytes[], int offset) {
-        byte b = bytes[offset];
-        int c = 0;
-        int len = bytes.length;
-        for (int i = offset + 1; (i < len) && (bytes[i] == b); i++) {
-            c = i;
-        }
-
-        return c - offset;
-    }
-
-    private static byte[] compressRow(byte bytes[]) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        int pos = 0;
-        while (pos < bytes.length) {
-            int dup = getNextDup(bytes, pos);
-            if (dup == pos) {
-                int len = getNextRun(bytes, dup);
-                int dataLen = Math.min(len, 128);
-                bos.write(-(dataLen - 1));
-                bos.write(bytes[pos]);
-                pos += dataLen;
-            } else {
-                int len = dup - pos;
-
-                if (dup > 0) {
-                    int runlen = getNextRun(bytes, dup);
-                    if (runlen < 3) {
-                        int nextptr = pos + len + runlen;
-                        int nextdup = getNextDup(bytes, nextptr);
-                        if (nextdup != nextptr) {
-                            dup = nextdup;
-                            len = dup - pos;
-                        }
-                    }
-                }
-
-                if (dup < 0) {
-                    len = bytes.length - pos;
-                }
-                int dataLen = Math.min(len, 128);
-                bos.write(dataLen - 1);
-                for (int i = 0; i < dataLen; i++) {
-                    bos.write(bytes[pos]);
-                    pos++;
-                }
-            }
-        }
-        bos.close();
-        return bos.toByteArray();
-    }
 
 }

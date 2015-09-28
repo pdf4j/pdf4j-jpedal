@@ -45,5 +45,5 @@ public interface PdfFilter {
 
     void decode(BufferedInputStream bis, BufferedOutputStream streamCache, String cacheName, Map<String, String> cachedObjects) throws Exception;
 
-    public boolean hasError();
+    boolean hasError();
 }

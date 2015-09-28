@@ -46,7 +46,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import javax.swing.*;
 
@@ -125,6 +127,7 @@ public class JDeli {
         panel.add(getStyledLabel(new JLabel(" ")));
         panel.add(getStyledLabel(new JLabel(" Features: ")));
         panel.add(getStyledLabel(new JLabel("          TiffEncoder (Single/Multi Page)")));
+        panel.add(getStyledLabel(new JLabel("          TiffDecoder (Single/Multi Page)")));
         panel.add(getStyledLabel(new JLabel("          PngEncoder")));
         panel.add(getStyledLabel(new JLabel("          PngCompressor")));
         panel.add(getStyledLabel(new JLabel("          JpegEncoder")));
@@ -151,8 +154,10 @@ public class JDeli {
             public void mouseClicked(final MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI("https://www.idrsolutions.com/jdeli"));
-                } catch (final Exception e1) {
+                } catch (final IOException e1) {
                     writeLog("Exception: " + e1.getMessage());
+                } catch (URISyntaxException ex) {
+                    writeLog("Exception: " + ex.getMessage());
                 }
             }
 
@@ -180,8 +185,10 @@ public class JDeli {
             public void mouseClicked(final MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI("https://www.idrsolutions.com/jdeli/license"));
-                } catch (final Exception e1) {
+                } catch (final URISyntaxException e1) {
                     writeLog("Exception: " + e1.getMessage());
+                } catch (IOException ex) {
+                    writeLog("Exception :" + ex.getMessage());
                 }
             }
 
@@ -210,8 +217,10 @@ public class JDeli {
             public void mouseClicked(final MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI("https://files.idrsolutions.com/jdeli-javadoc/"));
-                } catch (final Exception e1) {
+                } catch (final IOException e1) {
                     writeLog("Exception: " + e1.getMessage());
+                } catch (URISyntaxException ex) {
+                    writeLog("Exception: " + ex.getMessage()); 
                 }
             }
 
@@ -263,6 +272,7 @@ public class JDeli {
             '\n' +
                 "Features:\n" +
                 "\tTiffEncoder (Single/Multi Page)\n" +
+                "\tTiffDecoder (Single/Multi Page)\n" +
                 "\tPngEncoder\n" +
                 "\tPngCompressor\n" +
                 "\tJpegEncoder\n" +

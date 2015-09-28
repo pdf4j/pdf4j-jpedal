@@ -64,7 +64,7 @@ public interface PdfDecoderInt {
     /**
      * build number of this version
      */
-    String version = "6.3.31";
+    String version = "6.4.28";
     /**
      * flag to show extraction mode should include any text
      */
@@ -189,7 +189,7 @@ public interface PdfDecoderInt {
      *
      * access textlines object
      */
-    public TextLines getTextLines();
+    TextLines getTextLines();
 
     //<start-adobe>
 
@@ -198,7 +198,7 @@ public interface PdfDecoderInt {
      * returns object containing grouped text from background grouping - Please
      * see org.jpedal.examples.text for example code
      */
-    public PdfGroupingAlgorithms getBackgroundGroupingObject();
+    PdfGroupingAlgorithms getBackgroundGroupingObject();
 
     //
 
@@ -234,9 +234,9 @@ public interface PdfDecoderInt {
 
     PdfPageData getPdfPageData();
     
-    public int getPDFWidth();
+    int getPDFWidth();
     
-    public int getPDFHeight();
+    int getPDFHeight();
 
     BufferedImage getPageAsImage(int pageIndex) throws PdfException;
 
@@ -246,13 +246,13 @@ public interface PdfDecoderInt {
      * Return amount to inset the page rectangle height by
      * @return int
      */
-    public int getInsetH();
+    int getInsetH();
     
     /**
      * Return amount to inset the page rectangle width by
      * @return int
      */
-    public int getInsetW();
+    int getInsetW();
     
     
     //<start-adobe>
@@ -260,29 +260,29 @@ public interface PdfDecoderInt {
          * Return amount to scroll window by when scrolling (default is 10).
          * @return int
          */
-        public int getScrollInterval();
+        int getScrollInterval();
 
         /**
          * Sets the ammount to scroll the window by (default is 10).
          * @param scrollInterval 
          */
-        public void setScrollInterval(int scrollInterval);
+        void setScrollInterval(int scrollInterval);
 
 
         /**
          * NOT PART OF API
          * turns off the viewable area, scaling the page back to original scaling
          */
-        public void resetViewableArea();
+        void resetViewableArea();
 
 
         /**
          * used for non-PDF files to reset page
          */
-        public void resetForNonPDFPage(int pageCount);
+        void resetForNonPDFPage(int pageCount);
     //<end-adobe>
         
-    public void setPDFBorder(Border newBorder);
+    void setPDFBorder(Border newBorder);
 
     void flushObjectValues(boolean reinit);
 
@@ -322,9 +322,9 @@ public interface PdfDecoderInt {
      * updateCursorBoxOnScreen(final int[] rectParams, final int outlineColor) instead
      * @deprecated
      */
-    public void updateCursorBoxOnScreen(Rectangle newOutlineRectangle,Color outlineColor);
+    void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor);
     
-    public void updateCursorBoxOnScreen(int[] rectParams,int outlineColor);
+    void updateCursorBoxOnScreen(int[] rectParams, int outlineColor);
     //<end-adobe>
     void useHiResScreenDisplay(boolean value);
 
@@ -378,7 +378,7 @@ public interface PdfDecoderInt {
 
     void setStreamCacheSize(int size);
     
-    public void setUserOffsets(int x, int y, int mode);
+    void setUserOffsets(int x, int y, int mode);
     
     //<start-adobe>
     /**
@@ -386,7 +386,7 @@ public interface PdfDecoderInt {
      * please use getPages().setViewableArea instead.
      * @deprecated
      */
-    public AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
+    AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
     //<end-adobe>
     
     boolean hasEmbeddedFonts();
@@ -411,12 +411,12 @@ public interface PdfDecoderInt {
 
     int getDisplayView();
 
-    public BufferedImage getSelectedRectangleOnscreen(float t_x1, float t_y1,
-            float t_x2, float t_y2, float scaling);
+    BufferedImage getSelectedRectangleOnscreen(float t_x1, float t_y1,
+                                               float t_x2, float t_y2, float scaling);
     
     float getScaling();
     
-    public void setScaling(float x);
+    void setScaling(float x);
     
     //temporary below
     void setDisplayRotation(int newRotation);
@@ -426,63 +426,63 @@ public interface PdfDecoderInt {
     void setPageParameters(float scaleBy, int page);
 
 
-    public void drawAdditionalObjectsOverPage(int page, int[] type, Color[] colors, Object[] obj) throws PdfException;
+    void drawAdditionalObjectsOverPage(int page, int[] type, Color[] colors, Object[] obj) throws PdfException;
 
     /**
      * allow user to remove all additional grapical content from the page (only for display)
      * ONLY works in SINGLE VIEW displaymode
      */
-    public void flushAdditionalObjectsOnPage(int page) throws PdfException;
+    void flushAdditionalObjectsOnPage(int page) throws PdfException;
 
-    public String getFileName();
+    String getFileName();
     
-    public boolean getPageDecodeStatus(int status);
+    boolean getPageDecodeStatus(int status);
     
-    public String getPageDecodeStatusReport(int status);
+    String getPageDecodeStatusReport(int status);
     
     //<start-adobe>
     //public boolean setDisplayView(int displayView, int orientation);
     //<end-adobe>
     
-    public String getPDFVersion();
+    String getPDFVersion();
     
-    public ExternalHandlers getExternalHandler();
+    ExternalHandlers getExternalHandler();
     
-    public int getSpecialMode();
+    int getSpecialMode();
     
-    public boolean useNewGraphicsMode();
+    boolean useNewGraphicsMode();
     
-    public void useNewGraphicsMode(boolean b);
+    void useNewGraphicsMode(boolean b);
     
-    public void setPageParameters(float scaling, int pageNumber,int newRotation);
+    void setPageParameters(float scaling, int pageNumber, int newRotation);
     
     //<start-adobe>
-    public void setStatusBarObject(StatusBar statusBar);
+    void setStatusBarObject(StatusBar statusBar);
     //<end-adobe>
     
     //<start-adobe>
-    public void setInset(int width,int height);
+    void setInset(int width, int height);
     //<end-adobe>
     
-    public DecoderOptions getDecoderOptions();
+    DecoderOptions getDecoderOptions();
     
-    public int[] getMaxSizeWH();
+    int[] getMaxSizeWH();
     
-    public int[] getPaneBounds();
+    int[] getPaneBounds();
     
-    public void repaintPane(int page);
+    void repaintPane(int page);
     
-    public void requestFocus();
+    void requestFocus();
     
-    public void setBorderPresent(boolean borderPresent);
+    void setBorderPresent(boolean borderPresent);
     
-    public boolean isBorderPresent();
+    boolean isBorderPresent();
     
-    public void setPreviewThumbnail(final BufferedImage previewImage, final String previewText);
+    void setPreviewThumbnail(final BufferedImage previewImage, final String previewText);
 
-    public Rectangle getVisibleRect();
+    Rectangle getVisibleRect();
 
-    public DisplayOffsets getDisplayOffsets();
+    DisplayOffsets getDisplayOffsets();
 
-    public int getTextPrint();
+    int getTextPrint();
 }

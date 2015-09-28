@@ -49,22 +49,22 @@ import org.jpedal.objects.raw.PdfObject;
 public interface PrintStreamDecoder {
 
     //<start-server>
-    public void print(Graphics2D g2,AffineTransform scaling,int currentPrintPage,
-                      Rectangle userAnnot,CustomPrintHintingHandler customPrintHintingHandler, PdfDecoderInt pdf) throws PrinterException ;
+    void print(Graphics2D g2, AffineTransform scaling, int currentPrintPage,
+               Rectangle userAnnot, CustomPrintHintingHandler customPrintHintingHandler, PdfDecoderInt pdf) throws PrinterException ;
     //<end-server>
     
-    public void setObjectValue(int key, Object  obj);
+    void setObjectValue(int key, Object obj);
 
-    public void setParameters(boolean b, boolean b0, int i, int i0, boolean isPrinting,boolean b1);
+    void setParameters(boolean b, boolean b0, int i, int i0, boolean isPrinting, boolean b1);
 
-    public void setIntValue(int PageNum, int page);
+    void setIntValue(int PageNum, int page);
 
-    public boolean getBooleanValue(int PageDecodingSuccessful);
+    boolean getBooleanValue(int PageDecodingSuccessful);
 
     @SuppressWarnings("UnusedReturnValue")
-    public T3Size decodePageContent(PdfObject pdfObject) throws PdfException;
+    T3Size decodePageContent(PdfObject pdfObject) throws PdfException;
     
-    public Object getObjectValue(int key);
+    Object getObjectValue(int key);
 
-    public ErrorTracker getErrorTracker();
+    ErrorTracker getErrorTracker();
 }

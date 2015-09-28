@@ -37,6 +37,6 @@ import org.jpedal.gui.GUIFactory;
 
 public interface PrinterInt {
     
-    public void printPDF(PdfDecoderInt decodePdf, GUIFactory currentGUI, String blacklist, String defaultPrinter);
+    void printPDF(PdfDecoderInt decodePdf, GUIFactory currentGUI, String blacklist, String defaultPrinter);
     
 }

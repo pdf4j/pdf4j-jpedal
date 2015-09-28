@@ -51,17 +51,17 @@ public class Info {
     public static final int CS_ESYCC = 24;
     
     //main info
-    public int imageWidth = 0;
-    public int imageHeight = 0;
-    public int nComp = 0;
-    public int bitDepth = 0;
+    public int imageWidth;
+    public int imageHeight;
+    public int nComp;
+    public int bitDepth;
     public int compressionType = 7;
-    public int unknownColorSpace = 0;
-    public int ip = 0;    
+    public int unknownColorSpace;
+    public int ip;
     public byte[] bitDepths; 
     
     //colorspace info
-    public int enumerateCS = 0;
+    public int enumerateCS;
     
     public List<Integer> contiguousCodeStreamBoxes = new ArrayList<Integer>();
     public List<Integer> tileOffsets = new ArrayList<Integer>();
@@ -72,6 +72,7 @@ public class Info {
     public SIZ siz;
     public COD cod;
     public QCD qcd;
+    public QCD[] qcc;
     public Palette palette;
     public Cmap cmap;
     

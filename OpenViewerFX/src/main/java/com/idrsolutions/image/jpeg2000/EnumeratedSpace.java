@@ -11,7 +11,7 @@ package com.idrsolutions.image.jpeg2000;
 public class EnumeratedSpace {
 
     private static final byte[] LUT;
-    private byte oldC = 0, oldM = 0, oldY = 0, oldK = 0;
+    private byte oldC, oldM, oldY, oldK;
     private byte red = (byte) 255, green = (byte) 255, blue = (byte) 255;
 
     public EnumeratedSpace() {

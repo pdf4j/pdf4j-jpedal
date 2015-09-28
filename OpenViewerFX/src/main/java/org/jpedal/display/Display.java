@@ -50,8 +50,7 @@ public interface Display {
     * Please use PdfDecoder.setBorderPresent(boolean) instead
     * True : Show border around page.
     * Flase : Remove border around page.
-    */
-    public static final int BORDER_SHOW=1;
+    */ int BORDER_SHOW=1;
 
     @SuppressWarnings("UnusedDeclaration")
     @Deprecated
@@ -59,8 +58,7 @@ public interface Display {
     * Please use PdfDecoder.setBorderPresent(boolean) instead
     * True : Show border around page.
     * Flase : Remove border around page.
-    */
-    public static final int BORDER_HIDE=0;
+    */ int BORDER_HIDE=0;
 
     /**when no display is set*/
     int NODISPLAY=0;
@@ -84,27 +82,27 @@ public interface Display {
 
     int DISPLAY_CENTERED=2;
     
-    public double getIndent();
+    double getIndent();
 
     /**
      * Please use public int[] getCursorBoxOnScreenAsArray() instead.
      * @deprecated on 04/07/2014
      */
-    public Rectangle getCursorBoxOnScreen();
+    Rectangle getCursorBoxOnScreen();
     
-    public int[] getCursorBoxOnScreenAsArray();
+    int[] getCursorBoxOnScreenAsArray();
 
-    public void setCursorBoxOnScreen(Rectangle cursorBoxOnScreen, boolean isSamePage);
+    void setCursorBoxOnScreen(Rectangle cursorBoxOnScreen, boolean isSamePage);
 
-    public void forceRedraw();
+    void forceRedraw();
 
-    public void setPageRotation(int displayRotation);
+    void setPageRotation(int displayRotation);
 
-    public void resetViewableArea();
+    void resetViewableArea();
 
-    public void paintPage(Pane box,AcroRenderer formRenderer,TextLines textLines);
+    void paintPage(Pane box, AcroRenderer formRenderer, TextLines textLines);
     
-    public void paintPage(Graphics2D g2,AcroRenderer formRenderer,TextLines textLines);
+    void paintPage(Graphics2D g2, AcroRenderer formRenderer, TextLines textLines);
     
     void updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size);
 
@@ -113,9 +111,9 @@ public interface Display {
      * updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead.
      * @deprecated
      */
-    public void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor, int pageNumber,int x_size,int y_size);
+    void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor, int pageNumber, int x_size, int y_size);
 
-    public void drawCursor(Graphics g, float scaling);
+    void drawCursor(Graphics g, float scaling);
 
     /**
      * Deprecated on 07/07/2014
@@ -129,13 +127,13 @@ public interface Display {
     
     void drawFacing(Rectangle visibleRect);
     
-    public enum BoolValue {
+    enum BoolValue {
         TURNOVER_ON,
         SEPARATE_COVER
     }
 
     /**flag used in development of layout modes*/
-    final boolean debugLayout=false;
+    boolean debugLayout=false;
     
     int[] getPageSize(int displayView);
 

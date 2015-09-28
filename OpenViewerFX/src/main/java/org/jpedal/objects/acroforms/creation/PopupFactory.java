@@ -256,8 +256,6 @@ public class PopupFactory {
 
             //Some Text annotations can have incorrect sizes so correct to icon size
             if (form.getParameterConstant(PdfDictionary.Subtype) == PdfDictionary.Text) {
-                rect[0] = rect[0];
-                rect[3] = rect[3];
                 rect[2] = rect[0] + iconWidth;
                 rect[1] = rect[3] - iconHeight;
                 form.setFloatArray(PdfDictionary.Rect, rect);

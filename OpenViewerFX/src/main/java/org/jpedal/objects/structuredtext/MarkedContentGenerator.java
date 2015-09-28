@@ -92,7 +92,7 @@ public class MarkedContentGenerator {
     
     Map reverseLookup=new HashMap();
     
-    boolean isHTML=false;
+    boolean isHTML;
     
     /**
      * main entry paint

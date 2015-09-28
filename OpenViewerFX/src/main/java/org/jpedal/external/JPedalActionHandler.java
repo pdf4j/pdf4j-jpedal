@@ -38,5 +38,5 @@ import org.jpedal.gui.GUIFactory;
 
 @SuppressWarnings("UnusedParameters")
 public interface JPedalActionHandler {
-	public void actionPerformed(GUIFactory currentGUI, Commands commands);
+	void actionPerformed(GUIFactory currentGUI, Commands commands);
 }

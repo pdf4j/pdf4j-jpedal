@@ -60,7 +60,7 @@ public class PdfObject implements Cloneable{
     
     Shape clip;
     
-    byte[] convertedData=null;
+    byte[] convertedData;
     
     /**
      * states

@@ -43,6 +43,6 @@ import org.jpedal.render.DynamicVectorRenderer;
  */
 public interface FontHandler {
 
-    public void processFont(boolean isHTML, PdfFont restoredFont, DynamicVectorRenderer current, PdfObject newFont,PdfObjectReader currentPdfFile);
+    void processFont(boolean isHTML, PdfFont restoredFont, DynamicVectorRenderer current, PdfObject newFont, PdfObjectReader currentPdfFile);
     
 }

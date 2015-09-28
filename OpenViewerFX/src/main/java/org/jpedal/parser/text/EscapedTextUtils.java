@@ -35,7 +35,6 @@ package org.jpedal.parser.text;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.parser.ParserOptions;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
 /**
@@ -143,7 +142,7 @@ class EscapedTextUtils {
             glyphData.setRawInt(rawInt);
         }
         //fix for character wrong in some T1 fonts
-        if(currentFontData.getFontType()==StandardFonts.TYPE1 && BaseDisplay.isHTMLorSVG(current)){
+        if(currentFontData.getFontType()==StandardFonts.TYPE1 && current.isHTMLorSVG()){
             final String possAltValue = currentFontData.getMappedChar(glyphData.getRawInt(),true);
             if(possAltValue!=null && possAltValue.length()==1 && possAltValue.equalsIgnoreCase(glyphData.getUnicodeValue().toLowerCase())){
                 glyphData.set(possAltValue);

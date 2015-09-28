@@ -41,20 +41,20 @@ import org.jpedal.gui.GUIFactory;
 
 public interface RecentDocumentsFactory {
     
-    public String getPreviousDocument();
+    String getPreviousDocument();
 
-    public String getNextDocument();
+    String getNextDocument();
     
-    public void updateRecentDocuments(String[] recentDocs);
+    void updateRecentDocuments(String[] recentDocs);
     
-    public void enableRecentDocuments(boolean enable);
+    void enableRecentDocuments(boolean enable);
     
-    public void clearRecentDocuments(PropertiesFile properties);
+    void clearRecentDocuments(PropertiesFile properties);
     
-    public void addToFileList(String selectedFile);
+    void addToFileList(String selectedFile);
     
-    public void createMenuItems(String fileNameToAdd, int position, GUIFactory currentGUI,
-                                Values commonValues, PdfDecoderInt decode_pdf, PropertiesFile properties,
-                                GUIThumbnailPanel thumbnails, GUISearchWindow searchFrame);
+    void createMenuItems(String fileNameToAdd, int position, GUIFactory currentGUI,
+                         Values commonValues, PdfDecoderInt decode_pdf, PropertiesFile properties,
+                         GUIThumbnailPanel thumbnails, GUISearchWindow searchFrame);
     
 }

@@ -144,7 +144,7 @@ public class Viewer implements ViewerInt{
     public static boolean exitOnClose=true;
     
     /**Throw runtime exception when user tries to open document after close() has been called*/
-    public static boolean closeCalled=false;
+    public static boolean closeCalled;
 
     //
 

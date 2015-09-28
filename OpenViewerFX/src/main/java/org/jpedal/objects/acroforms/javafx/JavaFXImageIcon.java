@@ -87,8 +87,8 @@ public class JavaFXImageIcon extends ImageView {
 	/** the maximum scaling factor difference between the rootImage and the current Form dimentions */
     protected static final float MAXSCALEFACTOR = 1.5f;
     
-    protected final int iconWidth = -1;
-    protected final int iconHeight = -1;
+    protected static final int iconWidth = -1;
+    protected static final int iconHeight = -1;
     
     private final SimpleDoubleProperty xScale;
     private final SimpleDoubleProperty yScale;

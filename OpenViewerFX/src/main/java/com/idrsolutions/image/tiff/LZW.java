@@ -34,115 +34,134 @@ package com.idrsolutions.image.tiff;
 
 public class LZW {
 
-    private static final int[] TABLE = new int[]{511, 1023, 2047, 4095};
-    private int bp, op, tp, nextBits, nextData, bitsToGet = 9;
-    private byte stringTable[][];
+    private byte[][] codes;
     private byte[] input, output;
+    private int bitsToGet = 9;
+    private int bp, tp, op;
+    private int putBuffer, putBits;
 
-    public void decompress(byte[] input, byte[] output) {
+    public LZW() {
+
+    }
+
+    public byte[] decompress(byte[] output, byte[] input, int w, int h) {
+
         init();
+
         this.input = input;
         this.output = output;
 
-        // Initialize pointers
         bp = 0;
         op = 0;
-        nextData = 0;
-        nextBits = 0;
+
+        putBuffer = 0;
+        putBits = 0;
+
         int code, oldCode = 0;
-        byte string[];
-        while (((code = getNextCode()) != 257) && op < output.length) {
+        byte[] chars;
+
+        while (((code = findNext()) != 257)
+                && op < output.length) {
+
             if (code == 256) {
+
                 init();
-                code = getNextCode();
+                code = findNext();
+
                 if (code == 257) {
                     break;
                 }
-                writeString(stringTable[code]);
+
+                addCodes(codes[code]);
                 oldCode = code;
+
             } else {
+
                 if (code < tp) {
-                    string = stringTable[code];
-                    writeString(string);
-                    addStringToTable(stringTable[oldCode], string[0]);
+                    chars = codes[code];
+                    addCodes(chars);
+                    LZW.this.addCodeToCodes(codes[oldCode], chars[0]);
                     oldCode = code;
+
                 } else {
-                    string = stringTable[oldCode];
-                    string = composeString(string, string[0]);
-                    writeString(string);
-                    addStringToTable(string);
+
+                    chars = codes[oldCode];
+                    chars = generateCodeArray(chars, chars[0]);
+                    addCodes(chars);
+                    addCodeArrToCodes(chars);
                     oldCode = code;
                 }
             }
         }
+
+
+        return output;
     }
 
-    public int getNextCode() {
-        try {
-            nextData = (nextData << 8) | (input[bp++] & 0xff);
-            nextBits += 8;
-            if (nextBits < bitsToGet) {
-                nextData = (nextData << 8) | (input[bp++] & 0xff);
-                nextBits += 8;
-            }
-            final int code = (nextData >> (nextBits - bitsToGet)) & TABLE[bitsToGet - 9];
-            nextBits -= bitsToGet;
-            return code;
-        } catch (final ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
-            return 257;
-        }
-    }
-
-    private static byte[] composeString(final byte[] oldString, final byte newString) {
-        final int length = oldString.length;
-        final byte[] string = new byte[length + 1];
-        System.arraycopy(oldString, 0, string, 0, length);
-        string[length] = newString;
-        return string;
-    }
-
-    private void init() {
-        stringTable = new byte[4096][];
+    public void init() {
+        codes = new byte[4096][];
         for (int i = 0; i < 256; i++) {
-            stringTable[i] = new byte[1];
-            stringTable[i][0] = (byte) i;
+            codes[i] = new byte[1];
+            codes[i][0] = (byte) i;
         }
         tp = 258;
         bitsToGet = 9;
     }
 
-    private void writeString(final byte[] string) {
-        for (final byte aString : string) {
-            output[op++] = aString;
+    private void addCodes(byte[] codes) {
+        for (int i = 0; i < codes.length; i++) {
+            output[op++] = codes[i];
         }
     }
 
-    private void addStringToTable(final byte[] oldString, final byte newString) {
-        final int length = oldString.length;
-        final byte[] string = new byte[length + 1];
+    private void addCodeToCodes(byte[] oldCodes, byte code) {
+        int length = oldCodes.length;
+        byte string[] = new byte[length + 1];
+        System.arraycopy(oldCodes, 0, string, 0, length);
+        string[length] = code;
+        codes[tp++] = string;
+        if (tp == 511) {
+            bitsToGet = 10;
+        } else if (tp == 1023) {
+            bitsToGet = 11;
+        } else if (tp == 2047) {
+            bitsToGet = 12;
+        }
+    }
+
+    private void addCodeArrToCodes(byte[] codeArr) {
+        codes[tp++] = codeArr;
+        if (tp == 511) {
+            bitsToGet = 10;
+        } else if (tp == 1023) {
+            bitsToGet = 11;
+        } else if (tp == 2047) {
+            bitsToGet = 12;
+        }
+    }
+
+    private byte[] generateCodeArray(byte oldString[], byte newString) {
+        int length = oldString.length;
+        byte string[] = new byte[length + 1];
         System.arraycopy(oldString, 0, string, 0, length);
         string[length] = newString;
-
-        stringTable[tp++] = string;
-        if (tp == 511) {
-            bitsToGet = 10;
-        } else if (tp == 1023) {
-            bitsToGet = 11;
-        } else if (tp == 2047) {
-            bitsToGet = 12;
-        }
+        return string;
     }
 
-    private void addStringToTable(final byte[] string) {
-
-        stringTable[tp++] = string;
-        if (tp == 511) {
-            bitsToGet = 10;
-        } else if (tp == 1023) {
-            bitsToGet = 11;
-        } else if (tp == 2047) {
-            bitsToGet = 12;
+    private int findNext() {
+        int[] combinator = {511, 1023, 2047, 4095};
+        try {
+            putBuffer = (putBuffer << 8) | (input[bp++] & 0xff);
+            putBits += 8;
+            if (putBits < bitsToGet) {
+                putBuffer = (putBuffer << 8) | (input[bp++] & 0xff);
+                putBits += 8;
+            }
+            int code = (putBuffer >> (putBits - bitsToGet)) & combinator[bitsToGet - 9];
+            putBits -= bitsToGet;
+            return code;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return 257;
         }
     }
 }

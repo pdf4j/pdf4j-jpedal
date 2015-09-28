@@ -27,35 +27,49 @@
 
  *
  * ---------------
- * GUIOutline.java
+ * FXExternalHandlers.java
  * ---------------
  */
-package org.jpedal.examples.viewer.gui.generic;
+package org.jpedal.external;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import org.jpedal.FileAccess;
+import org.jpedal.display.GUIModes;
+import org.jpedal.objects.acroforms.javafx.JavaFXFormCreator;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.parser.PDFtoImageConvertor;
+import org.jpedal.parser.fx.PDFtoImageConvertorFX;
+import org.jpedal.render.FXDisplay;
 
-import org.w3c.dom.Node;
+/**
+ *
+ * @author markee
+ */
+public class FXExternalHandlers extends ExternalHandlers {
 
-/**abstract level for outlines panel*/
-public interface GUIOutline {
-
-	Object getTree();
-
-	DefaultMutableTreeNode getLastSelectedPathComponent();
-
-	String getPage(String title);
-
-	//Point getPoint(String title);
-
-	//void setMinimumSize(Dimension dimension);
-
-	void selectBookmark();
-
-	//int readChildNodes(Node rootNode,DefaultMutableTreeNode topNode, int nodeIndex);
-
-    void reset(Node rootNode);
-
-	//String getPageViaNodeNumber(int nodeNumber);
-
-    String convertNodeIDToRef(int index);
+    public FXExternalHandlers(GUIModes guiModes) {
+        super(guiModes);
+    }
+    
+    @Override
+    public boolean isJavaFX() {
+        return true;
+    }
+    
+    @Override
+    public void setDVR(FileAccess fileAccess) {
+        fileAccess.setDVR(new FXDisplay(1,fileAccess.getObjectStore(),false));
+    }
+    
+    @Override
+    public PDFtoImageConvertor getConverter(float multiplyer, DecoderOptions options) {
+        return new PDFtoImageConvertorFX(multiplyer, options);
+    }
+    
+    @Override
+    public void openPdfFile(final Object userExpressionEngine) {
+         
+        initObjects(userExpressionEngine,new JavaFXFormCreator());
+        
+    }
+    
 }

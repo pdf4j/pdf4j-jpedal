@@ -37,18 +37,18 @@ import javafx.scene.input.MouseEvent;
 @SuppressWarnings("UnusedParameters")
 public interface JavaFXMouseFunctionality {
 
-    public void mouseClicked(MouseEvent e);
+    void mouseClicked(MouseEvent e);
 
-    public void mouseEntered(MouseEvent e);
+    void mouseEntered(MouseEvent e);
 
-    public void mouseExited(MouseEvent e);
+    void mouseExited(MouseEvent e);
 
-    public void mousePressed(MouseEvent e);
+    void mousePressed(MouseEvent e);
 
-    public void mouseReleased(MouseEvent e);
+    void mouseReleased(MouseEvent e);
 
-    public void mouseDragged(MouseEvent e);
+    void mouseDragged(MouseEvent e);
 
-    public void mouseMoved(MouseEvent e);
+    void mouseMoved(MouseEvent e);
 
 }

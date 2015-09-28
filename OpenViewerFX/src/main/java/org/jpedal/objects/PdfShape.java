@@ -40,39 +40,39 @@ import javafx.scene.shape.Path;
  */
 public interface PdfShape {
 
-    public void setEVENODDWindingRule();
+    void setEVENODDWindingRule();
 
-    public void setNONZEROWindingRule();
+    void setNONZEROWindingRule();
 
-    public void closeShape();
+    void closeShape();
 
-    public Shape generateShapeFromPath(float[][] CTM, float lineWidth, int B, int type);
+    Shape generateShapeFromPath(float[][] CTM, float lineWidth, int B, int type);
 
-    public void setClip(boolean b);
+    void setClip(boolean b);
 
-    public void resetPath();
+    void resetPath();
 
-    public boolean isClip();
+    boolean isClip();
 
-    public int getSegmentCount();
+    int getSegmentCount();
 
-    public int getComplexClipCount();
+    int getComplexClipCount();
 
-    public void lineTo(float parseFloat, float parseFloat0);
+    void lineTo(float parseFloat, float parseFloat0);
 
-    public void moveTo(float parseFloat, float parseFloat0);
+    void moveTo(float parseFloat, float parseFloat0);
 
-    public void appendRectangle(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
+    void appendRectangle(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
 
-    public void addBezierCurveC(float x, float y, float x2, float y2, float x3, float y3);
+    void addBezierCurveC(float x, float y, float x2, float y2, float x3, float y3);
 
-    public void addBezierCurveV(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
+    void addBezierCurveV(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
 
-    public void addBezierCurveY(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
+    void addBezierCurveY(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
 
-    public Path getPath();
+    Path getPath();
 
-    public boolean adjustLineWidth();
+    boolean adjustLineWidth();
 
-    public boolean isClosed();
+    boolean isClosed();
 }

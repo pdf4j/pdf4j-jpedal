@@ -129,7 +129,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
         this.page_data = decode_pdf.getPdfPageData();
 
     }
-    ContextMenu cm = null;
+    ContextMenu cm;
     private ContextMenu createRightClickMenu() {
         
         /**

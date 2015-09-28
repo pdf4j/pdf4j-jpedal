@@ -42,7 +42,7 @@ public class Precinct {
     public int cbx1;
     public int cby1;
     
-    public IncQuadTree incQuadTree = null;
-    public QuadTree zeroBitTree = null;
+    public IncQuadTree incQuadTree;
+    public QuadTree zeroBitTree;
     
 }

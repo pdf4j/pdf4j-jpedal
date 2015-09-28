@@ -57,7 +57,6 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
 
         //setupArrays(defaultSize);
         areas = new Vector_Rectangle_Int(defaultSize);
-        imageAndShapeAreas = new Vector_Rectangle_Int(defaultSize);
     }
 
     // save image in array to draw
@@ -186,72 +185,27 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
             }
 
             //track objects so we can work out if anything behind
-            addTextShapeToAreas(gs.CTM);
+            int fontSize2 = (int) gs.CTM[1][1];
+            if (fontSize2 < 0) {
+                fontSize2 = -fontSize2;
+            }
+
+            if (fontSize2 == 0) {
+                fontSize2 = (int) gs.CTM[0][1];
+            }
+            if (fontSize2 < 0) {
+                fontSize2 = -fontSize2;
+            }
+
+            //  System.out.println(">>"+CTM[2][0]+" "+CTM[2][1]+" "+CTM[0][0]+" "+" "+CTM[0][1]+" "+" "+CTM[1][0]+" "+" "+CTM[1][1]+" "+this);
+            final int[] rectParams = {(int) gs.CTM[2][0], (int) gs.CTM[2][1], fontSize2, fontSize2};
+            areas.addElement(rectParams);
 
             renderEmbeddedText(text_fill_type, embeddedGlyph, type, at, null, strokeCol, fillCol,
                     gs.getAlpha(GraphicsState.STROKE), gs.getAlpha(GraphicsState.FILL), (int) gs.getLineWidth());
 
             g2.setStroke(currentStroke);
 
-        }
-    }
-
-    /*save shape in array to draw*/
-    @Override
-    public void eliminateHiddenText(final Shape currentShape, final GraphicsState gs, final int count, boolean ignoreScaling) {
-
-        if(useShapeToHideText(gs.CTM, count)){
-
-
-            int x=currentShape.getBounds().x;
-            int y=currentShape.getBounds().y;
-            int x2=x+currentShape.getBounds().width;
-            int y2=y+currentShape.getBounds().height;
-
-            //factor in clip
-            final Shape clip=gs.getClippingShape();
-            if(clip!=null){
-                final int clipX=clip.getBounds().x;
-                final int clipY=clip.getBounds().y;
-                final int clipX2=clipX+clip.getBounds().x;
-                final int clipY2=clipY+clip.getBounds().y;
-
-                if(clipX>x) {
-                    x = clipX;
-                }
-
-                if(clipY>y) {
-                    y = clipY;
-                }
-
-                if(clipX2<x2) {
-                    x2 = clipX;
-                }
-
-                if(clipY2<y) {
-                    y2 = clipY2;
-                }
-            }
-
-            //now work out values
-            final int w=x2-x;
-            final int h=y2-y;
-
-
-            /**
-             * factor in if reversed on x or y
-             */
-            if(gs.CTM[0][0]<0) {
-                x -= w;
-            }
-
-            if(gs.CTM[1][1]<0) {
-                y -= h;
-            }
-
-            imageAndShapeAreas.addElement(new int[]{x,y,w,h});
-
-            //    System.out.println("Shape="+currentShape.getBounds()+" "+x+" "+y+" "+w+" "+h+" "+imageAndShapeAreas);
         }
     }
 

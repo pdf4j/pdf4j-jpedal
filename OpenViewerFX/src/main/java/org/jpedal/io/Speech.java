@@ -41,7 +41,7 @@ public interface Speech {
      * the default boice should be used.
      * @param voiceName A string representing the name of the voice
      */
-    public void setVoice(String voiceName);
+    void setVoice(String voiceName);
     
     /**
      * A flag to specify if we can currently speak text.
@@ -49,19 +49,19 @@ public interface Speech {
      * and files are present.
      * @return True is text to speach will be possible.
      */
-    public boolean speechAvailible();
+    boolean speechAvailible();
     
     /**
      * Method to get a complete list of the voices this functionality
      * can use.
      * @return String array containing the names of all voices
      */
-    public String[] listVoices();
+    String[] listVoices();
     
     /**
      * Method to actually speak the text passed in.
      * This method is called internal to work with jPedals example viewer.
      * @param text String of text to be spoken.
      */
-    public void speakText(final String text);
+    void speakText(final String text);
 }

@@ -33,6 +33,7 @@
 
 package org.jpedal;
 
+import org.jpedal.external.FXExternalHandlers;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -95,7 +96,6 @@ import org.jpedal.objects.raw.PdfObject;
 //
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.parser.DecoderResults;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.render.FXDisplay;
 import org.jpedal.text.TextLines;
@@ -125,7 +125,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
     //public SwingPrinter swingPrinter = new SwingPrinter();
     
-    private final ExternalHandlers externalHandlers=new ExternalHandlers(GUIModes.JAVAFX);
+    private final ExternalHandlers externalHandlers=new FXExternalHandlers(GUIModes.JAVAFX);
     
     private final PdfResources res=new PdfResources();
     
@@ -145,7 +145,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
     private boolean isBorderPresent = true;
     
-    private final DisplayOffsets displayOffsets=new DisplayOffsets(externalHandlers);
+    private final DisplayOffsets displayOffsets=new DisplayOffsets();
     
     private ActionHandler formsActionHandler,userActionHandler;
    
@@ -188,7 +188,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         return fileAccess.isOpen();
     }
     
-    Canvas previewThumbnail = null;
+    Canvas previewThumbnail;
     /**
      * put a little thumbnail of page on display for user in viewer as he scrolls through
      * @param g2
@@ -884,7 +884,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
         currentDisplay.init(mediaW,max_y,displayRotation,options.getPageColor());
         
-        if(!BaseDisplay.isHTMLorSVG(currentDisplay)){
+        if(!currentDisplay.isHTMLorSVG()){
             currentDisplay.setValue(DynamicVectorRenderer.ALT_BACKGROUND_COLOR, options.getPageColor().getRGB());
             if(options.getTextColor()!=null){
                 currentDisplay.setValue(DynamicVectorRenderer.ALT_FOREGROUND_COLOR, options.getTextColor().getRGB());
@@ -1590,7 +1590,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         parser.resetOnOpen();
         
         final Object userExpressionEngine=externalHandlers.getExternalHandler(Options.ExpressionEngine);
-        externalHandlers.openPdfFile(userExpressionEngine,true);
+        externalHandlers.openPdfFile(userExpressionEngine);
         
     
         final AcroRenderer formRenderer=externalHandlers.getFormRenderer();

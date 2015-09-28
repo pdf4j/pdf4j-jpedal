@@ -44,7 +44,6 @@ public class FXDisplayForRasterizing extends FXDisplay {
 
 		//setupArrays(defaultSize);
 		areas = new Vector_Rectangle_Int(defaultSize);
-        imageAndShapeAreas = new Vector_Rectangle_Int(defaultSize);
 	}
     
     

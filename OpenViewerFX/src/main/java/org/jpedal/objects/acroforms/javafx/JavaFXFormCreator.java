@@ -27,35 +27,32 @@
 
  *
  * ---------------
- * GUIOutline.java
+ * JavaFXFormCreator.java
  * ---------------
  */
-package org.jpedal.examples.viewer.gui.generic;
+package org.jpedal.objects.acroforms.javafx;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import org.jpedal.objects.acroforms.GUIData;
+import org.jpedal.objects.acroforms.creation.FormFactory;
+import org.jpedal.objects.acroforms.creation.SwingFormCreator;
 
-import org.w3c.dom.Node;
-
-/**abstract level for outlines panel*/
-public interface GUIOutline {
-
-	Object getTree();
-
-	DefaultMutableTreeNode getLastSelectedPathComponent();
-
-	String getPage(String title);
-
-	//Point getPoint(String title);
-
-	//void setMinimumSize(Dimension dimension);
-
-	void selectBookmark();
-
-	//int readChildNodes(Node rootNode,DefaultMutableTreeNode topNode, int nodeIndex);
-
-    void reset(Node rootNode);
-
-	//String getPageViaNodeNumber(int nodeNumber);
-
-    String convertNodeIDToRef(int index);
+/**
+ *
+ * @author markee
+ */
+public class JavaFXFormCreator extends SwingFormCreator {
+    
+    @Override
+    public GUIData getData() {
+        return new JavaFXData();
+    }
+    
+    
+    /**
+     * create appropriate FormFactory
+     */
+    @Override
+    public FormFactory createFormFactory() {
+        return new JavaFXFormFactory();
+    }
 }

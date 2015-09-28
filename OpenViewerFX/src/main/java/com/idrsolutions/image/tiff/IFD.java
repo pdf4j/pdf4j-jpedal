@@ -34,30 +34,58 @@ package com.idrsolutions.image.tiff;
 
 public class IFD {
 
-    public int fillOrder = 1;
-    public int imageWidth = 0;
-    public int imageHeight = 0;
-    public int samplesPerPixel = 0;
-    public int[] bps = null;
+    public int imageWidth;
+    public int imageHeight;
+    public int samplesPerPixel = 1;
+    public int[] bps = {0};
     public int compressionType;
-    public int photometric = 0;
+    public int photometric;
     public int rowsPerStrip;
-    public int[] stripOffsets = null;
-    public int[] stripByteCounts = null;
+    public int[] stripOffsets;
+    public int[] stripByteCounts;
+    public int fillOrder = 1;
     public int nextIFD;
     public byte[] colorMap;
     public int planarConfiguration = 1;
+    public int tileWidth;
+    public int tileLength;
+    public int[] tileOffsets;
+    public int[] tileByteCounts;
+    public int predictor = 1;
+    public int[] sampleFormat = {1,1,1};
+    public byte[] iccProfile;
     
+    //old jpeg tables
+    public int[] jpegQOffsets;
+    public int[] jpegDCOffsets;
+    public int[] jpegACOffsets;
+    public byte[][] jpegQData;
+    public byte[][] jpegDCData;
+    public byte[][] jpegACData;
+    public int[] jpegFrequency = {2,1,1};
+    //technote 2 jpegtables
+    public byte[] jpegTables;
+    
+            
     @Override
     public String toString() {
-        return "Endian Type: " + fillOrder + "\n"
-                + "ImageWidth: " + imageWidth + "\n"
-                + "ImageHeight: " + imageHeight + "\n"
-                + "SamplesPerPixel: " + samplesPerPixel + "\n"
-                + "CompressionType: " + compressionType + "\n"
-                + "Photomtric: " + photometric + "\n"
-                + "RowsPerStrip: " + rowsPerStrip + "\n"
-                + "PlanarConfig: " + planarConfiguration + "\n";
-
+        String str = "ImageWidth: " + imageWidth + '\n'
+                + "ImageHeight: " + imageHeight + '\n'
+                + "SamplesPerPixel: " + samplesPerPixel + '\n'
+                + "CompressionType: " + compressionType + '\n'
+                + "Photomtric: " + photometric + '\n'
+                + "RowsPerStrip: " + rowsPerStrip + '\n'
+                + "PlanarConfig: " + planarConfiguration + '\n'
+                + "FillOrder: " + fillOrder + '\n'
+                + "bits per sample: ";
+        for (int i = 0; i < bps.length; i++) {
+            str += "\t"+bps[i];
+        }
+        str+="\n";
+        if(tileOffsets!=null){
+            str += "Tile Width: "+tileWidth+"\n Tile Height: "+tileLength+ '\n';
+        }
+        
+        return str;
     }
 }

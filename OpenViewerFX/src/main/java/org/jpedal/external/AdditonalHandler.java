@@ -38,8 +38,8 @@ package org.jpedal.external;
  */
 public interface AdditonalHandler {
 
-    public Object getExternalHandler(int type);
+    Object getExternalHandler(int type);
 
-    public void addExternalHandler(Object newHandler, int type);
+    void addExternalHandler(Object newHandler, int type);
     
 }

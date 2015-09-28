@@ -47,6 +47,7 @@ public class Tags {
     public static final int Group_4_Fax = 4;
     public static final int LZW = 5;
     public static final int JPEG = 6;
+    public static final int JPEG_TechNote = 7;
     public static final int ADOBEDEFLATE = 8;
     public static final int PackBits = 32773;
     public static final int Deflate = 0x80b2;

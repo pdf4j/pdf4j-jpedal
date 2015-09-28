@@ -56,7 +56,7 @@ public class FormFlattener {
      * @param AcroRes
      * @throws org.jpedal.exception.PdfException
      */
-    public static void drawFlattenedForm(final PdfStreamDecoder pdfStreamDecoder, final PdfObject form, final boolean isHTML, final PdfObject AcroRes) throws PdfException {
+    public void drawFlattenedForm(final PdfStreamDecoder pdfStreamDecoder, final PdfObject form, final boolean isHTML, final PdfObject AcroRes) throws PdfException {
 
         /**
          * ignore if not going to be drawn
@@ -391,21 +391,22 @@ public class FormFlattener {
             newClip=new Area(new Rectangle((int)BBox[0],(int)BBox[1],(int)BBox[2],(int)BBox[3]));
         }
 
-        //
+        drawForm(imgObj, form, pdfStreamDecoder, newClip, isHTML, BBox, x, y, formData, APobjN, oldGS);
+      
+    }
 
+    void drawForm(PdfObject imgObj, final PdfObject form, final PdfStreamDecoder pdfStreamDecoder, Area newClip, final boolean isHTML, float[] BBox, float x, float y, byte[] formData, final PdfObject APobjN, final GraphicsState oldGS) throws PdfException {
+        
         //set clip to match bounds on form
         if(newClip!=null) {
             pdfStreamDecoder.gs.updateClip(new Area(newClip));
         }
-
         pdfStreamDecoder.current.drawClip(pdfStreamDecoder.gs, pdfStreamDecoder.parserOptions.defaultClip, false) ;
-
         /**
          * avoid values in main stream
          */
         final TextState oldState= pdfStreamDecoder.gs.getTextState();
         pdfStreamDecoder.gs.setTextState(new TextState());
-
         /**
          * write out forms as images in HTML mode - hooks into flatten forms mode
          */
@@ -461,16 +462,15 @@ public class FormFlattener {
             }
 
         }
-
         /**
          * we need to reset clip otherwise items drawn afterwards
          * like forms data in image or print will not appear.
          */
         pdfStreamDecoder.gs.updateClip((Area) null);
         pdfStreamDecoder.current.drawClip(pdfStreamDecoder.gs, null, true) ;
-
         //restore
         pdfStreamDecoder.gs =oldGS;
         pdfStreamDecoder.gs.setTextState(oldState);
+        
     }
 }

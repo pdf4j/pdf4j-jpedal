@@ -100,7 +100,7 @@ import org.mozilla.javascript.ScriptRuntime;
 
 public class SwingProperties extends JPanel {
     
-    final private int TRUE_HASH = "true".hashCode();
+    private final int TRUE_HASH = "true".hashCode();
 
     /**
      * Gets the boolean value of a property and loads it into a JCheckBox
@@ -160,7 +160,7 @@ public class SwingProperties extends JPanel {
     }
     
     //Text to Speech external handler
-    Speech speech = null;
+    Speech speech;
             
     final Map reverseMessage =new HashMap();
     

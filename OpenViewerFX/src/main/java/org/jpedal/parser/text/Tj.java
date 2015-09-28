@@ -41,7 +41,6 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfData;
 import org.jpedal.objects.TextState;
 import org.jpedal.parser.*;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.utils.Fonts;
 import org.jpedal.utils.LogWriter;
@@ -63,17 +62,15 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
  */
 public class Tj extends BaseDecoder {
     
-    static boolean marksNewCode=false;
-    
     public static boolean showInvisibleText;
     
     private PdfData pdfData;
     
     private PdfFont currentFontData;
     
-    private Vector_Rectangle_Int textAreas = new Vector_Rectangle_Int();
+    private final Vector_Rectangle_Int textAreas;
     
-    private Vector_Int textDirections = new Vector_Int();
+    private final Vector_Int textDirections;
     
     private TextState currentTextState=new TextState();
 
@@ -292,7 +289,7 @@ public class Tj extends BaseDecoder {
      */
     private StringBuffer processTextArray(final byte[] stream, int startCommand, final int dataPointer, final float multiplyer, final boolean multipleTJs){
         
-        boolean isHTML=BaseDisplay.isHTMLorSVG(current);
+        boolean isHTML=current.isHTMLorSVG();
         
         /**
          * global and local values
@@ -816,7 +813,7 @@ public class Tj extends BaseDecoder {
                         
                         if(glyphData.getDisplayValue()!=null && !glyphData.getDisplayValue().startsWith("&#")){
                             
-                            if(BaseDisplay.isHTMLorSVG(current)) {
+                            if(current.isHTMLorSVG()) {
                                 current.drawEmbeddedText(Trm, glyphData.getFontSize(), null, null, DynamicVectorRenderer.TEXT, gs, null,glyphData.getDisplayValue(), currentFontData, -100);
                             } else {
                                 current.drawText(Trm, glyphData.getDisplayValue(), gs, Trm[2][0], -Trm[2][1], currentFontData.getJavaFontX(glyphData.getFontSize()));
@@ -971,7 +968,7 @@ public class Tj extends BaseDecoder {
          */
         boolean alreadyRemaped=false;
         
-        if((newValue.isEmpty() || (!newValue.isEmpty() && newValue.charAt(0)<32)) && BaseDisplay.isHTMLorSVG(current) && !currentFontData.isCIDFont()){
+        if((newValue.isEmpty() || (!newValue.isEmpty() && newValue.charAt(0)<32)) && current.isHTMLorSVG() && !currentFontData.isCIDFont()){
             alreadyRemaped=HTMLTextUtils.remapGlyph(currentFontData, glyphData);
         }
         
@@ -989,7 +986,7 @@ public class Tj extends BaseDecoder {
         }
         
         //fix for character wrong in some T1 fonts
-        if(currentFontData.getFontType()==StandardFonts.TYPE1 && BaseDisplay.isHTMLorSVG(current)){
+        if(currentFontData.getFontType()==StandardFonts.TYPE1 && current.isHTMLorSVG()){
             final String possAltValue = currentFontData.getMappedChar(rawInt,true);
             if(possAltValue!=null && possAltValue.length()==1 && possAltValue.equalsIgnoreCase(glyphData.getUnicodeValue().toLowerCase())){
                 glyphData.set(possAltValue);

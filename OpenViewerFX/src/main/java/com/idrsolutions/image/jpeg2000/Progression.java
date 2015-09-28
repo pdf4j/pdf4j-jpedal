@@ -37,8 +37,8 @@ package com.idrsolutions.image.jpeg2000;
  */
 public interface Progression {
 
-    public Packet getNextPacket();
+    Packet getNextPacket();
 
-    public Packet createPacket(TileResolution resolution, int precintNumber, int layerNumber);
+    Packet createPacket(TileResolution resolution, int precintNumber, int layerNumber);
 
 }

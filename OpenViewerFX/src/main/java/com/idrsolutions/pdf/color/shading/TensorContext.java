@@ -76,10 +76,6 @@ public class TensorContext implements PaintContext {
     private ArrayList<Point2D> pp; //patch points
     private ArrayList<Color> pc; // patch colors
     private final ArrayList<Shape67> shapes;
-    private final int pageHeight;
-    private final float scaling;
-    private final int offX;
-    private final int offY;
     private BitReader reader;
     private PDFFunction[] function;
     private final Shape67[] duplicates;
@@ -99,10 +95,6 @@ public class TensorContext implements PaintContext {
 
         this.shapes = shapes;
         this.background = background;
-        this.pageHeight = pageHeight;
-        this.scaling = scaling;
-        this.offX = offX;
-        this.offY = offY;
         
         duplicates = new Shape67[shapes.size()];
         for (int i = 0; i < shapes.size(); i++) {
@@ -133,10 +125,6 @@ public class TensorContext implements PaintContext {
 
         this.function = function;
         this.matrix = matrix;
-        this.pageHeight = pageHeight;
-        this.scaling = scaling;
-        this.offX = offX;
-        this.offY = offY;
 
         pp = new ArrayList<Point2D>();
         pc = new ArrayList<Color>();

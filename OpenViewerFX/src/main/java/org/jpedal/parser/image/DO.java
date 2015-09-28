@@ -40,7 +40,6 @@ import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.PdfImageData;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.render.BaseDisplay;
 import org.jpedal.utils.LogWriter;
 
 import java.awt.image.BufferedImage;
@@ -113,7 +112,7 @@ public class DO extends ImageDecoder {
             }
         }
 
-        final boolean isForHTML= BaseDisplay.isHTMLorSVG(current);
+        final boolean isForHTML= current.isHTMLorSVG();
 
         /**don't process unless needed*/
         if (renderImages || finalImagesExtracted || clippedImagesExtracted || rawImagesExtracted) {

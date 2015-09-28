@@ -43,16 +43,16 @@ import java.awt.image.BufferedImage;
 public interface JPedalHelper {
 
     //Allow user to replace setFont Method in PdfJavaGlyphs
-    public Font setFont(PdfJavaGlyphs pdfJavaGlyphs, String name, int size);
+    Font setFont(PdfJavaGlyphs pdfJavaGlyphs, String name, int size);
 
-    public Font getJavaFontX(PdfFont pdfFont, int size);
+    Font getJavaFontX(PdfFont pdfFont, int size);
 
 
     //allow user to control how color set when rendering (ie to produce grayscale or bw)
     //Look at org.jpedal.external.ColorHandler for a multithreaded solution
-    public void setPaint(Graphics2D g2, PdfPaint textFillCol, int pageNumber, boolean isPrinting);
+    void setPaint(Graphics2D g2, PdfPaint textFillCol, int pageNumber, boolean isPrinting);
 
     //allow user to process images before drawn (ie to convert to bw or grayscale)
     //Look at org.jpedal.external.ColorHandler for a multithreaded solution
-    public BufferedImage processImage(BufferedImage image, int pageNumber, boolean isPrinting);
+    BufferedImage processImage(BufferedImage image, int pageNumber, boolean isPrinting);
 }

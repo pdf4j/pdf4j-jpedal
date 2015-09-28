@@ -44,14 +44,14 @@ import java.awt.*;
 public interface ImageHandler {
 
     //tell JPedal if it ignores its own Image code or not
-    public boolean alwaysIgnoreGenericHandler();
+    boolean alwaysIgnoreGenericHandler();
 
     //pass in raw data for image handling - if valid image returned it will be used.
     //if alwaysIgnoreGenericHandler() is true JPedal code always ignored. If false, JPedal code used if null
-    public BufferedImage processImageData(GraphicsState gs, PdfObject XObject);
+    BufferedImage processImageData(GraphicsState gs, PdfObject XObject);
 
     /**Indicate that image already scaled so should not be scaled/clipped by JPedal*/
-    public boolean imageHasBeenScaled();
+    boolean imageHasBeenScaled();
 
     /**
      * Allow user to paint directly onto g2 for screen display

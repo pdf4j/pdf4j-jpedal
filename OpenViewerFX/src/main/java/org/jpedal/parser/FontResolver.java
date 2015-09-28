@@ -90,7 +90,7 @@ public class FontResolver {
                     
                     boolean fallbackToArial=false;
                     
-                    final boolean isHTML=org.jpedal.render.BaseDisplay.isHTMLorSVG(current);
+                    final boolean isHTML=current.isHTMLorSVG();
                     
                     /** if text as shape or image, display Arial if font not embedded*/
                     if(isHTML && !current.getBooleanValue(DynamicVectorRenderer.IsRealText)){

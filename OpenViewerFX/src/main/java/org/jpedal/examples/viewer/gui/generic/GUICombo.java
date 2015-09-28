@@ -36,26 +36,26 @@ package org.jpedal.examples.viewer.gui.generic;
 
 public interface GUICombo {
 
-	public void setSelectedIndex(int defaultSelection);
+	void setSelectedIndex(int defaultSelection);
 
-	public void setEditable(boolean b);
+	void setEditable(boolean b);
 
-	public void setID(int id);
+	void setID(int id);
 
-	public void setToolTipText(String tooltip);
+	void setToolTipText(String tooltip);
 
-	public void setEnabled(boolean value);
+	void setEnabled(boolean value);
 
-	public int getSelectedIndex();
+	int getSelectedIndex();
 
-	public void setSelectedItem(Object index);
+	void setSelectedItem(Object index);
 
-	public Object getSelectedItem();
+	Object getSelectedItem();
     
-    public int getID();
+    int getID();
     
-    public void setVisibility(boolean set);
+    void setVisibility(boolean set);
     
-    public void setName(String name);
+    void setName(String name);
 
 }

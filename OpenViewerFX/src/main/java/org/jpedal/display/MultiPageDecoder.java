@@ -494,12 +494,7 @@ public abstract class MultiPageDecoder {
             val = 1;
         }
         
-        final PdfStreamDecoder current;
-
-        //
-            current = new PdfStreamDecoder(currentPdfFile, pdf.isHiResScreenDisplay(), fileAccess.getRes().getPdfLayerList());
-
-            //
+        final PdfStreamDecoder current=formRenderer.getStreamDecoder(currentPdfFile, pdf.isHiResScreenDisplay(), fileAccess.getRes().getPdfLayerList(),true);
 
         /**
          * draw acroform data onto Panel

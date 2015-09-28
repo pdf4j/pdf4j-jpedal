@@ -43,9 +43,9 @@ public class CMAP extends Table {
 
     protected int[][] glyphIndexToChar;
     
-    private boolean remapType4=false;
+    private boolean remapType4;
     
-    private boolean hasFormatZero=false;
+    private boolean hasFormatZero;
 
     private int[] glyphToIndex;
 
@@ -358,20 +358,19 @@ public class CMAP extends Table {
             System.out.println(glyph + " fontMapping=" + fontMapping + " index=" + index+ ' ' +remapType4);
         }
 
-        /**convert index if needed*/
-        if((fontMapping==1 || fontMapping==3 || (fontMapping==4  && remapType4))&&(glyph!=null)&&(!"notdef".equals(glyph))){
-            index=StandardFonts.getAdobeMap(glyph);
-            
-        }else if (fontMapping==2){
-            
-            if(glyph!=null) {
-                index = StandardFonts.lookupCharacterIndex(glyph, StandardFonts.MAC);
-                
-                index2=StandardFonts.lookupCharacterIndex(glyph,StandardFonts.WIN);
-                
-            }else if(exceptions.containsKey(glyph)){
-                index= (Integer)exceptions.get(glyph);
-            } 
+        /**
+         * convert index if needed
+         */
+        if ((fontMapping == 1 || fontMapping == 2 || fontMapping == 3 || (fontMapping == 4 && remapType4))){//) && (!"notdef".equals(glyph))) {
+
+            if (glyph != null && !"notdef".equals(glyph)) {
+                index2 = index;//StandardFonts.lookupCharacterIndex(glyph,StandardFonts.WIN);
+
+                index = StandardFonts.getAdobeMap(glyph);
+
+            } else if (exceptions.containsKey(glyph)) {
+                index = (Integer) exceptions.get(glyph);
+            }
         }
 
         int value = -1;
@@ -522,7 +521,7 @@ public class CMAP extends Table {
         final boolean encodingDebug=false;
        
         this.fontEncoding=fontEncoding;
-
+        
         if(encodingDebug) {
             System.out.println(this + "hasEncoding=" + hasEncoding + " fontEncoding=" + fontEncoding + " isCID=" + isCID);
         }
@@ -603,7 +602,7 @@ public class CMAP extends Table {
                             (wasCase2 || getFormat4Value(223, 0)==0)){
                         remapType4=true;     
                       // System.out.println("d "+wasCase2+ " "+isCase2+" "+(glyphIndexToChar[formatToUse][223]+" "+getFormat4Value(223, 0)));
-                    }else if(platformSpecificID[formatToUse]==1 && platformID[formatToUse]==3 && hasEncoding && fontEncoding==StandardFonts.MAC){
+                    }else if(platformSpecificID[formatToUse]==1 && platformID[formatToUse]==3 && hasEncoding && (fontEncoding==StandardFonts.MAC || (count==1 && fontEncoding==StandardFonts.WIN))){
                         remapType4=true;   
                       //  System.out.println("e");
                     }else if(!hasEncoding && fontEncoding!=1){

@@ -72,7 +72,7 @@ public interface GUIThumbnailPanel {
 
 	void dispose();
 
-    public BufferedImage getImage(int pNum);
+    BufferedImage getImage(int pNum);
     
-    public void drawThumbnails();
+    void drawThumbnails();
 }

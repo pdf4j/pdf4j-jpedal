@@ -45,7 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.*;
 import java.util.zip.Deflater;
 
 /**
@@ -60,7 +60,7 @@ import java.util.zip.Deflater;
  */
 public class PngEncoder {
 
-    private boolean compress = false;
+    private boolean compress;
 
     public PngEncoder() {
     }
@@ -135,23 +135,28 @@ public class PngEncoder {
         outputStream.write(chunk.getData());
         outputStream.write(chunk.getCRCValue());
 
-        byte[] pixels = getPixelData(image, bitDepth, nComp, bw, bh);
-        pixels = getDeflatedData(pixels);
-
-        byte[] trnsBytes = null;
+        byte[] pixels ;
+        if(isIndexed && bitDepth!=8){
+            pixels = getIndexedPaletteData(image);
+        }else{
+            pixels = getPixelData(image, bitDepth, nComp, bw, bh);
+        }
 
         if (isIndexed) { // indexed model need to be created
             final IndexColorModel indexModel = ((IndexColorModel) colorModel);
-            final int size = indexModel.getMapSize();
-            final byte[] r = new byte[size];
-            final byte[] g = new byte[size];
-            final byte[] b = new byte[size];
-            indexModel.getReds(r);
-            indexModel.getGreens(g);
-            indexModel.getBlues(b);
-            final ByteBuffer bb = ByteBuffer.allocate(size * 3);
-            for (int i = 0; i < size; i++) {
-                bb.put(new byte[]{r[i], g[i], b[i]});
+            int indexModelMapSize = indexModel.getMapSize();
+
+            final int[] rgbs = new int[indexModelMapSize];
+            indexModel.getRGBs(rgbs);
+
+            if (bitDepth == 8) {
+                indexModelMapSize = reduceIndexMap(indexModelMapSize, rgbs, pixels);
+            }
+
+            final ByteBuffer bb = ByteBuffer.allocate(indexModelMapSize * 3);
+            for (int i = 0; i < indexModelMapSize; i++) {
+                final int color = rgbs[i];
+                bb.put(new byte[]{(byte) (color >> 16), (byte) (color >> 8), (byte) color});
             }
             chunk = PngChunk.createPaleteChunk(bb.array());
             outputStream.write(chunk.getLength());
@@ -160,19 +165,20 @@ public class PngEncoder {
             outputStream.write(chunk.getCRCValue());
 
             if (indexModel.getNumComponents() == 4) {
-                trnsBytes = new byte[256];
-                indexModel.getAlphas(trnsBytes);
+                final byte[] trnsBytes = new byte[indexModelMapSize];
+                for (int i = 0; i < indexModelMapSize; i++) {
+                    trnsBytes[i] = (byte) (rgbs[i] >> 24);
+                }
+
+                chunk = PngChunk.createTrnsChunk(trnsBytes);
+                outputStream.write(chunk.getLength());
+                outputStream.write(chunk.getName());
+                outputStream.write(chunk.getData());
+                outputStream.write(chunk.getCRCValue());
             }
         }
 
-        if (trnsBytes != null) {
-            chunk = PngChunk.createTrnsChunk(trnsBytes);
-            outputStream.write(chunk.getLength());
-            outputStream.write(chunk.getName());
-            outputStream.write(chunk.getData());
-            outputStream.write(chunk.getCRCValue());
-        }
-
+        pixels = getDeflatedData(pixels);
         chunk = PngChunk.createDataChunk(pixels);
         outputStream.write(chunk.getLength());
         outputStream.write(chunk.getName());
@@ -185,6 +191,55 @@ public class PngEncoder {
         outputStream.write(chunk.getName());
         outputStream.write(chunk.getData());
         outputStream.write(chunk.getCRCValue());
+    }
+
+    /**
+     * Removes duplicate values from the index and rewrites pointers in image if required.
+     * Will rewrite values in the rgbs and pixels arrays passed in.
+     *
+     * @return The new indexModelMapSize
+     */
+    private static int reduceIndexMap(final int indexModelMapSize, final int[] rgbs, final byte[] pixels) {
+        int numColors = 0;
+        final byte[] indexMap = new byte[indexModelMapSize];
+        final Map<Integer, Integer> colors = new LinkedHashMap<Integer, Integer>();
+
+        // Count the number of colors and build a mapping table to map old index to new index
+        for (int i = 0; i < indexModelMapSize; i++){
+            final int color = rgbs[i];
+            if (!colors.containsKey(color)) {
+                indexMap[i] = (byte) numColors;
+                colors.put(color, numColors);
+                numColors++;
+            } else {
+                indexMap[i] = (byte) (int) colors.get(color);
+            }
+        }
+
+        if (numColors < indexModelMapSize) {
+            // Rewrite pixel pointers to new index value
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = indexMap[pixels[i] & 0xff];
+            }
+
+            // Rebuild color index from unique colors
+            final Set<Integer> colorSet = colors.keySet();
+            int temp = 0;
+            for (final int c : colorSet) {
+                rgbs[temp++] = c;
+            }
+        }
+
+        return numColors;
+    }
+
+    private static boolean isAlphaUsed(final byte[] trnsBytes) {
+        for (final byte trn : trnsBytes) {
+            if (trn != -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void compress8Bit(final BufferedImage image, final OutputStream outputStream) throws IOException {
@@ -278,18 +333,26 @@ public class PngEncoder {
         if (argb != null) {
 //            adjustAlpha(abgrPixels);
             byte[] qBytes;
-            
+
             Object[] objs = getIndexedMap(argb);
             if(objs!=null){
                 qBytes = (byte[]) objs[0];
                 colorPalette = (byte[]) objs[1];          
                 trnsBytes = (byte[]) objs[2];
+
+                if (!isAlphaUsed(trnsBytes)) {
+                    trnsBytes = null;
+                }
             }else{
                 Quant32 wu = new Quant32();
                 Object[] obj = wu.getPalette(argb);
                 colorPalette = (byte[]) obj[0];
                 trnsBytes = (byte[]) obj[1];
+
                 qBytes = D4.process(colorPalette, trnsBytes, argb, bh, bw);
+                if (!isAlphaUsed(trnsBytes)) {
+                    trnsBytes = null;
+                }
             }
             int k = 0;
             int z = 0;
@@ -302,7 +365,6 @@ public class PngEncoder {
 
         } else {
             byte[] qBytes;
-            
             Object[] objs = getIndexedMap(rgb);
             if(objs!=null){
                 qBytes = (byte[]) objs[0];
@@ -417,6 +479,24 @@ public class PngEncoder {
         return new Object[]{indexedBytes,palette,trns};
         
     }
+    
+    private static byte[] getIndexedPaletteData(final BufferedImage buff) throws IOException{
+        final byte[] pixels = ((DataBufferByte) buff.getRaster().getDataBuffer()).getData();
+        int ih = buff.getHeight();
+       
+        int len = pixels.length/ih;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        int k =0;
+        for (int i = 0; i < ih; i++) {
+            bos.write(0);
+            byte[] temp = new byte[len];
+            System.arraycopy(pixels, k, temp, 0, len);
+            bos.write(temp);
+            k+=len;
+        }
+        bos.close();
+        return bos.toByteArray();        
+    }
 
     private static byte[] getPixelData(final BufferedImage buff, final int bitDepth, final int nComp, final int bw, final int bh) throws IOException {
         ColorModel model = buff.getColorModel();
@@ -436,9 +516,7 @@ public class PngEncoder {
                     if (cc2 == 0) {
                         writer.writeByte((byte) 0);
                     }
-                    for (int k = 0; k < bitDepth; k++) {
-                        writer.writeBit(reader.getPositive(1));
-                    }
+                    writer.writeBits(reader.getPositive(bitDepth),bitDepth);
                     cc2++;
                     if (cc2 == bw) {
                         cc2 = 0;
@@ -463,7 +541,7 @@ public class PngEncoder {
                                     if (col == 0) {
                                         bOut.put((byte) 0);
                                     }
-                                    final byte[] b = new byte[]{pixels8[p + 2], pixels8[p + 1], pixels8[p]};
+                                    final byte[] b = {pixels8[p + 2], pixels8[p + 1], pixels8[p]};
                                     bOut.put(b);
                                     col++;
                                     if (col == bw) {
@@ -477,7 +555,7 @@ public class PngEncoder {
                                     if (col == 0) {
                                         bOut.put((byte) 0);
                                     }
-                                    final byte[] b = new byte[]{pixels8[p + 3], pixels8[p + 2], pixels8[p + 1], pixels8[p]};
+                                    final byte[] b = {pixels8[p + 3], pixels8[p + 2], pixels8[p + 1], pixels8[p]};
                                     bOut.put(b);
                                     col++;
                                     if (col == bw) {

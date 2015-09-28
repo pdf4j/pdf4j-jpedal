@@ -86,9 +86,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     /**holds rectangular outline to test in redraw*/
     protected Vector_Rectangle_Int areas;
 
-    /**holds rectangular outline to test in redraw*/
-    protected Vector_Rectangle_Int imageAndShapeAreas;
-
     protected ObjectStore objectStoreRef;
     
     protected int currentItem = -1;
@@ -96,8 +93,8 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     //Used purely to keep track of rendering for colour change functionality
     protected static int itemToRender = -1;
     
-  //used to track end of PDF page in display
-  protected static int endItem=-1;
+    //used to track end of PDF page in display
+    protected static int endItem=-1;
 
     /**raw page rotation*/
     protected int pageRotation;
@@ -1167,7 +1164,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         return areas.elementAt(i);
     }
     
-   /**
+    /**
      * return number of image in display queue
      * or -1 if none
      * @return
@@ -1543,11 +1540,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 	@Override
     public void eliminateHiddenText(final Shape currentShape, final GraphicsState gs, final int count, boolean ignoreScaling) {
     }
-    
-    /* This check is used in both ImageDisplay and OutputDisplay in elminateHiddenText() */
-    protected boolean useShapeToHideText(final float[][] CTM, final int count){
-        return (count==9 || count==6 || count==7) && CTM[0][1]==0 && CTM[1][0]==0;
-    }
 
     private void renderComposite(final float alpha) {
         
@@ -1563,8 +1555,9 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         }
     }
 
-    public static boolean isHTMLorSVG(final DynamicVectorRenderer dvr) {
-        return dvr.getType() == DynamicVectorRenderer.CREATE_HTML || dvr.getType() == DynamicVectorRenderer.CREATE_SVG || dvr.getType() == DynamicVectorRenderer.CREATE_EPOS;
+    @Override
+    public boolean isHTMLorSVG() {
+        return false;
     }
 
     //public Graphics2D getG2() {
@@ -1579,25 +1572,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     @Override
     public boolean saveImageData() {
         return saveImageData;
-    }
-    
-    public void addTextShapeToAreas(float[][] CTM) {
-        
-         int fontSize2 = (int) CTM[1][1];
-            if (fontSize2 < 0) {
-                fontSize2 = -fontSize2;
-            }
-
-            if (fontSize2 == 0) {
-                fontSize2 = (int) CTM[0][1];
-            }
-            if (fontSize2 < 0) {
-                fontSize2 = -fontSize2;
-            }
-
-          //  System.out.println(">>"+CTM[2][0]+" "+CTM[2][1]+" "+CTM[0][0]+" "+" "+CTM[0][1]+" "+" "+CTM[1][0]+" "+" "+CTM[1][1]+" "+this);
-            final int[] rectParams = {(int) CTM[2][0], (int) CTM[2][1], fontSize2, fontSize2};
-            areas.addElement(rectParams);
     }
 
     /**

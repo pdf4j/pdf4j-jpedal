@@ -49,38 +49,38 @@ public interface WizardPanelModel
 	/**
 	 * @return true if the currently displayed panel requires a Finish box instead of a next box.
 	 */
-    public abstract boolean isFinishPanel();
+	boolean isFinishPanel();
 	
 	/**
 	 * @return The unique ID String of the first JPanel to be shown
 	 */
-    public abstract String getStartPanelID();
+	String getStartPanelID();
 	
 	/**
 	 * @return The ID of the JPanel that should be displayed if next is clicked.
 	 */
-    public abstract String next();
+	String next();
 	
 	/**
 	 * @return The ID of the JPanel that should be displayed if previous is clicked.
 	 */
-    public abstract String previous();
+	String previous();
 	
 	/**
 	 * This method can contain any housekeeping you require when the Wizard
 	 * is exited.
 	 */
-    public abstract void close();
+	void close();
 	
 	/**
 	 * @return true if the current panel has a previous panel
 	 */
-    public abstract boolean hasPrevious();
+	boolean hasPrevious();
 	
 	/**
 	 * @return true if the current panel is able to advance.
 	 */
-    public abstract boolean canAdvance();
+	boolean canAdvance();
 	
 	/**
 	 * In order to use the Card Layout in the wizard class
@@ -89,7 +89,7 @@ public interface WizardPanelModel
 	 * 
 	 * @return A mapping of ID Strings to JPanels. 
 	 */
-    public abstract Map getJPanels();
+	Map getJPanels();
 	
 	/**
 	 * A component that is registered will alert the Wizard
@@ -97,7 +97,7 @@ public interface WizardPanelModel
 	 * 
 	 * @param e Alerts Wizard that the registered component effects the Next button enable/disable status
 	 */
-    public abstract void registerNextChangeListeners(ChangeListener e);
+	void registerNextChangeListeners(ChangeListener e);
 	
 	/**
 	 * The same effect as registerNextChangeListeners(ChangeListener e) except
@@ -105,5 +105,5 @@ public interface WizardPanelModel
 	 * 
 	 * @param e Alerts Wizard that the registered component effects the Next button enable/disable status
 	 */
-    public abstract void registerNextKeyListeners(KeyListener e);
+	void registerNextKeyListeners(KeyListener e);
 }

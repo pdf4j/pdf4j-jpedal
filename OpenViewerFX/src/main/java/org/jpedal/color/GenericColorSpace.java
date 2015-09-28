@@ -1501,153 +1501,23 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     }
     
     public BufferedImage JPEG2000ToImage(final byte[] data, final int pX, final int pY, final float[] decodeArray) throws PdfException {
-        
-        final boolean sudasNewCode=true;
-        
-        int w;
-        int h;
-        
+           
         BufferedImage image=null;
         
-        if (sudasNewCode) {
-            try {
-                Jpeg2000Decoder decoder = new Jpeg2000Decoder();
-                image = decoder.read(data);
-                image = cleanupImage(image, pX, pY);
-                return image;
-            } catch (Exception ex) {
+        try {
+            Jpeg2000Decoder decoder = new Jpeg2000Decoder();
+            image = decoder.read(data);
+            image = cleanupImage(image, pX, pY);
+        } catch (Exception ex) {
 
-                //
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in JPEG2000toImage  " + ex);
-                }
+            //
+            if (LogWriter.isOutput()) {
+                LogWriter.writeLog("Exception in JPEG2000toImage  " + ex);
             }
         }
         
-        try {
-            final ByteArrayInputStream in;
-            Raster ras;
-            
-            in = new ByteArrayInputStream(data);
-            
-            final ImageReader iir = ImageIO.getImageReadersByFormatName("JPEG2000").next();
-            final ImageInputStream iin = ImageIO.createImageInputStream(in);
-            
-            
-            iir.setInput(iin, true);
-            
-            /**
-             * indexes are a completely different game
-             * CMYK has 4 color components (C,M,Y,K) for each pixel
-             * indexed has 1 component pointing to value in lookup table
-             * so need a totally different approach
-             */
-            byte[] index=this.getIndexedMap();
-            if(index!=null){
-
-                    //make it RGB
-                if(!isIndexConverted()){
-                    index=convertIndexToRGB(index);
-                }
-
-                //get data for image (its an index so just refers to color numbers
-                final RenderedImage renderimage = iir.readAsRenderedImage(0,iir.getDefaultReadParam());
-                ras=renderimage.getData();
-                //and build a standard rgb image
-                final ColorModel cm=new IndexColorModel(8, index.length/3, index, 0, false);
-                image = new BufferedImage(cm, ras.createCompatibleWritableRaster(), false, null);
-                image.setData(ras);
-
-                //downsample to reduce size if huge
-                image=cleanupImage(image,pX,pY);
-                
-            }else{ //non-indexed routine
-                
-                
-                //This works except image is wrong so we read and convert
-                image=iir.read(0);
-                
-                
-                ras=image.getRaster();
-                
-                //apply if set
-                if(decodeArray!=null){
-                    
-                    if((decodeArray.length==6 && decodeArray[0]==1f && decodeArray[1]==0f &&
-                            decodeArray[2]==1f && decodeArray[3]==0f &&
-                            decodeArray[4]==1f && decodeArray[5]==0f )||
-                            (decodeArray.length>2 &&
-                            decodeArray[0]==1f && decodeArray[1]==0)){
-                        
-                        final DataBuffer buf=ras.getDataBuffer();
-                        
-                        final int count=buf.getSize();
-                        
-                        for(int ii=0;ii<count;ii++) {
-                            buf.setElem(ii,255-buf.getElem(ii));
-                        }
-                        
-                    }else if(decodeArray.length==6 &&
-                            decodeArray[0]==0f && decodeArray[1]==1f &&
-                            decodeArray[2]==0f && decodeArray[3]==1f &&
-                            decodeArray[4]==0f && decodeArray[5]==1f){
-                    }else if(decodeArray!=null && decodeArray.length>0){
-                        //
-                    }
-                }
-                
-                ras=cleanupRaster(ras,pX,pY,4);
-                w=ras.getWidth();
-                h=ras.getHeight();
-                
-                //generate the rgb image
-                final WritableRaster rgbRaster;
-                if(image.getType()==13){ //indexed variant
-                    rgbRaster = ColorSpaceConvertor.createCompatibleWritableRaaster(image.getColorModel(),w,h);
-                    CSToRGB = new ColorConvertOp(cs, image.getColorModel().getColorSpace(), ColorSpaces.hints);
-                    image =new BufferedImage(w,h,image.getType());
-                }else{
-                    
-                    if(CSToRGB==null) {
-                        initCMYKColorspace();
-                    }
-                    
-                    rgbRaster=ColorSpaceConvertor.createCompatibleWritableRaaster(rgbModel,w, h);
-                    
-                    CSToRGB = new ColorConvertOp(cs, rgbCS, ColorSpaces.hints);
-                    CSToRGB.filter(ras, rgbRaster);
-                    
-                    image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-                    
-                }
-                
-                image.setData(rgbRaster);
-            }
-            
-            iir.dispose();
-            iin.close();
-            in.close();
-            
-            //image=cleanupImage(image,pX,pY);
-            //image= ColorSpaceConvertor.convertToRGB(image);
-            
-        } catch (final IOException ee) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem reading JPEG 2000: " + ee);
-            }
-            
-            ee.printStackTrace();
-            throw new PdfException("Exception "+ee+" with JPEG2000 image");
-        } catch (final Error ee2) {
-            ee2.printStackTrace();
-            
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem reading JPEG 2000 with error " + ee2);
-            }
-            
-            throw new PdfException("Error with JPEG2000 image");
-        }
         return image;
+        
     }
     
 }

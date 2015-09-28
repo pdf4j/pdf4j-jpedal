@@ -67,7 +67,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
  */
 public class PdfStreamDecoder extends BaseDecoder{
     
-    private static boolean showFXShadingMessage=false;
+    private static boolean showFXShadingMessage;
     
     //<start-adobe><end-adobe>
     
@@ -148,7 +148,7 @@ public class PdfStreamDecoder extends BaseDecoder{
      * internal development flag which should not be used
      */
     //turn on debugging to see commands
-    final public static boolean showCommands=false;
+    public static final boolean showCommands=false;
 //    public static boolean showCommands = true;
     
     /**interactive display*/

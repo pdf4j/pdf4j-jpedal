@@ -266,7 +266,6 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             
         }//icon rotation is always defined in the constructor so we dont need to change it
     }
-    
     public void setText(String str){
         if(str==null) {
             str = "";
@@ -352,25 +351,29 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             }else{
             	
                 //Add 2 to simulate form padding
-                String textAlignment = " 2 Td ";
-                int alignment = 2;
-                
-                if(((FormObject)form).getAlignment()!=SwingConstants.LEFT){
-
-                	final FontMetrics fm = new Canvas().getFontMetrics(new Font(fontName, Font.PLAIN, (int)Float.parseFloat(fontSize)));
-                	final Rectangle2D r = fm.getStringBounds(text, null);
-
-                	switch(((FormObject)form).getAlignment()){
-                	case SwingConstants.CENTER : 
-                		alignment = ((int)(((FormObject)form).getBoundingRectangle().width - r.getWidth()))/2;
-                		break;
-                	case SwingConstants.RIGHT : 
-                		alignment = ((int)(((FormObject)form).getBoundingRectangle().width - r.getWidth()))-2;
-                		break;
-                	}
+                int alignmentX = 2;
+                int alignmentY = ((int) (((FormObject) form).getBoundingRectangle().height - Float.parseFloat(fontSize))) / 2;
+                if(alignmentY<2){
+                    alignmentY = 2;
                 }
+                
+                if (((FormObject) form).getAlignment() != SwingConstants.LEFT) {
+
+                    final FontMetrics fm = new Canvas().getFontMetrics(new Font(fontName, Font.PLAIN, (int) Float.parseFloat(fontSize)));
+                    final Rectangle2D r = fm.getStringBounds(text, null);
+
+                    switch (((FormObject) form).getAlignment()) {
+                        case SwingConstants.CENTER:
+                            alignmentX = ((int) (((FormObject) form).getBoundingRectangle().width - r.getWidth())) / 2;
+                            break;
+                        case SwingConstants.RIGHT:
+                            alignmentX = ((int) (((FormObject) form).getBoundingRectangle().width - r.getWidth())) - 2;
+                            break;
+                    }
+                }
+                
                 //Construction alignment string
-                textAlignment = alignment+textAlignment;
+                String textAlignment = alignmentX+" "+alignmentY+" Td ";
                 
                 this.fullCommandString = preFontStream+fontName+fontSize+fontCommand+
                         betweenFontAndTextStream+ textAlignment+'(' +text+")Tj "+afterTextStream;
@@ -471,7 +474,7 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             
         }
     }
-        
+      
     /** decodes and saves all information needed to decode the object on the fly,
      * the test and font can be altered with specific methods.
      * @return boolean true if it all worked.

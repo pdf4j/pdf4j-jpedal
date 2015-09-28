@@ -150,25 +150,25 @@ public class CCITT {
         390, 390, 390, 390, 390, 390, 390, 390, 390, 390, 390, 390
     };
 
-    private static final short[] MOREBLACKS = new short[]{
+    private static final short[] MOREBLACKS = {
         28679, 28679, 31752, (short) 32777, (short) 33801, (short) 34825,
         (short) 35849, (short) 36873, (short) 29703, (short) 29703, (short) 30727,
         (short) 30727, (short) 37897, (short) 38921, (short) 39945, (short) 40969
     };
 
-    private static final short[] FIRSTBLACKS = new short[]{
+    private static final short[] FIRSTBLACKS = {
         3226, 6412, 200, 168, 38, 38, 134, 134, 100, 100, 100, 100, 68, 68, 68, 68
     };
 
     private static final short[] BLACKS2BIT = {292, 260, 226, 226};
 
-    private static final int[] LEFTBITS = new int[]{0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff};
+    private static final int[] LEFTBITS = {0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff};
 
-    private static final int[] CURBITS = new int[]{
+    private static final int[] CURBITS = {
         0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff
     };
 
-    private static final byte[] LITTLEENDIANS = new byte[]{
+    private static final byte[] LITTLEENDIANS = {
         0, -128, 64, -64, 32, -96, 96, -32, 16, -112, 80, -48, 48, -80, 112, -16,
         8, -120, 72, -56, 40, -88, 104, -24, 24, -104, 88, -40, 56, -72, 120, -8,
         4, -124, 68, -60, 36, -92, 100, -28, 20, -108, 84, -44, 52, -76, 116, -12,
@@ -200,9 +200,9 @@ public class CCITT {
     
     private byte[] input, output;
     private int[] prevItems, curItems;
-    private int processItem = 0;
+    private int processItem;
     private int compression = 2;
-    private int changingElemSize = 0;
+    private int changingElemSize;
     private int bitP, bp, w, h, endianOrder, dim1, bitsToPut;
        
     public CCITT(int fillOrder, int w, int h) {

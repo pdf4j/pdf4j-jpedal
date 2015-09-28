@@ -39,15 +39,15 @@ public interface T3Renderer extends DynamicVectorRenderer {
     /**
      * use by type3 fonts to differentiate images in local store
      */
-    public abstract void setType3Glyph(String pKey);
+    void setType3Glyph(String pKey);
 
     /**
      * used by type 3 glyphs to set colour
      */
-    public abstract void lockColors(PdfPaint strokePaint, PdfPaint nonstrokePaint, boolean lockColour);
+    void lockColors(PdfPaint strokePaint, PdfPaint nonstrokePaint, boolean lockColour);
 
     /**
 	 * used internally - please do not use
 	 */
-	public abstract void setOptimisedRotation(boolean value);
+    void setOptimisedRotation(boolean value);
 }

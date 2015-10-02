@@ -57,25 +57,17 @@ public class BitWriter {
      */
     public void end() {
         while (bitCount > 0) {
-            writeBit(0);
-        }
-    }
-
-    /**
-     *
-     * @param tinyBit
-     */
-    public void writeBit(final int tinyBit) {
-        pointer = pointer << 1 | tinyBit;
-        bitCount++;
-        if (bitCount == 8) {
-            try {
-                stream.write(pointer);
-            } catch (IOException e) {
-                e.printStackTrace();
+            pointer = pointer << 1;
+            bitCount++;
+            if (bitCount == 8) {
+                try {
+                    stream.write(pointer);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                pointer = 0;
+                bitCount = 0;
             }
-            pointer = 0;
-            bitCount = 0;
         }
     }
 

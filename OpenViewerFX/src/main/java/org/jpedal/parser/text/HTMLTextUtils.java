@@ -30,7 +30,6 @@
  * HTMLTextUtils.java
  * ---------------
  */
-
 package org.jpedal.parser.text;
 
 import org.jpedal.fonts.PdfFont;
@@ -41,37 +40,31 @@ import org.jpedal.fonts.StandardFonts;
  * @author markee
  */
 class HTMLTextUtils {
-    
-    static boolean remapGlyph(PdfFont currentFontData, GlyphData glyphData){
-        
-        boolean alreadyRemaped=false;
-        
-        final String charGlyph= currentFontData.getMappedChar(glyphData.getRawInt(), false);
-        
-        if(charGlyph!=null){
-            final int newRawInt=currentFontData.getDiffChar(charGlyph);
-            
-            if(newRawInt!=-1){
-                glyphData.setRawInt(newRawInt); //only reassign if not -1 as messes up code further down
-                glyphData.setDisplayValue(String.valueOf((char)newRawInt));
-                
+
+    static boolean remapGlyph(PdfFont currentFontData, GlyphData glyphData) {
+
+        boolean alreadyRemaped = false;
+
+        final String charGlyph = currentFontData.getMappedChar(glyphData.getRawInt(), false);
+
                 //fix for PDFdata/sample_pdfs_html/general-July2012/klar--men-aldri-ferdig_dacecc.pdf
-                //in some examples the unicode table is wrong and maps the character into this odd range, but the glyph is always correct
-                //this is a sanity check to fix this mapping issue
-            }else if(!glyphData.getDisplayValue().isEmpty() && glyphData.getDisplayValue().charAt(0)<32){
-                
-                final int altValue=StandardFonts.getAdobeMap(charGlyph);
-                
+        //in some examples the unicode table is wrong and maps the character into this odd range, but the glyph is always correct
+        //this is a sanity check to fix this mapping issue
+        if (charGlyph != null && !glyphData.getDisplayValue().isEmpty()
+                && glyphData.getDisplayValue().charAt(0) < 32 && currentFontData.getDiffChar(charGlyph) == -1) {
+
+            final int altValue = StandardFonts.getAdobeMap(charGlyph);
+
                 //this test can return -1 for invalid value as in sample_pdfs_html/general-May2014/18147.pdf
-                //which breaks code further down so we reject this value
-                if(altValue>-1) {
-                    glyphData.setRawInt(altValue);
-                    glyphData.set(String.valueOf((char) altValue));
-                    alreadyRemaped = true;
-                }
+            //which breaks code further down so we reject this value
+            if (altValue > -1 && currentFontData.getMappedChar(altValue, false)!=null) {
+                
+                glyphData.setRawInt(altValue);
+                glyphData.set(String.valueOf((char) altValue));
+                alreadyRemaped = true;
             }
         }
-        
+
         return alreadyRemaped;
     }
 }

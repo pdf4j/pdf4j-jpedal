@@ -80,7 +80,13 @@ public class CM {
             gs.CTM[0][1]=0;
             gs.CTM[1][0]=0;
         }
-
+        
+        //Ignore very minor skew
+//        if(Math.abs(gs.CTM[0][1]/gs.CTM[0][0])<0.006 && Math.abs(gs.CTM[1][0]/gs.CTM[1][1])<0.006){
+//            gs.CTM[0][1]=0;
+//            gs.CTM[1][0]=0;
+//        }
+        
         //deal with very minor rotation on page in 17780
         if(gs.CTM[1][0]>100 && gs.CTM[0][1]>100 && gs.CTM[0][0]<0.001 && Math.abs(gs.CTM[1][1])<0.001){
         

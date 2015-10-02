@@ -1001,7 +1001,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
 
                 //This tests whether the previously saved potential width is an argument of the first operator or
                 //an actual width. If it's an actual width, it's saved.
-                if (is1C() && nonSubrCommandCount == 0 &&
+                if (is1C && nonSubrCommandCount == 0 &&
                         nextVal != 10 &&    //callsubr
                         nextVal != 11 &&    //return
                         nextVal != 29) {    //callgsubr

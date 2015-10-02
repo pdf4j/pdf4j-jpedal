@@ -39,12 +39,10 @@ import org.jpedal.PdfDecoderInt;
 
 public interface AnnotationHandler {
 
-    //<start-adobe><start-thin>
     /**called when each page created*/
     void handleAnnotations(PdfDecoderInt decode_pdf, Map objs, int p);
 
     /**called when mouse moves so you can react to context*/
     void checkLinks(Map objs, boolean mouseClicked, PdfObjectReader pdfObjectReader, int x, int y, org.jpedal.gui.GUIFactory currentGUI, org.jpedal.examples.viewer.Values commonValues);
 
-    //<end-thin><end-adobe>
 }

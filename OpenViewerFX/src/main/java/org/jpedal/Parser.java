@@ -56,7 +56,7 @@ import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-//<start-adobe><end-adobe>
+//
 import org.jpedal.parser.*;
 
 import org.jpedal.render.*;
@@ -73,7 +73,7 @@ public class Parser {
      */
     private String decodeStatus = "";
 
-    private StatusBar statusBar;
+    StatusBar statusBar;
 
     /**
      * list of fonts for decoded page
@@ -89,7 +89,7 @@ public class Parser {
     private float multiplyer = 1;
 
     /**
-     * store image data extracted from pdf
+     * store image data extracted from pdf file
      */
     private PdfImageData pdfImages = new PdfImageData();
 
@@ -147,7 +147,7 @@ public class Parser {
     private final boolean useJavaFX;
     private boolean warnOnceOnForms;
     private PdfObject structTreeRootObj;
-    //<start-adobe><end-adobe>
+    //
 
     /**
      * return scaleup factor applied to last Hires image of page generated
@@ -511,7 +511,6 @@ public class Parser {
         }
     }
 
-    //<start-adobe>
     /**
      * returns object containing grouped text of last decoded page
      * - if no page decoded, a Runtime exception is thrown to warn user
@@ -532,8 +531,7 @@ public class Parser {
 
         return options.getBackgroundGroupingObject(pdfBackgroundData, fileAcces.getPdfPageData());
     }
-    //<end-adobe>
-
+    
     /**
      * provide method for outside class to get data object
      * containing images
@@ -691,7 +689,6 @@ public class Parser {
 
                 } else{
 
-                    //<start-adobe>
                     /**
                      * title changes to give user something to see under timer
                      * control
@@ -702,8 +699,6 @@ public class Parser {
                         t = new javax.swing.Timer(150, listener);
                         t.start(); // start it
                     }
-
-                    //<end-adobe>
 
                     fileAcces.setPageNumber(page);
 
@@ -729,7 +724,7 @@ public class Parser {
                             textLines.setLineAreas(null);
                         }
 
-                        //<start-adobe><end-adobe>
+                        //
                         current.decodePageContent(pdfObject);
                         
                     } catch (final Error err) {
@@ -748,14 +743,12 @@ public class Parser {
 
 
                     /** turn off status bar update */
-                    // <start-adobe>
                     if (t != null) {
                         t.stop();
                         statusBar.setProgress(100);
 
                     }
-                    // <end-adobe>
-
+                    
                     /**
                      * handle acroform data to display
                      */

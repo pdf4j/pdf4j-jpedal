@@ -187,9 +187,9 @@ public class PdfFont implements Serializable {
     /**holds lookup to map char differences*/
     String[] diffTable;
     
-    private int[] diffCharTable;
+    protected final Map rawDiffKeys=new HashMap();
     
-    protected Map diffLookup;
+    private int[] diffCharTable;
     
     /**lookup for which of each char for embedded fonts which we can flush*/
     private float[] widthTable ;
@@ -1563,6 +1563,11 @@ public class PdfFont implements Serializable {
                         
                     }
                     
+                    String rawKey=Diffs.getNextValueAsString(false);
+                    
+                     //   System.out.println(rawKey+" "+pointer);
+                    rawDiffKeys.put(rawKey.substring(1),pointer);
+                    
                     putMappedChar( pointer,Diffs.getNextValueAsFontChar(pointer, containsHexNumbers, allNumbers));
                     pointer++;
                 }
@@ -1642,7 +1647,6 @@ public class PdfFont implements Serializable {
         
         if(diffTable==null){
             diffTable = new  String[maxCharCount];
-            diffLookup=new HashMap();
         }
         
         if(charInt>255 && maxCharCount==256){ //hack for odd file
@@ -1654,8 +1658,6 @@ public class PdfFont implements Serializable {
         }else if(diffTable[charInt]==null && mappedChar!=null && !mappedChar.startsWith("glyph")){
             
             diffTable[charInt]= mappedChar;
-            
-            diffLookup.put(mappedChar, charInt);
         }
     }
     
@@ -1674,7 +1676,7 @@ public class PdfFont implements Serializable {
     
     /** Returns the char glyph corresponding to the specified code for the specified font. */
     public final String getMappedChar(final int charInt, final boolean remap) {
-        
+       
         String result =null;
         
         //check differences

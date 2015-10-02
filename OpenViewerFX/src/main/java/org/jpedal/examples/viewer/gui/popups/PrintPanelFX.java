@@ -695,7 +695,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
     }
     private boolean debugPrinterChange;
 	
-    int pageCount, currentPageNo, currentPreviewedPage=1, pagePrintCount=1;
+    int pageCount, currentPageNo;
     private boolean okClicked;
 
     private String[] printersList;
@@ -882,6 +882,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 //        int h = previewComponent.getHeight();
 //        int pW,pH,iW,iH,iX,iY;    //values in 72ths of an inch
 //        int pageWidth, pageHeight;
+//        int currentPreviewedPage = 1;
 //
 //        //In print current view use the visible area of the screen instead of the page heights
 //        if (printRangeCurrentView.isSelected()) {
@@ -1074,6 +1075,8 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 //
 //        //check for illogical settings
 //        SetOfIntegerSyntax set = getPrintRange();
+//        int pagePrintCount=1;
+//        int currentPreviewedPage=1;
 //        if (set == null) {
 //
 //            //Illogical - preview nothing

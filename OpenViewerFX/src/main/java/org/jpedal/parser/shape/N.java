@@ -34,7 +34,6 @@ package org.jpedal.parser.shape;
 
 import java.awt.Shape;
 import java.awt.geom.Area;
-import javafx.scene.shape.Path;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.PdfShape;
@@ -54,60 +53,23 @@ public class N {
             //create clipped shape
             currentDrawShape.closeShape();
 
-            Shape s=null;
-            //<start-adobe>
-            Path fxPath=null;
-            
             if(useJavaFX) {
-                fxPath = currentDrawShape.getPath();
-            } else
-            //<end-adobe>
-            {
-                s = currentDrawShape.generateShapeFromPath(gs.CTM, 0, Cmd.n, current.getType());
+                gs.updateClip(currentDrawShape.getPath());
+            }else{
+                gs.updateClip(new Area(currentDrawShape.generateShapeFromPath(gs.CTM, 0, Cmd.n, current.getType())));
             }
-            
-            //ignore huge shapes which will crash Java in Swing
-            //(not tested in FX)
-//            if(s!=null){
-//                if(currentDrawShape.getComplexClipCount()<5){
-//                    //if(currentDrawShape.getSegmentCount()>5000){
-//                      //  s=s.getBounds();
-//                    //}
-//                }else{
-//                    if(currentDrawShape.getSegmentCount()>2500){
-//                        s=s.getBounds();
-//                    }
-//                }
-//            }
-            
-            //<start-adobe>
-            if(useJavaFX) {
-                gs.updateClip(fxPath);
-            } else
-            //<end-adobe>
-            {
-                gs.updateClip(new Area(s));
-            }
-            
             
             if(formLevel==0){
                 final int pageNum=parserOptions.getPageNumber();
-
                 gs.checkWholePageClip(pageData.getMediaBoxHeight(pageNum)+pageData.getMediaBoxY(pageNum));
             }
 
             //always reset flag
             currentDrawShape.setClip(false);
 
-
-            //System.out.println(">>"+renderPage+" "+gs+" "+defaultClip);
             //save for later
             if (renderPage){
-                if(useJavaFX){
-                    current.drawClip(gs,defaultClip,false) ;
-                }else{
-                    current.drawClip(gs,defaultClip,false) ;
-                }
+                current.drawClip(gs,defaultClip,false) ;
             }
         }
 

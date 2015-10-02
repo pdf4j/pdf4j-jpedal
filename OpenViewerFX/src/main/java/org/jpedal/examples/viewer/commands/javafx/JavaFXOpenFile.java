@@ -34,7 +34,6 @@
 package org.jpedal.examples.viewer.commands.javafx;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -851,42 +850,24 @@ public class JavaFXOpenFile {
                     }
                 } else {
 
-                    //alternate code to open via array or test byteArray
-                    //not recommended for large files
-                    final boolean test = false;
-                    if (test) {
-                        final File fileSize = new File(commonValues.getSelectedFile());
-                        final byte[] bytes = new byte[(int) fileSize.length()];
-                        FileInputStream fis;
-                        try {
-                            fis = new FileInputStream(commonValues.getSelectedFile());
-                            fis.read(bytes);
-                            decode_pdf.openPdfArray(bytes);
-                            //System.out.println("open via decode_pdf.openPdfArray(bytes)");
+                    try {
+                        decode_pdf.openPdfFile(commonValues.getSelectedFile());
+                    } catch (final RuntimeException e) {
 
-                        } catch (final Exception e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        //
+
+                        //customise message for missing bouncycastle error
+                        final String message;
+                        if (e.getMessage()!=null && e.getMessage().contains("bouncycastle")) {
+                            message = e.getMessage();
+                        } else {
+                            message = "Exception in code " + e.getMessage() + " please send to IDRsolutions";
                         }
-                    } else {
-                        try {
-                            decode_pdf.openPdfFile(commonValues.getSelectedFile());
-                        } catch (final RuntimeException e) {
 
-                            //
-
-                            //customise message for missing bouncycastle error
-                            final String message;
-                            if (e.getMessage()!=null && e.getMessage().contains("bouncycastle")) {
-                                message = e.getMessage();
-                            } else {
-                                message = "Exception in code " + e.getMessage() + " please send to IDRsolutions";
-                            }
-
-                            currentGUI.showMessageDialog(message);
-                            LogWriter.writeLog("Exception " + e.getMessage());
-                        }
+                        currentGUI.showMessageDialog(message);
+                        LogWriter.writeLog("Exception " + e.getMessage());
                     }
-                    
+
                     if (decode_pdf.getPageCount() <= 1) {
                         currentGUI.getButtons().setPageLayoutButtonsEnabled(false);
                     }

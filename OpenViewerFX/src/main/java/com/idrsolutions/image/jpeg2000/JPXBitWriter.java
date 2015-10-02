@@ -32,7 +32,6 @@
  */
 package com.idrsolutions.image.jpeg2000;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -105,7 +104,7 @@ public class JPXBitWriter {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    /**public static void main(String[] args) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final JPXBitWriter writer = new JPXBitWriter(bos);
         writer.writeUInt(2147483647);
@@ -115,6 +114,6 @@ public class JPXBitWriter {
         final byte ss[] = bos.toByteArray();
         System.out.println("done");
 
-    }
+    }  /**/
 
 }

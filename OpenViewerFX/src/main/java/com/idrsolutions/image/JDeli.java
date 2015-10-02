@@ -291,7 +291,7 @@ public class JDeli {
         } else if (!GraphicsEnvironment.isHeadless()) {
             showHelpWindow();
         }
-        // else... User is not going to see any message. (log to file?)
+        // Else... User is not going to see any message. (log to file?)
 
     }
 

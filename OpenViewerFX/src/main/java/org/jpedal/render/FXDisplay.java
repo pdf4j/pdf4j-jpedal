@@ -62,7 +62,6 @@ import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.utils.LogWriter;
-import org.jpedal.utils.Matrix;
 import org.jpedal.utils.repositories.Vector_Int;
 import org.jpedal.utils.repositories.Vector_Object;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
@@ -79,17 +78,11 @@ public class FXDisplay extends GUIDisplay {
 
     private final java.util.List collection=new ArrayList(2000);
     
-    public FXDisplay() {
-        init();
-    }
-
     public FXDisplay(final int pageNumber, final boolean addBackground, final int defaultSize, final ObjectStore newObjectRef) {
 
         this.rawPageNumber =pageNumber;
         this.objectStoreRef = newObjectRef;
         this.addBackground=addBackground;
-        
-        init();
         
         setupArrays(defaultSize);
 
@@ -107,16 +100,10 @@ public class FXDisplay extends GUIDisplay {
         this.objectStoreRef = newObjectRef;
         this.isPrinting=isPrinting;
         
-        init();
-        
         setupArrays(defaultSize);
 
     }
     
-    private void init(){
-         isSwing=false;
-    }
-
     /* remove all page objects and flush queue */
     @Override
     public void flush() {
@@ -188,17 +175,7 @@ public class FXDisplay extends GUIDisplay {
                 CTM[2][0]+CTM[1][0],CTM[2][1]+CTM[1][1]};
             
             im1View.getTransforms().setAll(Transform.affine(affine[0], affine[1], affine[2], affine[3], affine[4], affine[5]));
-        }else if(optionsApplied==PDFImageProcessing.IMAGE_ROTATED){
-            
-            final float[][] scaleDown={{0,1f/ imageW,0},{1f/ imageH,0,0},{0,0,1}};
-            CTM=Matrix.multiply(scaleDown,CTM);
-            
-            affine = new float[]{CTM[0][0],CTM[0][1]
-                    ,CTM[1][0],CTM[1][1]
-                    ,CTM[2][0],CTM[2][1]};
-            
-            im1View.getTransforms().add(Transform.affine(affine[0], affine[1], affine[2], affine[3], affine[4], affine[5]));
-            
+           
         }else{
             //
         }
@@ -317,7 +294,7 @@ public class FXDisplay extends GUIDisplay {
 //        if(true) return;
         final PatternColorSpace fillCS=(PatternColorSpace)currentGraphicsState.nonstrokeColorSpace;
         //get Image as BufferedImage and convert to javafx WritableImage
-        final BufferedImage imageForPattern = fillCS.getImageForPatternedShape(currentGraphicsState,currentShape);
+        final BufferedImage imageForPattern = fillCS.getImageForPatternedShape(currentGraphicsState);
         if(imageForPattern == null) {
             return;
         }

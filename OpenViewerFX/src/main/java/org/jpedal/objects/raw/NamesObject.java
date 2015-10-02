@@ -53,6 +53,9 @@ public class NamesObject extends PdfObject {
 
     private byte[][] Kids,Names;
     
+    private byte[][] Limits;
+
+    
     public NamesObject(final String ref) {
         super(ref);
     }
@@ -378,6 +381,20 @@ public class NamesObject extends PdfObject {
     }
 
     @Override
+    public void setStringArray(final int id, final byte[][] value) {
+
+        switch(id){
+
+            case PdfDictionary.Limits:
+                Limits=value;
+            break;
+
+            default:
+            	super.setMixedArray(id, value);
+        }
+    }
+
+    @Override
     public float[] getFloatArray(final int id) {
 
         switch(id){
@@ -548,6 +565,19 @@ public class NamesObject extends PdfObject {
         }
     }
 
+    @Override
+    public byte[][] getStringArray(final int id) {
+
+        switch(id){
+
+            case PdfDictionary.Limits:
+                               return deepCopy(Limits);
+
+            default:
+            	return super.getKeyArray(id);
+        }
+    }
+    
     @Override
     public byte[][] getKeyArray(final int id) {
 

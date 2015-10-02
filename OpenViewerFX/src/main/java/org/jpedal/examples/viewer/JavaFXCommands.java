@@ -34,6 +34,7 @@ package org.jpedal.examples.viewer;
 
 import java.util.Map;
 import javafx.scene.Cursor;
+import org.jpedal.FileAccess;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
 import static org.jpedal.examples.viewer.Commands.ABOUT;
@@ -113,7 +114,8 @@ public class JavaFXCommands extends Commands {
                     status = decode_pdf.getFileName(); //cast to string when using.
                     break;
                     
-                case SINGLE:
+                case SINGLE:                    
+                    ((FileAccess)decode_pdf.getExternalHandler(Options.FileAccess)).setLastPageDecoded(-1);
                     Single.execute(args, decode_pdf, currentGUI);
                     JavaFXTextSelect.execute(args, currentGUI, mouseMode, decode_pdf);
                     break;
@@ -129,9 +131,7 @@ public class JavaFXCommands extends Commands {
                 case EXTRACTASIMAGE:
                     JavaFXExtractSelectionAsImage.execute(commonValues, currentGUI, decode_pdf);
                     break;
-                case PAGEFLOW:
-                    PageFlow.execute(args, currentGUI, commonValues, decode_pdf, properties, searchFrame);
-                    break;
+                   
                 case EXTRACTTEXT:
                     JavaFXExtractText.execute(args, currentGUI, decode_pdf, commonValues);
                     break;

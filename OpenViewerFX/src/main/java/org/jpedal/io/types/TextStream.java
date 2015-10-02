@@ -52,175 +52,8 @@ public class TextStream {
             final PdfFileReader objectReader) {
         
         
-        if(PDFkeyInt==PdfDictionary.W || PDFkeyInt==PdfDictionary.W2){
-            
-            //we need to roll on as W2 is 2 chars and W is 1
-            if(PDFkeyInt==PdfDictionary.W2) {
-                i++;
-            }
-            
-            boolean isRef=false;
-            
-            if(debugFastCode) {
-                System.out.println(padding + "Reading W or W2");
-            }
-            
-            //move to start
-            while(raw[i]!='[' ){ //can be number as well
-                
-                //System.out.println((char) raw[i]);
-                if(raw[i]=='('){ //allow for W (7)
-                    isRef=false;
-                    break;
-                }
-                
-                //allow for number as in refer 9 0 R
-                if(raw[i]>='0' && raw[i]<='9'){
-                    isRef=true;
-                    break;
-                }
-                
-                i++;
-            }
-            
-            //allow for direct or indirect
-            byte[] data=raw;
-            
-            int start=i,j=i;
-            
-            int count=0;
-            
-            //read ref data and slot in
-            if(isRef){
-                //number
-                int keyStart2=i;
-                while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62){
-                    
-                    i++;
-                    
-                }
-                final int number= NumberUtils.parseInt(keyStart2, i, raw);
-                
-                //generation
-                while(raw[i]==10 || raw[i]==13 || raw[i]==32 || raw[i]==47 || raw[i]==60) {
-                    i++;
-                }
-                
-                keyStart2=i;
-                //move cursor to end of reference
-                while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62) {
-                    i++;
-                }
-                final int generation= NumberUtils.parseInt(keyStart2, i, raw);
-                
-                //move cursor to start of R
-                while(raw[i]==10 || raw[i]==13 || raw[i]==32 || raw[i]==47 || raw[i]==60) {
-                    i++;
-                }
-                
-                if(raw[i]!=82) //we are expecting R to end ref
-                {
-                    throw new RuntimeException("3. Unexpected value in file " + raw[i] + " - please send to IDRsolutions for analysis");
-                }
-                
-                if(!ignoreRecursion){
-                    
-                    //read the Dictionary data
-                    data=objectReader.readObjectAsByteArray(pdfObject, objectReader.isCompressed(number, generation), number, generation);
-                    
-                    //allow for data in Linear object not yet loaded
-                    if(data==null){
-                        pdfObject.setFullyResolved(false);
-                        
-                        if(debugFastCode) {
-                            System.out.println(padding + "Data not yet loaded");
-                        }
-                        
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (6)");
-                        }
-                        
-                        return raw.length;
-                    }
-                    
-                    //lose obj at start
-                    j = 3;
-
-                    if (data.length < 3) { //allow for empty string line []
-                        j = 0;
-                    } else {
-                        while (data[j - 1] != 106 && data[j - 2] != 98 && data[j - 3] != 111) {
-                            j++;
-
-                            //catch for error
-                            if (j == data.length) {
-                                j = 0;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    
-                    //skip any spaces after
-                    while(data[j]==10 || data[j]==13 || data[j]==32)// || data[j]==47 || data[j]==60)
-                    {
-                        j++;
-                    }
-                    
-                    //reset pointer
-                    start=j;
-                    
-                }
-            }
-            
-            //move to end
-            while(j<data.length){
-                
-                if(data[j]=='[' || data[j]=='(') {
-                    count++;
-                } else if(data[j]==']' || data[j]==')') {
-                    count--;
-                }
-                
-                if(count==0) {
-                    break;
-                }
-                
-                j++;
-            }
-            
-            if(!ignoreRecursion){
-                final int stringLength=j-start+1;
-                final byte[] newString=new byte[stringLength];
-                
-                System.arraycopy(data, start, newString, 0, stringLength);
-                
-                /**
-                 * clean up so matches old string so old code works
-                 */
-                if(PDFkeyInt!=PdfDictionary.JS){ //keep returns in code
-                    for(int aa=0;aa<stringLength;aa++){
-                        if(newString[aa]==10 || newString[aa]==13) {
-                            newString[aa] = 32;
-                        }
-                    }
-                }
-                
-                pdfObject.setTextStreamValue(PDFkeyInt, newString);
-                
-                if(debugFastCode){
-                    if(PDFkeyInt==39) {
-                        System.out.println(padding + pdfObject + " W=" + new String(newString));
-                    } else {
-                        System.out.println(padding + pdfObject + " W2=" + new String(newString));
-                    }
-                }
-            }
-            
-            //roll on
-            if(!isRef) {
-                i = j;
-            }
+        if(PDFkeyInt==PdfDictionary.W || PDFkeyInt==PdfDictionary.W2) {
+            return readCIDWidths(pdfObject, i, raw, PDFkeyInt, ignoreRecursion, objectReader);
         }else{
             
             byte[] data;
@@ -228,11 +61,9 @@ public class TextStream {
                 if(raw[i]!='<' && raw[i]!='(') {
                     i++;
                 }
-                
-                while(raw[i]==10 || raw[i]==13 || raw[i]==32) {
-                    i++;
-                }
-                
+
+                i=ArrayUtils.skipSpaces(raw,i);
+
                 //allow for no actual value but another key
                 if(raw[i]==47){
                     pdfObject.setTextStreamValue(PDFkeyInt, new byte[1]);
@@ -313,14 +144,10 @@ public class TextStream {
                             while(data[j-1]!=106 && data[j-2]!=98 && data[j-3]!=111) {
                                 j++;
                             }
-                            
-                            //skip any spaces after
-                            while(data[j]==10 || data[j]==13 || data[j]==32)// || data[j]==47 || data[j]==60)
-                            {
-                                j++;
-                            }
+
+                            j=ArrayUtils.skipSpaces(data,j);
+
                         }
-                        
                     }
                 }
                 /////////////////
@@ -378,11 +205,9 @@ public class TextStream {
                             if(start==j) {
                                 break;
                             }
-                            
-                            while(data[start]==32 || data[start]==10 || data[start]==13) {
-                                start++;
-                            }
-                            
+
+                            start=ArrayUtils.skipSpaces(data,start);
+
                             topHex=data[start];
                             
                             //convert to number
@@ -392,20 +217,12 @@ public class TextStream {
                                 topHex -= 87;
                             }else if(topHex>='0' && topHex<='9'){
                                 topHex -= 48;
-                            }else{
-                                
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Unexpected number " + (char) data[start]);
-                                }
-                                
                             }
                             
                             start++;
-                            
-                            while(data[start]==32 || data[start]==10 || data[start]==13) {
-                                start++;
-                            }
-                            
+
+                            start=ArrayUtils.skipSpaces(data,start);
+
                             bottomHex=data[start];
                             
                             if(bottomHex>='A' && bottomHex<='F'){
@@ -497,8 +314,181 @@ public class TextStream {
         }
         return i;
     }
-    
-    
+
+    private static int readCIDWidths(PdfObject pdfObject, int i, byte[] raw, int PDFkeyInt, boolean ignoreRecursion, PdfFileReader objectReader) {
+
+        //we need to roll on as W2 is 2 chars and W is 1
+        if(PDFkeyInt== PdfDictionary.W2) {
+            i++;
+        }
+
+        boolean isRef=false;
+
+        if(debugFastCode) {
+            System.out.println(padding + "Reading W or W2");
+        }
+
+        //move to start
+        while(raw[i]!='[' ){ //can be number as well
+
+            //System.out.println((char) raw[i]);
+            if(raw[i]=='('){ //allow for W (7)
+                isRef=false;
+                break;
+            }
+
+            //allow for number as in refer 9 0 R
+            if(raw[i]>='0' && raw[i]<='9'){
+                isRef=true;
+                break;
+            }
+
+            i++;
+        }
+
+        //allow for direct or indirect
+        byte[] data=raw;
+
+        int start=i,j=i;
+
+        int count=0;
+
+        //read ref data and slot in
+        if(isRef){
+            //number
+            int keyStart2=i;
+            while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62){
+
+                i++;
+
+            }
+            final int number= NumberUtils.parseInt(keyStart2, i, raw);
+
+            //generation
+            while(raw[i]==10 || raw[i]==13 || raw[i]==32 || raw[i]==47 || raw[i]==60) {
+                i++;
+            }
+
+            keyStart2=i;
+            //move cursor to end of reference
+            while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62) {
+                i++;
+            }
+            final int generation= NumberUtils.parseInt(keyStart2, i, raw);
+
+            //move cursor to start of R
+            while(raw[i]==10 || raw[i]==13 || raw[i]==32 || raw[i]==47 || raw[i]==60) {
+                i++;
+            }
+
+            if(raw[i]!=82) //we are expecting R to end ref
+            {
+                throw new RuntimeException("3. Unexpected value in file " + raw[i] + " - please send to IDRsolutions for analysis");
+            }
+
+            if(!ignoreRecursion){
+
+                //read the Dictionary data
+                data=objectReader.readObjectAsByteArray(pdfObject, objectReader.isCompressed(number, generation), number, generation);
+
+                //allow for data in Linear object not yet loaded
+                if(data==null){
+                    pdfObject.setFullyResolved(false);
+
+                    if(debugFastCode) {
+                        System.out.println(padding + "Data not yet loaded");
+                    }
+
+                    if(LogWriter.isOutput()) {
+                        LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (6)");
+                    }
+
+                    return raw.length;
+                }
+
+                //lose obj at start
+                j = 3;
+
+                if (data.length < 3) { //allow for empty string line []
+                    j = 0;
+                } else {
+                    while (data[j - 1] != 106 && data[j - 2] != 98 && data[j - 3] != 111) {
+                        j++;
+
+                        //catch for error
+                        if (j == data.length) {
+                            j = 0;
+                            break;
+                        }
+                    }
+                }
+
+
+                //skip any spaces after
+                while(data[j]==10 || data[j]==13 || data[j]==32)// || data[j]==47 || data[j]==60)
+                {
+                    j++;
+                }
+
+                //reset pointer
+                start=j;
+
+            }
+        }
+
+        //move to end
+        while(j<data.length){
+
+            if(data[j]=='[' || data[j]=='(') {
+                count++;
+            } else if(data[j]==']' || data[j]==')') {
+                count--;
+            }
+
+            if(count==0) {
+                break;
+            }
+
+            j++;
+        }
+
+        if(!ignoreRecursion){
+            final int stringLength=j-start+1;
+            final byte[] newString=new byte[stringLength];
+
+            System.arraycopy(data, start, newString, 0, stringLength);
+
+            /**
+             * clean up so matches old string so old code works
+             */
+            if(PDFkeyInt!=PdfDictionary.JS){ //keep returns in code
+                for(int aa=0;aa<stringLength;aa++){
+                    if(newString[aa]==10 || newString[aa]==13) {
+                        newString[aa] = 32;
+                    }
+                }
+            }
+
+            pdfObject.setTextStreamValue(PDFkeyInt, newString);
+
+            if(debugFastCode){
+                if(PDFkeyInt==39) {
+                    System.out.println(padding + pdfObject + " W=" + new String(newString));
+                } else {
+                    System.out.println(padding + pdfObject + " W2=" + new String(newString));
+                }
+            }
+        }
+
+        //roll on
+        if(!isRef) {
+            i = j;
+        }
+
+        return i;
+    }
+
+
     public static int setTextStreamValue(final PdfObject pdfObject, int i, final byte[] raw, final boolean ignoreRecursion, final int PDFkeyInt, final PdfFileReader objectReader) {
         
         if(raw[i+1]==40 && raw[i+2]==41){ //allow for empty stream

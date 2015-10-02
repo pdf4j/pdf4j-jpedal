@@ -38,8 +38,6 @@ import java.awt.geom.Area;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
-import javafx.geometry.Bounds;
-import javafx.scene.shape.Path;
 import javax.swing.*;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.PdfColor;
@@ -59,7 +57,7 @@ import org.jpedal.utils.Messages;
 import org.jpedal.utils.repositories.*;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
-public class SwingDisplay extends GUIDisplay{
+ public class SwingDisplay extends GUIDisplay{
     
     //Flag to prevent drawing highlights too often.
     boolean ignoreHighlight;
@@ -78,10 +76,6 @@ public class SwingDisplay extends GUIDisplay{
     
     private int pageX1=9999, pageX2=-9999, pageY1=-9999, pageY2=9999;
     
-    //flag highlights need to be generated for page
-    private boolean highlightsNeedToBeGenerated;
-    
-    
     /**used to cache single image*/
     private BufferedImage singleImage;
     
@@ -89,9 +83,6 @@ public class SwingDisplay extends GUIDisplay{
     
     /**hint for conversion ops*/
     private static final RenderingHints hints;
-    
-    /**Turn on new highlight code*/
-    private static final boolean newHighlight = true;
     
     private final Map cachedWidths=new HashMap(10);
     
@@ -103,14 +94,14 @@ public class SwingDisplay extends GUIDisplay{
     
     protected GlyphFactory factory;
     
-    private PdfGlyphs glyphs;
+    //
     
     private Map imageID=new HashMap(10);
     
     private Map storedImageValues=new HashMap(10);
     
     /**text highlights if needed*/
-    private int[] textHighlightsX,textHighlightsWidth,textHighlightsHeight;
+    private int[] textHighlightsX;
     
     //allow user to diable g2 setting
     boolean stopG2setting;
@@ -655,13 +646,6 @@ public class SwingDisplay extends GUIDisplay{
             fillCol=this.fillCol;
         }
         
-        //setup first time something to highlight
-        if((highlightsNeedToBeGenerated) && 
-            (!newHighlight && areas!=null && highlights!=null)) {
-                generateHighlights(g2, count, objectTypes, pageObjects, a, b, c, d, fsValues, this.fontBounds.get());
-            }
-        
-        
         /**
          * now draw all shapes
          */
@@ -869,10 +853,6 @@ public class SwingDisplay extends GUIDisplay{
                                 }
                             }
 
-                            if(!newHighlight) {
-                                renderHighlight(highlight, g2);
-                            }
-
                             renderEmbeddedText(currentTR,currentObject,DynamicVectorRenderer.TYPE1C,aff,highlight,textStrokeCol,textFillCol,strokeOpacity,fillOpacity,lineWidth);
 
                             break;
@@ -904,9 +884,6 @@ public class SwingDisplay extends GUIDisplay{
                                 }
                             }
                             
-                            if(!newHighlight) {
-                                renderHighlight(highlight, g2);
-                            }
                             renderEmbeddedText(currentTR,currentObject,DynamicVectorRenderer.TYPE3,aff,highlight, textStrokeCol,textFillCol,strokeOpacity,fillOpacity,lineWidth);
                             
                             break;
@@ -1151,7 +1128,7 @@ public class SwingDisplay extends GUIDisplay{
         //Reset to minus 1 as rendering loop has ended
         itemToRender = -1;
         
-        if(newHighlight && highlights!=null) {
+        if(highlights!=null) {
             for (int h = 0; h != highlights.length; h++) {
                 renderHighlight(highlights[h], g2);
             }
@@ -1239,10 +1216,6 @@ public class SwingDisplay extends GUIDisplay{
                     ocr_highlights.addElement(highlight);
                 }
             }
-            
-            if (!newHighlight) {
-                renderHighlight(highlight, g2);
-            }
 
             renderEmbeddedText(currentTR, currentObject, DynamicVectorRenderer.TRUETYPE, aff, highlight, textStrokeCol, textFillCol, strokeOpacity, fillOpacity, lineWidth);
         }
@@ -1256,12 +1229,8 @@ public class SwingDisplay extends GUIDisplay{
 
         }
         
-        if(isSwing){
-            renderShape(defaultClip, fillType,strokeCol,fillCol, currentStroke, (Shape)currentObject,strokeOpacity,fillOpacity);
-        }else{
-            renderShape(defaultClip, fillType,strokeCol,fillCol, currentStroke, currentObject,strokeOpacity,fillOpacity);
-        }
-        
+        renderShape(defaultClip, fillType,strokeCol,fillCol, currentStroke, (Shape)currentObject,strokeOpacity,fillOpacity);
+
         if(endItem!=-1 && endItem<i) {
             g2.setClip(s);
         }
@@ -1282,10 +1251,6 @@ public class SwingDisplay extends GUIDisplay{
         }
 
         final AffineTransform def=g2.getTransform();
-
-        if(!newHighlight) {
-            renderHighlight(highlight, g2);
-        }
 
         if(afCount!=-1){
             g2.transform(new AffineTransform(afValues1[afCount],afValues2[afCount],-afValues3[afCount],-afValues4[afCount],x,y));
@@ -1350,12 +1315,8 @@ public class SwingDisplay extends GUIDisplay{
             
         }else if(afValues1!=null && type==DynamicVectorRenderer.SHAPE){
             
-            if(isSwing){
-                currentArea=((Shape)pageObjects[i]).getBounds();
-            }else{
-                Bounds b=((Path)pageObjects[i]).getBoundsInLocal();
-                currentArea=new Rectangle((int)b.getMinX(),(int)b.getMinY(),(int)b.getWidth(),(int)b.getHeight());
-            }
+            currentArea=((Shape)pageObjects[i]).getBounds();
+
         }else if(type==DynamicVectorRenderer.TEXT && afCount>-1){
             
             //Use on page coords to make sure the glyph needs highlighting
@@ -1909,35 +1870,16 @@ public class SwingDisplay extends GUIDisplay{
             imageOptions.setCheckpoint();
         }
         
-        //for special case on Page 7 randomHouse/9780857510839
-        final boolean oddRotationCase=optionsApplied==0 && CTM[0][0]<0 && CTM[0][1]>0 && CTM[1][0]<0 && CTM[1][1]<0 && pageRotation==0 && type==1;
-           
-        //Turn image around if needed
-        //(avoid if has skew on as well as currently breaks image)
-        if(!alreadyCached && image.getHeight()>1 && ((optionsApplied & PDFImageProcessing.IMAGE_INVERTED) !=PDFImageProcessing.IMAGE_INVERTED)){
-            
-            boolean turnLater=(optimisedTurnCode && (CTM[0][0]*CTM[0][1]==0) && (CTM[1][1]*CTM[1][0]==0) && !RenderUtils.isRotated(CTM));
-            
-            //fix for p4 image /Users/markee/Downloads/testdruck.pdf
-            if(optimisedTurnCode && !turnLater && CTM[0][0]>0 && CTM[1][1]<0 && CTM[0][1]>0 && CTM[1][0]>0 && Math.abs(CTM[0][0])> Math.abs(CTM[0][1]) && Math.abs(CTM[1][1])>Math.abs(CTM[1][0])) {
-                turnLater = true;               
-            }
-            
-            if(((!optimisedTurnCode || !turnLater) && pageRotation != 90 && pageRotation != 270) &&
-                (type==3 || oddRotationCase)) {
-                    image = RenderUtils.invertImage(image);
-                }
-            
-            
-            if(turnLater) {
-                optionsApplied += PDFImageProcessing.TURN_ON_DRAW;
-            }
-            
-        }
-        
         imageOptions.addElement(optionsApplied);
         
-        if(useHiResImageForDisplay){
+        if(!useHiResImageForDisplay){
+            if(!alreadyCached && image.getHeight()>1 && ((optionsApplied & PDFImageProcessing.IMAGE_INVERTED) !=PDFImageProcessing.IMAGE_INVERTED)){
+        
+                if((pageRotation != 90 && pageRotation != 270) && type==3) {
+                    image = RenderUtils.invertImage(image);
+                }
+            }
+        }else{
             
             final int w;
             final int h;
@@ -1949,84 +1891,28 @@ public class SwingDisplay extends GUIDisplay{
                 w= (Integer) cachedWidths.get(key);
                 h= (Integer) cachedHeights.get(key);
             }
-            
-            final boolean isRotated=RenderUtils.isRotated(CTM);
-            if(isRotated){
                 
-                if((optionsApplied & PDFImageProcessing.IMAGE_ROTATED) !=PDFImageProcessing.IMAGE_ROTATED){    //fix for odd rotated behaviour
-                    
-                    AffineTransform tx = new AffineTransform();
-                    tx.rotate(Math.PI/2, w/2, h/2);
-                    tx.translate(-(h-tx.getTranslateX()),-tx.getTranslateY());
-                    
-                    //allow for 1 pixel high
-                    final double[] matrix=new double[6];
-                    tx.getMatrix(matrix);
-                    if(matrix[4]<1){
-                        matrix[4]=1;
-                        tx =new AffineTransform(matrix);
-                    }
-                    
-                    final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-                    
-                    if(image!=null){
-                        
-                        if(image.getHeight()>1 && image.getWidth()>1) {
-                            image = op.filter(image, null);
-                        }
-                        
-                        if(RenderUtils.isInverted(CTM) && ((optionsApplied & PDFImageProcessing.IMAGE_ROTATED) !=PDFImageProcessing.IMAGE_ROTATED)){
-                            //turn upside down
-                            final AffineTransform image_at2 =new AffineTransform();
-                            image_at2.scale(-1,1);
-                            image_at2.translate(-image.getWidth(),0);
-                            
-                            final AffineTransformOp invert3= new AffineTransformOp(image_at2,  ColorSpaces.hints);
-                            
-                            if(image.getType()==12){ //avoid turning into ARGB
-                                final BufferedImage source=image;
-                                image =new BufferedImage(source.getWidth(),source.getHeight(),source.getType());
-                                
-                                invert3.filter(source,image);
-                            }else {
-                                image = invert3.filter(image, null);
-                            }
-                        }
-                    }
-                    
-                    final float[][] scaleDown={{0,1f/h,0},{1f/w,0,0},{0,0,1}};
-                    CTM=Matrix.multiply(scaleDown,CTM);
-                    
-                }else{
-                    final float[][] scaleDown={{0,1f/w,0},{1f/h,0,0},{0,0,1}};
-                    CTM=Matrix.multiply(scaleDown,CTM);
+            if(optionsApplied==0){
+
+                //turn upside down
+                final AffineTransform image_at2 =new AffineTransform();
+                image_at2.scale(1,-1);
+                image_at2.translate(0,-image.getHeight());
+
+                final AffineTransformOp invert3= new AffineTransformOp(image_at2,  ColorSpaces.hints);
+
+                if(image.getType()==12){ //avoid turning into ARGB
+                    final BufferedImage source=image;
+                    image =new BufferedImage(source.getWidth(),source.getHeight(),source.getType());
+
+                    invert3.filter(source,image);
+                }else {
+                    image = invert3.filter(image, null);
                 }
-                
-            }else{
-                
-                //allow for complex scaling (case 17441) where image needs inverting
-                if(optionsApplied==0 && CTM[0][0]<0 && CTM[0][1]>0 && CTM[1][0]>0 && CTM[1][1]>0){
-               
-                    //turn upside down
-                    final AffineTransform image_at2 =new AffineTransform();
-                    image_at2.scale(1,-1);
-                    image_at2.translate(0,-image.getHeight());
-                    
-                    final AffineTransformOp invert3= new AffineTransformOp(image_at2,  ColorSpaces.hints);
-                    
-                    if(image.getType()==12){ //avoid turning into ARGB
-                        final BufferedImage source=image;
-                        image =new BufferedImage(source.getWidth(),source.getHeight(),source.getType());
-                        
-                        invert3.filter(source,image);
-                    }else {
-                        image = invert3.filter(image, null);
-                    }
-                }     
-                
-                final float[][] scaleDown={{1f/w,0,0},{0,1f/h,0},{0,0,1}};
-                CTM=Matrix.multiply(scaleDown,CTM);
-            }
+            }  
+
+            final float[][] scaleDown={{1f/w,0,0},{0,1f/h,0},{0,0,1}};
+            CTM=Matrix.multiply(scaleDown,CTM);
             
             final AffineTransform upside_down=new AffineTransform(CTM[0][0],CTM[0][1],CTM[1][0],CTM[1][1],0,0);
             
@@ -3343,266 +3229,6 @@ public class SwingDisplay extends GUIDisplay{
     @Override
     public Rectangle getArea(final int i) {
         return new Rectangle(areas.elementAt(i)[0], areas.elementAt(i)[1],areas.elementAt(i)[2],areas.elementAt(i)[3]);
-    }
-    
-   
-    /**
-     * operations to do once page done
-     */
-    @Override
-    public void flagDecodingFinished() {
-        
-        highlightsNeedToBeGenerated=true;
-    }
-    
-    private void generateHighlights(final Graphics2D g2, final int count, final int[] objectTypes, final Object[] pageObjects, final float a, final float b, final float c, final float d, final int[] fsValues, final Rectangle[] fontBounds) {
-        
-        //flag done for page
-        highlightsNeedToBeGenerated=false;
-        
-        //array for text highlights
-        final int[] highlightIDs=new int[count];
-        
-        int fsCount=-1,fontBBCount=0;//note af is 1 behind!
-        
-        float x,y;
-        
-        Rectangle currentHighlight;
-        
-        final float[] top=new float[count];
-        final float[] bottom=new float[count];
-        final float[] left=new float[count];
-        final float[] right=new float[count];
-        final boolean[] isFontEmbedded =new boolean[count];
-        final int[] fontSizes =new int[count];
-        final float[] w=new float[count];
-        
-        textHighlightsX=new int[count];
-        final int[] textHighlightsY=new int[count];
-        textHighlightsWidth=new int[count];
-        textHighlightsHeight=new int[count];
-        
-        /**
-         * get highlights
-         */
-        //fontBoundsX=0,
-        int fontBoundsY=0,fontBoundsH=1000,fontBoundsW=1000,fontSize=1,realSize=1;
-        
-        final double[] matrix=new double[6];
-        g2.getTransform().getMatrix(matrix);
-        
-        //see if rotated
-        int pageRotation=0;
-        if(matrix[1]<0 && matrix[2]<0) {
-            pageRotation = 270;
-        }
-        
-        for(int i=0;i<count;i++){
-            
-            type=objectTypes[i];
-            
-            //
-            
-            if(type>0){
-                
-                x=x_coord[i];
-                y=y_coord[i];
-                
-                //put in displacement if text moved up by inversion
-                if(realSize<0) {
-                    x += realSize;
-                }
-                
-                final Object currentObject=pageObjects[i];
-                
-                if(type==DynamicVectorRenderer.fontBB){
-                    
-                    currentHighlight=fontBounds[fontBBCount];
-                    
-                    fontBoundsH=currentHighlight.height;
-                    //fontBoundsX=currentHighlight.x;
-                    fontBoundsY=currentHighlight.y;
-                    fontBoundsW=currentHighlight.width;
-                    fontBBCount++;
-                    
-                }else if(type==DynamicVectorRenderer.FONTSIZE){
-                    fsCount++;
-                    realSize=fsValues[fsCount];
-                    if(realSize<0) {
-                        fontSize = -realSize;
-                    } else {
-                        fontSize = realSize;
-                    }
-                    
-                }else if(type==DynamicVectorRenderer.TRUETYPE || type==DynamicVectorRenderer.TYPE1C || type==DynamicVectorRenderer.TEXT){
-                    
-                    //this works in 2 different unit spaces for embedded and non-embedded hence flags
-                    final float scaling;
-                    
-                    if(type==DynamicVectorRenderer.TRUETYPE || type==DynamicVectorRenderer.TYPE1C){
-                        final PdfGlyph raw=((PdfGlyph)currentObject);
-                        
-                        scaling=fontSize/1000f;
-                        
-                        textHighlightsX[i]=raw.getFontBB(PdfGlyph.FontBB_X);
-                        textHighlightsY[i]=fontBoundsY;
-                        textHighlightsWidth[i]=raw.getFontBB(PdfGlyph.FontBB_WIDTH);
-                        textHighlightsHeight[i]=fontBoundsH;
-                        
-                        isFontEmbedded[i]=true;
-                        
-                        if(pageRotation==90){
-                            bottom[i]=-((textHighlightsY[i]*scaling))+x;
-                            left[i]=(textHighlightsX[i]*scaling)+y;
-                        }else if(pageRotation==270){
-                            bottom[i]=((textHighlightsY[i]*scaling))+x;
-                            left[i]=-((textHighlightsX[i]*scaling)+y);
-                        }else{ //0 and 180 work the same way
-                            bottom[i]=((textHighlightsY[i]*scaling))+y;
-                            left[i]=((textHighlightsX[i]*scaling))+x;
-                        }
-                        
-                        top[i]=bottom[i]+(textHighlightsHeight[i]*scaling);
-                        right[i]=left[i]+(textHighlightsWidth[i]*scaling);
-                        
-                        w[i]=10; //any non zero number
-                        fontSizes[i]=fontSize;
-                        
-                    }else{
-                        
-                        final float scale=1000f/fontSize;
-                        textHighlightsX[i]=(int)x;
-                        textHighlightsY[i]=(int)(y+(fontBoundsY/scale));
-                        textHighlightsWidth[i]=(int)((fontBoundsW)/scale);
-                        textHighlightsHeight[i]=(int)((fontBoundsH-fontBoundsY)/scale);
-                        
-                        
-                        if(pageRotation==90){
-                            bottom[i]=-textHighlightsY[i];
-                            left[i]=textHighlightsX[i];
-                        }else if(pageRotation==270){
-                            bottom[i]=(textHighlightsY[i]);
-                            left[i]=-textHighlightsX[i];
-                        }else{ //0 and 180 work the same way
-                            bottom[i]=textHighlightsY[i];
-                            left[i]=textHighlightsX[i];
-                        }
-                        
-                        top[i]=bottom[i]+textHighlightsHeight[i];
-                        right[i]=left[i]+textHighlightsWidth[i];
-                        
-                        w[i]=((Area)currentObject).getBounds().width;
-                        
-                        fontSizes[i]=fontSize;
-                        
-                    }
-                    highlightIDs[i]=i;
-                    
-                }
-            }
-        }
-        
-        //sort highlights
-        //highlightIDs=Sorts.quicksort(left,bottom,highlightIDs);
-        
-        final int zz=-31;
-        //scan each and adjust so it touches next
-        //if(1==2)
-        for(int aa=0;aa<count-1;aa++){
-            
-            final int ptr=highlightIDs[aa];
-            
-            {//if(textHighlights[ptr]!=null){
-                
-                if(ptr==zz) {
-                    System.out.println("*" + ptr + " = " + " left=" + left[ptr] +
-                            " bottom=" + bottom[ptr] + " right=" + right[ptr] + " top=" + top[ptr]);
-                }
-                
-                int gap;
-                for(int next=aa+1;next<count;next++){
-                    final int nextPtr=highlightIDs[next];
-                    
-                    //skip empty
-                    if(isFontEmbedded[nextPtr]!=isFontEmbedded[ptr] || w[nextPtr]<1) {
-                        continue;
-                    }
-                    
-                    if(ptr==zz) {
-                        System.out.println("compare with=" + nextPtr + " left=" + left[nextPtr] + " right=" + right[nextPtr] + ' ' + (left[nextPtr] > left[ptr] && left[nextPtr] < right[ptr]));
-                    }
-                    
-                    //find glyph on right
-                    if((left[nextPtr]>left[ptr] && left[nextPtr]<right[ptr])||(left[nextPtr]>((left[ptr]+right[ptr])/2) && right[ptr]<right[nextPtr])){
-                        
-                        final int currentW=textHighlightsWidth[ptr];
-                        //int currentH=textHighlightsHeight[ptr];
-                        final int currentX=textHighlightsX[ptr];
-                        //int currentY=textHighlightsY[ptr];
-                        
-                        if(isFontEmbedded[nextPtr]){
-                            float diff=left[nextPtr]-right[ptr];
-                            
-                            if(diff>0) {
-                                diff += .5f;
-                            } else {
-                                diff += .5f;
-                            }
-                            
-                            gap=(int)(((diff*1000f/fontSizes[ptr])));
-                            
-                            if(textHighlightsX[nextPtr]>0) {
-                                gap += textHighlightsX[nextPtr];
-                            }
-                            
-                        }else {
-                            gap = (int) (left[nextPtr] - right[ptr]);
-                        }
-                        
-                        if(ptr==zz) {
-                            System.out.println((left[nextPtr] - right[ptr]) + " gap=" + gap + ' ' + (((left[nextPtr] - right[ptr]) * 1000f / fontSizes[ptr])) + " currentX=" + currentX + " scaling=" + scaling + ' ' + fontBoundsW);
-                        }
-                        
-                        final boolean isCorrectLocation=(gap>0 ||(gap<0 && left[ptr]<left[nextPtr] && right[ptr]>left[nextPtr] && right[ptr]<right[nextPtr] && left[ptr]<right[ptr] &&
-                                ( (-gap< fontSizes[ptr] && !isFontEmbedded[ptr])|| (-gap< fontBoundsW && isFontEmbedded[ptr]))));
-                        if(bottom[ptr]<top[nextPtr] && bottom[nextPtr]<top[ptr] && (gap>0 || isCorrectLocation)){
-                            if(isCorrectLocation &&   ((!isFontEmbedded[ptr] && gap<fontSizes[ptr] && currentW+gap<fontSizes[ptr]) || (isFontEmbedded[ptr] && gap<fontBoundsW))){
-                                
-                                
-                                
-                                if(ptr==zz) {
-                                    System.out.println(nextPtr + " = " + " left=" + left[nextPtr] +
-                                            " bottom=" + bottom[nextPtr] + " right=" + right[nextPtr] + " top=" + top[nextPtr]);
-                                }
-                                
-                                if(isFontEmbedded[ptr]){
-                                    
-                                    if(gap>0){
-                                        textHighlightsWidth[ptr]=currentW+gap;
-                                        //textHighlightsX[nextPtr]=textHighlightsX[nextPtr]-half-1;
-                                    }else{
-                                        textHighlightsWidth[ptr]=currentW-gap;
-                                    }
-                                    
-                                }else if(gap>0) {
-                                    textHighlightsWidth[ptr] = gap;
-                                } else {
-                                    textHighlightsWidth[ptr] = currentW + gap;
-                                }
-                                
-                                if(ptr==zz){
-                                    System.out.println("new="+textHighlightsWidth[ptr]);
-                                }
-                                
-                                next=count;
-                            }else if(gap>fontBoundsW){ //off line so exit
-                                //next=count;
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
     
     @Override

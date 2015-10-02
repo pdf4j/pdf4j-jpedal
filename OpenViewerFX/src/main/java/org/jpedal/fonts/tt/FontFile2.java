@@ -89,7 +89,7 @@ public class FontFile2 implements Serializable{
     public static final int LCCL=37;
     public static final int Zapf=38;
     
-    protected int tableCount=39;
+    protected static final int tableCount=39;
     
     //location of tables
     protected int checksums[][];

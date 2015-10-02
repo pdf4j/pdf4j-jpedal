@@ -44,9 +44,9 @@ public class PDFImageProcessing {
     public static final int IMAGE_INVERTED = 1;
 
     /**shows we have already rotated*/
-    public static final int IMAGE_ROTATED = 2;
+    //public static final int IMAGE_ROTATED = 2;
 
     /**shows we have left invert to rendering*/
-    public static final int TURN_ON_DRAW = 4;
+    //public static final int TURN_ON_DRAW = 4;
 
 }

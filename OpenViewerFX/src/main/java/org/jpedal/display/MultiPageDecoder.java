@@ -106,7 +106,7 @@ public abstract class MultiPageDecoder {
     
     final DecoderOptions options;
     
-    DisplayOffsets offsets;
+    final DisplayOffsets offsets;
     
     public MultiPageDecoder(final GUIFactory gui,final PdfDecoderInt pdf,final PdfPageData pageData,final MultiPagesDisplay display, final MultiDisplayOptions multiDisplayOptions, 
             final DynamicVectorRenderer currentDisplay, final int pageNumber,final FileAccess fileAccess, 
@@ -824,7 +824,7 @@ public abstract class MultiPageDecoder {
     }
 
     public void repaint() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("repaint Not supported yet.");
     }
 
     public DynamicVectorRenderer getNewDisplay(int pageNumber) {

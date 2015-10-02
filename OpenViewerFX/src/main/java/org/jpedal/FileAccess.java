@@ -817,7 +817,7 @@ public class FileAccess {
         return lastPageDecoded;
     }
 
-    void setLastPageDecoded(final int page) {
+    public void setLastPageDecoded(final int page) {
       lastPageDecoded = page;
     }
 

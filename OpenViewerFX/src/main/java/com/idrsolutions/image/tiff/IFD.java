@@ -69,15 +69,15 @@ public class IFD {
             
     @Override
     public String toString() {
-        String str = "ImageWidth: " + imageWidth + '\n'
-                + "ImageHeight: " + imageHeight + '\n'
-                + "SamplesPerPixel: " + samplesPerPixel + '\n'
-                + "CompressionType: " + compressionType + '\n'
-                + "Photomtric: " + photometric + '\n'
-                + "RowsPerStrip: " + rowsPerStrip + '\n'
-                + "PlanarConfig: " + planarConfiguration + '\n'
-                + "FillOrder: " + fillOrder + '\n'
-                + "bits per sample: ";
+        String str = "ImageWidth: " + imageWidth 
+                + "\nImageHeight: " + imageHeight
+                + "\nSamplesPerPixel: " + samplesPerPixel
+                + "\nCompressionType: " + compressionType 
+                + "\nPhotomtric: " + photometric
+                + "\nRowsPerStrip: " + rowsPerStrip
+                + "\nPlanarConfig: " + planarConfiguration 
+                + "\nFillOrder: " + fillOrder 
+                + "\nbits per sample: ";
         for (int i = 0; i < bps.length; i++) {
             str += "\t"+bps[i];
         }

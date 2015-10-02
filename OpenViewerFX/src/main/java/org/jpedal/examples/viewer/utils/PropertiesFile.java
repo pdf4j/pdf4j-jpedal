@@ -68,10 +68,6 @@ public class PropertiesFile {
     private String configFile=userDir+separator+".properties.xml";
     private InputStream configInputStream;
     
-    private boolean isTest;
-    
-    private boolean refactorProperties;
-    
     private boolean isReadOnly;
     
     public boolean isReadOnly() {
@@ -347,11 +343,11 @@ public class PropertiesFile {
             
             if(configInputStream==null && (((config!=null && (config.canWrite() || (!config.exists() && !config.canWrite()))) && !getValue("readOnly").toLowerCase().equals("true"))||config.length()==0)){
                 isReadOnly= false;
-                final boolean hasAllElements=checkAllElementsPresent();
+                checkAllElementsPresent();
                 
                 //If properties is an old version or we are missing elements
                 //add missing / reload properties file
-                if(refactorProperties || !hasAllElements){
+                /*if(refactorProperties || !hasAllElements){
                     //Reset to start of properties file
                     position = 0;
                     
@@ -366,7 +362,7 @@ public class PropertiesFile {
                     
                     /**
                      * Move RecentFiles List Over to new properties
-                     */
+                   
                     //New Properties
                     final NodeList newRecentFiles =doc.getElementsByTagName("recentfiles");
                     final Element newRecentRoot=(Element) newRecentFiles.item(0);
@@ -407,7 +403,7 @@ public class PropertiesFile {
                     if(!isTest) {
                         writeDoc();
                     }
-                }
+                }*/
                 
                 //Check for invalid color options (possible mistake in properties file)
                 final String v1 = getValue("vfgColor");
@@ -588,38 +584,35 @@ public class PropertiesFile {
         this.configFile=null;
         
     }
-    
-    private boolean checkAllElementsPresent() throws Exception{
-        
+
+    private void checkAllElementsPresent() throws Exception{
+
     	//Reset to start of properties file
         position = 0;
-        
-        //assume true and set to false if wrong
-        final boolean hasAllElements;
-        
+
         NodeList allElements = doc.getElementsByTagName("*");
         final List elementsInTree=new ArrayList(allElements.getLength());
-        
+
         for(int i=0;i<allElements.getLength();i++) {
             elementsInTree.add(allElements.item(i).getNodeName());
         }
-        
+
         final Element propertiesElement;
-        
+
         if(elementsInTree.contains("properties")){
             propertiesElement = (Element) doc.getElementsByTagName("properties").item(0);
         }else{
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             final DocumentBuilder db = dbf.newDocumentBuilder();
-            
+
             doc =  db.newDocument();
-            
+
             propertiesElement = doc.createElement("properties");
             doc.appendChild(propertiesElement);
-            
+
 //            allElements = propertiesElement.getChildNodes();//getElementsByTagName("*");
 //            elementsInTree=new ArrayList(allElements.getLength());
-//            
+//
 //            for(int i=0;i<allElements.getLength();i++)
 //                elementsInTree.add(allElements.item(i).getNodeName());
         }
@@ -627,14 +620,13 @@ public class PropertiesFile {
             final Element recent = doc.createElement("recentfiles");
             propertiesElement.appendChild(recent);
         }
-        
+
         allElements = propertiesElement.getChildNodes();
-        
-        hasAllElements = addProperties(allElements, propertiesElement);
-        
-        return hasAllElements;
+
+        addProperties(allElements, propertiesElement);
+
     }
-    
+
     //Keep track of position in the properties array
     int position;
     
@@ -674,10 +666,8 @@ public class PropertiesFile {
     	
     }
     
-    private boolean addMenuElement(final NodeList tree, final Element menu){
-        boolean hasAllElements = true;
+    private void addMenuElement(final NodeList tree, final Element menu){
         
-        //System.out.println("MENU == "+properties[position]);
         final int containsNode = checkNodelistForValue(tree, properties[position+1], false);
         final int containsComment = checkNodelistForValue(tree, properties[position], true);
     	
@@ -700,7 +690,6 @@ public class PropertiesFile {
             //Start on children of menu
             addProperties(tree, property);
             
-            hasAllElements=false;
         }else{
         	final Element property = (Element) doc.getElementsByTagName(properties[position+1]).item(0);
             if(containsComment==-1){
@@ -711,14 +700,8 @@ public class PropertiesFile {
             position++;
             addProperties(tree, property);
         }
-        
-        return hasAllElements;
     }
-    private boolean addChildElements(final NodeList tree, final Element menu){
-        boolean hasAllElements = true;
-        
-        //System.out.println("Child == "+properties[position]);
-        //Not at the end of the children so keep adding
+    private void addChildElements(final NodeList tree, final Element menu){
         
         if(!properties[position].equals("ENDCHILDREN")){
 
@@ -738,7 +721,6 @@ public class PropertiesFile {
                 property.setAttribute("value",properties[position]);
                 menu.appendChild(property);
                 
-                hasAllElements=false;
             }else{
             	if(containsComment==-1){
                 	menu.insertBefore(doc.createComment(properties[position]), tree.item(containsNode));
@@ -757,7 +739,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.4.28")){
+                        if(properties[position+1].equals("6.6b02")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;
@@ -781,7 +763,6 @@ public class PropertiesFile {
                             //compare version, only update on newer version
                             if(progVersion>propVersion){
                                 element.setAttribute("value", PdfDecoderInt.version);
-                                refactorProperties  = true;
                             }
                         }
                     }
@@ -794,32 +775,23 @@ public class PropertiesFile {
             endMenu = true;
         }
         position++;
-        return hasAllElements;
     }
     
     private boolean endMenu;
     
-    private boolean addProperties(final NodeList tree, final Element menu){
-        boolean hasAllElements=true;
-        
+    private void addProperties(final NodeList tree, final Element menu){
         while(position<properties.length){
-            final boolean value;
             //Add menu to properties
             if(properties[position+1].endsWith("Menu")){
-                value = addMenuElement(tree, menu);
+                addMenuElement(tree, menu);
             }else{
-                value = addChildElements(tree, menu);
+                addChildElements(tree, menu);
                 if(endMenu){
                     endMenu=false;
-                    return hasAllElements;
+                    break;
                 }
             }
-            
-            if(!value) {
-                hasAllElements = false;
-            }
         }
-        return hasAllElements;
     }
     
     public static int getNoRecentDocumentsToDisplay() {

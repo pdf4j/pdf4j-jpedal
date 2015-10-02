@@ -41,10 +41,10 @@ import org.jpedal.objects.acroforms.creation.FormFactory;
 import org.jpedal.objects.acroforms.utils.FormUtils;
 
 import org.jpedal.objects.raw.*;
-import org.jpedal.parser.PdfStreamDecoder;
 import org.jpedal.utils.*;
 
 import java.util.*;
+import org.jpedal.external.ExternalHandlers;
 import org.jpedal.objects.acroforms.creation.SwingFormCreator;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.parser.*;
@@ -127,8 +127,6 @@ public class AcroRenderer{
      */
     private Javascript javascript;
     
-    PdfObject acroObj;
-    
     /*flag to show if XFA or FDF*/
     boolean hasXFA;
     private boolean isContainXFAStream;
@@ -201,8 +199,6 @@ public class AcroRenderer{
         this.currentPdfFile = currentPdfFile;
         this.pageData = pageData;
 
-        this.acroObj=acroObj;
-        
         compData.flushFormData();
         
         //explicitly flush
@@ -324,6 +320,7 @@ public class AcroRenderer{
         this.pageData = pageData;
         
         boolean resetToEmpty = true;
+        addedMissingPopup = false;
         
         //track inset on page
         compData.setPageData(pageData,insetW,insetH);
@@ -377,7 +374,7 @@ public class AcroRenderer{
 
                 PDFformType=FormTypes.NON_XFA;
 
-                setupXFADecoder();
+                fDecoder = new FormStream();
                 
             }
         }
@@ -409,6 +406,7 @@ public class AcroRenderer{
         }
     }
 
+    private boolean addedMissingPopup;
     /**
      * build forms display using standard swing components
      */
@@ -507,10 +505,15 @@ public class AcroRenderer{
                                 objRef = fieldList.getNextValueAsString(true);
                             }
                         }else{
-                            if(annotList.length>page && annotList[page]!=null) {
-                                objRef = annotList[page].getNextValueAsString(true);
-                            }
-                            
+                            if(addedMissingPopup && !annotList[page].hasMoreTokens()){
+                        		//Ignore this as we have added our own object that does not need reading
+                        		//with the PdfArrayIterator. Code positioned like this to explain.
+                                //Test File : baseline_screens\cid2\SampleError.pdf
+                        	}else{
+                        		if(annotList.length>page && annotList[page]!=null) {
+                        			objRef = annotList[page].getNextValueAsString(true);
+                        		}
+                        	}
                         }
                         
                         if(objRef==null || (objRef!=null && (formsProcessed.get(objRef)!=null || objRef.isEmpty()))) {
@@ -559,6 +562,8 @@ public class AcroRenderer{
                         		Aforms = newForms;
                         		
                         		AfieldCount[page]++;
+                                
+                                addedMissingPopup = true;
                         	}
                       
                         final byte[][] kids=formObject.getKeyArray(PdfDictionary.Kids);
@@ -931,8 +936,9 @@ public class AcroRenderer{
                 fDecoder.createAppearanceString(formObject, currentPdfFile);
             }
             
-            if (formObject!= null){
-                
+            //Check that type returns as a valid value to lock out broken objects
+            //Added for case 22215
+            if (formObject!= null && formObject.getParameterConstant(PdfDictionary.Subtype)!=-1){
                 if(parent!=null) {
                     formObject.setParent(parent);//parent object was added earlier
                 }
@@ -1045,8 +1051,8 @@ public class AcroRenderer{
         
         final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);//FT
         
-        //<start-noform>
-
+        final int formFactoryType=formFactory.getType();
+        
         //if sig object set global sig object so we can access later
         storeSignatures(formObject, subtype);
 
@@ -1089,8 +1095,11 @@ public class AcroRenderer{
              */
         }
         
-        /** setup field */
-        if (subtype == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
+        //hard-coded for HTML non-forms
+        if(!ExternalHandlers.isXFAPresent() && (formFactoryType==FormFactory.HTML || formFactoryType==FormFactory.SVG)){
+            widgetType=FormFactory.ANNOTATION;
+           
+        }else if (subtype == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
             
             //flags used for button types
             //20100212 (ms) Unused ones commented out
@@ -1166,15 +1175,10 @@ public class AcroRenderer{
                 widgetType=FormFactory.SIGNATURE;
             } else{//assume annotation if (formType == ANNOTATION) {
                 
-                //<end-noform>
-                
                 widgetType=FormFactory.ANNOTATION;
                 
-                //<start-noform>
             }
         }
-        
-        //<end-noform>
         
         formObject.setFormType(widgetType);
 
@@ -1297,10 +1301,7 @@ public class AcroRenderer{
         
         fDecoder=null;
         
-        //linkHandler=null;
-        
-        acroObj=null;
-        
+       
     }
     
     /**
@@ -1450,8 +1451,8 @@ public class AcroRenderer{
     public boolean showFormWarningMessage(int page) {
         
         boolean warnOnceOnForms=false;
-        
-        if(isXFA()){
+
+        if(hasXFA){
             warnOnceOnForms=true;
             System.out.println("[WARNING] This file contains XFA forms that are not supported by this version of JPDF2HTML5. To convert into functional HTML forms and display non-legacy mode page content, JPDF2HTML5 Forms Edition must be used.");
         }else if(hasFormsOnPage(page)){
@@ -1464,12 +1465,6 @@ public class AcroRenderer{
 
     FormObject[] createXFADisplayComponentsForPage(FormObject[] xfaFormList, int page) {
         throw new UnsupportedOperationException("createXFADisplayComponentsForPage should never be called");
-    }
-
-    void setupXFADecoder() {
-      
-        fDecoder = new FormStream();
-                
     }
 
     public HashMap getPageMapXFA() {
@@ -1485,7 +1480,7 @@ public class AcroRenderer{
     }
 
     public PrintStreamDecoder getStreamDecoderForPrinting(PdfObjectReader currentPdfFile, boolean isHires, PdfLayerList pdfLayerList) {
-        //<start-server><end-server>
+        //
          return null;
         /**/
     }

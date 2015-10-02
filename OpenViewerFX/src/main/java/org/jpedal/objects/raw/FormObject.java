@@ -39,15 +39,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-//<start-adobe>
-import javafx.application.Platform;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-//<end-adobe>
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.jpedal.color.DeviceCMYKColorSpace;
+import org.jpedal.external.ExternalHandlers;
+import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.objects.acroforms.creation.FormFactory;
 import org.jpedal.objects.acroforms.creation.GenericFormFactory;
 import org.jpedal.objects.javascript.defaultactions.DisplayJavascriptActions;
@@ -57,6 +54,8 @@ import org.jpedal.utils.StringUtils;
 
 public class FormObject extends PdfObject{
 
+    private static final JavaFXSupport fxSupport = ExternalHandlers.getFXHandler();
+                 
     private int formType = -1;
 
     private String fontName="Arial";
@@ -2382,18 +2381,6 @@ public class FormObject extends PdfObject{
 
     }
     
-    /** oldJS */
-    private void setTextColor(final Object jscolor) {
-    	
-        // <start-demo><end-demo>
-		
-		//code below should work if ever called.
-		if(jscolor!=null){
-			//convert javascript string to the appropriate color
-			textColor = DisplayJavascriptActions.convertToColorFloatArray((String)jscolor);
-		}
-    }
-   
     /**
      * set the text font for this form
      */
@@ -3764,42 +3751,23 @@ public class FormObject extends PdfObject{
             };
             SwingUtilities.invokeLater(doPaintComponent);
         }
-    }
-        //<start-adobe>
-        else if(guiType == FormFactory.JAVAFX){
-            if(Platform.isFxApplicationThread()){
-                setGUI(formType, value, guiComp, guiType);
-            }else{
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        setGUI(formType, value, guiComp, guiType);
-                    }
-                });
-            }
+    }else if(guiType == FormFactory.JAVAFX){
+            setGUI(formType, value, guiComp, guiType);        
         }
-        //<end-adobe>
+       
     }
 
     private static void setGUI(final int formType, final Object value, final Object guiComp, final int guiType) {
         
         try{
-            //<start-adobe>
+            
             if(guiType == FormFactory.JAVAFX){
-                if(GenericFormFactory.isTextForm(formType)){
-                    ((TextInputControl)guiComp).setText((String) value);
-                }else if (formType == FormFactory.checkboxbutton){
-                    ((ToggleButton)guiComp).setSelected(Boolean.valueOf((String)value));
-                }else if(GenericFormFactory.isButtonForm(formType)){
-                    ((ToggleButton)guiComp).setText((String)value);
-                    ((ToggleButton)guiComp).setSelected(Boolean.valueOf((String)value));
-                }else if (formType == FormFactory.annotation &&
-                    guiComp instanceof ToggleButton){
-                        ((ToggleButton)guiComp).setSelected(Boolean.valueOf((String)value));
-                    }
                 
-            }else
-                //<end-adobe>
-                if(guiType == FormFactory.SWING){
+                 if(fxSupport!=null){
+                    fxSupport.renderGUIComponent(formType, value,guiComp, guiType); 
+                 }
+                
+            }else if(guiType == FormFactory.SWING){
                     if (GenericFormFactory.isTextForm(formType)) {
                         ((JTextComponent) guiComp).setText((String) value);
                     }else if(formType==FormFactory.checkboxbutton){
@@ -3811,8 +3779,6 @@ public class FormObject extends PdfObject{
                         guiComp instanceof JButton){
                             ((JButton) guiComp).setSelected(Boolean.valueOf((String) value));
                         }
-                    
-                } else { //ulc
                     
                 }
         }catch(final Exception ee){
@@ -3855,18 +3821,13 @@ public class FormObject extends PdfObject{
             selectionIndices[0]=index;
 
             if (guiComp != null) {
-                //<start-adobe>
                 // Check if it's a JavaFX object, if not than use Swing
                 // Might need to be on FX Thread
                 if(guiType == FormFactory.JAVAFX){
-                    if(formType==FormFactory.combobox){
-                         selectedItem=(String) ((ComboBox)guiComp).getSelectionModel().getSelectedItem();
-                    }else{
-                         selectedItem=(String) ((ListView)guiComp).getSelectionModel().getSelectedItem();
+                    if(fxSupport!=null){
+                        selectedItem=fxSupport.getSelectedItem(guiComp,formType);
                     }
-                }else
-                //<end-adobe>
-                if (SwingUtilities.isEventDispatchThread()) {
+                }else if (SwingUtilities.isEventDispatchThread()) {
                     if(formType==FormFactory.combobox){
                         ((JComboBox) guiComp).setSelectedIndex(selectionIndex);
                         selectedItem= (String) ((JComboBox) guiComp).getSelectedItem();
@@ -3911,16 +3872,11 @@ public class FormObject extends PdfObject{
     private void updateCombo() {
 
         if(formType==FormFactory.combobox || formType==FormFactory.list){
-            //<start-adobe>
             if(guiType == FormFactory.JAVAFX){
-                if(formType == FormFactory.combobox){
-                    ((ComboBox)guiComp).getSelectionModel().select(selectedItem);
-                }else{
-                    ((ListView)guiComp).getSelectionModel().select(selectedItem);
-                }
-            }else
-            //<end-adobe>
-        if (SwingUtilities.isEventDispatchThread()) {
+                if(fxSupport!=null){
+                        fxSupport.select(guiComp,selectedItem,formType);
+                    }
+            }else if (SwingUtilities.isEventDispatchThread()) {
             if(formType==FormFactory.combobox){
                 ((JComboBox) guiComp).setSelectedItem(selectedItem);
             }else{
@@ -4018,15 +3974,13 @@ public class FormObject extends PdfObject{
     public void setVisible(final boolean isVisible) {
 	
         if (guiComp != null) {
-            //<start-adobe>
             if(guiType == FormFactory.JAVAFX){
-                ((Node)guiComp).setVisible(isVisible);
+                if(fxSupport!=null){
+                    fxSupport.setVisible(guiComp,isVisible);
+                }
             }else{
-            //<end-adobe>
                 ((JComponent)guiComp).setVisible(isVisible);
-            //<start-adobe>
             }
-            //<end-adobe>
         }
     }
 

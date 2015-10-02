@@ -238,7 +238,10 @@ public class FormFlattener {
             BBox=new float[]{0,0,1,1};
         }
 
-        if (pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber()) == 0) {
+        //we need to factor in this to calculations
+        final int pageRotation= pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber());
+        
+        if (pageRotation == 0) {
             if (BBox[1] > BBox[3]) {
                 float t = BBox[1];
                 BBox[1] = BBox[3];
@@ -264,137 +267,144 @@ public class FormFlattener {
             matrix = imgObj.getFloatArray(PdfDictionary.Matrix);
         }
         
-        //we need to factor in this to calculations
-        final int pageRotation= pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber());
-
-        //System.out.println("pageRot="+pageRotation);
-        //System.out.println("BBox="+BBox[0]+" "+BBox[1]+" "+BBox[2]+" "+BBox[3]);
-        //System.out.println("matrix="+matrix[0]+" "+matrix[1]+" "+matrix[2]+" "+matrix[3]);
         float x = BBox[0],y = BBox[1];
         Area newClip=null;
 
         //check for null and then recalculate insets
-        if(matrix!=null){
+        if (matrix != null) {
 
             float yScale = 1;
 
-            //Check for appearnce stream
-            PdfObject temp = form.getDictionary(PdfDictionary.AP);
-            if(temp != null){
+            if (imgObj!=null && pageRotation == 0 && matrix[4]>0 && matrix[5]>0) {
 
-                //Check for N object
-                temp = temp.getDictionary(PdfDictionary.N);
-                if(temp!=null){
+                final float[] BoundingBox = imgObj.getFloatArray(PdfDictionary.BBox);
+                if (BoundingBox[1] > BoundingBox[3]) {
+                    float t = BoundingBox[1];
+                    BoundingBox[1] = BoundingBox[3];
+                    BoundingBox[3] = t;
+                }
 
-                    //Check for a bounding box of this object
-                    final float[] BoundingBox = temp.getFloatArray(PdfDictionary.BBox);
-                    if (BoundingBox != null) {
-//                        if (BoundingBox[1] > BoundingBox[3]) {
-//                            float t = BoundingBox[1];
-//                            BoundingBox[1] = BoundingBox[3];
-//                            BoundingBox[3] = t;
-//                        }
-//
-//                        if (BoundingBox[0] > BoundingBox[2]) {
-//                            float t = BoundingBox[0];
-//                            BoundingBox[0] = BoundingBox[2];
-//                            BoundingBox[2] = t;
-//                        }
-                        //If different from BB provided and matrix is standard than add scaling
-                        if (BBox[0]!=BoundingBox[0] && BBox[1]!=BoundingBox[1]
-                                && BBox[2]!=BoundingBox[2] && BBox[3]!=BoundingBox[3]){
+                if (BoundingBox[0] > BoundingBox[2]) {
+                    float t = BoundingBox[0];
+                    BoundingBox[0] = BoundingBox[2];
+                    BoundingBox[2] = t;
+                }
+                
+                matrix[0] = (BBox[2] - BBox[0]) / (BoundingBox[2] - BoundingBox[0]);
+                matrix[1] = 0;
+                matrix[2] = 0;
+                matrix[3] = (BBox[3] - BBox[1]) / (BoundingBox[3] - BoundingBox[1]);
+                matrix[4] = (BBox[0] - BoundingBox[0]);
+                matrix[5] = (BBox[1] - BoundingBox[1]);
+                
+                pdfStreamDecoder.gs.CTM = new float[][]{{matrix[0],matrix[1],0},{matrix[2],matrix[3],0},{matrix[4],matrix[5],1}};
+                newClip=new Area(new Rectangle((int)BBox[0],(int)BBox[1],(int)((BBox[2]-BBox[0])+2),(int)((BBox[3]-BBox[1])+2)));                   
+                
+                //Set variables for draw form call
+                x = (matrix[4]);
+                y = (matrix[5]);
+            } else {
 
-                            if (//Check matrix is standard
-                                    matrix[0]*matrix[3]==1.0f
-                                    && matrix[1]*matrix[2]==0.0f){
+                //Check for appearnce stream
+                PdfObject temp = form.getDictionary(PdfDictionary.AP);
+                if (temp != null) {
 
-                                //float bbw = BBox[2]-BBox[0];
-                                final float bbh = BBox[3]-BBox[1];
-                                //float imw = BoundingBox[2]-BoundingBox[0];
-                                final float imh = BoundingBox[3]-BoundingBox[1];
+                    //Check for N object
+                    temp = temp.getDictionary(PdfDictionary.N);
+                    if (temp != null) {
 
-                            //Adjust scale on the x to fit form size
-//            				if(pageRotation!=0 && (int)bbw!=(int)imw){
-//            					float xScale = bbw/imw;
-//
-//            					//Move form up instead of drawing top at bottom of area
-//            					x-=(imw*xScale);
-//            				}
-                                //Adjust scale on the y to fit form size
-                                if ((int)bbh!=(int)imh) {
-                                    yScale = bbh/imh;
-                                }
-                            } else {
-                                //-90 rotation
-                                if (matrix[0]*matrix[3]==0.0f
-                                        && matrix[1]*matrix[2]==-1.0f) {
+                        //Check for a bounding box of this object
+                        final float[] BoundingBox = temp.getFloatArray(PdfDictionary.BBox);
+                        if (BoundingBox != null) {
+
+                            //If different from BB provided and matrix is standard than add scaling
+                            if (BBox[0] != BoundingBox[0] && BBox[1] != BoundingBox[1]
+                                    && BBox[2] != BoundingBox[2] && BBox[3] != BoundingBox[3]) {
+
+                                if (//Check matrix is standard
+                                        matrix[0] * matrix[3] == 1.0f
+                                        && matrix[1] * matrix[2] == 0.0f) {
+
                                     //float bbw = BBox[2]-BBox[0];
-                                    
-                                    //Handle 0 rot case here
-                                    float bbh = BBox[2]-BBox[0];
-                                    switch(pageRotation){
-                                        
-                                        case 90 : 
-                                            bbh = BBox[2]-BBox[0];
-                                            break;
-                                            
-                                        case 180 :
-                                            break;
-                                            
-                                        case 270 : 
-                                            bbh = BBox[2]-BBox[0];
-                                            break;
-                                    }
+                                    final float bbh = BBox[3] - BBox[1];
                                     //float imw = BoundingBox[2]-BoundingBox[0];
-                                    final float imh = BoundingBox[3]-BoundingBox[1];
+                                    final float imh = BoundingBox[3] - BoundingBox[1];
 
                                     //Adjust scale on the y to fit form size
-                                    if ((int)bbh!=(int)imh){
-                                        yScale = bbh/imh;
+                                    if ((int) bbh != (int) imh) {
+                                        yScale = bbh / imh;
+                                    }
+                                } else {
+                                    //-90 rotation
+                                    if (matrix[0] * matrix[3] == 0.0f
+                                            && matrix[1] * matrix[2] == -1.0f) {
+                                    //float bbw = BBox[2]-BBox[0];
+
+                                        //Handle 0 rot case here
+                                        float bbh = BBox[2] - BBox[0];
+                                        switch (pageRotation) {
+
+                                            case 90:
+                                                bbh = BBox[2] - BBox[0];
+                                                break;
+
+                                            case 180:
+                                                break;
+
+                                            case 270:
+                                                bbh = BBox[2] - BBox[0];
+                                                break;
+                                        }
+                                        //float imw = BoundingBox[2]-BoundingBox[0];
+                                        final float imh = BoundingBox[3] - BoundingBox[1];
+
+                                        //Adjust scale on the y to fit form size
+                                        if ((int) bbh != (int) imh) {
+                                            yScale = bbh / imh;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            switch(pageRotation){
-                case 90:
-                    
-                    //Allow for rotated forms, form requires lowest value
-                    if (BBox[0] < BBox[2]) {
-                        x = BBox[0] + (matrix[4] * yScale);
-                    } else {
-                        x = BBox[2] + (matrix[4] * yScale);
-                    }
-                    
-                    //Added code to fix ny1981.pdf and 133419-without-annotations-p2.pdf
-                    if(matrix[4]<0) {
-                        x = BBox[0] + (matrix[4] * yScale);
-                    }
-                    //newClip=new Area(new Rectangle((int)BBox[2],(int)BBox[1],(int)BBox[0],(int)BBox[3]));
-                    break;
-                default:
-                    x = BBox[0]+(matrix[4]*yScale);
-                    newClip=new Area(new Rectangle((int)BBox[0],(int)BBox[1],(int)((BBox[2]-BBox[0])+2),(int)((BBox[3]-BBox[1])+2)));
-                    break;
-            }
-            
-            y = BBox[1]+(matrix[5]*yScale);
-            
-            //set gs.CTM to form coords (probably {1,0,0}{0,1,0}{x,y,1} at a guess
-            pdfStreamDecoder.gs.CTM = new float[][]{{matrix[0]*yScale,matrix[1]*yScale,0},{matrix[2]*yScale,matrix[3]*yScale,0},{x,y,1}};
+                switch (pageRotation) {
+                    case 90:
 
+                        //Allow for rotated forms, form requires lowest value
+                        if (BBox[0] < BBox[2]) {
+                            x = BBox[0] + (matrix[4] * yScale);
+                        } else {
+                            x = BBox[2] + (matrix[4] * yScale);
+                        }
+
+                        //Added code to fix ny1981.pdf and 133419-without-annotations-p2.pdf
+                        if (matrix[4] < 0) {
+                            x = BBox[0] + (matrix[4] * yScale);
+                        }
+                        //newClip=new Area(new Rectangle((int)BBox[2],(int)BBox[1],(int)BBox[0],(int)BBox[3]));
+                        break;
+                    default:
+                        x = BBox[0] + (matrix[4] * yScale);
+                        newClip = new Area(new Rectangle((int) BBox[0]-1, (int) BBox[1]-1, (int) ((BBox[2] - BBox[0]) + 3), (int) ((BBox[3] - BBox[1]) + 3)));
+                        break;
+                }
+
+                y = BBox[1] + (matrix[5] * yScale);
+
+                //set gs.CTM to form coords (probably {1,0,0}{0,1,0}{x,y,1} at a guess
+                pdfStreamDecoder.gs.CTM = new float[][]{{matrix[0] * yScale, matrix[1] * yScale, 0}, {matrix[2] * yScale, matrix[3] * yScale, 0}, {x, y, 1}};
+            }
         }else{
             pdfStreamDecoder.gs.CTM = new float[][]{{1,0,0},{0,1,0},{x,y,1}};
             newClip=new Area(new Rectangle((int)BBox[0],(int)BBox[1],(int)BBox[2],(int)BBox[3]));
         }
-
+        //newClip=new Area(new Rectangle(0,0,2000,2000));
         drawForm(imgObj, form, pdfStreamDecoder, newClip, isHTML, BBox, x, y, formData, APobjN, oldGS);
       
     }
-
+    
     void drawForm(PdfObject imgObj, final PdfObject form, final PdfStreamDecoder pdfStreamDecoder, Area newClip, final boolean isHTML, float[] BBox, float x, float y, byte[] formData, final PdfObject APobjN, final GraphicsState oldGS) throws PdfException {
         
         //set clip to match bounds on form
@@ -417,7 +427,7 @@ public class FormFlattener {
             final int h=(int) (BBox[3]-BBox[1]);
 
             if(w>0 && h>0){
-                final BufferedImage image= MaskUtils.createTransparentForm(imgObj, 0, 0, w, h, true, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
+                final BufferedImage image= MaskUtils.createTransparentForm(imgObj, 0, 0, w, h, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
 
                 //draw the image to HTML
 
@@ -466,7 +476,7 @@ public class FormFlattener {
          * we need to reset clip otherwise items drawn afterwards
          * like forms data in image or print will not appear.
          */
-        pdfStreamDecoder.gs.updateClip((Area) null);
+        pdfStreamDecoder.gs.updateClip(null);
         pdfStreamDecoder.current.drawClip(pdfStreamDecoder.gs, null, true) ;
         //restore
         pdfStreamDecoder.gs =oldGS;

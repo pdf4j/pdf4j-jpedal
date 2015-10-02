@@ -84,7 +84,7 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
 
     long timeOfLastPageChange;
     
-    DisplayOffsets offsets;
+    final DisplayOffsets offsets;
 
     public JavaFXMousePageTurn(final PdfDecoderFX decode_pdf, final GUIFactory currentGUI,
             final Values commonValues, final Commands currentCommands) {

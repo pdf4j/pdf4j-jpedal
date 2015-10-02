@@ -34,6 +34,7 @@
 package org.jpedal.display.javafx;
 
 import org.jpedal.FileAccess;
+import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.MultiDisplayOptions;
 import org.jpedal.display.MultiPagesDisplay;
@@ -87,14 +88,18 @@ class JavaFXMultiPageDecoder extends MultiPageDecoder {
     public void decodeMorePages(int page, int originalStart, int originalEnd) {
 
         /**
-         * decode or get cached page data. If it is still in cache we just need a repaint
+         * Decode or get cached page data. If it is still in cache we just need a repaint
          */
         if (currentPageViews.get(page) == null) {
 
             decodePage(page, originalStart, originalEnd);
         }
-
+       
         currentPageViews.put(page, "x");
-
+        
+        
+        //some hacky code to make page navigation to work in continuous mode ; need to be fixed in due time   
+        ((PdfDecoderFX) pdf).setPageNumber(originalStart);        
+        
     }
 }

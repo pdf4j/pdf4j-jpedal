@@ -42,6 +42,7 @@ import org.jpedal.exception.PdfException;
 import org.jpedal.external.*;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.StandardFonts;
+import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.fonts.glyph.T3Size;
 import org.jpedal.images.SamplingFactory;
 import org.jpedal.io.DefaultErrorTracker;
@@ -69,7 +70,7 @@ public class PdfStreamDecoder extends BaseDecoder{
     
     private static boolean showFXShadingMessage;
     
-    //<start-adobe><end-adobe>
+    //
     
     int formLevel;
     
@@ -377,7 +378,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 this.layers=(PdfLayerList) obj;
                 break;
                 
-                //<start-adobe><end-adobe>
+                //
                 
             case ValueTypes.ImageHandler:
                 this.customImageHandler = (ImageHandler)obj;
@@ -551,14 +552,15 @@ public class PdfStreamDecoder extends BaseDecoder{
         //used in CS to avoid miscaching
         String csInUse="",CSInUse="";
         
-        final PdfShape currentDrawShape;
+        PdfShape currentDrawShape = null;
         
-        //<start-adobe>
         if(parserOptions.useJavaFX()) {
-            currentDrawShape = new JavaFXShape();
-        } else
-            //<end-adobe>
-        {
+            JavaFXSupport fxSupport = ExternalHandlers.getFXHandler();
+            if(fxSupport!=null){
+                currentDrawShape = fxSupport.getFXShape();
+            }
+            
+        } else{
             currentDrawShape = new SwingShape();
         }
         
@@ -1154,7 +1156,7 @@ public class PdfStreamDecoder extends BaseDecoder{
             case ValueTypes.EmbeddedFonts:
                 return pdfFontFactory.hasEmbeddedFonts();
                 
-                //<start-adobe><end-adobe>
+                //
             
             case DecodeStatus.PageDecodingSuccessful:
                 return errorTracker.ispageSuccessful();
@@ -1294,7 +1296,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                     parserOptions.getLayerVisibility().add(parserOptions.getLayerLevel());
                 }
                 
-                //<start-adobe><end-adobe>
+                //
                 break;
                 
             case Cmd.BDC :
@@ -1312,7 +1314,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 //track setting and use in preference for text extraction
                 textDecoder.setActualText(BDCobj.getTextStreamValue(PdfDictionary.ActualText));
                 
-                //<start-adobe><end-adobe>
+                //
                 break;
                 
             case Cmd.BT :
@@ -1321,7 +1323,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 
             case Cmd.EMC :
                 textDecoder.setActualText(null);
-                //<start-adobe><end-adobe>
+                //
                 
                 //balance stack inside tagged commands
                 if(parserOptions.getLayerLevel()==1 && BDCDepth!=-1 && BDCDepth!=graphicsStates.getDepth()){
@@ -1342,7 +1344,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 break;
                 
             case Cmd.DP :
-                //<start-adobe> <end-adobe>
+                //
                 break;
 
             case Cmd.Tf :

@@ -69,66 +69,6 @@ public class NumberUtils {
             return finalValue;
         }
     }
-    
-    /**
-     * turn stream of bytes into a flaot number
-     */
-    public static double parseDouble(final int start, final int end, final byte[] stream) {
-        
-        final double d;
-
-        int ptr=end;
-        int intStart=start;
-        boolean isMinus=false;
-        //hand optimised float code
-        
-        //find decimal point
-        for(int j=end-1;j>start-1;j--){
-            if(stream[j]==46){ //'.'=46
-                ptr=j;
-                break;
-            }
-        }
-        
-        int intChars=ptr;
-        
-        final int decStart=ptr;
-        
-        //allow for minus
-        if(stream[start]==43){ //'+'=43
-            intChars--;
-            intStart++;
-        }else if(stream[start]==45){ //'-'=45
-            //intChars--;
-            intStart++;
-            isMinus=true;
-        }
-        
-        //optimisations
-        final int intNumbers=intChars-intStart;
-        final int decNumbers=end-ptr;
-        
-        if((intNumbers>4)){ //non-optimised to cover others
-            isMinus=false;
-            
-            final int count=end-start;
-            final byte[] doubleValue=new byte[count];
-            
-            System.arraycopy(stream, start,doubleValue,0,count);
-            
-            //System.out.println(new String(floatVal)+"<");
-            d=Double.parseDouble(new String(doubleValue));
-            
-        }else{
-            d = convertStreamFromDouble(stream, intStart, decStart, intNumbers, decNumbers);
-        }
-        
-        if(isMinus) {
-            return -d;
-        } else {
-            return d;
-        }
-    }
 
     public static double convertStreamFromDouble(byte[] stream, int intStart, int decStart, int intNumbers, int decNumbers) {
         double dec;

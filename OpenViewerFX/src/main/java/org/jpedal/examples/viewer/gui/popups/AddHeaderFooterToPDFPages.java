@@ -64,41 +64,41 @@ public class AddHeaderFooterToPDFPages extends Save
 	private static final long serialVersionUID = -8681143216306570454L;
 	
 	JLabel OutputLabel = new JLabel();
-	ButtonGroup buttonGroup1 = new ButtonGroup();
+	final ButtonGroup buttonGroup1 = new ButtonGroup();
 	ButtonGroup buttonGroup2 = new ButtonGroup();
 	
-	JToggleButton jToggleButton3 = new JToggleButton();
+	final JToggleButton jToggleButton3 = new JToggleButton();
 	
-	JToggleButton jToggleButton2 = new JToggleButton();
+	final JToggleButton jToggleButton2 = new JToggleButton();
 	
-	JRadioButton printAll=new JRadioButton();
-	JRadioButton printCurrent=new JRadioButton();
-	JRadioButton printPages=new JRadioButton();
+	final JRadioButton printAll=new JRadioButton();
+	final JRadioButton printCurrent=new JRadioButton();
+	final JRadioButton printPages=new JRadioButton();
 	
-	JTextField pagesBox=new JTextField();
+	final JTextField pagesBox=new JTextField();
 	
-	JTextField leftHeaderBox=new JTextField();
-	JTextField centerHeaderBox=new JTextField();
-	JTextField rightHeaderBox=new JTextField();
-	JTextField leftFooterBox=new JTextField();
-	JTextField centerFooterBox=new JTextField();
-	JTextField rightFooterBox=new JTextField();
+	final JTextField leftHeaderBox=new JTextField();
+	final JTextField centerHeaderBox=new JTextField();
+	final JTextField rightHeaderBox=new JTextField();
+	final JTextField leftFooterBox=new JTextField();
+	final JTextField centerFooterBox=new JTextField();
+	final JTextField rightFooterBox=new JTextField();
 	
-	JComboBox<String> fontsList = new JComboBox<String>(new String[] { "Courier",
+	final JComboBox<String> fontsList = new JComboBox<String>(new String[] { "Courier",
 			"Courier-Bold", "Courier-Oblique", "Courier-BoldOblique",
 			"Helvetica", "Helvetica-Bold", "Helvetica-BoldOblique",
 			"Helvetica-Oblique", "Times-Roman", "Times-Bold", "Times-Italic",
 			"Times-BoldItalic", "Symbol", "ZapfDingbats"
 	});
 	
-	JSpinner fontSize = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+	final JSpinner fontSize = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
 	
-	JLabel colorBox = new JLabel();
+	final JLabel colorBox = new JLabel();
 	
-	JSpinner leftRightBox = new JSpinner(new SpinnerNumberModel(36.00, 1.00, 1000.00, 1));
-	JSpinner topBottomBox = new JSpinner(new SpinnerNumberModel(36.00, 1.00, 1000.00, 1));
+	final JSpinner leftRightBox = new JSpinner(new SpinnerNumberModel(36.00, 1.00, 1000.00, 1));
+	final JSpinner topBottomBox = new JSpinner(new SpinnerNumberModel(36.00, 1.00, 1000.00, 1));
 	
-	JTextArea tagsList = new JTextArea();
+	final JTextArea tagsList = new JTextArea();
 	
 	
 	

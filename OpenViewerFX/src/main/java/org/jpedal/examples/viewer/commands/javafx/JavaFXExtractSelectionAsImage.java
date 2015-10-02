@@ -118,7 +118,6 @@ public class JavaFXExtractSelectionAsImage extends GUIExtractSelectionAsImage {
 
                         if (!outName.toString().toLowerCase().endsWith(('.' + format).toLowerCase())) {
                             outName.append('.').append(format);
-                            outputFile = new File(outName.toString());
                         }
 
                         //Do the actual save

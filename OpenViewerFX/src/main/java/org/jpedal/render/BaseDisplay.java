@@ -110,9 +110,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     Graphics2D g2;
 
-    /**internal flag to control how we turn images*/
-    boolean optimisedTurnCode = true;
-
     /**use hi res images to produce better quality display*/
     public boolean useHiResImageForDisplay;
 
@@ -219,7 +216,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         //ensure stroke only shows up
         float strokeOnlyLine = 0;
         if (text_fill_type == GraphicsState.STROKE && lineWidth >= 1.0) {
-            strokeOnlyLine = scaling;
+            strokeOnlyLine = lineWidth;
         }
 
         //get glyph to draw
@@ -232,27 +229,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         at.getMatrix(affValues);
 
         if (glyph != null) {
-
-            final Stroke currentStoke = g2.getStroke();
-
-            final boolean useNewCode = true;
-            if (lineWidth != 0 || (useNewCode && text_fill_type==GraphicsState.FILLSTROKE)) {
-                float w = lineWidth * (float)g2.getTransform().getScaleX();
-                if (w < 0) {
-                    w = -w;
-                }
-                
-                //hack to allow for some PDFs which use a FILL and STROKE (TR 2) to make font look Bold
-                if((text_fill_type==GraphicsState.FILLSTROKE || useNewCode) && (isPrinting || useNewCode)){
-//                       if(w<1)
-//                    	   w=1;
-                	   
-                	   w += (32-(float)g2.getTransform().getScaleX());
-                   }
-                
-                g2.setStroke(new BasicStroke(w));
-            }
-
+            
             //set transform
             g2.transform(glyphAT);
 
@@ -359,9 +336,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             //restore transform
             g2.setTransform(at);
 
-            if (lineWidth != 0) {
-                g2.setStroke(currentStoke);
-            }
         }
     }
 
@@ -480,235 +454,217 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     void renderImage(final AffineTransform imageAf, BufferedImage image, final float alpha,
-	    final GraphicsState currentGraphicsState, final float x, final float y, final int optionsApplied) {
-        
-    final boolean renderDirect = (currentGraphicsState != null);
+            final GraphicsState currentGraphicsState, final float x, final float y, final int optionsApplied) {
 
-	if (image == null || g2==null) {
-	    return;
-	}
+        final boolean renderDirect = (currentGraphicsState != null);
 
-	final int w = image.getWidth();
-	final int h = image.getHeight();
-
-	//plot image (needs to be flipped as well as co-ords upside down)
-	//graphics less than 1 get swallowed if flipped
-	AffineTransform upside_down = new AffineTransform();
-
-	boolean applyTransform = false;
-
-	float CTM[][] = new float[3][3];
-	if (currentGraphicsState != null) {
-	    CTM = currentGraphicsState.CTM;
-	}
-        
-	//special case - ignore rotation
-	if (CTM[0][0] < 0 && CTM[1][1] < 0 && CTM[1][0] > -2 && CTM[1][0] < 0 && CTM[0][1] > 0 && CTM[0][1] < 10) {
-	    CTM[0][1] = 0;
-	    CTM[1][0] = 0;
-	}
-
-	final AffineTransform before = g2.getTransform();
-
-	boolean invertInAff = false;
-
-	float dx = 0, dy = 0;
-
-	/**
-	 * setup for printing
-	 */
-	if (renderDirect || useHiResImageForDisplay) {
-
-	    if (renderDirect) {
-
-		upside_down = null;
-
-		//Turn image around if needed (ie JPEG not yet turned)
-		if ((optionsApplied & PDFImageProcessing.IMAGE_INVERTED) != PDFImageProcessing.IMAGE_INVERTED) {
-
-		    if (!optimisedTurnCode) {
-			image = RenderUtils.invertImage(image);
-		    } else {
-
-			if ((CTM[0][1] < 0 && CTM[1][0] > 0) && (CTM[0][0] * CTM[1][1] == 0)) {
-
-			    upside_down = new AffineTransform(CTM[0][0] / w, CTM[0][1] / w, -CTM[1][0] / h, CTM[1][1] / h, CTM[2][0] + CTM[1][0], CTM[2][1]);
-
-			} else if ((CTM[0][1] != 0 || CTM[1][0] !=0)) {
-
-                float[][] flip2 = {{1f / w, 0, 0}, {0, -1f / h, 0}, {0, 1f / h, 1}};
-			    final float[][] rot = {{CTM[0][0], CTM[0][1], 0},
-				{CTM[1][0], CTM[1][1], 0},
-				{0, 0, 1}};
-
-			    flip2 = Matrix.multiply(flip2, rot);
-			    upside_down = new AffineTransform(flip2[0][0], flip2[0][1], flip2[1][0], flip2[1][1], flip2[2][0], flip2[2][1]);
-
-                if(image.getHeight()>1) {
-                    dx = CTM[2][0] - image.getHeight() * flip2[1][0];
-                } else {
-                    dx = CTM[2][0];
-                }
-                
-			    dy = CTM[2][1];
-
-			    //special case
-			    //if (CTM[0][0] < 0 && CTM[1][0] < 0 && CTM[0][1] > 0 && CTM[1][1] < 0) {
-                //    System.out.println("a");
-			    //} else if (CTM[1][1] != 0) {
-				dy += CTM[1][1];
-                //    System.out.println("b");
-			    //}
-
-
-
-			} else if ((CTM[0][0] * CTM[0][1] == 0 && CTM[1][1] * CTM[1][0] == 0) && (CTM[0][1] > 0 && CTM[1][0] > 0)) {
-			    float[][] flip2 = {{-1f / w, 0, 0}, {0, 1f / h, 0}, {1f / w, 0, 1}};
-			    final float[][] rot = {{CTM[0][0],
-				    CTM[0][1], 0},
-				{CTM[1][0], CTM[1][1], 0},
-				{0, 0, 1}};
-
-			    flip2 = Matrix.multiply(flip2, rot);
-			    upside_down = new AffineTransform(
-				    flip2[0][0], flip2[1][0],
-				    flip2[0][1], flip2[1][1],
-				    flip2[2][0], flip2[2][1]);
-
-			    dx = CTM[2][0] - image.getHeight() * flip2[0][1];
-			    dy = CTM[2][1];
-
-			} else if (CTM[1][1] != 0) {
-			    invertInAff = true;
-			}
-		    }
-		}
-
-		if (upside_down == null) {
-		    upside_down = new AffineTransform(CTM[0][0] / w, CTM[0][1] / w,
-			    CTM[1][0] / h, CTM[1][1] / h, CTM[2][0], CTM[2][1]);
-		}
-	    } else {
-		upside_down = imageAf;
-
-		invertInAff = ((optionsApplied & PDFImageProcessing.TURN_ON_DRAW) == PDFImageProcessing.TURN_ON_DRAW);
-	    }
-
-	    applyTransform = true;
-
-	}
-    
-    final Composite c = g2.getComposite();
-    
-    renderComposite(alpha);
-    
-    /**
-     * color type3 glyphs if not black
-     */
-    if (isType3Font && fillCol!=null) {
-        
-        image = T3ImageUtils.handleType3Image(image,fillCol);
-        
-        if(image==null){
+        if (image == null || g2 == null) {
             return;
         }
-    }
-    
-    
-    
-    if (renderDirect || useHiResImageForDisplay) {
 
-	    try {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
 
-		if (optimisedTurnCode && (invertInAff && (optionsApplied & PDFImageProcessing.IMAGE_INVERTED) != PDFImageProcessing.IMAGE_INVERTED)) {
+        //plot image (needs to be flipped as well as co-ords upside down)
+        //graphics less than 1 get swallowed if flipped
+        AffineTransform upside_down = new AffineTransform();
 
-		    final double[] values = new double[6];
-		    upside_down.getMatrix(values);
+        boolean applyTransform = false;
 
-		    dx = (float) (values[4] + (values[1] * image.getWidth()));
-		    dy = (float) (values[5] + (image.getHeight() * values[3]));
+        float CTM[][] = new float[3][3];
+        if (currentGraphicsState != null) {
+            CTM = currentGraphicsState.CTM;
+        }
 
-		    //correct rotation case
-		    if (values[0] > 0 && values[1] > 0 && values[2] > 0 && values[3] < 0) {
-			values[2] = -values[2];
-		    }
+        //special case - ignore rotation
+        if (CTM[0][0] < 0 && CTM[1][1] < 0 && CTM[1][0] > -2 && CTM[1][0] < 0 && CTM[0][1] > 0 && CTM[0][1] < 10) {
+            CTM[0][1] = 0;
+            CTM[1][0] = 0;
+        }
 
-		    values[3] = -values[3];
+        final AffineTransform before = g2.getTransform();
 
-		    values[4] = 0;
-		    values[5] = 0;
+        boolean invertInAff = false;
 
-		    upside_down = new AffineTransform(values);
+        float dx = 0, dy = 0;
 
-		}
+        /**
+         * setup for printing
+         */
+        if (renderDirect || useHiResImageForDisplay) {
 
-		//allow user to over-ride
-		boolean useCustomRenderer = customImageHandler != null;
+            if (renderDirect) {
 
-        g2.translate(dx, dy);
+                upside_down = null;
 
-		if (useCustomRenderer) {
-		    useCustomRenderer = customImageHandler.drawImageOnscreen(image, optionsApplied, upside_down, null, g2, renderDirect, objectStoreRef, isPrinting);
-		}
+                //Turn image around if needed (ie JPEG not yet turned)
+                if ((optionsApplied & PDFImageProcessing.IMAGE_INVERTED) != PDFImageProcessing.IMAGE_INVERTED) {
 
-		//exit if done
-		if (useCustomRenderer) {
-		    g2.setComposite(c);
-		    return;
-		}
+                    if ((CTM[0][1] < 0 && CTM[1][0] > 0) && (CTM[0][0] * CTM[1][1] == 0)) {
 
-		//hack to make bw
-		if (customColorHandler != null) {
-		    final BufferedImage newImage = customColorHandler.processImage(image, rawPageNumber, isPrinting);
-		    if (newImage != null) {
-			image = newImage;
-		    }
-		} else if (DecoderOptions.Helper != null) {
-		    final BufferedImage newImage = DecoderOptions.Helper.processImage(image, rawPageNumber, isPrinting);
-		    if (newImage != null) {
-			image = newImage;
-		    }
-		}
+                        upside_down = new AffineTransform(CTM[0][0] / w, CTM[0][1] / w, -CTM[1][0] / h, CTM[1][1] / h, CTM[2][0] + CTM[1][0], CTM[2][1]);
 
-		final Shape g2clip = g2.getClip();
-		boolean isClipReset = false;
+                    } else if ((CTM[0][1] != 0 || CTM[1][0] != 0)) {
 
-		//hack to fix clipping issues due to sub-pixels
-		if (g2clip != null) {
+                        float[][] flip2 = {{1f / w, 0, 0}, {0, -1f / h, 0}, {0, 1f / h, 1}};
+                        final float[][] rot = {{CTM[0][0], CTM[0][1], 0},
+                        {CTM[1][0], CTM[1][1], 0},
+                        {0, 0, 1}};
 
-		    final double cy = g2.getClip().getBounds2D().getY();
-		    final double ch = g2.getClip().getBounds2D().getHeight();
-		    double diff = image.getHeight() - ch;
-		    if (diff < 0) {
-			    diff = -diff;
-		    }
+                        flip2 = Matrix.multiply(flip2, rot);
+                        upside_down = new AffineTransform(flip2[0][0], flip2[0][1], flip2[1][0], flip2[1][1], flip2[2][0], flip2[2][1]);
 
-		    if (diff > 0 && diff < 1 && cy < 0 && image.getHeight() > 1 && image.getHeight() < 10) {
+                        if (image.getHeight() > 1) {
+                            dx = CTM[2][0] - image.getHeight() * flip2[1][0];
+                        } else {
+                            dx = CTM[2][0];
+                        }
 
-			final boolean isSimpleOutline = isSimpleOutline(g2.getClip());
+                        dy = CTM[2][1];
+                        dy += CTM[1][1];
 
-			if (isSimpleOutline) {
-			    final double cx = g2.getClip().getBounds2D().getX();
-			    final double cw = g2.getClip().getBounds2D().getWidth();
+                    } else if ((CTM[0][0] * CTM[0][1] == 0 && CTM[1][1] * CTM[1][0] == 0) && (CTM[0][1] > 0 && CTM[1][0] > 0)) {
+                        float[][] flip2 = {{-1f / w, 0, 0}, {0, 1f / h, 0}, {1f / w, 0, 1}};
+                        final float[][] rot = {{CTM[0][0],
+                            CTM[0][1], 0},
+                        {CTM[1][0], CTM[1][1], 0},
+                        {0, 0, 1}};
 
-			    g2.setClip(new Rectangle((int) cx, (int) cy, (int) cw, (int) ch));
+                        flip2 = Matrix.multiply(flip2, rot);
+                        upside_down = new AffineTransform(
+                                flip2[0][0], flip2[1][0],
+                                flip2[0][1], flip2[1][1],
+                                flip2[2][0], flip2[2][1]);
 
-			    isClipReset = false;
-			}
-		    }
-		}
+                        dx = CTM[2][0] - image.getHeight() * flip2[0][1];
+                        dy = CTM[2][1];
 
-        AffineTransform aff = g2.getTransform();
-        
-        double mx = aff.getScaleX();
-        double my = aff.getScaleX();
-        double sx = upside_down.getScaleX();
-        double sy = upside_down.getScaleY();
+                    } else if (CTM[1][1] != 0) {
+                        invertInAff = true;
+                    }
+                }
 
-        //Rotated images can cause issue when scaling up
-        //Only handle rotated page with rotation on image
-        if ((image.getType() != 0) && //Catch issue with images with odd types
-             (mx == 0 && my == 0 && sx > 0 && sy < 0)) {
+                if (upside_down == null) {
+                    upside_down = new AffineTransform(CTM[0][0] / w, CTM[0][1] / w,
+                            CTM[1][0] / h, CTM[1][1] / h, CTM[2][0], CTM[2][1]);
+                }
+            } else {
+                upside_down = imageAf;
+
+                invertInAff = false;
+            }
+
+            applyTransform = true;
+
+        }
+
+        final Composite c = g2.getComposite();
+
+        renderComposite(alpha);
+
+        /**
+         * color type3 glyphs if not black
+         */
+        if (isType3Font && fillCol != null) {
+
+            image = T3ImageUtils.handleType3Image(image, fillCol);
+
+            if (image == null) {
+                return;
+            }
+        }
+
+        if (renderDirect || useHiResImageForDisplay) {
+
+            if (invertInAff && (optionsApplied & PDFImageProcessing.IMAGE_INVERTED) != PDFImageProcessing.IMAGE_INVERTED) {
+
+                final double[] values = new double[6];
+                upside_down.getMatrix(values);
+
+                dx = (float) (values[4] + (values[1] * image.getWidth()));
+                dy = (float) (values[5] + (image.getHeight() * values[3]));
+
+                //correct rotation case
+                if (values[0] > 0 && values[1] > 0 && values[2] > 0 && values[3] < 0) {
+                    values[2] = -values[2];
+                }
+
+                values[3] = -values[3];
+
+                values[4] = 0;
+                values[5] = 0;
+
+                upside_down = new AffineTransform(values);
+
+            }
+
+            //allow user to over-ride
+            boolean useCustomRenderer = customImageHandler != null;
+
+            g2.translate(dx, dy);
+
+            if (useCustomRenderer) {
+                useCustomRenderer = customImageHandler.drawImageOnscreen(image, optionsApplied, upside_down, null, g2, renderDirect, objectStoreRef, isPrinting);
+            }
+
+            //exit if done
+            if (useCustomRenderer) {
+                g2.setComposite(c);
+                return;
+            }
+
+            //hack to make bw
+            if (customColorHandler != null) {
+                final BufferedImage newImage = customColorHandler.processImage(image, rawPageNumber, isPrinting);
+                if (newImage != null) {
+                    image = newImage;
+                }
+            } else if (DecoderOptions.Helper != null) {
+                final BufferedImage newImage = DecoderOptions.Helper.processImage(image, rawPageNumber, isPrinting);
+                if (newImage != null) {
+                    image = newImage;
+                }
+            }
+
+            final Shape g2clip = g2.getClip();
+            boolean isClipReset = false;
+
+            //hack to fix clipping issues due to sub-pixels
+            if (g2clip != null) {
+
+                final double cy = g2.getClip().getBounds2D().getY();
+                final double ch = g2.getClip().getBounds2D().getHeight();
+                double diff = image.getHeight() - ch;
+                if (diff < 0) {
+                    diff = -diff;
+                }
+
+                if (diff > 0 && diff < 1 && cy < 0 && image.getHeight() > 1 && image.getHeight() < 10) {
+
+                    final boolean isSimpleOutline = isSimpleOutline(g2.getClip());
+
+                    if (isSimpleOutline) {
+                        final double cx = g2.getClip().getBounds2D().getX();
+                        final double cw = g2.getClip().getBounds2D().getWidth();
+
+                        g2.setClip(new Rectangle((int) cx, (int) cy, (int) cw, (int) ch));
+
+                        isClipReset = false;
+                    }
+                }
+            }
+
+            AffineTransform aff = g2.getTransform();
+
+            double mx = aff.getScaleX();
+            double my = aff.getScaleX();
+            double sx = upside_down.getScaleX();
+            double sy = upside_down.getScaleY();
+
+            //Rotated images can cause issue when scaling up
+            //Only handle rotated page with rotation on image
+            if ((image.getType() != 0) && //Catch issue with images with odd types
+                    (mx == 0 && my == 0 && sx > 0 && sy < 0)) {
                 mx = aff.getShearX();
                 my = aff.getShearY();
                 sx = Math.abs(sx);
@@ -737,109 +693,28 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
                     }
                 }
             }
-        
 
-		//Draw image as normal
-		g2.drawImage(image, upside_down, null);
+            //Draw image as normal
+            g2.drawImage(image, upside_down, null);
 
-		if (isClipReset) {
-		    g2.setClip(g2clip);
-		}
-
-	    } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
+            if (isClipReset) {
+                g2.setClip(g2clip);
             }
-            //
-	    }
-	} else {
 
-	    try {
+        } else {
 
-		if (applyTransform) {
-		    final AffineTransformOp invert = new AffineTransformOp(upside_down, ColorSpaces.hints);
-		    image = invert.filter(image, null);
-		}
-
-		g2.translate(x, y);
-
-		if (optimisedTurnCode && (optionsApplied & PDFImageProcessing.TURN_ON_DRAW) == PDFImageProcessing.TURN_ON_DRAW) {
-
-		    final AffineTransform flip2;
-
-		    float[] flip = {1f, 0f, 0f, -1f, 0f, image.getHeight()};
-		    final AffineTransform flip3;
-		    if (pageRotation == 0) {
-
-			    flip2 = new AffineTransform(flip);
-
-		    } else if (pageRotation == 90) {
-
-
-			    flip2 = new AffineTransform();
-
-                if (extraRot) {
-                    flip2.rotate(Math.PI, 0, 0);
-                } else {
-                    flip2.rotate(Math.PI / 2, 0, 0);
-                }
-                flip2.translate(-image.getWidth(), -image.getHeight());
-
-                flip = new float[]{-1f, 0f, 0f, 1f, image.getWidth(), 0};//(float)image.getHeight()};
-                flip3 = new AffineTransform(flip);
-
-                flip2.concatenate(flip3);
-
-		    } else if (pageRotation == 180) {
-
-                flip2 = new AffineTransform();
-                if (extraRot) {
-                    flip2.rotate(Math.PI, 0, 0);
-                }
-                flip2.translate(-image.getWidth(), -image.getHeight());
-
-                flip = new float[]{-1f, 0f, 0f, 1f, image.getWidth(), 0};//(float)image.getHeight()};
-
-                flip3 = new AffineTransform(flip);
-
-                flip2.concatenate(flip3);
-
-		    } else {
-
-                flip2 = new AffineTransform();
-                if (extraRot) {
-                    flip2.rotate(Math.PI, 0, 0);
-                } else {
-                    flip2.rotate(Math.PI / 2 + Math.PI, 0, 0);
-                }
-                flip2.translate(-image.getWidth(), -image.getHeight());
-                flip = new float[]{-1f, 0f, 0f, 1f, image.getWidth(), 0};
-                flip3 = new AffineTransform(flip);
-                flip2.concatenate(flip3);
-
-		    }
-
-		    g2.drawImage(image, flip2, null);
-
-		} else {
-		    g2.drawImage(image, 0, 0, null);
-		}
-
-		g2.translate(-x, -y);
-
-	    } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
+            if (applyTransform) {
+                final AffineTransformOp invert = new AffineTransformOp(upside_down, ColorSpaces.hints);
+                image = invert.filter(image, null);
             }
-            //
-	    }
-	}
 
-	g2.setTransform(before);
+            g2.drawImage(image, (int) x, (int) y, null);
 
-	g2.setComposite(c);
+        }
+
+        g2.setTransform(before);
+
+        g2.setComposite(c);
 
     }
 
@@ -1218,10 +1093,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         }
         
         if(image!=null){
-            
-            if(!optimisedTurnCode) {
-                image = RenderUtils.invertImage(image);
-            }
             
             if(image.getType()==BufferedImage.TYPE_CUSTOM || (type.equals("jpg") && image.getType()==BufferedImage.TYPE_INT_ARGB)){
                 image=ColorSpaceConvertor.convertToRGB(image);

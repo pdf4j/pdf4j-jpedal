@@ -311,7 +311,7 @@ public class Tier1Decoder {
         int w1 = width;
         int w2 = width * 2;
         int w3 = width * 3;
-        int nextBit = 0;
+        int nextBit;
         for (int i0 = 0; i0 < height; i0 = nextBit) {
             nextBit = Math.min(i0 + 4, height);
             int indexBase = i0 * width;

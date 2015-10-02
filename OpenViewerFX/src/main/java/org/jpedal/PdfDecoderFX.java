@@ -58,6 +58,7 @@ import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -117,6 +118,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     private Image previewImage;
 
     private String previewText;
+    
+    private int curThumbPage = 1;
     
     /**
      * shared values
@@ -205,16 +208,17 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             context.drawImage(previewImage, 10, 10);
             context.setStroke(new javafx.scene.paint.Color(1.0, 1.0, 1.0, 1.0));
             context.strokeText(previewText, 10, (previewThumbnail.getHeight())-10);
-            
-            
-            double scale = getBoundsInLocal().getWidth()/getBoundsInParent().getWidth();
-            double startX = getParent().getBoundsInParent().getMinX();
-            double endX = getParent().getBoundsInLocal().getMaxX()-previewThumbnail.getBoundsInLocal().getWidth();
-            double diff = endX - startX;
-            //double x = getBoundsInLocal().getMinX()+(diff * scale);
-            double y=(getBoundsInLocal().getMaxY()-20-previewThumbnail.getBoundsInParent().getHeight())/2;
-
-            previewThumbnail.setLayoutX(getPdfPageData().getCropBoxWidth(getPageNumber()));
+            ScrollPane pane = (ScrollPane) (getParent().getParent().getParent().getParent());
+            Group group = (Group)getParent();
+            double groupX = group.getBoundsInParent().getMinX();
+            double viewW = pane.getViewportBounds().getWidth();
+            double viewH = pane.getViewportBounds().getHeight();
+            double pdfW = getBoundsInParent().getWidth();
+            double thumW = previewThumbnail.getBoundsInLocal().getWidth();
+            double thumH = previewThumbnail.getBoundsInLocal().getHeight();
+            double x = pdfW+(viewW-groupX-pdfW-thumW-10); //use 10 for left padding fix;
+            double y = (viewH-thumH)/ getPageCount()* (curThumbPage-1);
+            previewThumbnail.setLayoutX(x);
             previewThumbnail.setLayoutY(y);
         }
     }
@@ -253,7 +257,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         return fileAccess.getPageNumber();
     }
     
-    protected void setPageNumber(final int newPage) {
+    public void setPageNumber(final int newPage) {
         fileAccess.setPageNumber(newPage);
     }
     
@@ -1881,15 +1885,11 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
     }
     
-    //<start-server>
     @Override
     public DisplayOffsets getDisplayOffsets() {
         
         return displayOffsets;
     }
-    //<end-server>
-
-    
     
     /**
      * get page statuses (flags in class org.jpedal.parser.DecoderStatus)
@@ -2313,7 +2313,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
     @Override
     public void repaintPane(final int page) {
-        
+        curThumbPage = page;
         final Map areas = parser.getTextLines().getAllHighlights();
         if (areas != null) {
             final int[][] rawRects = ((int[][]) areas.get(page));
@@ -2388,25 +2388,27 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      */
     @Override
     public void setPreviewThumbnail(final BufferedImage previewImage, final String previewText) {
-        if (GUI.debugFX) {
-            if (previewThumbnail == null) {
-                previewThumbnail = new Canvas(previewImage.getWidth() + 20, previewImage.getHeight() + 40);
-                
-            }
+        
+        if (previewThumbnail == null) {
+            previewThumbnail = new Canvas(previewImage.getWidth() + 20, previewImage.getHeight() + 40);
 
-            //Prevent thumbnail scaling
-            previewThumbnail.setScaleX(1.0f / getScaling());
-            previewThumbnail.setScaleY(-(1.0f / getScaling()));
-            previewThumbnail.setScaleZ(1.0f / getScaling());
-                
-            //Make sure preview is actually displayed
-            if (!getChildren().contains(previewThumbnail)) {
-                getChildren().add(previewThumbnail);
-            }
-                
-            this.previewImage = SwingFXUtils.toFXImage(previewImage, null);
-            this.previewText = previewText;
         }
+
+        //Prevent thumbnail scaling
+//        previewThumbnail.setScaleX(1.0f / scaling);
+//        previewThumbnail.setScaleY(-(1.0f / scaling));
+//        previewThumbnail.setScaleZ(1.0f / scaling);
+        
+        Group group = (Group)getParent();
+
+        //Make sure preview is actually displayed
+        if (!group.getChildren().contains(previewThumbnail)) {
+            group.getChildren().add(previewThumbnail);
+        }
+
+        this.previewImage = SwingFXUtils.toFXImage(previewImage, null);
+        this.previewText = previewText;
+        
     }
     
      @Override

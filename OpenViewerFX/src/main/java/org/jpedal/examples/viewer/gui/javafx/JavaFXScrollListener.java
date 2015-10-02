@@ -62,7 +62,6 @@ public class JavaFXScrollListener implements ChangeListener<Number>, EventHandle
     private int nextPage=-1, lastPageSent=-1;
     private boolean decodeLock;
     private final ScrollBar scroll;
-    boolean showLast;
     public BufferedImage lastImage;
     
     public JavaFXScrollListener(final GUI gui, final ScrollBar callback) {
@@ -137,7 +136,6 @@ public class JavaFXScrollListener implements ChangeListener<Number>, EventHandle
 
                 //Store and turn off using stored image
                 lastImage = image;
-                showLast = false;
                 gui.getPdfDecoder().setPreviewThumbnail(image, "Page " + nextPage + " of " + gui.getPdfDecoder().getPageCount());
 
                 gui.getPdfDecoder().repaintPane(nextPage);

@@ -42,7 +42,6 @@ import javafx.scene.shape.Shape;
  */
 public class FXClip implements PdfClip {
 
-    private static final boolean debugClip = false;
     private Shape current_clipping_shape;
     
     @Override
@@ -68,28 +67,9 @@ public class FXClip implements PdfClip {
             current_clipping_shape = Shape.intersect(current_clipping_shape, fxPath);
         }
         
-        if(debugClip) {
-            getClipInfo();
-        }
-        
         return true;
     }
     
-    /**
-     * Debug purposes.
-     * 
-     * Prints out the elements of the clip.
-     */
-    private void getClipInfo(){
-        System.out.println("[checkWholePageClip]");
-        if(current_clipping_shape==null){
-            System.out.println("Null Path");
-        }else{
-            System.out.println("Path: " + ((Path)current_clipping_shape).getElements());
-
-        }
-    }
-
     @Override
     public Object getClippingShape() {
         return setupClippingShape(current_clipping_shape);

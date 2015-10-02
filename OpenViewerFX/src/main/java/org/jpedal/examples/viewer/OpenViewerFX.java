@@ -32,6 +32,7 @@
  */
 package org.jpedal.examples.viewer;
 
+import org.jpedal.PdfDecoderFX;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -39,7 +40,6 @@ import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.jpedal.*;
 import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.examples.viewer.gui.javafx.*;
 import org.jpedal.examples.viewer.utils.*;

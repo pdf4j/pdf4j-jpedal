@@ -18,14 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class reads JPEG2000 images as BufferedImage
- * <p>
- * Here is an example of how the code can be used:-
- * </p>
- * <br>
+ * Class reads Jpeg2000 images as BufferedImage
+ *
+ * <h3>Example:</h3>
  * <pre><code>
  * Jpeg2000Decoder decoder = new Jpeg2000Decoder();
- * //Make NO assumptions about type of BufferedImage type returned (may change)
+ * // Make NO assumptions about type of BufferedImage type returned (may change)
  * BufferedImage decodedImage = decoder.read(jpxByteData);
  * </code></pre>
  *
@@ -35,13 +33,13 @@ public class Jpeg2000Decoder {
     private static final boolean debug = false;
 
     /**
-     * decodes JPEG2000 image data as BufferedImage Make NO assumptions about
-     * type of BufferedImage type returned (may change)
+     * Decodes and returns the Jpeg2000 image as a BufferedImage.
+     * <p>
+     * Make NO assumptions about type of BufferedImage type returned (may change)
      *
      * @param jpxRawData A byte[] array containing the JPEG2000 data
-     * @return BufferedImage to read image
-     * @throws Exception Provides for different exceptions thrown under java
-     * lang package
+     * @return BufferedImage The decoded image
+     * @throws Exception
      */
     public BufferedImage read(final byte[] jpxRawData) throws Exception {
         final Info info = new Info();
@@ -112,9 +110,10 @@ public class Jpeg2000Decoder {
                 case Boxes.JP2H:
                     //read image header box first
                     long tLen = reader.readInt();
-                    int tType = reader.readInt();
+                    int tType;
+                    reader.readInt(); //initial tType
                     if (tLen == 1) {
-                        tLen = reader.readLong();
+                       reader.readLong();  //read next
                     }
                     info.imageHeight = reader.readInt();
                     info.imageWidth = reader.readInt();
@@ -305,24 +304,7 @@ public class Jpeg2000Decoder {
                     break;
                 case Markers.SIZ:
                     reader.readUShort();//int LSIZ 
-                    final SIZ siz = new SIZ();
-                    siz.capabilities = reader.readUShort();
-                    siz.Xsiz = reader.readInt();
-                    siz.Ysiz = reader.readInt();
-                    siz.XOsiz = reader.readInt();
-                    siz.YOsiz = reader.readInt();
-                    siz.XTsiz = reader.readInt();
-                    siz.YTsiz = reader.readInt();
-                    siz.XTOsiz = reader.readInt();
-                    siz.YTOsiz = reader.readInt();
-                    siz.nComp = reader.readUShort();
-                    siz.precisionInfo = new int[siz.nComp][3];
-                    for (int i = 0; i < siz.nComp; i++) {
-                        siz.precisionInfo[i][0] = reader.readUByte();
-                        siz.precisionInfo[i][1] = reader.readUByte();
-                        siz.precisionInfo[i][2] = reader.readUByte();
-                    }
-                    info.siz = siz;
+                    info.siz = readSIZ(reader);
                     if (debug) {
                         System.out.println("Width " + info.imageWidth + " Height " + info.imageHeight);
                         System.out.println("SIZ info : " + info.siz);
@@ -330,27 +312,8 @@ public class Jpeg2000Decoder {
                     info.qcc = new QCD[info.siz.nComp];
                     break;
                 case Markers.COD:
-                    reader.readUShort();//int LCOD 
-                    final COD cod = new COD();
-                    final boolean[] bools = toBoolean8(reader.readByte());
-                    cod.hasPrecint = bools[7];
-                    cod.hasSOP = bools[6];
-                    cod.hasEPH = bools[5];
-                    cod.progressionOrder = reader.readUByte();
-                    cod.nLayers = reader.readUShort();
-                    cod.multiCompTransform = reader.readByte();
-                    cod.nDecompLevel = reader.readUByte();
-                    cod.xcb = reader.readUByte() + 2;
-                    cod.ycb = reader.readUByte() + 2;
-                    cod.codeBlockStyle = reader.readByte();
-                    cod.transformation = reader.readUByte();
-                    if (cod.hasPrecint) {
-                        cod.precintSizes = new int[cod.nDecompLevel + 1];
-                        for (int i = 0; i < cod.precintSizes.length; i++) {
-                            cod.precintSizes[i] = reader.readByte();
-                        }
-                    }
-                    info.cod = cod;
+                    reader.readUShort();//int LCOD                     
+                    info.cod = readCOD(reader);
                     if (debug) {
                         System.out.println("info.cod : \n" + info.cod);
                     }
@@ -364,51 +327,7 @@ public class Jpeg2000Decoder {
                     break;
                 case Markers.QCD:
                     final int LQCD = reader.readUShort();
-                    final QCD qcd = new QCD();
-                    final Byte qs = reader.readByte();
-                    JPXBitReader br = new JPXBitReader(qs);
-                    qcd.guardBits = br.readBits(3);
-                    qcd.quantBits = br.readBits(5);
-                    qcd.hasScalar = false;
-
-                    final int balance = LQCD - 3;
-                    int NB = 0;
-                    switch (qcd.quantBits) {
-                        case 0:
-                            qcd.hasScalar = true;
-                            NB = balance;
-                            qcd.exponentB = new int[NB];
-                            qcd.mantissaB = new int[NB];
-                            for (int i = 0; i < NB; i++) {
-                                br = new JPXBitReader(reader.readByte());
-                                qcd.exponentB[i] = br.readBits(5);
-                                qcd.mantissaB[i] = 0;
-                            }
-                            break;
-                        case 1:
-                            qcd.hasScalar = false;
-                            final byte[] temp = {reader.readByte(), reader.readByte()};
-                            br = new JPXBitReader(temp);
-                            final int eB = br.readBits(5);
-                            final int muB = br.readBits(11);
-                            qcd.exponentB = new int[]{eB};
-                            qcd.mantissaB = new int[]{muB};
-                            break;
-                        case 2:
-                            NB = balance / 2;
-                            qcd.hasScalar = true;
-                            qcd.exponentB = new int[NB];
-                            qcd.mantissaB = new int[NB];
-                            for (int i = 0; i < NB; i++) {
-                                final byte[] tt = {reader.readByte(), reader.readByte()};
-                                br = new JPXBitReader(tt);
-                                qcd.exponentB[i] = br.readBits(5);
-                                qcd.mantissaB[i] = br.readBits(11);
-                            }
-                            break;
-                    }
-
-                    info.qcd = qcd;
+                    info.qcd = readQCD(reader, LQCD);
                     if (debug) {
                         System.out.println("info.qcd : \n" + info.qcd);
                     }
@@ -507,22 +426,108 @@ public class Jpeg2000Decoder {
         }
     }
 
+    private static SIZ readSIZ(JPXReader reader) {
+        final SIZ siz = new SIZ();
+        siz.capabilities = reader.readUShort();
+        siz.Xsiz = reader.readInt();
+        siz.Ysiz = reader.readInt();
+        siz.XOsiz = reader.readInt();
+        siz.YOsiz = reader.readInt();
+        siz.XTsiz = reader.readInt();
+        siz.YTsiz = reader.readInt();
+        siz.XTOsiz = reader.readInt();
+        siz.YTOsiz = reader.readInt();
+        siz.nComp = reader.readUShort();
+        siz.precisionInfo = new int[siz.nComp][3];
+        for (int i = 0; i < siz.nComp; i++) {
+            siz.precisionInfo[i][0] = reader.readUByte();
+            siz.precisionInfo[i][1] = reader.readUByte();
+            siz.precisionInfo[i][2] = reader.readUByte();
+        }
+        return siz;
+    }
+
+    private static COD readCOD(JPXReader reader) {
+        final COD cod = new COD();
+        final boolean[] bools = toBoolean8(reader.readByte());
+        cod.hasPrecint = bools[7];
+        cod.hasSOP = bools[6];
+        cod.hasEPH = bools[5];
+        cod.progressionOrder = reader.readUByte();
+        cod.nLayers = reader.readUShort();
+        cod.multiCompTransform = reader.readByte();
+        cod.nDecompLevel = reader.readUByte();
+        cod.xcb = reader.readUByte() + 2;
+        cod.ycb = reader.readUByte() + 2;
+        cod.codeBlockStyle = reader.readByte();
+        cod.transformation = reader.readUByte();
+        if (cod.hasPrecint) {
+            cod.precintSizes = new int[cod.nDecompLevel + 1];
+            for (int i = 0; i < cod.precintSizes.length; i++) {
+                cod.precintSizes[i] = reader.readByte();
+            }
+        }
+        return cod;
+    }
+    
+    private static QCD readQCD(JPXReader reader, int qcdLength){
+        final QCD qcd = new QCD();
+        final Byte qs = reader.readByte();
+        JPXBitReader br = new JPXBitReader(qs);
+        qcd.guardBits = br.readBits(3);
+        qcd.quantBits = br.readBits(5);
+        qcd.hasScalar = false;
+
+        final int balance = qcdLength - 3;
+        int NB;
+        switch (qcd.quantBits) {
+            case 0:
+                qcd.hasScalar = true;
+                NB = balance;
+                qcd.exponentB = new int[NB];
+                qcd.mantissaB = new int[NB];
+                for (int i = 0; i < NB; i++) {
+                    br = new JPXBitReader(reader.readByte());
+                    qcd.exponentB[i] = br.readBits(5);
+                    qcd.mantissaB[i] = 0;
+                }
+                break;
+            case 1:
+                qcd.hasScalar = false;
+                final byte[] temp = {reader.readByte(), reader.readByte()};
+                br = new JPXBitReader(temp);
+                final int eB = br.readBits(5);
+                final int muB = br.readBits(11);
+                qcd.exponentB = new int[]{eB};
+                qcd.mantissaB = new int[]{muB};
+                break;
+            case 2:
+                NB = balance / 2;
+                qcd.hasScalar = true;
+                qcd.exponentB = new int[NB];
+                qcd.mantissaB = new int[NB];
+                for (int i = 0; i < NB; i++) {
+                    final byte[] tt = {reader.readByte(), reader.readByte()};
+                    br = new JPXBitReader(tt);
+                    qcd.exponentB[i] = br.readBits(5);
+                    qcd.mantissaB[i] = br.readBits(11);
+                }
+                break;
+        }
+        return qcd;
+    }
+    
     private static void decodeTileOffsets(Info info, JPXReader reader) {
-        int counter = 0;
+
         for (final int offset : info.tileOffsets) {
             reader.setPosition(offset);
 
-            final int SOT = reader.readUShort();
-            final int LSOT = reader.readUShort();
+            reader.readUShort();//final int SOT = 
+            reader.readUShort();//final int LSOT = 
             final int tileIndex = reader.readUShort(); //index of tile
             final int lengthTilePart = reader.readInt(); //length of tilestream 
             final int indexTilePart = reader.readUByte();//tile part index
             final int numberTilePart = reader.readUByte();//number of tile parts
-
-            if (debug) {
-                System.out.println("Counter " + counter + " Tile Part Info: ..... " + indexTilePart + ' ' + numberTilePart + ' ' + lengthTilePart + ' ' + tileIndex);
-                counter++;
-            }
 
             final int totalLen = lengthTilePart - 12;
             final int maxRead = offset + lengthTilePart;
@@ -543,82 +548,18 @@ public class Jpeg2000Decoder {
                     case Markers.COD:
                         final int LCOD = reader.readUShort();//int LCOD 
                         otherRead = otherRead + 2 + LCOD;
-
-                        final COD cod = new COD();
-                        final boolean[] bools = toBoolean8(reader.readByte());
-                        cod.hasPrecint = bools[7];
-                        cod.hasSOP = bools[6];
-                        cod.hasEPH = bools[5];
-                        cod.progressionOrder = reader.readUByte();
-                        cod.nLayers = reader.readUShort();
-                        cod.multiCompTransform = reader.readByte();
-                        cod.nDecompLevel = reader.readUByte();
-                        cod.xcb = reader.readUByte() + 2;
-                        cod.ycb = reader.readUByte() + 2;
-                        cod.codeBlockStyle = reader.readByte();
-                        cod.transformation = reader.readUByte();
-                        if (cod.hasPrecint) {
-                            cod.precintSizes = new int[cod.nDecompLevel + 1];
-                            for (int i = 0; i < cod.precintSizes.length; i++) {
-                                cod.precintSizes[i] = reader.readByte();
-                            }
-                        }
+                        tile.cod = readCOD(reader);
                         if (debug) {
-                            System.err.println("Contains Tile COD " + cod);
-                        }
-                        tile.cod = cod;
-                        if (debug) {
-                            System.out.println("tile.cod : \n" + cod);
+                            System.err.println("Contains Tile COD " + tile.cod);
                         }
                         break;
                     case Markers.QCD:
                         final int LQCD = reader.readUShort();//int LQCD 
                         otherRead = otherRead + 2 + LQCD;
-                        final QCD qcd = new QCD();
-                        final Byte qs = reader.readByte();
-                        JPXBitReader br = new JPXBitReader(qs);
-                        qcd.guardBits = br.readBits(3);
-                        qcd.quantBits = br.readBits(5);
-                        qcd.hasScalar = false;
-
-                        final int balance = LQCD - 3;
-                        int NB = 0;
-                        switch (qcd.quantBits) {
-                            case 0:
-                                qcd.hasScalar = true;
-                                NB = balance;
-                                qcd.exponentB = new int[NB];
-                                for (int i = 0; i < NB; i++) {
-                                    br = new JPXBitReader(reader.readByte());
-                                    qcd.exponentB[i] = br.readBits(5);
-                                }
-                                break;
-                            case 1:
-                                qcd.hasScalar = false;
-                                final byte[] temp = {reader.readByte(), reader.readByte()};
-                                br = new JPXBitReader(temp);
-                                final int eB = br.readBits(5);
-                                final int muB = br.readBits(11);
-                                qcd.exponentB = new int[]{eB};
-                                qcd.mantissaB = new int[]{muB};
-                                break;
-                            case 2:
-                                NB = balance / 2;
-                                qcd.hasScalar = true;
-                                qcd.exponentB = new int[NB];
-                                qcd.mantissaB = new int[NB];
-                                for (int i = 0; i < NB; i++) {
-                                    byte[] tt = {reader.readByte(), reader.readByte()};
-                                    br = new JPXBitReader(tt);
-                                    qcd.exponentB[i] = br.readBits(5);
-                                    qcd.mantissaB[i] = br.readBits(11);
-                                }
-                                break;
-                        }
+                        tile.qcd = readQCD(reader, LQCD);
                         if (debug) {
-                            System.err.println("Contains Tile QCD " + qcd);
+                            System.err.println("Contains Tile QCD " + tile.qcd);
                         }
-                        tile.qcd = qcd;
                         break;
                     case Markers.QCC:
                         final int LQCC = reader.readUShort();
@@ -704,7 +645,6 @@ public class Jpeg2000Decoder {
                         parser.parseTile();
 
                         break;
-
                     case Markers.EOC:
                         break;
                 }
@@ -917,7 +857,7 @@ public class Jpeg2000Decoder {
 
             int shift;
             float offset, min, max;
-            int pos = 0;
+            int pos;
             for (int c = 0; c < componentsCount; c++) {
                 final float[] items = transformedTiles[c].floatItems;
                 shift = (info.siz.precisionInfo[c][0] + 1) - 8;
@@ -991,7 +931,7 @@ public class Jpeg2000Decoder {
             image = new BufferedImage(siz.Xsiz, siz.Ysiz, BufferedImage.TYPE_INT_RGB);
             int[] imageData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
             pos = 0;
-            double r = 0, g = 0, b = 0, cc = 0, mm = 0, yy = 0, kk = 0, c, m, y, k;
+            double r, g, b, cc = 0, mm = 0, yy = 0, kk = 0, c, m, y, k;
 
             for (int i = 0; i < imageData.length; i++) {
                 c = (tempData[pos++] & 0xff) / 255.0;
@@ -1123,7 +1063,7 @@ public class Jpeg2000Decoder {
 
         info.tilesMap.clear();
 
-        byte[] mainData = null;
+        byte[] mainData;
 
         if (resultImages.size() == 1) {
             mainData = resultImages.get(0).byteItems;
@@ -1154,7 +1094,7 @@ public class Jpeg2000Decoder {
             image = new BufferedImage(siz.Xsiz, siz.Ysiz, BufferedImage.TYPE_INT_RGB);
             int[] imageData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
             int pos = 0;
-            int r = 0, g = 0, b = 0;
+            int r, g, b;
             byte c, m, y, k;
 
             final EnumeratedSpace cs = new EnumeratedSpace();
@@ -1253,7 +1193,6 @@ public class Jpeg2000Decoder {
                         out[pos++] = (byte) (b < 0 ? 0 : b > max ? 255 : ((int) b) >> shift);
                     }
                 }
-
 
             } else { // no multi-component transform
 
@@ -1362,7 +1301,7 @@ public class Jpeg2000Decoder {
             float[] coefficients = new float[width * height];
 
             for (TileBand subband1 : resolution.tileBands) {
-                int mu = 0, epsilon = 0;
+                int mu, epsilon;
                 if (!qcd.hasScalar) {
                     epsilon = qcd.exponentB[0] + (i > 0 ? 1 - i : 0);
                     mu = qcd.mantissaB[0];
@@ -1593,6 +1532,8 @@ public class Jpeg2000Decoder {
     }
 
     /**
+     * Not recommended for external use.
+     * <p>
      * decodes JPEG2000 image data as rgb/gray image bytes <br/>
      * Example: if rgb component image then returned byte array contains r
      * followed by g followed by b

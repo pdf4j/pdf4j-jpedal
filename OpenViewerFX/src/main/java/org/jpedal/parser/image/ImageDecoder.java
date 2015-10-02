@@ -224,7 +224,7 @@ public class ImageDecoder extends BaseDecoder{
 //          System.out.println("XObject="+XObject+" "+XObject.getObjectRefAsString());
         PdfObject newSMask=XObject.getDictionary(PdfDictionary.SMask);
         final PdfObject newMask=XObject.getDictionary(PdfDictionary.Mask);
-        ImageData imageData=new ImageData(XObject, objectData,ImageCommands.XOBJECT);
+        ImageData imageData=new ImageData(XObject, objectData);
         imageData.getFilter(XObject);
         GenericColorSpace decodeColorData = setupXObjectColorspace(XObject, imageData);
         imageData.setCompCount(decodeColorData.getColorSpace().getNumComponents());
@@ -258,7 +258,7 @@ public class ImageDecoder extends BaseDecoder{
                     objectData=JPeg2000ImageDecoder.getBytesFromJPEG2000(objectData,decodeColorData,XObject);
                     imageData.setObjectData(objectData);
                     XObject.setMixedArray(PdfDictionary.Filter,null);
-                    XObject.setDecodedStream(objectData);
+                    XObject.setDecodedStream(objectData);                    
                     
                     decodeColorData=new DeviceRGBColorSpace();
                 }
@@ -268,14 +268,14 @@ public class ImageDecoder extends BaseDecoder{
                  */
                 if(newSMask!=null){
                     ///WE NEED TO CONVERT JPG to raw DATA in smask as well
-                    ImageData smaskImageData=new ImageData(newSMask, null,ImageCommands.XOBJECT);
+                    ImageData smaskImageData=new ImageData(newSMask, null);
                     smaskImageData.getFilter(newSMask);
                     GenericColorSpace maskColorSpace = setupXObjectColorspace(newSMask, smaskImageData);
                     byte[] maskData =currentPdfFile.readStream(newSMask,true,true,false, false,false, newSMask.getCacheName(currentPdfFile.getObjectReader()));
                     
-                    
+                              
                     if(1==1){
-                        return SMaskDecoder.applyJPX_JBIG_Smask(imageData, smaskImageData, maskData,XObject, newSMask, decodeColorData, maskColorSpace);
+                        objectData =  SMaskDecoder.applyJPX_JBIG_Smask(imageData, smaskImageData, maskData,XObject, newSMask, decodeColorData, maskColorSpace);                        
                     }else{ // old method
                         maskData = MaskDataDecoder.getSMaskData(maskData,smaskImageData, newSMask,setupXObjectColorspace(newSMask, smaskImageData));
                         objectData=SMaskDecoder.applySMask(maskData,imageData,decodeColorData, newSMask,XObject);
@@ -301,7 +301,7 @@ public class ImageDecoder extends BaseDecoder{
                       //  imageData.setDepth(8);
                     }
                     ///WE NEED TO CONVERT JPG to raw DATA in mask as well
-                    ImageData maskImageData=new ImageData(newMask, objectData,ImageCommands.XOBJECT);
+                    ImageData maskImageData=new ImageData(newMask, objectData);
                     if(maskArray!=null){
                         return MaskDataDecoder.applyMaskArray(imageData, maskArray);
                     }                        
@@ -329,7 +329,7 @@ public class ImageDecoder extends BaseDecoder{
         
         //reset if changed in Mask/SMask code
         if(imageData==null){
-            imageData=new ImageData(XObject, objectData,ImageCommands.XOBJECT);
+            imageData=new ImageData(XObject, objectData);
             
             decodeColorData = new DeviceRGBColorSpace(true); //sets to 4 comp ARGB
             imageData.setCompCount(4);
@@ -541,7 +541,7 @@ public class ImageDecoder extends BaseDecoder{
             //this code is generic code being reused for HTML so breaks on several cases which we just lock out (ie rotation)
             final int pageRotation=pageData.getRotation(parserOptions.getPageNumber());
             
-            final boolean ignoreRotation= isHTML && ((optionsApplied & PDFImageProcessing.IMAGE_ROTATED )==PDFImageProcessing.IMAGE_ROTATED || (useHiResImageForDisplay && pageRotation==90) ) ;
+            final boolean ignoreRotation= isHTML && (useHiResImageForDisplay && pageRotation==90 ) ;
             
             if(!ignoreRotation){
                 
@@ -737,7 +737,7 @@ public class ImageDecoder extends BaseDecoder{
             final ImageTransformer image_transformation;
             
             //object to scale and clip. Creating instance does the scaling
-            image_transformation =new ImageTransformer(gs,image,true);
+            image_transformation =new ImageTransformer(gs,image);
             
             //get initial values
             x = image_transformation.getImageX();
@@ -1129,7 +1129,7 @@ public class ImageDecoder extends BaseDecoder{
         return image;
     }
     
-    private BufferedImage addOverPrint(GenericColorSpace decodeColorData, byte[] data, BufferedImage image, final ImageData imageData) throws PdfException {
+    private BufferedImage addOverPrint(GenericColorSpace decodeColorData, byte[] data, BufferedImage image, final ImageData imageData) {
         
         /**handle any soft mask*/
         final int colorspaceID=decodeColorData.getID();
@@ -1151,18 +1151,9 @@ public class ImageDecoder extends BaseDecoder{
         System.arraycopy(data,0,turnedData,0,count);
         
         boolean isInverted=!saveData && (parserOptions.renderDirectly() || useHiResImageForDisplay) && RenderUtils.isInverted(gs.CTM);
-        boolean isRotated=!saveData && (parserOptions.renderDirectly() || useHiResImageForDisplay) && RenderUtils.isRotated(gs.CTM);
         
         if(parserOptions.renderDirectly()){
             isInverted=false;
-            isRotated=false;
-        }
-        
-        if(isRotated){ //rotate at byte level with copy New Code still some issues
-            turnedData= ImageOps.rotateImage(turnedData, imageData.getWidth(), imageData.getHeight(), imageData.getDepth(), 1, index);
-            
-            imageData.swapValues();
-            
         }
         
         if(isInverted){//invert at byte level with copy
@@ -1188,10 +1179,6 @@ public class ImageDecoder extends BaseDecoder{
             }else{
                 current.getObjectStore().saveRawImageData(key,turnedData,imageData.getWidth(),imageData.getHeight(),imageData.getpX(), imageData.getpY(),null,decodeColorData.getID());
             }
-        }
-        
-        if(isRotated){
-            imageData.swapValues();
         }
     }
     
@@ -1393,32 +1380,6 @@ public class ImageDecoder extends BaseDecoder{
         
         optionsApplied=PDFImageProcessing.NOTHING;
         
-        /**fast op on data to speed up image manipulation*/
-        //optimse rotations here as MUCH faster and flag we have done this
-        //something odd happens if CTM[2][1] is negative so factor ignore this case
-        final boolean isInverted=useHiResImageForDisplay && RenderUtils.isInverted(gs.CTM) && !isHTML ;
-        final boolean isRotated=useHiResImageForDisplay && RenderUtils.isRotated(gs.CTM) && !isHTML;
-        
-        if(isInverted){
-            data = invertRawImageData(comp, ID, decodeColorData, data, w, h, d, index);
-        }
-        
-        if(isRotated){ //rotate at byte level with copy New Code still some issues
-            
-            final byte[] processedData=ImageOps.rotateImage(data, w, h, d, decodeColorData.getColorComponentCount(), index);
-            
-            if(processedData!=null){
-                data=processedData;
-                
-                optionsApplied += PDFImageProcessing.IMAGE_ROTATED;
-                
-                //reset
-                final int temp = h;
-                h=w;
-                w=temp;
-            }
-        }
-        
         if (index != null) {
             image = IndexedImage.make(w, h, decodeColorData, index, d, data);
             
@@ -1431,7 +1392,6 @@ public class ImageDecoder extends BaseDecoder{
             }
             
             image=decodeColorData.dataToRGB(data,w,h);
-            
             
         } else{
             
@@ -1455,26 +1415,6 @@ public class ImageDecoder extends BaseDecoder{
         }
         
         return image;
-    }
-    
-    byte[] invertRawImageData(final int comp, final int ID, final GenericColorSpace decodeColorData, byte[] data, int w, int h, int d, byte[] index) {
-        //invert at byte level with copy
-        
-        //needs to be 1 for sep
-        int count=comp;
-        if(ID==ColorSpaces.Separation) {
-            count = 1;
-        } else if(ID==ColorSpaces.DeviceN) {
-            count = decodeColorData.getColorComponentCount();
-        }
-        final byte[] processedData= ImageOps.invertImage(data, w, h, d, count, index);
-        if(processedData!=null){
-            
-            data=processedData;
-            optionsApplied += PDFImageProcessing.IMAGE_INVERTED;
-            
-        }
-        return data;
     }
     
     static byte[] correctDataArraySize(final int d, final int w, final int h, byte[] data) {

@@ -40,5 +40,5 @@ import java.util.List;
  */
 public class Packet {
     public int layerNumber;
-    public List<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
+    public final List<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
 }

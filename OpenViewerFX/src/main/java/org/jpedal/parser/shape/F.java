@@ -193,16 +193,8 @@ public class F {
                 }else{
                     current.drawShape(currentShape,gs, Cmd.F);
 
-//                    System.out.println("current.hasObjectsBehind(gs.CTM)="+current.hasObjectsBehind(new float[][]{{(float)currentShape.getBounds2D().getWidth(),0,1},
-//                        {0,(float)currentShape.getBounds2D().getHeight(),1},
-//                        {(float)currentShape.getBounds2D().getX(),(float)currentShape.getBounds2D().getY(),0}})+" "+current);
-                    //lock down to specific case
-                    if(current.isHTMLorSVG() && currentDrawShape.getSegmentCount()==7 && cache.groupObj==null && current.hasObjectsBehind(new float[][]{{(float)currentShape.getBounds2D().getWidth(),0,1},
-                        {0,(float)currentShape.getBounds2D().getHeight(),1},
-                        {(float)currentShape.getBounds2D().getX(),(float)currentShape.getBounds2D().getY(),0}})) { //avoid anything with potential transparency
-                        //System.out.println("ADD "+currentShape.getBounds());
+                    if (current.isHTMLorSVG() && cache.groupObj==null) {
                         current.eliminateHiddenText(currentShape, gs, currentDrawShape.getSegmentCount(),false);
-                    //
                     }
                 }
             }

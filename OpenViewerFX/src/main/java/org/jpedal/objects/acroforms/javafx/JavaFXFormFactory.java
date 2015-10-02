@@ -287,7 +287,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
         return but;
     }
     
-    private Color getAnnotationColor(final FormObject form){
+    private static Color getAnnotationColor(final FormObject form){
         final float[] formColor = form.getFloatArray(PdfDictionary.C);
         Color color = Color.TRANSPARENT;
         if (formColor != null) {

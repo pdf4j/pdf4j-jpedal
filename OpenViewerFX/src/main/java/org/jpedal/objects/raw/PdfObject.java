@@ -1466,7 +1466,7 @@ public class PdfObject implements Cloneable{
         {
             o = super.clone();
         }
-        catch( final Exception e ){
+        catch( final CloneNotSupportedException e ){
             //tell user and log
             if(LogWriter.isOutput()) {
                 LogWriter.writeLog("Exception: " + e.getMessage());

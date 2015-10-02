@@ -815,8 +815,7 @@ public class JSFunction {
 			
 			//DEFINE the strings to search for within getfield
 			final String valStr = ".value";
-			final int VALUE = 1;
-			
+
 			if(arg.indexOf(valStr,finish+1)!=-1){
                             finish  = arg.indexOf(valStr,finish+1)+valStr.length();
 			

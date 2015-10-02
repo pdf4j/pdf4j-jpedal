@@ -33,6 +33,7 @@
 package org.jpedal.display.javafx;
 
 
+import org.jpedal.PdfDecoderFX;
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -46,7 +47,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Transform;
-import org.jpedal.*;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.commands.javafx.JavaFXPreferences;
@@ -211,7 +211,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         
         final Rectangle clip = new Rectangle(crx,cry,crw,crh);
         clip.setFill(Color.WHITE);
-
+        
         
 // Remove box from the current node it belongs to - avoids duplication errors
         if(box != null && box.getParent() != null) {
@@ -222,6 +222,16 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         
         if(displayView==SINGLE_PAGE){
             pdf.getChildren().clear();
+            
+            if(formRenderer.isXFA()){
+                //draw wihte background border on xfa contents
+                final Path border = getBorder(crw, crh);
+                border.setFill(Color.WHITE);
+                pdf.getChildren().addAll(border);
+                border.setLayoutX(crx);
+                border.setLayoutY(cry);
+            }
+            
             if(!pdf.getChildren().contains(fxPane)){
                 pdf.getChildren().addAll(fxPane);
             }
@@ -285,8 +295,12 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         }
         
         addForms(formRenderer);
+   
+        //
+        /**/
+        
     }
-
+    
     private void addForms(final AcroRenderer formRenderer) {
         int start=pageNumber,end=pageNumber;
         //control if we display forms on multiple pages

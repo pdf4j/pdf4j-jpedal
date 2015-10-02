@@ -45,16 +45,14 @@ import javafx.stage.Stage;
 public class CertificateHolderFX {
     private final Stage frame;
     private JavaFXGeneral generalTab;
-    private JavaFXDetails detailsTab;
-  
+    
 
      public void setValues(final String name, final int version, final String hashAlgorithm, final String subjectFields, final String issuerFields,
                           final BigInteger serialNumber, final String notBefore, final String notAfter, final String publicKeyDescription, final String publicKey,
                           final String x509Data, final String sha1Digest, final String md5Digest) {
         // TODO Auto-generated method stub
         generalTab = new JavaFXGeneral();
-        detailsTab = new JavaFXDetails();
-
+       
         generalTab.setValues(name, notBefore, notAfter);
         JavaFXDetails.setValues(version, hashAlgorithm, subjectFields, issuerFields,
             serialNumber, notBefore, notAfter, publicKeyDescription, publicKey, x509Data, sha1Digest, md5Digest);

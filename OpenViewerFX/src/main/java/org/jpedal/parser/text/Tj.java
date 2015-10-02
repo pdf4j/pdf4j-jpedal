@@ -289,7 +289,7 @@ public class Tj extends BaseDecoder {
      */
     private StringBuffer processTextArray(final byte[] stream, int startCommand, final int dataPointer, final float multiplyer, final boolean multipleTJs){
         
-        boolean isHTML=current.isHTMLorSVG();
+        isHTML=current.isHTMLorSVG();
         
         /**
          * global and local values
@@ -838,7 +838,7 @@ public class Tj extends BaseDecoder {
                 }
             }
             
-            if(glyph!=null){
+            if(glyph!=null || isHTML){
                 
                 //set raw width to use for scaling
                 if(glyph!=null && type==StandardFonts.TYPE1) {
@@ -893,7 +893,8 @@ public class Tj extends BaseDecoder {
                  */
                 if((Tmode==GraphicsState.CLIPTEXT)){
 
-                    if(glyph.getShape()!=null){
+                    //will need FX implementation
+                    if(glyph!=null && !parserOptions.useJavaFX() && glyph.getShape()!=null){
                         
                         final Area glyphShape=(Area) (glyph.getShape()).clone();
                         
@@ -927,11 +928,12 @@ public class Tj extends BaseDecoder {
                         lineWidth = lw / multiplyer;
 
                     }
-                    gs.setLineWidth(lineWidth);
 
                     final double[] textTrans = new double[6];
                     at.getMatrix(textTrans);
-
+                    
+                    gs.setLineWidth((float)(lineWidth/textTrans[0]));
+                    
                     if (isTextShifted) {
                         current.drawEmbeddedText(Trm, -glyphData.getFontSize(), glyph, null, fontType, gs, textTrans, glyphData.getUnicodeValue(), currentFontData, -100);
                     } else {
@@ -953,6 +955,7 @@ public class Tj extends BaseDecoder {
             
             errorTracker.addPageFailureMessage("Exception " + e + " on embedded font renderer");
             
+            //
         }
     }
     

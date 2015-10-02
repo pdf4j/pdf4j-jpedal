@@ -37,12 +37,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.gui.CommandListenerImpl;
 import org.jpedal.examples.viewer.gui.generic.GUIButton;
 
 /**
  *
  */
-public class JavaFXCommandListener implements EventHandler<ActionEvent> {
+public class JavaFXCommandListener extends CommandListenerImpl implements EventHandler<ActionEvent> {
 
     
     final Commands currentCommands;

@@ -3277,7 +3277,23 @@ public class PdfGroupingAlgorithms {
                                 }
                                 //System.out.println("c=="+c);
                                 //System.out.println("id=="+id);
+                                if (debug) {
+                                    System.out.println("Merge items "+c+" & "+id);
+                                    System.out.println("c  : "+removeHiddenMarkers(content[c].toString()));
+                                    System.out.println("id : "+removeHiddenMarkers(content[id].toString()));
+                                    System.out.println("");
+                                }
+                                if ((isSearch && (i!=c && 
+									((f_x1[i] > f_x1[c] && mode!=PdfData.VERTICAL_TOP_TO_BOTTOM) ||
+									(f_x1[i] < f_x1[c] && mode==PdfData.VERTICAL_TOP_TO_BOTTOM) && 
+									writingMode[c]==mode)))
+									||
+									(!isSearch && (i!=c &&((f_x1[i] > f_x1[c] && mode!=PdfData.VERTICAL_TOP_TO_BOTTOM)||
+									f_x1[i] < f_x1[c] && mode==PdfData.VERTICAL_TOP_TO_BOTTOM && writingMode[c]==mode
+									)))
+									) { //see if on right
                                 merge(c,id,separator,true);
+                                }
                     
                                 id = -1;
                             }
@@ -4200,7 +4216,7 @@ public class PdfGroupingAlgorithms {
 
         //Merge text fragments into lines as displayed on page
         createLinesForSearch(items.length, items, mode, true, false, true, true);
-
+        
         //Bitwise flags for regular expressions engine, options always required 
         int options = loadSearcherOptions(searchType);
 

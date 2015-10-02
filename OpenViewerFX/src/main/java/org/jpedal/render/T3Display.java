@@ -56,14 +56,6 @@ public class T3Display extends SwingDisplay implements T3Renderer{
     }
 
     /**
-     * used internally - please do not use
-     */
-    @Override
-    public void setOptimisedRotation(final boolean value) {
-        optimisedTurnCode=value;
-    }
-
-    /**
      * use by type3 fonts to differentiate images in local store
      */
     @Override

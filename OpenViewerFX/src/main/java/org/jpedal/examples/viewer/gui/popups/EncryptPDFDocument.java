@@ -46,27 +46,27 @@ import javax.swing.JToggleButton;
 public class EncryptPDFDocument extends Save
 {
 
-    JToggleButton jToggleButton3 = new JToggleButton();
+    final JToggleButton jToggleButton3 = new JToggleButton();
 	
-	JToggleButton jToggleButton2 = new JToggleButton();
+	final JToggleButton jToggleButton2 = new JToggleButton();
 	
-	JCheckBox userPasswordCheck=new JCheckBox("Password required to open document");
-	JCheckBox masterPasswordCheck=new JCheckBox("Password required to chnge permissions and passwords");
+	final JCheckBox userPasswordCheck=new JCheckBox("Password required to open document");
+	final JCheckBox masterPasswordCheck=new JCheckBox("Password required to chnge permissions and passwords");
 	
-	JCheckBox printing = new JCheckBox("No Printing");
-	JCheckBox modifyDocument = new JCheckBox("No modifying the document");
-	JCheckBox contentExtract = new JCheckBox("No content copying or extraction");
-	JCheckBox modifyAnnotations = new JCheckBox("No modifying annotations");
-	JCheckBox formFillIn = new JCheckBox("No form fields fill-in");
+	final JCheckBox printing = new JCheckBox("No Printing");
+	final JCheckBox modifyDocument = new JCheckBox("No modifying the document");
+	final JCheckBox contentExtract = new JCheckBox("No content copying or extraction");
+	final JCheckBox modifyAnnotations = new JCheckBox("No modifying annotations");
+	final JCheckBox formFillIn = new JCheckBox("No form fields fill-in");
 	
-	JTextField userPasswordBox = new JTextField();
-	JTextField masterPasswordBox = new JTextField();
+	final JTextField userPasswordBox = new JTextField();
+	final JTextField masterPasswordBox = new JTextField();
 	
 	final String[] securityItems = {"128-bit RC4 (Acrobat 5.0 and up)",
 			"40-bit RC4 (Acrobat 3.x, 4.x)"
 	};
 	
-	JComboBox encryptionLevel = new JComboBox(securityItems);
+	final JComboBox encryptionLevel = new JComboBox(securityItems);
 	
 	public EncryptPDFDocument( final String root_dir, final int end_page, final int currentPage )
 	{

@@ -70,18 +70,6 @@ class JavaFXDetails {
 
     }
     
-    @SuppressWarnings("unused")
-    private static void initComponents() {
-        //final Scene scene = new Scene(new Group());
-    
-        
-        final TableColumn first = new TableColumn("");
-        first.setCellValueFactory(
-                new PropertyValueFactory<Model, String>("one"));
-        
-
-    }
-
     public static class Model {
 
         private final SimpleStringProperty one;

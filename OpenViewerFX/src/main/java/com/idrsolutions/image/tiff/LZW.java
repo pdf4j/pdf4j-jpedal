@@ -44,7 +44,7 @@ public class LZW {
 
     }
 
-    public byte[] decompress(byte[] output, byte[] input, int w, int h) {
+    public void decompress(byte[] output, byte[] input, int w, int h) {
 
         init();
 
@@ -93,9 +93,6 @@ public class LZW {
                 }
             }
         }
-
-
-        return output;
     }
 
     public void init() {
@@ -140,7 +137,7 @@ public class LZW {
         }
     }
 
-    private byte[] generateCodeArray(byte oldString[], byte newString) {
+    private static byte[] generateCodeArray(byte oldString[], byte newString) {
         int length = oldString.length;
         byte string[] = new byte[length + 1];
         System.arraycopy(oldString, 0, string, 0, length);
@@ -161,6 +158,8 @@ public class LZW {
             putBits -= bitsToGet;
             return code;
         } catch (ArrayIndexOutOfBoundsException e) {
+
+            System.err.println("Exception in findNext "+e);
             return 257;
         }
     }

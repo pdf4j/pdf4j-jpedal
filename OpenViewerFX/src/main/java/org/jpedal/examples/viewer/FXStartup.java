@@ -104,9 +104,10 @@ public class FXStartup extends Application {
     @Override
     
     public void start(final Stage initstage){
-        //Debug mode
-        final boolean debugSplash  = false;
-        if(debugSplash){
+        
+        final boolean showSplashScreen  = false;
+        
+        if(showSplashScreen){
             System.out.println("Starting the SplashScreen");
             final Task<ObservableList<String>> loadModsTask = new Task() {
                 @Override

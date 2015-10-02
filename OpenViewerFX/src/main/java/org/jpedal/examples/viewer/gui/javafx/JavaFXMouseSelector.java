@@ -46,7 +46,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -101,9 +100,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
     //used to track changes when dragging rectangle around
     private int old_m_x2 = -1, old_m_y2 = -1;
-
-    //Use alt to extract only within exact area
-    boolean altIsDown;
 
     //Right click options
     MenuItem copy;
@@ -629,7 +625,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
     public void mouseDragged(final MouseEvent e) {
         if (isOtherKey(e)) {
 
-            altIsDown = e.isAltDown();
             if (!startHighlighting) {
                 startHighlighting = true;
             }
@@ -1192,8 +1187,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
         return e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.NONE);
     }
-    
-    Pane pane = new Pane();
     
     /**
      * generate new  cursorBox and highlight extractable text,

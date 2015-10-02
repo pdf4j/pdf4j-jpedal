@@ -31,7 +31,7 @@
   <!--Flag to allow the viewer to auto update-->
   <automaticupdate value="true"/>
   <!--Value shows what version of the library is being used-->
-  <currentversion value="6.4.28"/>
+  <currentversion value="6.6b02"/>
   <!--Show message when using tiffs-->
   <showtiffmessage value="true"/>
   <!--The maximum number of viewers when using the multi viewer example-->

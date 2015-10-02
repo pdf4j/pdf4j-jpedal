@@ -141,20 +141,14 @@ public class Type3 extends PdfFont {
              */
             final PdfKeyPairsIterator keyPairs=CharProcs.getKeyPairsIterator();
             
-            String glyphKey,pKey;
+            String glyphKey;
             PdfObject glyphObj;
             
             while(keyPairs.hasMorePairs()){
                 
                 glyphKey=keyPairs.getNextKeyAsString();
                 glyphObj=keyPairs.getNextValueAsDictionary();
-                
-                Object diffValue=null;
-                if(diffLookup!=null){
-                    pKey= StandardFonts.convertNumberToGlyph(glyphKey, containsHexNumbers, allNumbers);
-                    diffValue=diffLookup.get(pKey);
-                }
-                
+               
                 //decode and store in array
                 if(glyphObj!=null && renderPage && !glyphKey.equals(".notdef") && !glyphKey.equals(".")){
                     
@@ -196,15 +190,9 @@ public class Type3 extends PdfFont {
                         glyph.setScaling(1f/factor);
                         
                         otherKey=-1;
-                        if(diffValue!=null){
-                            key= (Integer) diffValue;
-                            
-                            if(keyPairs.isNextKeyANumber()) {
-                                otherKey=keyPairs.getNextKeyAsNumber();
-                            }
-                        }else {
-                            key=keyPairs.getNextKeyAsNumber();
-                        }
+                        
+                       // System.out.println("str="+" "+rawDiffKeys.keySet());
+                        key=((Integer)rawDiffKeys.get(keyPairs.getNextKeyAsString())).intValue();
                         
                         glyphs.setT3Glyph(key,otherKey, glyph);
                         

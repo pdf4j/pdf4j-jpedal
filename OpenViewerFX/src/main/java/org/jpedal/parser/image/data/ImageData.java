@@ -54,10 +54,9 @@ public class ImageData {
     
     private boolean removed;
     
-    public ImageData(PdfObject XObject,byte[] objectData, int mode) {
+    public ImageData(PdfObject XObject,byte[] objectData) {
 
         this.objectData=objectData;
-        
 
         width = XObject.getInt(PdfDictionary.Width);
         height = XObject.getInt(PdfDictionary.Height);

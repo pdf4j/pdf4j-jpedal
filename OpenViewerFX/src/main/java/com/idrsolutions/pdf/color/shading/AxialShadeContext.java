@@ -35,9 +35,18 @@ public class AxialShadeContext implements PaintContext {
     private boolean[] extension;
 //    private final int pageHeight;
 //    private final boolean isReversed;
-    float t0, t1;
-    double x0, y0, x1, y1;
-    double deltaX, deltaY, deltaT, multiXY, textX,textY;
+final float t0;
+    final float t1;
+    final double x0;
+    final double y0;
+    final double x1;
+    final double y1;
+    final double deltaX;
+    final double deltaY;
+    final double deltaT;
+    final double multiXY;
+    final double textX;
+    final double textY;
 
     private final AffineTransform shadeAffine;
     private AffineTransform inversed;

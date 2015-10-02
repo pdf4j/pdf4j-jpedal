@@ -48,9 +48,9 @@ public class JpegHuffman {
     private final int DC_matrix1[];
     private final int AC_matrix1[];
 
-    public ArrayList<int[]> bitList;
+    public final ArrayList<int[]> bitList;
 
-    public ArrayList<int[]> valList;
+    public final ArrayList<int[]> valList;
 
     private static final int[] bitsDCchrominance = {1, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0};
     private static final int[] bitsDCluminance = {0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};

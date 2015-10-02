@@ -39,7 +39,6 @@ import org.jpedal.PdfDecoderInt;
 /**
  * allow user to set print hinting
  */
-@SuppressWarnings({"UnusedReturnValue", "UnusedDeclaration"})
 public interface CustomPrintHintingHandler {
     boolean preprint(Graphics2D g2, PdfDecoderInt pdf);
     boolean postprint(Graphics2D g2, PdfDecoderInt pdf);

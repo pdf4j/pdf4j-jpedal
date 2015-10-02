@@ -51,7 +51,7 @@ import java.awt.print.PageFormat;
 import org.jpedal.objects.PrinterOptions;
 
 
-public class PdfPrintTransform
+public final class PdfPrintTransform
 {
     private boolean autoRotate;
     private final boolean chooseSourceByPDFSize;

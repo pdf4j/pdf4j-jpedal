@@ -123,6 +123,6 @@ public class MarkerGlyph implements PdfGlyph, Serializable {
 
     @Override
     public Path getPath() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("getPath Not supported yet.");
     }
 }

@@ -45,7 +45,7 @@ public class TileComponent {
     public int x1;
     public int y1;
     
-    public List<TileResolution> resolutions = new ArrayList<TileResolution>();
+    public final List<TileResolution> resolutions = new ArrayList<TileResolution>();
     
     public double getWidth() {
         return (x1 - x0);

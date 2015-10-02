@@ -36,7 +36,6 @@ import java.awt.Stroke;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 
-import javafx.scene.shape.Path;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
@@ -45,6 +44,8 @@ import org.jpedal.color.DeviceGrayColorSpace;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
+import org.jpedal.external.ExternalHandlers;
+import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.objects.raw.PdfArrayIterator;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.objects.raw.PdfDictionary;
@@ -979,16 +980,18 @@ public class GraphicsState implements Cloneable
     public TextState getTextState() {
         return currentTextState;
     }
-    //<start-adobe>
-    public void updateClip(final Path fxPath) {
+    
+    public void updateClip(final Object fxPath) {
         // Initialise when needed
         if(current_clip == null){
-            current_clip = new FXClip();
+             JavaFXSupport fxSupport = ExternalHandlers.getFXHandler();
+            if(fxSupport!=null){
+                current_clip = fxSupport.getFXClip();
+            }
         }
         
         hasClipChanged = current_clip.updateClip(fxPath);
     }
-    //<end-adobe>
     
     public Shape getFXClippingShape(){
         if (current_clip == null) {

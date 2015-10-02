@@ -45,7 +45,7 @@ public class TileResolution {
     public int x1;
     public int y1;
     public PrecinctInfo precinctInfo;
-    public List<TileBand> tileBands = new ArrayList<TileBand>();
+    public final List<TileBand> tileBands = new ArrayList<TileBand>();
 
     public int getWidth() {
         return (x1 - x0);

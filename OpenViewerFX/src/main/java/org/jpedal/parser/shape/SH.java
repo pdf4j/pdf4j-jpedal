@@ -88,13 +88,9 @@ public class SH {
             shadeShape = new Rectangle(pageData.getMediaBoxX(pageNum), pageData.getMediaBoxY(pageNum), pageData.getMediaBoxWidth(pageNum), pageData.getMediaBoxHeight(pageNum));
         }
         
-        if(current.isHTMLorSVG() && cache.groupObj==null && current.hasObjectsBehind(new float[][]{{(float)shadeShape.getBounds2D().getWidth(),0,1},
-                        {0,(float)shadeShape.getBounds2D().getHeight(),1},
-                        {(float)shadeShape.getBounds2D().getX(),(float)shadeShape.getBounds2D().getY(),0}})) { //avoid anything with potential transparency
-                       // System.out.println("ADD "+shadeShape.getBounds());
-                        current.eliminateHiddenText(shadeShape, gs, 7, true);
-                    //
-                    }
+        if (current.isHTMLorSVG() && cache.groupObj==null) {
+            current.eliminateHiddenText(shadeShape, gs, 7, true);
+        }
 
         /**
          * generate the appropriate shading and then colour in the current clip with it

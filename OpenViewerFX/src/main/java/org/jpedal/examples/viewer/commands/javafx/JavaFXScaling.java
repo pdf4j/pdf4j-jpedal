@@ -32,8 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands.javafx;
 
+import org.jpedal.FileAccess;
+import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Values;
+import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
 
 /**
@@ -51,13 +55,20 @@ public class JavaFXScaling {
                 
                 int mode=decode_pdf.getDisplayView();
                 int alignment=decode_pdf.getPageAlignment();
-                final int pageNumber=commonValues.getCurrentPage();
+                ((PdfDecoderFX)decode_pdf).getChildren().clear();
+               // final int pageNumber=commonValues.getCurrentPage();
                 currentGUI.scaleAndRotate();
+                currentGUI.setDisplayView(mode,alignment);
+                //if the mode is not single page then set display needs to be called twice 
+                //this is a hack fix need to be fixed properly
+                if(mode==Display.SINGLE_PAGE){
+                    FileAccess  fa = (FileAccess)decode_pdf.getExternalHandler(Options.FileAccess);
+                    fa.setLastPageDecoded(-1);
+                }else{
+                    currentGUI.setDisplayView(mode,alignment);
+                }
+//                currentGUI.scrollToPage(pageNumber);
                 
-                    //we need to switch modes and bck to avoid issues with listeners
-//                currentGUI.setDisplayView(Display.SINGLE_PAGE,alignment);
-                currentGUI.scrollToPage(pageNumber);
-//                currentGUI.setDisplayView(mode,alignment);
                 
             }
         } else {

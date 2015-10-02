@@ -335,7 +335,20 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
       frame.show();
       
       
-      
-        //<start-server><end-server>
+        // Swing code
+//        org.jpedal.PdfDecoder decode_pdf = (org.jpedal.PdfDecoder) this.decode_pdf;
+//        
+//        JDialog frame = new JDialog(getParentJFrame(decode_pdf), "Signature Properties", true);
+//        
+//        Summary summary = new Summary(frame, sigObject);
+//        summary.setValues(sigObject.getTextStreamValue(PdfDictionary.Name),
+//                sigObject.getTextStreamValue(PdfDictionary.Reason),
+//                sigObject.getTextStreamValue(PdfDictionary.Location));
+//        
+//        frame.getContentPane().add(summary);
+//        frame.setSize(550, 220);
+//        frame.setLocationRelativeTo(null);
+//        frame.setVisible(true);
+        
     }
 }

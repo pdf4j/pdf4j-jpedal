@@ -32,6 +32,10 @@
  */
 package org.jpedal.fonts.glyph;
 
+import org.jpedal.fonts.tt.FontFile2;
+import org.jpedal.fonts.tt.Glyf;
+import org.jpedal.fonts.tt.Hmtx;
+import org.jpedal.fonts.tt.hinting.TTVM;
 
 /**
  * template for glyph creation routines
@@ -80,4 +84,6 @@ public interface GlyphFactory {
 
     boolean useFX();
 
+    PdfGlyph getGlyph(Glyf currentGlyf,FontFile2 fontTable, Hmtx currentHmtx, int idx, float f, TTVM vm, String baseFontName);
+                    
 }

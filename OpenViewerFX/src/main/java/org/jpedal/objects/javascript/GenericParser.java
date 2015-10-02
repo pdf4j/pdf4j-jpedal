@@ -143,8 +143,7 @@ public class GenericParser implements ExpressionEngine {
 
         if (debugEngine) {
             System.out.println("execute(FormObject ref, int type, Object js, int eventType, char keyPressed)");
-            final String sEventType = getActionHandlerAsString(eventType);
-            System.out.println("execute(" + '[' + ref.getObjectRefAsString() + ']' + ", " + PdfDictionary.showAsConstant(type) + ", \"" + js + "\", " + sEventType + ", " + keyPressed + ')');
+            System.out.println("execute(" + '[' + ref.getObjectRefAsString() + ']' + ", " + PdfDictionary.showAsConstant(type) + ", \"" + js + "\", "  + ", " + keyPressed + ')');
         }
 
         if (js instanceof String) {
@@ -497,43 +496,6 @@ public class GenericParser implements ExpressionEngine {
         js = sb.toString();
 //		js = js.replaceAll("var\\s", "this.");
         return js;
-    }
-
-    /**
-     * Helper method that tells you what type eventType is
-     *
-     * @param eventType
-     * @return
-     */
-    private static String getActionHandlerAsString(final int eventType) {
-        final String sEventType;
-        switch (eventType) {
-            case ActionHandler.MOUSEPRESSED:
-                sEventType = "ActionHandler.MOUSEPRESSED";
-                break;
-            case ActionHandler.MOUSECLICKED:
-                sEventType = "ActionHandler.MOUSECLICKED or ActionHandler.VALUESCHANGED";
-                break;
-            case ActionHandler.FOCUS_EVENT:
-                sEventType = "ActionHandler.FOCUS_EVENT";
-                break;
-            case ActionHandler.MOUSEENTERED:
-                sEventType = "ActionHandler.MOUSEENTERED";
-                break;
-            case ActionHandler.MOUSEEXITED:
-                sEventType = "ActionHandler.MOUSEEXITED";
-                break;
-            case ActionHandler.MOUSERELEASED:
-                sEventType = "ActionHandler.MOUSERELEASED";
-                break;
-            case ActionHandler.NOMESSAGE:
-                sEventType = "ActionHandler.NOMESSAGE";
-                break;
-            default:
-                sEventType = String.valueOf(eventType);
-                break;
-        }
-        return sEventType;
     }
 
     public static void debugLog(final String log) {

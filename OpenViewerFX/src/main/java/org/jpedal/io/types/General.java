@@ -169,10 +169,6 @@ public class General {
                     valueObj.setStatus(PdfObject.UNDECODED_DIRECT);
                     valueObj.setUnresolvedData(newData,PdfObject.UNDECODED_DIRECT);
 
-                    if(debugFastCode) {
-                        System.out.println(padding + "obj ");
-                    }
-
                     isNumber=false;
                     typeFound=4;
 
@@ -185,10 +181,6 @@ public class General {
                     typeFound=0;
 
                     i=j;
-
-                    if(debugFastCode) {
-                        System.out.println(padding + "Dict starting << ");
-                    }
 
                     break;
 
@@ -211,23 +203,7 @@ public class General {
                     break;
 
                 }else if(PDFkeyInt== PdfDictionary.OpenAction && data[i]=='R'){
-
-                    //get the object data and pass in
-                    int jj2=0;
-                    while(newData[jj2]!='['){
-                        jj2++;
-
-                        if(newData[jj2]=='<' && newData[jj2+1]!='<') {
-                            break;
-                        }
-                    }
-
-                    final Array objDecoder=new Array(objectReader, jj2, endPt, PdfDictionary.VALUE_IS_MIXED_ARRAY);
-                    objDecoder.readArray(ignoreRecursion, newData, pdfObject, PDFkeyInt);
-                    i=j;
-
-                    return i;
-                    //break;
+                    return readOpenAction(pdfObject, PDFkeyInt, ignoreRecursion, objectReader, endPt, j, newData);
                 }else{
 
                     data=newData;
@@ -373,73 +349,8 @@ public class General {
             //really horrible code to allow for /N <</sillyKey 15 0 R /D 15 0 R>>
             //see CIS_Post_Training_Event_Assessment_User1Response.pdf
             if (PDFkeyInt == PdfDictionary.D || PDFkeyInt == PdfDictionary.N || PDFkeyInt == PdfDictionary.R) {
-
-                final PdfObject APobj= ObjectFactory.createObject(PDFkeyInt,pdfObject.getObjectRefAsString(), PdfDictionary.Form, pdfObject.getID());
-                pdfObject.setDictionary(PDFkeyInt, APobj);
-
-                int ptr = jj;
-                final int dataLength = data.length;
-                while (true) {
-
-                    if (ptr >= dataLength - 1) {
-                        break;
-                    }
-
-                    //got to start of command
-                    while (data[ptr] != '/') {
-                        ptr++;
-                    }
-
-                    ptr++;
-
-                    int start = ptr;
-                    final int key;
-                    final String value;
-
-                    //got to start of command
-                    while (data[ptr] != 32 && data[ptr] != 10 && data[ptr] != 9 && data[ptr] != 13) {
-                        ptr++;
-                    }
-
-                    key = PdfDictionary.getIntKey(start, ptr - start, data);
-                    final Object currentKey = PdfDictionary.getKey(start, ptr - start, data);
-
-                    //goto start of value
-                    while (data[ptr] == 32 || data[ptr] == 10 || data[ptr] == 9 && data[ptr] == 13) {
-                        ptr++;
-                    }
-
-                    //get value
-                    start = ptr;
-
-                    //got to start of command
-                    while (ptr < dataLength && data[ptr] != '/' && data[ptr] != '>') {
-                        ptr++;
-                    }
-
-                    value = (String) PdfDictionary.getKey(start, ptr - start, data);
-
-                    if (debugFastCode) {
-                        System.out.println("key=" + key + "<>" + value + " nextChar=" + data[ptr]);
-                    }
-
-                    final PdfObject obj= ObjectFactory.createObject(key,value, PdfDictionary.Form, pdfObject.getID());
-
-                    Dictionary.readDictionaryFromRefOrDirect(key, obj, (String) currentKey, 0, value.getBytes(), -1,objectReader);
-
-                    if(key!=PdfDictionary.On && key!=PdfDictionary.Off) {
-                        APobj.setCurrentKey(currentKey);
-                    }
-
-                    APobj.setDictionary(key, obj);
-
-                    while (ptr < dataLength && data[ptr] == '>') {
-                        ptr++;
-                    }
-                }
-                jj = ptr;
-
-            } else {
+                jj = handleArray(pdfObject, PDFkeyInt, objectReader, jj, data);
+            }else {
                 if (debugFastCode) {
                     System.out.println("Name");
                 }
@@ -454,6 +365,92 @@ public class General {
         if(!isRef) {
             i = jj;
         }
+
+        return i;
+    }
+
+    private static int handleArray(PdfObject pdfObject, int PDFkeyInt, PdfFileReader objectReader, int jj, byte[] data) {
+        final PdfObject APobj= ObjectFactory.createObject(PDFkeyInt,pdfObject.getObjectRefAsString(), PdfDictionary.Form, pdfObject.getID());
+        pdfObject.setDictionary(PDFkeyInt, APobj);
+
+        int ptr = jj;
+        final int dataLength = data.length;
+        while (true) {
+
+            if (ptr >= dataLength - 1) {
+                break;
+            }
+
+            //got to start of command
+            while (data[ptr] != '/') {
+                ptr++;
+            }
+
+            ptr++;
+
+            int start = ptr;
+            final int key;
+            final String value;
+
+            //got to start of command
+            while (data[ptr] != 32 && data[ptr] != 10 && data[ptr] != 9 && data[ptr] != 13) {
+                ptr++;
+            }
+
+            key = PdfDictionary.getIntKey(start, ptr - start, data);
+            final Object currentKey = PdfDictionary.getKey(start, ptr - start, data);
+
+            //goto start of value
+            while (data[ptr] == 32 || data[ptr] == 10 || data[ptr] == 9 && data[ptr] == 13) {
+                ptr++;
+            }
+
+            //get value
+            start = ptr;
+
+            //got to start of command
+            while (ptr < dataLength && data[ptr] != '/' && data[ptr] != '>') {
+                ptr++;
+            }
+
+            value = (String) PdfDictionary.getKey(start, ptr - start, data);
+
+            if (debugFastCode) {
+                System.out.println("key=" + key + "<>" + value + " nextChar=" + data[ptr]);
+            }
+
+            final PdfObject obj= ObjectFactory.createObject(key,value, PdfDictionary.Form, pdfObject.getID());
+
+            Dictionary.readDictionaryFromRefOrDirect(key, obj, (String) currentKey, 0, value.getBytes(), -1,objectReader);
+
+            if(key!=PdfDictionary.On && key!=PdfDictionary.Off) {
+                APobj.setCurrentKey(currentKey);
+            }
+
+            APobj.setDictionary(key, obj);
+
+            while (ptr < dataLength && data[ptr] == '>') {
+                ptr++;
+            }
+        }
+
+        return ptr;
+    }
+
+    private static int readOpenAction(PdfObject pdfObject, int PDFkeyInt, boolean ignoreRecursion, PdfFileReader objectReader, int endPt, int j, byte[] newData) {
+        int i;//get the object data and pass in
+        int jj2=0;
+        while(newData[jj2]!='['){
+            jj2++;
+
+            if(newData[jj2]=='<' && newData[jj2+1]!='<') {
+                break;
+            }
+        }
+
+        final Array objDecoder=new Array(objectReader, jj2, endPt, PdfDictionary.VALUE_IS_MIXED_ARRAY);
+        objDecoder.readArray(ignoreRecursion, newData, pdfObject, PDFkeyInt);
+        i=j;
 
         return i;
     }

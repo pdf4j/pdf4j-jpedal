@@ -39,10 +39,14 @@ import org.jpedal.fonts.tt.hinting.TTVM;
 import java.io.Serializable;
 import javafx.collections.ObservableList;
 
+
 /**
- *
+ * Provides addition javafx code if using JavaFX module
  */
 public class TTGlyphFX extends BaseTTGlyph implements PdfGlyph, Serializable{
+
+    /**paths for the letter, marked as transient so it wont be serialized */
+    transient Path pathsFX;
 
     /**
      * Unhinted constructor

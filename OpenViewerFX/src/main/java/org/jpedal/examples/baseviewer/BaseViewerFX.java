@@ -146,7 +146,7 @@ public class BaseViewerFX extends Application {
     
     //Controls size of the stage, in theory setting this to a higher value will
     //increase image quality as there's more pixels due to higher image resolutions
-    final static int FXscaling=1;
+    static final int FXscaling=1;
     
     FitToPage zoomMode = FitToPage.AUTO;
     

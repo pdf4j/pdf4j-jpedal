@@ -184,16 +184,11 @@ public class TTGlyphs extends PdfJavaGlyphs {
                 final int p=currentGlyf.getCharString(idx);
 
                 if(p!=-1){
-                    //<start-adobe>
+                    
                     if(factory.useFX()){
-                        if (TTGlyph.useHinting) {
-                            currentGlyph = new TTGlyphFX(currentGlyf, fontTable, currentHmtx, idx, (unitsPerEm / 1000f), vm);
-                        } else {
-                            currentGlyph = new TTGlyphFX(currentGlyf, fontTable, currentHmtx, idx, (unitsPerEm / 1000f), baseFontName);
-                        }
-                    }else
-                    //<end-adobe>
-                        if (TTGlyph.useHinting) {
+                        currentGlyph=factory.getGlyph(currentGlyf, fontTable, currentHmtx, idx, (unitsPerEm / 1000f), vm,baseFontName);
+                        
+                    }else if (TTGlyph.useHinting) {
                             currentGlyph = new TTGlyph(currentGlyf, fontTable, currentHmtx, idx, (unitsPerEm / 1000f), vm);
                         } else {
                             currentGlyph = new TTGlyph(currentGlyf, fontTable, currentHmtx, idx, (unitsPerEm / 1000f), baseFontName);

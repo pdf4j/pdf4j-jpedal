@@ -33,17 +33,12 @@
 package org.jpedal.objects.acroforms.actions;
 
 import org.jpedal.display.*;
-//<start-adobe><start-thin><start-server>
 import org.jpedal.examples.viewer.Viewer;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
-//<end-server><end-thin><end-adobe>
-
-//<start-adobe><start-thin>
 import org.jpedal.examples.viewer.gui.*;
-//<end-thin><end-adobe>
 
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
@@ -94,7 +89,7 @@ public class DefaultActionHandler implements ActionHandler {
     //handle so we can access
     protected PdfDecoderInt decode_pdf;
     
-    GUIFactory gui;
+    final GUIFactory gui;
     
     public DefaultActionHandler(GUIFactory viewerGUI){
         this.gui=viewerGUI;
@@ -251,7 +246,6 @@ public class DefaultActionHandler implements ActionHandler {
                     
                 } else if (command == PdfDictionary.Launch) {
                     
-                    //<start-thin><start-adobe>
                     try {
                         //get the F dictionary
                         final PdfObject dict=aData.getDictionary(PdfDictionary.F);
@@ -319,9 +313,7 @@ public class DefaultActionHandler implements ActionHandler {
                         }
                         //
                     }
-                    
-                    //<end-adobe><end-thin>
-                    
+                   
                     LogWriter.writeFormLog("{stream} launch activate action NOT IMPLEMENTED", FormStream.debugUnimplemented);
                     // <start-demo><end-demo>
                     
@@ -402,7 +394,7 @@ public class DefaultActionHandler implements ActionHandler {
                         @Override
                         public void run() {
                             // force refresh
-                            //<start-server><end-server>
+                            //
                             
                             // update settings on display and in PdfDecoder
                             final boolean newState;
@@ -447,13 +439,11 @@ public class DefaultActionHandler implements ActionHandler {
         }else if(name == PdfDictionary.FirstPage){
             changeTo(null, 1, null, null,true);
         }else if(name == PdfDictionary.GoBack){
-            //<start-adobe><start-thin><start-server>
             final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
-            
             if(gui!=null) {
                 gui.getCommand().executeCommand(Commands.BACK, null);
             }
-            //<end-server><end-thin><end-adobe>
+            
         }else if(name == PdfDictionary.LastPage){
             changeTo(null, decode_pdf.getPageCount(), null, null,true);
         }else if(name == PdfDictionary.ZoomTo){
@@ -463,7 +453,6 @@ public class DefaultActionHandler implements ActionHandler {
                 "25","50","75","100","125","150","200","250","500","750","1000"});
             final int option = JOptionPane.showConfirmDialog(null, scaling, Messages.getMessage("PdfViewerToolbarScaling.text")+ ':', JOptionPane.DEFAULT_OPTION);
             
-            //<start-adobe><start-thin><start-server>
             if(option!=-1){
                 final int selection = scaling.getSelectedIndex();
                 if(selection!=-1){
@@ -474,17 +463,16 @@ public class DefaultActionHandler implements ActionHandler {
                     }
                 }
             }
-            //<end-server><end-thin><end-adobe>
-        }else if(name == PdfDictionary.FullScreen){
-            //<start-server><start-adobe><start-thin>
-            final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
             
+        }else if(name == PdfDictionary.FullScreen){
+            
+            final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
             if(gui!=null) {
                 gui.getCommand().executeCommand(Commands.FULLSCREEN, null);
             }
-            //<end-thin><end-adobe><end-server>
+            
         }else if(name == PdfDictionary.AcroForm_FormsJSGuide) {//AcroForm:FormsJSGuide
-            //<start-adobe><start-thin>
+            
             final String acrobatJSGuideURL = "http://www.adobe.com/devnet/acrobat/pdfs/Acro6JSGuide.pdf";
             final int option = JOptionPane.showConfirmDialog(null, Messages.getMessage("AcroForm_FormsJSGuide.urlQuestion")
                     + '\n' + acrobatJSGuideURL + " ?\n\n"
@@ -498,7 +486,7 @@ public class DefaultActionHandler implements ActionHandler {
                 viewer.openDefaultFile(acrobatJSGuideURL);
                 
             }
-            //<end-thin><end-adobe>
+          
         } else {
             // <start-demo><end-demo>
             
@@ -997,7 +985,6 @@ public class DefaultActionHandler implements ActionHandler {
                                      * dimension. A null value for any of the parameters may result in unpredictable behavior.
                                      */
                                 	
-                                    // <start-adobe><start-thin><start-ulc>
                                     //and then scroll to location
                                     final float fitR_left=Dest.getNextValueAsFloat();
                                     final float fitR_bottom=Dest.getNextValueAsFloat();
@@ -1009,7 +996,6 @@ public class DefaultActionHandler implements ActionHandler {
                                     	final float scaling =gui.scaleToVisible(fitR_left, fitR_right, fitR_top, fitR_bottom);
                                     	scale = (int)(100f/scaling);
                                     }
-                                    //<end-ulc><end-thin><end-adobe>
                                     
                                     //create Rectangle to scroll to
 //                                    position=new Rectangle((int)fitR_left,(int)fitR_top,(int)(fitR_right-fitR_left),(int)(fitR_top-fitR_bottom));
@@ -1159,7 +1145,6 @@ public class DefaultActionHandler implements ActionHandler {
                 //still the original file, which causes issues. So we have to change file
                 //at the viewer level.
                 
-                //<start-adobe><start-thin><start-server>
                 //added to check the forms save flag to tell the user how to save the now changed pdf file
                 
                 final org.jpedal.gui.GUIFactory gui = ((org.jpedal.examples.viewer.gui.GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
@@ -1182,8 +1167,6 @@ public class DefaultActionHandler implements ActionHandler {
                     }
                 }
                 
-                //<end-server><end-thin><end-adobe>
-                
                 if(page==-1) {
                     page = 1;
                 }
@@ -1204,16 +1187,14 @@ public class DefaultActionHandler implements ActionHandler {
                     try {
                         // <start-demo><end-demo>
                         
-                        //<start-server><end-thin><end-adobe><end-server>
+                        //
                         
                         this.decode_pdf.decodePage(page);
                         
-                        //<start-adobe><start-thin><start-server>
                         //update page number
                         if (page != -1){
                             gui.setPage(page);
                         }
-                        //<end-server><end-thin><end-adobe>
                         
                     } catch (final Exception e) {
                         //tell user and log
@@ -1230,7 +1211,6 @@ public class DefaultActionHandler implements ActionHandler {
             
         
         
-        //<start-adobe><start-thin><start-server>
         if(type!=null){
             //now available via callback
             final Object gui = this.decode_pdf.getExternalHandler(org.jpedal.external.Options.GUIContainer);
@@ -1254,7 +1234,7 @@ public class DefaultActionHandler implements ActionHandler {
             }
         }
         
-        //<start-server> <end-server>
+        //
     }
 
     @Override
@@ -1687,17 +1667,17 @@ public class DefaultActionHandler implements ActionHandler {
     public void print() {
         
         
-        //<start-server><end-server>
+        //
     }
     
     protected void setCursor(final int eventType) {
 
-        //<start-adobe><start-server><end-server><end-adobe>
+        //
     }
 
     protected void showSig(final PdfObject sigObject) {
         
-        //<start-server><end-server>
+        //
     }
     
     private static JFrame getParentJFrame(Component component) {

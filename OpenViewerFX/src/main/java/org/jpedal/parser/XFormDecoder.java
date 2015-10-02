@@ -423,7 +423,7 @@ public class XFormDecoder {
             fx = 0;
         }
         //get the form as an image
-        final BufferedImage currentImage= MaskUtils.createTransparentForm(XObject, fx, fy, fw, fh, true, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
+        final BufferedImage currentImage= MaskUtils.createTransparentForm(XObject, fx, fy, fw, fh, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
         final String imgName='R'+ pdfStreamDecoder.formName;
         //store  final image on disk & in memory
         pdfStreamDecoder.pdfImages.setImageInfo(imgName, pdfStreamDecoder.parserOptions.getPageNumber(), pdfStreamDecoder.gs.CTM[2][0], pdfStreamDecoder.gs.CTM[2][1], fw, fh);

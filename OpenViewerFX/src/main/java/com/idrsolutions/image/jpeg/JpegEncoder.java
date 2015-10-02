@@ -36,15 +36,14 @@ import java.awt.image.*;
 import java.io.*;
 
 /**
- * Class writes buffered images as Baseline JPEGs
- * <p>
- * Here is an example of how the code can be used:-
- * <br>
+ * Class writes BufferedImages as Baseline JPEGs
+ *
+ * <h3>Example:</h3>
  * <pre><code>
  * JpegEncoder encoder = new JpegEncoder();
- * encoder.write(image_to_save, outputStream);
+ * encoder.write(image, outputStream);
  * </code></pre>
- * </p>
+ *
  */
 public class JpegEncoder {
 
@@ -60,14 +59,13 @@ public class JpegEncoder {
     }
 
     /**
-     * writes image as baseline jpegs
+     * Writes BufferedImage as Baseline Jpeg to OutputStream
      * <p>
      * This method does not close the provided OutputStream after the write
      * operation has completed; it is the responsibility of the caller to close
-     * the stream,
-     * </p>
+     * the stream.
      *
-     * @param image BufferedImage to write image
+     * @param image BufferedImage The image to write
      * @param out The stream to write to
      * @throws IOException if the image wasn't written
      */
@@ -306,8 +304,8 @@ public class JpegEncoder {
         }
         out.write(DQT);
 
-// Start of Frame Header
-//        int sampleFactor [] = new int[]{1,2,2};
+        // Start of Frame Header
+        //        int sampleFactor [] = new int[]{1,2,2};
         writeMarker(out, Markers.SOF0);
         writeLength(out, 17);
         byte SOF[] = new byte[15];
@@ -325,7 +323,7 @@ public class JpegEncoder {
         }
         out.write(SOF);
 
-// The DHT Header
+        // The DHT Header
         byte DHT1[], DHT2[], DHT3[], DHT4[];
         int bytes, temp, oldindex, intermediateindex;
         index = 4;
@@ -358,7 +356,7 @@ public class JpegEncoder {
         DHT4[3] = (byte) ((index - 2) & 0xFF);
         out.write(DHT4);
 
-// Start of Scan Header
+        // Start of Scan Header
         byte SOS[] = new byte[14];
         SOS[0] = (byte) 0xFF;
         SOS[1] = (byte) 0xDA;
@@ -372,7 +370,7 @@ public class JpegEncoder {
         }
         SOS[index++] = (byte) 0;
         SOS[index++] = (byte) 63;
-        SOS[index++] = (byte) 0;
+        SOS[index] = (byte) 0;   //does not need increment as value would never be used
         out.write(SOS);
 
     }
@@ -391,12 +389,12 @@ public class JpegEncoder {
         return new byte[]{(byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value};
     }
 
-    public static int[] rgbToYCBCR(int r, int g, int b) {
-        int y = (int) (0.299f * r + 0.587f * g + 0.114f * b);
-        int cb = (int) (128 - 0.169f * r - 0.331f * g + 0.5f * b);
-        int cr = (int) (128 + 0.5f * r - 0.419f * g - 0.081f * b);
-        return new int[]{y, cb, cr};
-    }
+//    public static int[] rgbToYCBCR(int r, int g, int b) {
+//        int y = (int) (0.299f * r + 0.587f * g + 0.114f * b);
+//        int cb = (int) (128 - 0.169f * r - 0.331f * g + 0.5f * b);
+//        int cr = (int) (128 + 0.5f * r - 0.419f * g - 0.081f * b);
+//        return new int[]{y, cb, cr};
+//    }
 
 //    public static void main(String[] args) throws Exception {
 //

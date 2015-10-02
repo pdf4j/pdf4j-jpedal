@@ -34,7 +34,6 @@ package org.jpedal.examples.handlers;
 
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.color.ColorSpaces;
 
@@ -85,56 +84,17 @@ public class ExampleImageDrawOnScreenHandler implements org.jpedal.external.Imag
                     double dy=0,dx=0;
 
                     //if already turned, tweak transform
-					if(optionsApplied!=PDFImageProcessing.NOTHING){
+					
+                    //int count=values.length;
+                    //for(int jj=0;jj<count;jj++)
+                    //System.out.println(jj+"=="+values[jj]);
 
-						//int count=values.length;
-						//for(int jj=0;jj<count;jj++)
-						//System.out.println(jj+"=="+values[jj]);
+//					System.out.println(image.getWidth());
+//					System.out.println(image.getHeight());
+//					System.out.println(values[4]*image.getHeight()/image.getWidth());
 
-//						System.out.println(image.getWidth());
-//						System.out.println(image.getHeight());
-//						System.out.println(values[4]*image.getHeight()/image.getWidth());
-
-                        //alter array to account for rotation elsewhere
-						if((optionsApplied & PDFImageProcessing.IMAGE_ROTATED)==PDFImageProcessing.IMAGE_ROTATED){
-
-                            if(values[0]>0 && values[3]<0 &&(optionsApplied & PDFImageProcessing.IMAGE_INVERTED)==PDFImageProcessing.IMAGE_INVERTED){
-                                final double newWidth= (values[0]*image.getWidth());
-                                final double newHeight= -((values[3]*image.getHeight()));
-                                dy=values[5]-newHeight;
-                                values[5]=newHeight;
-
-                                //allow for rounding error in scaling
-                                if(newWidth-(int)newWidth>0.5){
-                                    dx -= 1;
-                                }
-
-                            }else if(values[0]<0 && values[3]>0){
-                                final double tmp1=values[0];
-                                //double tmp3=values[2];
-                                values[0]=values[3];
-                                values[3]=tmp1;
-                                values[4]=0;
-                                values[5]=(int)(values[4]*image.getHeight()/image.getWidth());
-
-                            }
-                        } else if(values[0]>0 && values[3]>0 &&(optionsApplied & PDFImageProcessing.IMAGE_INVERTED)==PDFImageProcessing.IMAGE_INVERTED){
-
-                            dy=values[5];
-
-                            final double tmp1=values[0];
-                            //double tmp3=values[2];
-                            values[0]=values[3];
-                            values[3]=tmp1;
-                            values[4]=0;
-                            values[5]=(int)(values[4]*image.getHeight()/image.getWidth());
-                        }else{
-                            //<start-demo><end-demo>
-                        }
-
-                        upside_down=new AffineTransform(values);
-                    }
-
+                    upside_down=new AffineTransform(values);
+                    
 					boolean imageProcessed=true;
 
 						try{

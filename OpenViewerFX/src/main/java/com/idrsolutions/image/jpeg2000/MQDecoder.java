@@ -95,7 +95,7 @@ public final class MQDecoder {
     int[] mps;
     int d;
 
-    byte[] data;
+    final byte[] data;
 
     public MQDecoder(byte[] data, int start, int end) {
         this.data = data;        

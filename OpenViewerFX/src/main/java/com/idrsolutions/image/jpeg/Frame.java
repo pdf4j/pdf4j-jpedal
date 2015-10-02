@@ -51,6 +51,6 @@ public class Frame {
     public boolean arithmetic;
     public int maxH; 
     public int maxV;
-    public List <Component> components = new ArrayList<Component>();
-    public HashMap<Integer,Integer> componentID = new HashMap<Integer,Integer>();
+    public final List <Component> components = new ArrayList<Component>();
+    public final HashMap<Integer,Integer> componentID = new HashMap<Integer,Integer>();
 }

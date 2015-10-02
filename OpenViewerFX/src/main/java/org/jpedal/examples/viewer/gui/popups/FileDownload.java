@@ -154,13 +154,11 @@ final Point coords;
 
 			final FileOutputStream fos = new FileOutputStream(tempURLFile);
 
-			//<start-adobe><start-thin>
 			if(visible && coords!=null){
 				download.setLocation((coords.x-(download.getWidth()/2)), (coords.y-(download.getHeight()/2)));
 				download.setVisible(true);
 			}
-			//<end-thin><end-adobe>
-
+			
 			if(visible){
 				pb.setMinimum(0);
 				pb.setMaximum(fileLength);

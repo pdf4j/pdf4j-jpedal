@@ -58,19 +58,6 @@ public class RenderUtils {
         }
     }
 
-    public static boolean isRotated(final float[][] CTM){
- 
-        if(CTM[0][0]>0 && CTM[0][1]<0 && CTM[1][0]>0 && CTM[1][1]>0){
-            return false;
-        }else{
-       
-//        if(1==2 && CTM[0][0]<0 && CTM[0][1]<0 && CTM[1][0]>0 && CTM[1][1]<0){ //hand code this really complex case
-//            return false;
-//        }else{
-            return (CTM[0][0]==0 && CTM[1][1]==0) || (CTM[0][1] > 0 && CTM[1][0] < 0) || (CTM[0][1] < 0 && CTM[1][0] > 0);
-        }
-    }
-
     static BufferedImage invertImage(BufferedImage image) {
 
 //    	if((CTM[0][0]==0 || CTM[1][1]==0) || (isRotated(CTM) && !isInverted(CTM))) {

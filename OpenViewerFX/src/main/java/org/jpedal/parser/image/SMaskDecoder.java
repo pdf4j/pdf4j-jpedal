@@ -33,8 +33,7 @@
 
 package org.jpedal.parser.image;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.GenericColorSpace;
@@ -50,7 +49,7 @@ import org.jpedal.parser.image.data.ImageData;
  */
 class SMaskDecoder {
     
-    public static BufferedImage applyJPX_JBIG_Smask(final ImageData imageData, final ImageData smaskData, byte[] maskData,PdfObject imageObject, PdfObject maskObject, GenericColorSpace colorSpace, GenericColorSpace maskCS){
+    public static byte[] applyJPX_JBIG_Smask(final ImageData imageData, final ImageData smaskData, byte[] maskData,PdfObject imageObject, PdfObject maskObject, GenericColorSpace colorSpace, GenericColorSpace maskCS){
         byte[] objectData = imageData.getObjectData();
         int iw=imageData.getWidth();
         int ih=imageData.getHeight();
@@ -116,17 +115,17 @@ class SMaskDecoder {
             //do nothing
         }
         int p = 0;
-        
-        BufferedImage img = new BufferedImage(iw, ih, BufferedImage.TYPE_INT_ARGB);
-        int [] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
-        
-                
+               
+        ByteBuffer buffer = ByteBuffer.allocate(iw*ih*4);
+                        
         if (imageDim == objectData.length) {
-            int aa = 0,a;            
+            int aa = 0;
             for (int i = 0; i < imageDim; i++) {
-                a = maskData[aa++] & 0xff;
-                int r = objectData[i] & 0xff;
-                pixels[i] = (a << 24) | (r << 16) | (r << 8) | r;
+                byte r = objectData[i] ;
+                for (int j = 0; j < 3; j++) {
+                    buffer.put(r);
+                }
+                buffer.put(maskData[aa++]); // write out maskData[aa++] directly and lose a ?
             }
         } else {
             if(matte!=null){
@@ -146,8 +145,9 @@ class SMaskDecoder {
                         g = g < 0 ? 0 : g > 255 ? 255 : g;
                         b = b < 0 ? 0 : b > 255 ? 255 : b;
                     }
+                    byte[] bb = {(byte)r,(byte)g,(byte)b,(byte)a};
+                    buffer.put(bb);
                     
-                    pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
             }else{
                 int expected = imageDim*3;
@@ -156,20 +156,20 @@ class SMaskDecoder {
                     System.arraycopy(objectData, 0, temp, 0, objectData.length);
                     objectData = temp;
                 }
-                int iter = Math.min(maskData.length, pixels.length);
+                int iter = Math.min(maskData.length, iw*ih);
                 
                 for (int i = 0; i < iter; i++) {
-                    int a = maskData[i] & 0xff;
-                    int r = objectData[p++] & 0xff;
-                    int g = objectData[p++] & 0xff;
-                    int b = objectData[p++] & 0xff;
-                    pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                    buffer.put(new byte[]{objectData[p++],objectData[p++],objectData[p++], maskData[i]});
                 }
-            }
+            }            
             
         }                
         
-        return img;
+        imageObject.setIntNumber(PdfDictionary.Width,iw);
+        imageObject.setIntNumber(PdfDictionary.Height,ih);
+        imageObject.setIntNumber(PdfDictionary.BitsPerComponent, 8);
+        
+        return buffer.array();
     }
     
     private static byte[] getScaledBytes(byte[] data, int sw, int sh, int dw, int dh){
@@ -216,41 +216,63 @@ class SMaskDecoder {
             data = temp;
         }
         
-        byte[] temp = new byte[dw * dh];
-        int A, B, C, D, index, yIndex, xr, yr, gray;
-        long x, y = 0, xDiff, yDiff, xDiffMinus, yDiffMinus;
-        int xRatio = ((sw - 1) << 16) / dw;
-        int yRatio = ((sh - 1) << 16) / dh;
-        int offset = 0;
-        for (int i = 0; i < dh; i++) {
-            yr = (int) (y >> 16);
-            yDiff = y - (yr << 16);
-            yDiffMinus = 65536 - yDiff;
-            yIndex = yr * sw;
-            x = 0;
-            for (int j = 0; j < dw; j++) {
-                xr = (int) (x >> 16);
-                xDiff = x - (xr << 16);
-                xDiffMinus = 65536 - xDiff;
-                index = yIndex + xr;
-
-                A = data[index] & 0xff;
-                B = data[index + 1] & 0xff;
-                C = data[index + sw] & 0xff;
-                D = data[index + sw + 1] & 0xff;
-
-                gray = (int) ((A * xDiffMinus * yDiffMinus
-                        + B * xDiff * yDiffMinus
-                        + C * yDiff * xDiffMinus
-                        + D * xDiff * yDiff) >> 32);
-
-                temp[offset++] = (byte) gray;
-
-                x += xRatio;
+        float ratioW=(float)sw/(float)dw;
+        float ratioH=(float)sh/(float)dh;
+        byte[] combinedData=new byte[dw*dh];
+        final int rawDataSize=data.length;
+        int i = 0;
+        
+        try{
+            for(int mY=0;mY<dh;mY++){
+                for(int mX=0;mX<dw;mX++){
+                    int rgbPtr=(((int)(mX*ratioW)))+(((int)(mY*ratioH))*sw);
+                    if(rgbPtr<rawDataSize){
+                        combinedData[i]=data[rgbPtr];
+                    }
+                    i++;
+                }
             }
-            y += yRatio;
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        return temp;
+        
+        return combinedData;
+        //below is bilinear scaling algorithm
+//        byte[] temp = new byte[dw * dh];
+//        int A, B, C, D, index, yIndex, xr, yr, gray;
+//        long x, y = 0, xDiff, yDiff, xDiffMinus, yDiffMinus;
+//        int xRatio = ((sw - 1) << 16) / dw;
+//        int yRatio = ((sh - 1) << 16) / dh;
+//        int offset = 0;
+//        for (int i = 0; i < dh; i++) {
+//            yr = (int) (y >> 16);
+//            yDiff = y - (yr << 16);
+//            yDiffMinus = 65536 - yDiff;
+//            yIndex = yr * sw;
+//            x = 0;
+//            for (int j = 0; j < dw; j++) {
+//                xr = (int) (x >> 16);
+//                xDiff = x - (xr << 16);
+//                xDiffMinus = 65536 - xDiff;
+//                index = yIndex + xr;
+//
+//                A = data[index] & 0xff;
+//                B = data[index + 1] & 0xff;
+//                C = data[index + sw] & 0xff;
+//                D = data[index + sw + 1] & 0xff;
+//
+//                gray = (int) ((A * xDiffMinus * yDiffMinus
+//                        + B * xDiff * yDiffMinus
+//                        + C * yDiff * xDiffMinus
+//                        + D * xDiff * yDiff) >> 32);
+//
+//                temp[offset++] = (byte) gray;
+//
+//                x += xRatio;
+//            }
+//            y += yRatio;
+//        }
+//        return temp;
     }
     
     static byte[] applySMask(byte[] maskData, final ImageData imageData,final GenericColorSpace decodeColorData, final PdfObject newSMask, final PdfObject XObject) {
@@ -293,9 +315,8 @@ class SMaskDecoder {
             //System.out.println("Image bigger");
             objectData=upScaleMaskToImage(w, h, maskW,maskH,objectData, maskData);
         }
-        
         XObject.setIntNumber(PdfDictionary.BitsPerComponent, 8);
-       
+        
 //        BufferedImage img= ColorSpaceConvertor.createARGBImage( XObject.getInt(PdfDictionary.Width), XObject.getInt(PdfDictionary.Height), objectData);
 //        
 //        try{

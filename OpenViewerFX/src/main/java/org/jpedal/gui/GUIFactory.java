@@ -117,9 +117,7 @@ public interface GUIFactory {
      */
     void toogleAutoScrolling();
 
-    //	<start-thin>
     void setupThumbnailPanel();
-    //	<end-thin>
     
     void setAutoScrolling(boolean autoScroll);
     /**

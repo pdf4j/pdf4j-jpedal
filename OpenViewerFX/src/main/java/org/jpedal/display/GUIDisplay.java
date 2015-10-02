@@ -72,9 +72,7 @@ public class GUIDisplay implements Display{
      //rectangle onscreen
     public int rx,ry,rw,rh;
 
-    //<start-server>
     protected DisplayOffsets displayOffsets;
-    //<end-server>
     
     public DecoderOptions options;
     
@@ -410,7 +408,7 @@ public class GUIDisplay implements Display{
 
     @Override
     public void refreshDisplay() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("refreshDisplay Not supported yet.");
     }
 
     @Override
@@ -511,13 +509,11 @@ public class GUIDisplay implements Display{
         return highlightedImage;
     }
     
-    //<start-server>
     @Override
     public void drawBorder() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("drawBorder Not supported yet."); 
     }
-    //<end-server>
-
+    
     @Override
     public int getXCordForPage(final int page){
         
@@ -742,7 +738,7 @@ public class GUIDisplay implements Display{
 
     @Override
     public int[] getCursorBoxOnScreenAsArray() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("getCursorBoxOnScreenAsArray Not supported yet.");
     }
 
     @Override
@@ -802,12 +798,12 @@ public class GUIDisplay implements Display{
 
     @Override
     public void resetViewableArea() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("resetViewableArea Not supported yet.");
     }
 
     @Override
     public void paintPage(final Graphics2D g2, final AcroRenderer formRenderer, final TextLines textLines) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("paintPage not supported yet.");
     }
 
     /**
@@ -822,12 +818,12 @@ public class GUIDisplay implements Display{
     
     @Override
     public void updateCursorBoxOnScreen(final int[] newOutlineRectangle, final int outlineColor, final int pageNumber, final int x_size, final int y_size){
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("updateCursorBoxOnScreen Not supported yet."); 
     }
 
     @Override
     public void drawCursor(final Graphics g, final float scaling) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("drawCursor Not supported yet.");
     }
 
     /**
@@ -837,7 +833,7 @@ public class GUIDisplay implements Display{
      */
     @Override
     public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("setViewableArea Not supported yet."); 
     }
     
     /**
@@ -863,17 +859,17 @@ public class GUIDisplay implements Display{
      */
     @Override
     public AffineTransform setViewableArea(final int[] viewport) throws PdfException{
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("setViewableArea Not supported yet.");
     }
     
     @Override
     public void drawFacing(final Rectangle visibleRect) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("drawFacing Not supported yet.");
     }
 
     @Override
     public void paintPage(final Pane box, final AcroRenderer formRenderer, final TextLines textLines) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("paintPage Not supported yet.");
     }
     
     public void setCurrentDisplay(final DynamicVectorRenderer pageView) {
@@ -912,7 +908,7 @@ public class GUIDisplay implements Display{
     
     @Override
     public Rectangle getDisplayedRectangle() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("getDisplayedRectangle Not supported yet.");
     }
     
     public Rectangle getDisplayedRectangle(final boolean isShowing,final Rectangle userAnnot) {

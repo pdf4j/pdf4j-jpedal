@@ -47,39 +47,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class reads Tiff image as BufferedImage
- * <p>
- * Here is an example of how the code can be used:-
- * </p>
- * <br>
+ * Class reads Tiff images as BufferedImage
+ *
+ * <h3>Example 1 (single-page tiff):</h3>
  * <pre><code>
  * TiffDecoder decoder = new TiffDecoder(rawTiffData);
  * BufferedImage decodedImage = decoder.read();
  * </code></pre>
- * <p>
- * Here is an example of how the code can be used to extract all images from
- * Tiff data which contains multiple Tiff images:-
- * </p>
- * <br>
+ *
+ * <h3>Example 2 (multi-page tiff)</h3>
  * <pre><code>
  * TiffDecoder decoder = new TiffDecoder(rawTiffData);
- * for(int i=0;i&lt;decoder.getPageCount();i++){
- *      BufferedImage decodedImage = decoder.read(i+1);//page number should start with 1;
- *      //insert your bufferimage handling code here;
+ * for (int i = 0; i<= decoder.getPageCount(); i++) {
+ *      BufferedImage decodedImage = decoder.read(i);
+ *      // Insert BufferedImage handling code here
  * }
  * </code></pre>
- * <p>
- * Here is an example of how the code can be used with RandomAccessFile
- * </p>
+ *
+ * <h3>Example 3 (RandomAccessFile):</h3>
  * <strong>We recommend to use RandomAccessFile constructor for memory efficient
- * reading<strong>
- * <br>
+ * reading.</strong>
+ *
  * <pre><code>
- * RandomAccessFile raf = new RandomAccessFile("yourFileLocation","r");
+ * RandomAccessFile raf = new RandomAccessFile("yourFileLocation", "r");
  * TiffDecoder decoder = new TiffDecoder(raf);
- * for(int i=0;i&lt;decoder.getPageCount();i++){
- *      BufferedImage decodedImage = decoder.read(i+1);//page number should start with 1;
- *      //insert your bufferimage handling code here;
+ * for (int i = 1; i <= decoder.getPageCount(); i++) {
+ *      BufferedImage decodedImage = decoder.read(i);
+ *      // Insert BufferedImage handling code here
  * }
  * raf.close();
  * </code></pre>
@@ -89,7 +83,7 @@ public class TiffDecoder {
 
     private final RandomHandler reader;
     private int pageCount;
-    List<IFD> ifds = new ArrayList<IFD>();
+    final List<IFD> ifds = new ArrayList<IFD>();
 
     /**
      * Constructor generates instance from byte data <br/>
@@ -166,10 +160,11 @@ public class TiffDecoder {
     }
 
     /**
-     * decodes the first Tiff image as BufferedImage in Tiff file. Make NO
-     * assumptions about type of BufferedImage type returned (may change)
+     * Decodes and returns the first Tiff image as a BufferedImage from a single or multi page tiff file.
+     * <p>
+     * Make NO assumptions about type of BufferedImage type returned (may change)
      *
-     * @return BufferedImage to read image
+     * @return BufferedImage The decoded image
      * @throws IOException
      */
     public BufferedImage read() throws Exception {
@@ -177,11 +172,12 @@ public class TiffDecoder {
     }
 
     /**
-     * Method capable of decoding single image from multi page tiff file;
-     * <strong>Please Note: pageNumber start from 1</strong>
+     * Decodes and returns the requested Tiff image as a BufferedImage from a multi page tiff file.
+     * <p>
+     * <strong>Please Note: pageNumber should start from 1</strong>
      *
-     * @param pageNumber the page number to be decoded (starting from 1)
-     * @return BufferedImage to read image at given page number
+     * @param pageNumber the page number to be decoded and returned (starting from 1)
+     * @return BufferedImage The decoded image at given page number
      * @throws Exception
      */
     public BufferedImage read(int pageNumber) throws Exception {
@@ -203,32 +199,14 @@ public class TiffDecoder {
             int fieldName = reader.getUint16();
             int fieldType = reader.getUint16();
             int nValues = reader.getInt();
-            int current = 0;
-
+            int current;
 //            System.out.println(fieldName + " " + fieldType + " " + nValues);
-            switch (fieldName) {
-                case Tags.NewSubfileType:
-                    reader.getInt();
-                    break;
-                case Tags.SubfileType:
-                    reader.getUint16();//read and ignore;
-                    reader.getUint16();//read and ignore;
-                    break;
+            switch (fieldName) {                
                 case Tags.ImageWidth:
-                    if (fieldType == 3) {
-                        ifd.imageWidth = reader.getUint16();
-                        reader.getUint16();//read and ignore;
-                    } else {
-                        ifd.imageWidth = reader.getInt();
-                    }
+                    ifd.imageWidth = getShortOrInt(reader, fieldType);
                     break;
                 case Tags.ImageHeight:
-                    if (fieldType == 3) {
-                        ifd.imageHeight = reader.getUint16();
-                        reader.getUint16();
-                    } else {
-                        ifd.imageHeight = reader.getInt();
-                    }
+                    ifd.imageHeight = getShortOrInt(reader, fieldType);
                     break;
                 case Tags.BitsPerSample:
                     ifd.bps = new int[nValues];
@@ -253,14 +231,8 @@ public class TiffDecoder {
                     ifd.photometric = reader.getUint16();
                     reader.getUint16();
                     break;
-
                 case Tags.RowsPerStrip:
-                    if (fieldType == 3) {
-                        ifd.rowsPerStrip = reader.getUint16();
-                        reader.getUint16();//read and ignore;
-                    } else {
-                        ifd.rowsPerStrip = reader.getInt();
-                    }
+                    ifd.rowsPerStrip = getShortOrInt(reader, fieldType);
                     break;
                 case Tags.StripOffsets:
                     if (nValues == 1) {
@@ -299,20 +271,10 @@ public class TiffDecoder {
                     reader.getUint16();//read and ignore;
                     break;
                 case Tags.TileWidth:
-                    if (fieldType == 3) {
-                        ifd.tileWidth = reader.getUint16();
-                        reader.getUint16();//read and ignore;
-                    } else {
-                        ifd.tileWidth = reader.getInt();
-                    }
+                    ifd.tileWidth = getShortOrInt(reader, fieldType);
                     break;
                 case Tags.TileLength:
-                    if (fieldType == 3) {
-                        ifd.tileLength = reader.getUint16();
-                        reader.getUint16();//read and ignore;
-                    } else {
-                        ifd.tileLength = reader.getInt();
-                    }
+                    ifd.tileLength = getShortOrInt(reader, fieldType);
                     break;
                 case Tags.TIleOffsets:
                     if (nValues == 1) {
@@ -345,25 +307,7 @@ public class TiffDecoder {
                     reader.setPosition(cc);
                     ifd.jpegTables = new byte[nValues - 2];//remove EOI
                     System.arraycopy(tableBytes, 0, ifd.jpegTables, 0, nValues - 2);
-                    break;
-                case Tags.JPEGProc:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGInterchangeFormat:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGInterchangeFormatLength:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGRestartInterval:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGLosslessPredictors:
-                    reader.getInt();
-                    break;
-                case Tags.JPEGPointTransforms:
-                    reader.getInt();
-                    break;
+                    break;                
                 case Tags.JPEGQTables:
                     if (nValues == 1) {
                         ifd.jpegQOffsets = new int[1];
@@ -405,135 +349,12 @@ public class TiffDecoder {
                     reader.get(ifd.iccProfile);
                     reader.setPosition(current);
                     break;
-                case Tags.YCbCrCoefficients:
-                    reader.getInt();
-                    break;
-                case Tags.YCbCrSubSampling:
-                    reader.getInt();
-                    break;
-                case Tags.YCbCrPositioning:
-                    reader.getInt();
-                    break;
-                case Tags.Threshholding:
-                    reader.getInt();
-                    break;
-                case Tags.CellWidth:
-                    reader.getInt();
-                    break;
-                case Tags.CellLength:
-                    reader.getInt();
-                    break;
                 case Tags.FillOrder:
                     ifd.fillOrder = reader.getInt();
-                    break;
-                case Tags.DocumentName:
-                    reader.getInt();
-                    break;
-                case Tags.ImageDescription:
-                    reader.getInt();
-                    break;
-                case Tags.Make:
-                    reader.getInt();
-                    break;
-                case Tags.Model:
-                    reader.getInt();
-                    break;
-                case Tags.Orientation:
-                    reader.getInt();
-                    break;
-                case Tags.MinSampleValue:
-                    reader.getInt();
-                    break;
-                case Tags.MaxSampleValue:
-                    reader.getInt();
-                    break;
-                case Tags.Xresolution:
-                    reader.getInt();
-                    break;
-                case Tags.Yresolution:
-                    reader.getInt();
-                    break;
-                case Tags.PageName:
-                    reader.getInt();
-                    break;
-                case Tags.Xposition:
-                    reader.getInt();
-                    break;
-                case Tags.Yposition:
-                    reader.getInt();
-                    break;
-                case Tags.FreeOffsets:
-                    reader.getInt();
-                    break;
-                case Tags.FreeByteCounts:
-                    reader.getInt();
-                    break;
-                case Tags.GrayResponseUnit:
-                    reader.getInt();
-                    break;
-                case Tags.GrayResponseCurve:
-                    reader.getInt();
-                    break;
-                case Tags.T4Options:
-                    reader.getInt();
-                    break;
-                case Tags.T6Options:
-                    reader.getInt();
-                    break;
-                case Tags.ResolutionUnit:
-                    reader.getInt();
-                    break;
-                case Tags.PageNumber:
-                    reader.getInt();
-                    break;
-                case Tags.TransferFunction:
-                    reader.getInt();
-                    break;
-                case Tags.Software:
-                    reader.getInt();
-                    break;
-                case Tags.DateTime:
-                    reader.getInt();
-                    break;
-                case Tags.Artist:
-                    reader.getInt();
-                    break;
-                case Tags.HostComputer:
-                    reader.getInt();
                     break;
                 case Tags.Predictor:
                     ifd.predictor = reader.getUint16();
                     reader.getUint16();//read and ignore
-                    break;
-                case Tags.WhitePoint:
-                    reader.getInt();
-                    break;
-                case Tags.PrimaryChromaticities:
-                    reader.getInt();
-                    break;
-                case Tags.HalftoneHints:
-                    reader.getInt();
-                    break;
-                case Tags.SubIFDs:
-                    reader.getInt();
-                    break;
-                case Tags.InkSet:
-                    reader.getInt();
-                    break;
-                case Tags.InkNames:
-                    reader.getInt();
-                    break;
-                case Tags.NumberOfInks:
-                    reader.getInt();
-                    break;
-                case Tags.DotRange:
-                    reader.getInt();
-                    break;
-                case Tags.TargetPrinter:
-                    reader.getInt();
-                    break;
-                case Tags.ExtraSamples:
-                    reader.getInt();
                     break;
                 case Tags.SampleFormat:
                     if (nValues == 1) {
@@ -546,84 +367,83 @@ public class TiffDecoder {
                         reader.setPosition(current);
                     }
                     break;
+                case Tags.NewSubfileType:
+                case Tags.SubfileType:
+                case Tags.JPEGProc:
+                case Tags.JPEGInterchangeFormat:
+                case Tags.JPEGInterchangeFormatLength:
+                case Tags.JPEGRestartInterval:
+                case Tags.JPEGLosslessPredictors:
+                case Tags.JPEGPointTransforms:
+                case Tags.YCbCrCoefficients:
+                case Tags.YCbCrSubSampling:
+                case Tags.YCbCrPositioning:
+                case Tags.Threshholding:
+                case Tags.CellWidth:
+                case Tags.CellLength:
+                case Tags.DocumentName:
+                case Tags.ImageDescription:
+                case Tags.Make:
+                case Tags.Model:
+                case Tags.Orientation:
+                case Tags.MinSampleValue:
+                case Tags.MaxSampleValue:
+                case Tags.Xresolution:
+                case Tags.Yresolution:
+                case Tags.PageName:
+                case Tags.Xposition:
+                case Tags.Yposition:
+                case Tags.FreeOffsets:
+                case Tags.FreeByteCounts:
+                case Tags.GrayResponseUnit:
+                case Tags.GrayResponseCurve:
+                case Tags.T4Options:
+                case Tags.T6Options:
+                case Tags.ResolutionUnit:
+                case Tags.PageNumber:
+                case Tags.TransferFunction:
+                case Tags.Software:
+                case Tags.DateTime:
+                case Tags.Artist:
+                case Tags.HostComputer:
+                case Tags.WhitePoint:
+                case Tags.PrimaryChromaticities:
+                case Tags.HalftoneHints:
+                case Tags.SubIFDs:
+                case Tags.InkSet:
+                case Tags.InkNames:
+                case Tags.NumberOfInks:
+                case Tags.DotRange:
+                case Tags.TargetPrinter:
+                case Tags.ExtraSamples:
                 case Tags.SMinSampleValue:
-                    reader.getInt();
-                    break;
                 case Tags.SMaxSampleValue:
-                    reader.getInt();
-                    break;
                 case Tags.TransferRange:
-                    reader.getInt();
-                    break;
                 case Tags.ClipPath:
-                    reader.getInt();
-                    break;
                 case Tags.XClipPathUnits:
-                    reader.getInt();
-                    break;
                 case Tags.YClipPathUnits:
-                    reader.getInt();
-                    break;
                 case Tags.Indexed:
-                    reader.getInt();
-                    break;
                 case Tags.ReferenceBlackWhite:
-                    reader.getInt();
-                    break;
                 case Tags.StripRowCounts:
-                    reader.getInt();
-                    break;
                 case Tags.XMP:
-                    reader.getInt();
-                    break;
                 case Tags.ImageID:
-                    reader.getInt();
-                    break;
                 case Tags.Copyright:
-                    reader.getInt();
-                    break;
                 case Tags.Exif_IFD:
-                    int exifOffset = reader.getInt();
-//                    current =reader.getPosition();
-//                    IFD exifIFD = getIFD(reader, exifOffset);
-//                    reader.setPosition(current);
-                    break;
                 case Tags.ExifVersion:
-                    reader.getInt();
-                    break;
                 case Tags.DateTimeOriginal:
-                    reader.getInt();
-                    break;
                 case Tags.DateTimeDigitized:
-                    reader.getInt();
-                    break;
                 case Tags.ComponentConfiguration:
-                    reader.getInt();
-                    break;
                 case Tags.CompressedBitsPerPixel:
-                    reader.getInt();
-                    break;
                 case Tags.ApertureValue:
-                    reader.getInt();
-                    break;
                 case Tags.ImageNumber:
-                    reader.getInt();
-                    break;
                 case Tags.ImageHistory:
-                    reader.getInt();
-                    break;
                 case Tags.ColorSpace:
-                    reader.getInt();
-                    break;
                 case Tags.PixelXDimension:
-                    reader.getInt();
-                    break;
                 case Tags.PixelYDimension:
                     reader.getInt();
                     break;
                 default:
                     reader.getInt();
-                //
             }
         }
         ifd.nextIFD = reader.getInt();
@@ -631,51 +451,20 @@ public class TiffDecoder {
         if (ifd.rowsPerStrip == 0 || ifd.rowsPerStrip > ifd.imageHeight) {
             ifd.rowsPerStrip = ifd.imageHeight;
         }
-        
-//        if (ifd.compressionType == Tags.JPEG) {
-//            ifd.jpegQData = new byte[ifd.jpegQOffsets.length][64];
-//            for (int i = 0; i < ifd.jpegQOffsets.length; i++) {
-//                reader.setPosition(ifd.jpegQOffsets[i]);
-//                byte[] temp = new byte[64];
-//                reader.get(temp);
-//                System.arraycopy(temp, 0, ifd.jpegQData[i], 0, 64);
-//            }
-//
-//            //dc
-//            ifd.jpegDCData = new byte[ifd.jpegDCOffsets.length][];
-//            for (int i = 0; i < ifd.jpegDCOffsets.length; i++) {
-//                reader.setPosition(ifd.jpegDCOffsets[i]);
-//                int codeLength = 0;
-//                for (int j = 0; j < 16; j++) {
-//                    codeLength += reader.getUint8();
-//                }
-//                int tableLen = codeLength + 16;
-//                ifd.jpegDCData[i] = new byte[tableLen];
-//                byte temp[] = new byte[tableLen];
-//                reader.setPosition(ifd.jpegDCOffsets[i]);
-//                reader.get(temp);
-//                System.arraycopy(temp, 0, ifd.jpegDCData[i], 0, tableLen);
-//            }
-//
-//            //ac
-//            ifd.jpegACData = new byte[ifd.jpegACOffsets.length][];
-//            for (int i = 0; i < ifd.jpegACOffsets.length; i++) {
-//                reader.setPosition(ifd.jpegACOffsets[i]);
-//                int codeLength = 0;
-//                for (int j = 0; j < 16; j++) {
-//                    codeLength += reader.getUint8();
-//                }
-//                int tableLen = codeLength + 16;
-//                ifd.jpegACData[i] = new byte[tableLen];
-//                byte temp[] = new byte[tableLen];
-//                reader.setPosition(ifd.jpegACOffsets[i]);
-//                reader.get(temp);
-//                System.arraycopy(temp, 0, ifd.jpegACData[i], 0, tableLen);
-//            }
-//        }
         return ifd;
     }
 
+    private static int getShortOrInt(RandomHandler reader, int fieldType) throws IOException {
+        int value;
+        if (fieldType == 3) {
+            value = reader.getUint16();
+            reader.getUint16();//read and ignore;
+        } else {
+            value = reader.getInt();
+        }
+        return value;
+    }
+    
     private static BufferedImage getDataFromStrips(final RandomHandler reader, IFD ifd) throws Exception {
 
         final int iw = ifd.imageWidth;
@@ -834,7 +623,7 @@ public class TiffDecoder {
                                 int v = bitReader.readBits(bps) * 3;
                                 tileData[bp++] = ifd.colorMap[v++];
                                 tileData[bp++] = ifd.colorMap[v++];
-                                tileData[bp++] = ifd.colorMap[v++];
+                                tileData[bp++] = ifd.colorMap[v];
                             }
                             if (iw8 != 0) {
                                 bitReader.readBits(8 - iw8);
@@ -1144,7 +933,7 @@ public class TiffDecoder {
                                 int v = bitReader.readBits(bps) * 3;
                                 tileData[bp++] = ifd.colorMap[v++];
                                 tileData[bp++] = ifd.colorMap[v++];
-                                tileData[bp++] = ifd.colorMap[v++];
+                                tileData[bp++] = ifd.colorMap[v];
                             }
                             if (iw8 != 0) {
                                 bitReader.readBits(8 - iw8);
@@ -1438,6 +1227,10 @@ public class TiffDecoder {
         return temp;
     }
 
+    /**
+     * Returns the number of pages the tiff file contains.
+     * @return The number of pages the tiff file contains.
+     */
     public int getPageCount() {
         return pageCount;
     }
@@ -1467,6 +1260,51 @@ public class TiffDecoder {
         }
 
     }
+    
+    
+        
+//        if (ifd.compressionType == Tags.JPEG) {
+//            ifd.jpegQData = new byte[ifd.jpegQOffsets.length][64];
+//            for (int i = 0; i < ifd.jpegQOffsets.length; i++) {
+//                reader.setPosition(ifd.jpegQOffsets[i]);
+//                byte[] temp = new byte[64];
+//                reader.get(temp);
+//                System.arraycopy(temp, 0, ifd.jpegQData[i], 0, 64);
+//            }
+//
+//            //dc
+//            ifd.jpegDCData = new byte[ifd.jpegDCOffsets.length][];
+//            for (int i = 0; i < ifd.jpegDCOffsets.length; i++) {
+//                reader.setPosition(ifd.jpegDCOffsets[i]);
+//                int codeLength = 0;
+//                for (int j = 0; j < 16; j++) {
+//                    codeLength += reader.getUint8();
+//                }
+//                int tableLen = codeLength + 16;
+//                ifd.jpegDCData[i] = new byte[tableLen];
+//                byte temp[] = new byte[tableLen];
+//                reader.setPosition(ifd.jpegDCOffsets[i]);
+//                reader.get(temp);
+//                System.arraycopy(temp, 0, ifd.jpegDCData[i], 0, tableLen);
+//            }
+//
+//            //ac
+//            ifd.jpegACData = new byte[ifd.jpegACOffsets.length][];
+//            for (int i = 0; i < ifd.jpegACOffsets.length; i++) {
+//                reader.setPosition(ifd.jpegACOffsets[i]);
+//                int codeLength = 0;
+//                for (int j = 0; j < 16; j++) {
+//                    codeLength += reader.getUint8();
+//                }
+//                int tableLen = codeLength + 16;
+//                ifd.jpegACData[i] = new byte[tableLen];
+//                byte temp[] = new byte[tableLen];
+//                reader.setPosition(ifd.jpegACOffsets[i]);
+//                reader.get(temp);
+//                System.arraycopy(temp, 0, ifd.jpegACData[i], 0, tableLen);
+//            }
+//        }
+    
 
 //    may be useful in future
 //    private static byte[] generateOldJPEGFile(IFD ifd, byte[] data, int tw, int th, int tComp) throws IOException {

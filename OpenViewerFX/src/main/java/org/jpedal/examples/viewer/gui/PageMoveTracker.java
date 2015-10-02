@@ -43,7 +43,7 @@ import org.jpedal.display.Display;
  */
 public class PageMoveTracker {
     
-    java.util.Timer t2 = new java.util.Timer();
+    final java.util.Timer t2 = new java.util.Timer();
     TimerTask listener;
     
     /**

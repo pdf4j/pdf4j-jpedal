@@ -38,12 +38,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class CheckNode extends DefaultMutableTreeNode {
 
     protected boolean isSelected, isEnabled;
-    private Object text;
+    private final Object text;
 
     public CheckNode(final Object userObject) {
         this(userObject, true, false);
-
-        text=userObject;
     }
 
     public CheckNode(final Object userObject, final boolean allowsChildren

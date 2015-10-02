@@ -246,7 +246,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         return but;
     }
     
-    private Color getAnnotationColor(final FormObject form){
+    private static Color getAnnotationColor(final FormObject form){
         final float[] formColor = form.getFloatArray(PdfDictionary.C);
         Color color = new Color(0);
         if (formColor != null) {

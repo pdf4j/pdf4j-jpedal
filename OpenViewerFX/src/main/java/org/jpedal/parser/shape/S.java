@@ -136,32 +136,13 @@ public class S {
                 }
             }
             
-            
             if(currentDrawShape.isClip()){
-                //<start-adobe>
+                
                 if(useJavaFX) {
                     gs.updateClip(fxPath);
-                } else
-                    //<end-adobe>
-                {
+                } else{
                     gs.updateClip(new Area(currentShape));
                 }
-                
-                
-//            if(formLevel==0){
-//                final int pageNum=parserOptions.getPageNumber();
-//
-//                gs.checkWholePageClip(pageData.getMediaBoxHeight(pageNum)+pageData.getMediaBoxY(pageNum));
-//            }
-             
-                //save for later
-//            if (renderPage){
-//                if(useJavaFX){
-//                    current.drawClip(gs,defaultClip,false) ;
-//                }else{
-//                    current.drawClip(gs,defaultClip,false) ;
-//                }
-//            }
             }
         }
         

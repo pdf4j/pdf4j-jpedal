@@ -528,6 +528,8 @@ public class PdfDictionary {
     public static final int Length3=929066305;
     
     public static final int Lighten=945843829;
+    
+    public static final int Limits=1027170428;
 
     public static final int Linearized=2004845231;
 
@@ -1827,6 +1829,9 @@ public class PdfDictionary {
             case Length3:
                 return VALUE_IS_INT;
 
+            case Limits:
+                return VALUE_IS_STRING_ARRAY;
+                    
             case Linearized:
                 if(type==Linearized) {
                     return VALUE_IS_FLOAT;

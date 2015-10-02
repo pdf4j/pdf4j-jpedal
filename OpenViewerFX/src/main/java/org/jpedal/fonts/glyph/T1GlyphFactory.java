@@ -33,7 +33,10 @@
 package org.jpedal.fonts.glyph;
 
 import java.awt.geom.GeneralPath;
+import org.jpedal.external.ExternalHandlers;
 
+import org.jpedal.fonts.tt.*;
+import org.jpedal.fonts.tt.hinting.TTVM;
 import org.jpedal.utils.repositories.Vector_Float;
 import org.jpedal.utils.repositories.Vector_Int;
 import org.jpedal.utils.repositories.Vector_Path;
@@ -43,6 +46,17 @@ import org.jpedal.utils.repositories.Vector_Path;
  */
 public class T1GlyphFactory implements GlyphFactory {
 
+    private static JavaFXSupport javaFXSupport;
+    
+    
+    public T1GlyphFactory(final boolean useFX){
+        this.useFX=useFX; 
+        
+        if(useFX){
+            javaFXSupport=ExternalHandlers.getFXHandler();
+        }
+    }
+    
     final boolean useFX;
 
     private static final float zero=0f;
@@ -72,21 +86,15 @@ public class T1GlyphFactory implements GlyphFactory {
     private int leftSideBearing;
 
 
-    public T1GlyphFactory(final boolean useFX){
-        this.useFX=useFX;
-    }
     
     /* (non-Javadoc)
      * @see org.jpedal.fonts.GlyphFactory#getGlyph()
      */
     @Override
     public PdfGlyph getGlyph() {
-        //<start-adobe>
         if(useFX) {
             return getFXGlyph();
-        } else
-        //<end-adobe>
-        {
+        } else {
             return getSwingGlyph();
         }
         
@@ -157,8 +165,6 @@ public class T1GlyphFactory implements GlyphFactory {
         return new T1Glyph(cached_current_path);
     }
 
-    
-    //<start-adobe>
     /* (non-Javadoc)
      * @see org.jpedal.fonts.GlyphFactory#getGlyph()
      */
@@ -186,10 +192,13 @@ public class T1GlyphFactory implements GlyphFactory {
         shape_primitive_y2 = new Vector_Float( 1000 );
         shape_primitive_x = new Vector_Float( 1000 );
 
-        return new T1GlyphFX(x,y,x2,y2,x3,y3,ymin,end,commands);
+        if(javaFXSupport==null){
+            return null;
+        }else{
+            return javaFXSupport.getGlyph(x,y,x2,y2,x3,y3,ymin,end,commands);
+        }
     }
-    //<end-adobe>
-
+    
     /////////////////////////////////////////////////////////////////////////
     /**
      * end a shape, storing info for later
@@ -286,4 +295,15 @@ public class T1GlyphFactory implements GlyphFactory {
     public boolean useFX() {
         return useFX;
     }
+    
+    @Override
+    public PdfGlyph getGlyph(final Glyf currentGlyf, final FontFile2 fontTable, final Hmtx currentHmtx, final int idx, final float unitsPerEm, final TTVM vm, final String baseFontName) {
+
+        if (javaFXSupport!=null) {
+             return javaFXSupport.getGlyph(currentGlyf, fontTable, currentHmtx, idx, unitsPerEm, vm,baseFontName);
+        }else {
+            return null;
         }
+    }
+
+}

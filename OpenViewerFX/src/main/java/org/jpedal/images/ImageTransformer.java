@@ -66,8 +66,7 @@ public class ImageTransformer {
 	 */
 	public ImageTransformer(
 		final GraphicsState current_graphics_state,
-		final BufferedImage new_image,
-		final boolean scaleImage) {
+		final BufferedImage new_image) {
 
 		//save global values
 		this.current_image = new_image;
@@ -101,12 +100,12 @@ public class ImageTransformer {
 		}
 
 
-		scale(scaleImage,w,h);
+		scale(w,h);
 
 		completeImage();
 	}
 
-	private void scale(final boolean scaleImage, final int w, final int h){
+	private void scale(final int w, final int h){
 
         /**
          * transform the image only if needed
@@ -205,56 +204,60 @@ public class ImageTransformer {
             }
 
             //scale image to produce final version
-            if(scaleImage){
-                final BufferedImage destImage;
+            scaleImage(h, image_at, r, invert);
+
+        }
+    }
+
+    private void scaleImage(int h, AffineTransform image_at, Area r, AffineTransformOp invert) {
+
+        final BufferedImage destImage;
 
 //                if(r.getBounds2D().getWidth() < ((double)w)-.5){
-                int newW=(int)(r.getBounds2D().getWidth());
-                // Rounding up height fixes some files like shading/Reporttyp_21.pdf
-                int newH=(int)(r.getBounds2D().getHeight()+.7);
-                
-                if(newH < 1) {
-                    newH = 1;
-                }
-                if(newW < 1) {
-                    newW = 1;
-                }
-                
-                destImage=new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-                /**if not sheer/rotate, then bicubic*/
-                if(h>1){
+        int newW=(int)(r.getBounds2D().getWidth());
+        // Rounding up height fixes some files like shading/Reporttyp_21.pdf
+        int newH=(int)(r.getBounds2D().getHeight()+.7);
 
-                    boolean failed=false;
-                    //allow for odd behaviour on some files
-                    try{
-                        invert.filter(current_image,destImage);
-                        current_image=destImage;
-                    }catch(final Exception e){
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+        if(newH < 1) {
+            newH = 1;
+        }
+        if(newW < 1) {
+            newW = 1;
+        }
 
-                        failed=true;
-                    }
-                    if(failed){
-                        try{
-                            invert = new AffineTransformOp(image_at,null);
-                            current_image = invert.filter(current_image,null);
-                        }catch(final Exception e){
-                            //
-                            if (LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                        }
+        destImage=new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+        /**if not sheer/rotate, then bicubic*/
+        if(h>1){
+
+            boolean failed=false;
+            //allow for odd behaviour on some files
+            try{
+                invert.filter(current_image,destImage);
+                current_image=destImage;
+            }catch(final Exception e){
+                //tell user and log
+                if(LogWriter.isOutput()) {
+                    LogWriter.writeLog("Exception: " + e.getMessage());
+                }
+                //
+
+                failed=true;
+            }
+            if(failed){
+                try{
+                    invert = new AffineTransformOp(image_at,null);
+                    current_image = invert.filter(current_image,null);
+                }catch(final Exception e){
+                    //
+                    if (LogWriter.isOutput()) {
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                 }
             }
         }
     }
 
-	/**
+    /**
 	 * complete image
 	 */
 	private void completeImage(){

@@ -44,28 +44,22 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
 /**
- * Class writes bufferedimages as Tiff 
- * <p>
- * Here is an example of how the code can be used.:-
- * </p>
- * 
- * 
+ * Class writes BufferedImages as Tiff
+
+ * <h3>Example 1 (single-page tiff):</h3>
  * <pre><code>
  * TiffEncoder encoder = new TiffEncoder();
  * encoder.setCompress(true); //default is false
- * encoder.write(image_to_save,bos);
+ * encoder.write(image, bos);
  * </code></pre>
- * 
- * Code below exemplifies how to write several images to single output file
  *
+ * <h3>Example 2 (multi-page tiff)</h3>
  * <pre><code>
  * TiffEncoder encoder = new TiffEncoder();
- * for(BufferedImage image: yourImageArray){
- *     encoder.append(image,filename); 
+ * for (BufferedImage image : yourImageArray) {
+ *     encoder.append(image, fileName);
  * }
  * </code></pre>
- * 
- * 
  *
  */
 public class TiffEncoder {
@@ -76,14 +70,13 @@ public class TiffEncoder {
     }
 
     /**
-     * writes image as Tiff in outputstream
+     * Writes BufferedImage as Tiff to OutputStream
      * <p>
      * This method does not close the provided OutputStream after the write
      * operation has completed; it is the responsibility of the caller to close
-     * the stream,
-     * </p>
+     * the stream.
      *
-     * @param image BufferedImage to write image
+     * @param image BufferedImage The image to write
      * @param outputStream The stream to write to
      * @throws IOException if the image wasn't written
      */
@@ -104,15 +97,15 @@ public class TiffEncoder {
     }
 
     /**
-     * appends image to given tiff file
+     * Appends image to specified tiff file
      * <p>
-     * if file is empty then this method write image to the file otherwise it
+     * If the file is empty then this method will write the image to the file, otherwise it
      * will append the image after previous image.
-     * </p>
-     * <strong>Please note: This method supports only Big endian tiff
+     * <p>
+     * <strong>Please note: This method supports only Big Endian tiff
      * files</strong>
      *
-     * @param img BufferedImage to append image
+     * @param img BufferedImage The image to append
      * @param fileName The name of the file where the image will be written 
      * @throws IOException if the file is unreadable 
      */
@@ -149,16 +142,16 @@ public class TiffEncoder {
     }
 
     /**
-     * 
-     * @return whether the compression is applied
+     * Returns whether Deflate compression is enabled in tiff generation.
+     * @return Whether compression is enabled
      */
     public boolean isCompressed() {
         return compress;
     }
 
     /**
-     * set to use Deflate compression in tiff files
-     * @param compress A boolean value pack bit compression in tiff files
+     * Set true to enable Deflate compression in tiff generation
+     * @param compress If compression should be enabled
      */
     public void setCompressed(boolean compress) {
         this.compress = compress;
@@ -315,12 +308,11 @@ public class TiffEncoder {
         out.write(intToBytes(offsetIFD)); // offset to IFD  
     }
 
-    private static int writePadding(OutputStream out, int rawLen) throws IOException {
+    private static void writePadding(OutputStream out, int rawLen) throws IOException {
         int balance = rawLen % 8;
         for (int i = 0; i < balance; i++) {
             out.write(0);
         }
-        return balance;
     }
 
     private static void writeContents(OutputStream out, byte[] raw, int imageWidth, int imageHeight, int offsetIFD, boolean hasAlpha, boolean isCompress) throws IOException {

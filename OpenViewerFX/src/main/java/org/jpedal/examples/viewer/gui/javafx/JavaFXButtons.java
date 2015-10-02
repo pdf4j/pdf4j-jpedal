@@ -267,7 +267,9 @@ public class JavaFXButtons implements GUIButtons{
         facingButton.setEnabled(flag);
         pageFlowButton.setEnabled(flag);
         for(int i = Commands.FACING; i < Commands.FULLSCREEN; i++){
-            disableUnimplementedItems(i);
+            if(i!=Commands.PAGEFLOW){
+                disableUnimplementedItems(i);
+            }
         }
         /////////////////
         
@@ -383,7 +385,7 @@ public class JavaFXButtons implements GUIButtons{
                             final CommandListener currentCommandListener, final ToolBar pagesToolBar, final ToolBar navToolBar) {
 
         GUIButton newButton = new JavaFXButton();
-
+        
         /**
          * specific buttons
          */
@@ -519,7 +521,7 @@ public class JavaFXButtons implements GUIButtons{
         newButton.init(currentGUI.getGUICursor().getURLForImage(path), ID, toolTip);
 
         //add listener
-        ((JavaFXButton) newButton).setOnAction(currentCommandListener.getJavaFXCommandListener());
+        ((JavaFXButton) newButton).setOnAction((EventHandler) currentCommandListener.getCommandListener());
 
         final int mode = currentGUI.getValues().getModeOfOperation();
 
@@ -653,7 +655,7 @@ public class JavaFXButtons implements GUIButtons{
                     case Commands.PAGEFLOW:
                     pageFlowButton.setEnabled(debug);
                     break;
-                     case Commands.CONTINUOUS:
+                    case Commands.CONTINUOUS:
                     continuousButton.setEnabled(debug);
                     break;
             }

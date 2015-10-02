@@ -244,8 +244,7 @@ class MaskDataDecoder {
         */
         int w=imageData.getWidth();
         int h=imageData.getHeight();
-        int d=imageData.getDepth();
-        
+
         /*
         * mask data (ASSUME single component at moment)
         */

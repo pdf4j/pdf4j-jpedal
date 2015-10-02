@@ -41,13 +41,7 @@ public class ObjectFactory {
         switch(id){
 
             case PdfDictionary.A:
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref);
-                } else if(parentType==PdfDictionary.MCID) {
-                    return new MCObject(ref);
-                } else {
-                    return new OutlineObject(ref);
-                }
+                return getPdfObject(ref, parentType);
 
             case PdfDictionary.AA:
             	return new FormObject(ref);
@@ -76,9 +70,6 @@ public class ObjectFactory {
             case PdfDictionary.C:                
                 return new FormObject(ref);
 
-            //case PdfDictionary.C2:                
-              //  return new FormObject(ref);
-
             case PdfDictionary.CharProcs:
         		return new FontObject(ref);
 
@@ -94,15 +85,9 @@ public class ObjectFactory {
             case PdfDictionary.ClassMap:
             	return new MCObject(ref);
 
-
             case PdfDictionary.D:
-                
-                if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref, parentID);
-                } else {
-                    return new OCObject(ref);
-                }
-                
+                return getPdfObject(ref, parentType, parentID);
+
             case PdfDictionary.DC:                
                 return new FormObject(ref);
 
@@ -194,18 +179,10 @@ public class ObjectFactory {
                 return new DecodeParmsObject(ref);
 
             case PdfDictionary.JS:
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref);
-                } else {
-                    return new NamesObject(ref);
-                }
-                
+                return getJSPdfObject(ref, parentType);
+
             case PdfDictionary.K:
-                if(parentType==PdfDictionary.MCID) {
-                    return new MCObject(ref);
-                } else {
-                    return new FormObject(ref);
-                }
+                return getKPdfObject(ref, parentType);
 
             case PdfDictionary.Layer:
                 return new OCObject(ref);
@@ -229,12 +206,8 @@ public class ObjectFactory {
                 return new NamesObject(ref);
 
             case PdfDictionary.Next:
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref);
-                } else {
-                    return new OutlineObject(ref);
-                }
-           
+                return getNextPdfObject(ref, parentType);
+
             case PdfDictionary.O:                
                 return new FormObject(ref);
 
@@ -359,33 +332,65 @@ public class ObjectFactory {
 
             case PdfDictionary.Zoom:
                 return new OCObject(ref);
-            
-            default:
-
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref);
-                }
-            
-                //
         }
-        
-        return new PdfObject(ref);
+
+        if(parentType==PdfDictionary.Form) {
+            return new FormObject(ref);
+        }else {
+            return new PdfObject(ref);
+        }
     }
 
-     public static PdfObject createObject(final int id, final int ref, final int gen, final int parentType) {
+    private static PdfObject getNextPdfObject(String ref, int parentType) {
+        if(parentType== PdfDictionary.Form) {
+return new FormObject(ref);
+} else {
+return new OutlineObject(ref);
+}
+    }
+
+    private static PdfObject getKPdfObject(String ref, int parentType) {
+        if(parentType== PdfDictionary.MCID) {
+            return new MCObject(ref);
+        } else {
+            return new FormObject(ref);
+        }
+    }
+
+    private static PdfObject getJSPdfObject(String ref, int parentType) {
+        if(parentType== PdfDictionary.Form) {
+return new FormObject(ref);
+} else {
+return new NamesObject(ref);
+}
+    }
+
+    private static PdfObject getPdfObject(String ref, int parentType, int parentID) {
+        if(parentType== PdfDictionary.Form) {
+            return new FormObject(ref, parentID);
+        } else {
+            return new OCObject(ref);
+        }
+    }
+
+    private static PdfObject getPdfObject(String ref, int parentType) {
+        if(parentType== PdfDictionary.Form) {
+return new FormObject(ref);
+
+} else if(parentType==PdfDictionary.MCID) {
+return new MCObject(ref);
+} else {
+return new OutlineObject(ref);
+}
+    }
+
+    public static PdfObject createObject(final int id, final int ref, final int gen, final int parentType) {
 
         switch(id){
 
-        	
             case PdfDictionary.A:
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref, gen);
-                } else if(parentType==PdfDictionary.MCID) {
-                    return new MCObject(ref, gen);
-                } else {
-                    return new OutlineObject(ref, gen);
-                }
-	    		
+                return getAObject(ref, gen, parentType);
+
             case PdfDictionary.AA:
             	return new FormObject(ref,gen);
 
@@ -407,9 +412,6 @@ public class ObjectFactory {
             case PdfDictionary.C:
             	return new FormObject(ref, gen);
 
-            //case PdfDictionary.C2:
-            	//return new FormObject(ref, gen);
-            	
             case PdfDictionary.CF:
 	    		return new EncryptionObject(ref, gen);
     		
@@ -429,11 +431,7 @@ public class ObjectFactory {
                 return new MCObject(ref,gen);
 
             case PdfDictionary.D:
-            	if(parentType==PdfDictionary.Form){
-                    return new FormObject(ref, gen);
-                }else {
-                    return new OCObject(ref, gen);
-                }
+                return getDObject(ref, gen, parentType);
 
             case PdfDictionary.DC:
             	return new FormObject(ref, gen);
@@ -523,19 +521,11 @@ public class ObjectFactory {
                 return new DecodeParmsObject(ref,gen);
 
             case PdfDictionary.JS:
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref, gen);
-                } else {
-                    return new NamesObject(ref, gen);
-                }
-                
+                return getJSObject(ref, gen, parentType);
+
             case PdfDictionary.K:
-                if(parentType==PdfDictionary.MCID) {
-                    return new MCObject(ref, gen);
-                } else {
-                    return new FormObject(ref, gen);
-                }
-            
+                return getKObject(ref, gen, parentType);
+
             case PdfDictionary.Layer:
                 return new OCObject(ref, gen);
 
@@ -558,12 +548,8 @@ public class ObjectFactory {
                 return new NamesObject(ref,gen);
 
             case PdfDictionary.Next:
-            	if(parentType==PdfDictionary.Form) {
-                    return new FormObject(ref, gen);
-                } else {
-                    return new OutlineObject(ref, gen);
-                }
-                
+                return getNextObject(ref, gen, parentType);
+
             case PdfDictionary.O:
             	return new FormObject(ref, gen);
                
@@ -690,11 +676,51 @@ public class ObjectFactory {
 
             	//if(parentType==PdfDictionary.Form)
             		//return new FormObject(ref, gen);
-            
-                //
 
         }
 
         return new PdfObject(ref, gen);
+    }
+
+    private static PdfObject getNextObject(int ref, int gen, int parentType) {
+        if(parentType== PdfDictionary.Form) {
+            return new FormObject(ref, gen);
+        } else {
+            return new OutlineObject(ref, gen);
+        }
+    }
+
+    private static PdfObject getKObject(int ref, int gen, int parentType) {
+        if(parentType== PdfDictionary.MCID) {
+            return new MCObject(ref, gen);
+        } else {
+            return new FormObject(ref, gen);
+        }
+    }
+
+    private static PdfObject getJSObject(int ref, int gen, int parentType) {
+        if(parentType== PdfDictionary.Form) {
+            return new FormObject(ref, gen);
+        } else {
+            return new NamesObject(ref, gen);
+        }
+    }
+
+    private static PdfObject getDObject(int ref, int gen, int parentType) {
+        if(parentType== PdfDictionary.Form){
+            return new FormObject(ref, gen);
+        }else {
+            return new OCObject(ref, gen);
+        }
+    }
+
+    private static PdfObject getAObject(int ref, int gen, int parentType) {
+        if(parentType== PdfDictionary.Form) {
+            return new FormObject(ref, gen);
+        } else if(parentType==PdfDictionary.MCID) {
+            return new MCObject(ref, gen);
+        } else {
+            return new OutlineObject(ref, gen);
+        }
     }
 }

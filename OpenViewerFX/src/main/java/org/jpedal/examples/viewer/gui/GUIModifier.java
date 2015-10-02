@@ -325,7 +325,7 @@ public class GUIModifier {
         return used;
     }
     
-    private static boolean alterMenuBarProperties(final String value, final boolean set, final GUIFactory currentGUI, final boolean isSingle) {
+    private static void alterMenuBarProperties(final String value, final boolean set, final GUIFactory currentGUI, final boolean isSingle) {
         
         boolean skipOthers = alterFileMenuItemProperties(value, set, currentGUI, currentGUI.getMenuItems());
         
@@ -348,8 +348,6 @@ public class GUIModifier {
         if (skipOthers) {//Menu bar altered so double check separators
             currentGUI.getButtons().checkButtonSeparators();
         }
-
-        return skipOthers;
     }
      
     private static boolean alterEditMenuItemProperties(final String value, final boolean set, final GUIMenuItems menuItems) {

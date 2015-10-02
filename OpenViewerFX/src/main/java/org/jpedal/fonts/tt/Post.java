@@ -125,7 +125,7 @@ public class Post extends Table {
             //standard mac os table
 			if(id!=30){
 				for(int i=0;i<258;i++) {
-                    this.translateToID.put(this.macEncoding[i], i);
+                    translateToID.put(macEncoding[i], i+1);
                 }
 			}
 			
@@ -158,7 +158,7 @@ public class Post extends Table {
                      */
 					for(int i=0;i<numberOfGlyphs;i++){
                         if(glyphNameIndex[i]>257 && glyphNameIndex[i]<32768 && glyphNameIndex[i]-258<numberOfNewGlyphs){
-							this.translateToID.put(names[glyphNameIndex[i]-258], i);
+							translateToID.put(names[glyphNameIndex[i]-258], i);
                             //System.out.println(i+"="+names[glyphNameIndex[i]-258]);
                         }
                     }

@@ -151,9 +151,7 @@ public interface Display {
 
     void init(float scaling, int displayRotation, int pageNumber, DynamicVectorRenderer currentDisplay, boolean isInit);
 
-    //<start-server>
     void drawBorder();
-    //<end-server>
     
     void setup(boolean useAcceleration,PageOffsets currentOffset);
 

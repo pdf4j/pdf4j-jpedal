@@ -32,7 +32,6 @@
  */
 package org.jpedal.examples.viewer.gui;
 
-import org.jpedal.utils.BrowserLauncher;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.*;
@@ -193,7 +192,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     /**
      * Track whether both pages are properly displayed
      */
-    private final static boolean pageTurnScalingAppropriate = true;
+    private static final boolean pageTurnScalingAppropriate = true;
     
     /**
      * holds back/forward buttons at bottom of page
@@ -226,11 +225,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     private final JavaFXLayersPanel layersPanel;
 
     /**
-     * user dir in which program can write
-     */
-    private String user_dir = System.getProperty("user.dir");
-
-    /**
      * stop user forcing open tab before any pages loaded
      */
     private boolean tabsNotInitialised = true;
@@ -261,7 +255,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 //	private StatusBarFX statusBar=new StatusBarFX(new Color((235.0d/255.0d), (154.0d/255.0d), 0, 1));
     private StatusBarFX downloadBar;
 
-    private boolean addSearchTab;
     private boolean searchInMenu;
 
     private TextField searchText;
@@ -329,8 +322,14 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             System.out.println("setThumbnailScrollBarVisibility - Implemented");
         }
         pageScroll.setVisible(isVisible);
+        //#making invisible still shows the gap so iam padding negative to hide it
+        if(isVisible){
+            pageScroll.setStyle("-fx-padding:0px");
+        }else{
+            pageScroll.setStyle("-fx-padding:-10px");
+        }
     }
-
+        
     @Override
     public void setThumbnailScrollBarValue(final int pageNum) {
         if (debugFX) {
@@ -957,7 +956,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 //			VTextIcon textIcon2 = new VTextIcon(navOptionsPanel, "Search", VTextIcon.ROTATE_LEFT);
 //			navOptionsPanel.addTab(null, textIcon2, searchFrame.getContentPanel());
         }
-        addSearchTab = true;
     }
 
     /**
@@ -1641,21 +1639,8 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 }
                 break;
 
-            case Display.PAGEFLOW:
-
-                if (pages instanceof PageFlowDisplayFX) {
-                    return hasChanged;
-                }
-
-                if (lastDisplayView != Display.SINGLE_PAGE) {
-                    setDisplayView(Display.SINGLE_PAGE, 0);
-                    setDisplayView(Display.PAGEFLOW, 0);
-                    return hasChanged;
-                }
-
-                pages = new PageFlowDisplayFX((GUIFactory) customFXHandle, comp);
-
-                break;
+                 //
+                
             /**/
             default:
 
@@ -1743,6 +1728,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         if (pageNumber > 0) {
             if (hasChanged && displayView == Display.SINGLE_PAGE && decode_pdf.isOpen()) {
                 try {
+                    decode_pdf.getPages().getYCordForPage(pageNumber, scaling);
                     decode_pdf.setPageParameters(scaling, pageNumber, decode_pdf.getDisplayRotation());
                     //@swing
 //                    invalidate();
@@ -1755,10 +1741,15 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                     }
                     //
                 }
-            } else if (displayView != Display.SINGLE_PAGE && displayView != Display.PAGEFLOW) {
-
-                scrollToPage(pageNumber);
-
+            } else if (displayView == Display.CONTINUOUS || displayView == Display.CONTINUOUS_FACING) {
+                try {
+                    decode_pdf.getPages().getYCordForPage(pageNumber, scaling);
+                    decode_pdf.setPageParameters(scaling, pageNumber, decode_pdf.getDisplayRotation());
+                    decode_pdf.decodePage(pageNumber);
+                    scrollToPage(pageNumber);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
@@ -1835,7 +1826,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
      */
     @Override
     public void scaleAndRotate() {
-
+        
         if (decode_pdf.getDisplayView() == Display.PAGEFLOW) {
             decode_pdf.setPageParameters(scaling, commonValues.getCurrentPage(), rotation);
             return;
@@ -1860,7 +1851,13 @@ public class JavaFxGUI extends GUI implements GUIFactory {
          * update value and GUI
          */
         if (decode_pdf != null) {
-
+            
+           for(int i=0;i<group.getChildren().size();i++){
+               if(!group.getChildren().get(i).equals(decode_pdf)){
+                   group.getChildren().remove(group.getChildren().get(i));
+               }
+           }
+            
             int index = getSelectedComboIndex(Commands.SCALING);
 
             if (decode_pdf.getDisplayView() == Display.PAGEFLOW) {
@@ -1887,7 +1884,9 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             if (index != -1) {
                 //always check in facing mode with turnover on
                 int tw = 0, th = 0;//temp width and temp hegiht;
-                double sw = 0, sh = 0;//scalled width and height;
+                double sw;
+                double sh;
+                
                 PdfPageData pData = decode_pdf.getPdfPageData();
                 int curPW = pData.getCropBoxWidth(page); //current page width
                 int curPH = pData.getCropBoxHeight(page); //current page height
@@ -1937,12 +1936,19 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                         } else {
                             group.setTranslateX(0);
                         }
-
-//                        if (sh < height) {
+                        
+                        //##we need to hide the scrollbar and show the scrollpane if content does not fit
+                        if (sh < height && sw<width) {
+//                            setScrollBarPolicy(GUI.ScrollPolicy.VERTICAL_NEVER);
+//                            setScrollBarPolicy(GUI.ScrollPolicy.HORIZONTAL_NEVER);
+//                            setThumbnailScrollBarVisibility(true);
 //                            group.setTranslateY((height - sh) / 2.0);
-//                        } else {
+                        } else {
+//                            setScrollBarPolicy(GUI.ScrollPolicy.VERTICAL_AS_NEEDED);
+//                            setScrollBarPolicy(GUI.ScrollPolicy.HORIZONTAL_AS_NEEDED);
+//                            setThumbnailScrollBarVisibility(false);
 //                            group.setTranslateY(0);
-//                        }
+                        }
                         group.setTranslateY(0);
                         break;
                     case Display.CONTINUOUS:
@@ -2196,48 +2202,59 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
         if (commonValues.getCurrentPage() > 0) {
 
-            int xCord = 0;
-            int yCord = decode_pdf.getPages().getYCordForPage(page, scaling);
-
-            if (decode_pdf.getDisplayView() != Display.SINGLE_PAGE) {
-                xCord = 0;
-            }
+            //int xCord = 0;
+            int pageCount = decode_pdf.getPageCount();
+            double yCord;// = decode_pdf.getPages().getYCordForPage(page, scaling);
+                        
+            //$$$$$$$$$$$$$ call it and ignore please dont delete as it has affect in continuous mode               
+            decode_pdf.getPages().getYCordForPage(page, scaling);            
+                      
+           // if (decode_pdf.getDisplayView() != Display.SINGLE_PAGE) {
+             //   xCord = 0;
+            //}
             //System.out.println("Before="+decode_pdf.getVisibleRect()+" "+decode_pdf.getPreferredSize());
 
             final PdfPageData pageData = decode_pdf.getPdfPageData();
 
-            final int ch = (int) (pageData.getCropBoxHeight(page) * scaling);
-            final int cw = (int) (pageData.getCropBoxWidth(page) * scaling);
+            //final int ch = (int) (pageData.getCropBoxHeight(page) * scaling);
+            //final int cw = (int) (pageData.getCropBoxWidth(page) * scaling);
+                        
             double totalHeight = 0;
-            double curY = 0;
 
-            int pw = pageData.getScaledCropBoxWidth(page);
-            int ph = pageData.getScaledCropBoxHeight(page);
-            int pageCount = pageData.getPageCount();
+            //int pw = pageData.getScaledCropBoxWidth(page);
+            //int ph = pageData.getScaledCropBoxHeight(page);
 
-            double localH = pageContainer.getContent().getBoundsInLocal().getHeight();
-            double localW = pageContainer.getContent().getBoundsInLocal().getWidth();
-            double viewH = pageContainer.getViewportBounds().getHeight();
-            double viewW = pageContainer.getViewportBounds().getWidth();
-
+            //double localH = pageContainer.getContent().getBoundsInLocal().getHeight();
+            //double localW = pageContainer.getContent().getBoundsInLocal().getWidth();
+            //double viewH = pageContainer.getViewportBounds().getHeight();
+            //double viewW = pageContainer.getViewportBounds().getWidth();
+            
+            double vv;
             switch (decode_pdf.getDisplayView()) {
                 case Display.SINGLE_PAGE:
 
                     break;
                 case Display.CONTINUOUS:
-
-                    for (int i = 1; i <= pageCount; i++) {
-                        totalHeight += pageData.getScaledCropBoxHeight(i);
+                    yCord = 0;
+                    for (int i = 1; i < pageCount; i++) {
+                        totalHeight+= pageData.getScaledCropBoxHeight(i);
                     }
-                    int marginGap = (page - 1) * 20;
-                    double vv = (yCord + marginGap) / localH;
-                    pageContainer.setVvalue(vv);
-
-//                    System.out.println("localH: " + localH + " totalHeight: " + totalHeight + " viewH: " + viewH + " curY: " + curY + " " + paddingH);
-//                   
+                    for (int i = 1; i < page; i++) {
+                        yCord+= pageData.getScaledCropBoxHeight(i);
+                    }
+                    vv = yCord/totalHeight;
+                    pageContainer.setVvalue(vv);//                   
                     break;
                 case Display.CONTINUOUS_FACING:
-
+                    yCord = 0;
+                    for (int i = 1; i < pageCount; i+=2) {
+                        totalHeight+= pageData.getScaledCropBoxHeight(i);
+                    }
+                    for (int i = 1; i < page; i+=2) {
+                        yCord+= pageData.getScaledCropBoxHeight(i);
+                    }
+                    vv = yCord/totalHeight;
+                    pageContainer.setVvalue(vv);//               
                     break;
             }
 
@@ -2596,13 +2613,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         if (isSingle) {
             fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.SinglePage"), "single.gif", Commands.SINGLE, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
 
-            fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.Continuous"), "continuous.gif", Commands.CONTINUOUS, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
-            fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.ContinousFacing"), "continuous_facing.gif", Commands.CONTINUOUS_FACING, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
-            fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.Facing"), "facing.gif", Commands.FACING, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
-            fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.PageFlow"), "pageflow.gif", Commands.PAGEFLOW, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+            //
         }
 
         //on top in plugin
@@ -3441,8 +3452,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
         pageCounter3 = null;
 
-        user_dir = null;
-
         if (navToolBar != null) {
             navToolBar.getItems().removeAll(navToolBar.getItems());
         }
@@ -3611,7 +3620,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
      */
     @Override
     protected void addComboListenerAndLabel(final GUICombo combo, final String title) {
-        ((JavaFXCombo) combo).setOnAction(currentCommandListener.getJavaFXCommandListener());
+        ((JavaFXCombo) combo).setOnAction((EventHandler)currentCommandListener.getCommandListener());
     }
 
     /**
@@ -3838,20 +3847,18 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         if (isSingle) {
             previewOnSingleScroll = properties.getValue("previewOnSingleScroll").equalsIgnoreCase("true");
 
-            if (GUI.debugFX) {
-                if (previewOnSingleScroll) {
-                    pageScroll = new ScrollBar();
-                    pageScroll.setOrientation(Orientation.VERTICAL);
-                    pageScroll.setValue(0);
-                    pageScroll.setVisibleAmount(1);
-                    pageScroll.setMin(0);
-                    pageScroll.setMax(1);
-                    pageScroll.setUnitIncrement(1);
-
-                    pageScroll.valueProperty().addListener(new JavaFXScrollListener(this, pageScroll));
-                }
+            
+            if (previewOnSingleScroll && 1==2) { //currently disable as some bugs in pageflow to normal modes
+                pageScroll = new ScrollBar();
+                pageScroll.setOrientation(Orientation.VERTICAL);
+                pageScroll.setValue(0);
+                pageScroll.setVisibleAmount(1);
+                pageScroll.setMin(0);
+                pageScroll.setMax(1);
+                pageScroll.setUnitIncrement(1);
+                pageScroll.valueProperty().addListener(new JavaFXScrollListener(this, pageScroll));
             }
-
+            
             /**
              * Sets up the ScrollPane
              */
@@ -3947,7 +3954,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             if (pageScroll != null) {
                 center.getItems().add(pageScroll);
             }
-
+            
             setSplitDividerLocation(collapsedSize);
             tabsExpanded = false;
 
@@ -4445,7 +4452,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
     private void removeComponentListener(RefreshLayout viewListener) {
 
-        final ScrollPane customFXHandle = this.getPageContainer();
+        final ScrollPane customFXHandle = pageContainer;
 
         //picks up mode change
         customFXHandle.viewportBoundsProperty().removeListener(viewListener);
@@ -4456,7 +4463,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
     private void addComponentListener(RefreshLayout viewListener) {
 
-        final ScrollPane customFXHandle = this.getPageContainer();
+        final ScrollPane customFXHandle = pageContainer;
 
         if (customFXHandle != null) {
             //picks up mode change

@@ -38,7 +38,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import javafx.scene.shape.Path;
 import org.jpedal.exception.PdfException;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
@@ -165,13 +164,11 @@ public class PatternColorSpace extends GenericColorSpace{
     }
     
     
-    public BufferedImage getImageForPatternedShape(GraphicsState gs, Path path){
+    public BufferedImage getImageForPatternedShape(GraphicsState gs){
         
         float mm[][] = gs.CTM;
         AffineTransform gsAffine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
         
-        int pw = (int)path.getBoundsInLocal().getWidth();
-        int ph = (int)path.getBoundsInLocal().getHeight();
         currentPdfFile.checkResolved(PatternObj);
         final byte[] streamData=currentPdfFile.readStream(PatternObj,true,true,true, false,false, PatternObj.getCacheName(currentPdfFile.getObjectReader()));
         final int patternType= PatternObj.getInt(PdfDictionary.PatternType);
@@ -181,7 +178,7 @@ public class PatternColorSpace extends GenericColorSpace{
         }
         
         AffineTransform affine = new AffineTransform();
-        AffineTransform rotatedAffine = new AffineTransform();
+
         float[] inputs = PatternObj.getFloatArray(PdfDictionary.Matrix);
         if (inputs != null) {
             mm = new float[][]{{inputs[0], inputs[1], 0f}, {inputs[2], inputs[3], 0f}, {inputs[4], inputs[5], 1f}};
@@ -194,7 +191,6 @@ public class PatternColorSpace extends GenericColorSpace{
         boolean isRotated = affine.getShearX()!=0 || affine.getShearY()!=0;
         
         if(isRotated){
-            rotatedAffine = affine;
             affine = new AffineTransform();
             mm = new float[][]{{1f, 0f, 0f}, {0f, 1f, 0f}, {0f, 0f, 1f}};
         }
@@ -289,6 +285,8 @@ public class PatternColorSpace extends GenericColorSpace{
             glyphDisplay.paint(null, rdAffine, null);
 
         }
+        
+        return image;   
 //        //flip it for using in viewer
 ////        if(gsAffine.getScaleY()<0){
 ////            AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
@@ -318,186 +316,9 @@ public class PatternColorSpace extends GenericColorSpace{
 //        } catch (Exception ex) {
 //            ex.printStackTrace();
 //        }
-        return image;   
+        
     }
-    
-    @Override
-    public BufferedImage getImageForPatternedShape(final Path path) {
 
-        switch (PatternObj.getInt(PdfDictionary.PatternType)) {
-            case 1: //Tiling
-
-                //ensure read
-                currentPdfFile.checkResolved(PatternObj);
-
-                //lookup table
-                final byte[] streamData = currentPdfFile.readStream(PatternObj, true, true, true, false, false, PatternObj.getCacheName(currentPdfFile.getObjectReader()));
-                patternImage = getTilingPatternImage(PatternObj, streamData);
-
-                if (fullImage == null) {
-                    fullImage = createPatternCell();
-                }
-
-        //JavaFx bounds surrounds path by one pixel.
-                //Width / Height is 2 larger than the actual path and minX / minY is 1 less
-                final double minX = path.getBoundsInLocal().getMinX() + 1;
-                final double minY = path.getBoundsInLocal().getMinY() + 1;
-                double width = path.getBoundsInLocal().getWidth() - 2;
-                double height = path.getBoundsInLocal().getHeight() - 2;
-
-                //Round up here, otherwise bufferedImage has width / height of 0
-                if (0 <= width && width < 1) {
-                    width = 1;
-                }
-                if (0 <= height && height < 1) {
-                    height = 1;
-                }
-
-                final Rectangle bounds = new Rectangle((int) minX, (int) minY, (int) width, (int) height);
-                final Rectangle rect = new Rectangle(fullImage.getWidth(), fullImage.getHeight());
-                BufferedImage finalImage = new BufferedImage((int) (width + minX), (int) (height + minY), BufferedImage.TYPE_INT_ARGB);
-                final Graphics2D g2 = finalImage.createGraphics();
-                final AffineTransform defaultAff = g2.getTransform();
-
-                for (int x = 0; x < finalImage.getWidth(); x += fullImage.getWidth()) {
-                    for (int y = 0; y < finalImage.getHeight(); y += fullImage.getHeight()) {
-                        rect.setLocation(x, y);
-                        if (bounds.intersects(rect)) {
-                            g2.translate(x, y);
-                            g2.drawImage(fullImage, null, null);
-                            g2.setTransform(defaultAff);
-                        }
-                    }
-                }
-
-//        System.out.println(minX+" , "+minY+" , "+width+" , "+height);
-                finalImage = finalImage.getSubimage((int) minX, (int) minY, (int) width, (int) height);
-
-                return finalImage;
-            case 2: //Gradient
-                //System.err.println("Pattern gradient shading not implemented yet");
-                break;
-        }
-        return null;
-    }
-    
-    private BufferedImage createPatternCell(){
-//        boolean isRotated=matrix[1][0]!=0 && matrix[0][1]!=0 && matrix[0][0]!=0 && matrix[1][1]!=0;
-//        boolean isSkewed=matrix!=null && matrix[0][0]>0 &&  matrix[0][1]<0  && matrix[1][0]>0 &&  matrix[1][1]>0;
-        
-        final float xstep = PatternObj.getFloatNumber(PdfDictionary.XStep);
-        final float ystep = PatternObj.getFloatNumber(PdfDictionary.YStep);
-        final float[] BBox=PatternObj.getFloatArray(PdfDictionary.BBox);
-//        float[] matrix = PatternObj.getFloatArray(PdfDictionary.Matrix);
-        final float width = (BBox[0] + xstep) - BBox[0];
-        final float height = (BBox[1] + ystep) - BBox[1];
-        final float tileW = xstep * matrix[0][0];
-        final float tileH = ystep * Math.abs(matrix[1][1]);
-        float dx,dy;
-        
-        //ignore slight rotations
-//        if(isRotated && matrix[0][0]!=0 && matrix[0][0]<0.001 && matrix[1][1]!=0 && matrix[1][1]<0.001){
-//            isRotated=false;
-//            matrix[0][0]=-matrix[0][1];
-//            matrix[1][1]=-matrix[1][0];
-//
-//            matrix[1][0]=0;
-//            matrix[0][1]=0;
-//        }
-        
-        dx=matrix[0][0];
-        dy=matrix[1][1];
-        
-        if(dx==0) {
-            dx=matrix[0][1];
-        }
-        if(dx<0) {
-            dx=-dx;
-        }
-        
-        if(dy==0) {
-            dy=matrix[1][0];
-        }
-        if(dy<0) {
-            dy=-dy;
-        }
-        
-        dx *= xstep;
-        dy *= ystep;
-        final int xCount=(int)(xstep/dx);
-        final int yCount=(int)(ystep/dy);
-        int imgW=(int) xstep;
-        int imgH=(int) xstep;
-        if(xCount>0 && yCount>0){
-            imgW=(int)((xCount+1)*dx);
-            imgH=(int)((yCount+1)*dy);
-        }
-        final BufferedImage fullImage = new BufferedImage(imgW, imgH, BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g2 = fullImage.createGraphics();
-        
-//        float offX,offY,rotatedWidth,rotatedHeight;
-//        // Setup for rotated tiles
-//        if(isSkewed){
-//            rotatedWidth=(xstep *matrix[0][0])+(ystep * matrix[1][0]);
-//            rotatedHeight=(ystep *matrix[1][1])-(xstep *matrix[0][1]);
-//        }else{
-//            rotatedWidth=(xstep *matrix[0][0])-(ystep *matrix[1][0]);
-//
-//            if(matrix[1][1]>0 && matrix[0][1]>0)
-//                rotatedHeight=(ystep *matrix[1][1]);
-//            else
-//                rotatedHeight=-(ystep *matrix[1][1])-(xstep *matrix[0][1]);
-//        }
-//        System.out.println(rotatedHeight + " " + rotatedWidth);
-//
-//        offX=(patternImage.getWidth()-rotatedHeight);
-//        offY=(patternImage.getHeight()-rotatedWidth);
-        
-        
-        
-//        System.out.println(width + " " + height);
-        
-        final AffineTransform defaultAff = g2.getTransform();
-        // tile*2 to avaoid gaps
-        for(int x = 2; x <= width + tileW*2; x+=tileW){
-            for(int y = 0; y <= height + tileH*2; y+=tileH){
-//                g2.transform(new AffineTransform(matrix[0][0],matrix[0][1],matrix[1][0],matrix[1][1], x, y));
-                g2.transform(new AffineTransform(matrix[0][0],0,0,matrix[1][1], x, y));
-                g2.drawImage(patternImage, null, null);
-                g2.setTransform(defaultAff);
-            }
-        }
-        
-        g2.transform(new AffineTransform(matrix[0][0],matrix[0][1],matrix[1][0],matrix[1][1], 0, 0));
-        g2.drawImage(fullImage, null, null);
-        g2.setTransform(defaultAff);
-        
-        return fullImage;
-    }
-    
-    private BufferedImage getTilingPatternImage(final PdfObject PatternObj, final byte[] streamData) {
-        
-        final float[] BBox=PatternObj.getFloatArray(PdfDictionary.BBox);
-        
-        final int tileW=(int) (BBox[2]-BBox[0]);
-        final int tileH=(int) (BBox[3]-BBox[1]);
-        
-        final BufferedImage image=new BufferedImage(tileW, tileH, BufferedImage.TYPE_INT_ARGB);
-        
-        /**
-         * convert stream into an DynamicVector object we can then draw onto screen or tile
-         */
-        final ObjectStore localStore = new ObjectStore();
-        final DynamicVectorRenderer glyphDisplay = decodePatternContent(PatternObj, new float[][]{{1,0,0},{0,1,0},{0,0,1}}, streamData, localStore);
-        
-        final Graphics2D g2=image.createGraphics();
-        // g2.setClip(new Rectangle(0,0,tileW,tileH));
-        glyphDisplay.setG2(g2);
-        glyphDisplay.paint(null,new AffineTransform() ,null);
-        
-        return image;
-    }
-    
     private static float[][] getMatrix(AffineTransform af){
         return new float[][]{{(float)af.getScaleX(), (float)af.getShearX(), 0f}, {(float)af.getShearY(), (float)af.getScaleY(), 0f}, {(float)af.getTranslateX(), (float)af.getTranslateY(), 1f}};
     }
@@ -587,9 +408,9 @@ public class PatternColorSpace extends GenericColorSpace{
         imageH = imageH > 3000 ? 1500 : imageH;
         
         //very small images return white
-        if(imageW<0.5 && imageH<0.5){
-            return new PdfColor(255,255,255);
-        }
+//        if(imageW<0.5 && imageH<0.5){
+//            return new PdfColor(255,255,255);
+//        }
 
         int iw = (int) (imageW);
         iw = iw < 1 ? 1 : iw;
@@ -601,15 +422,6 @@ public class PatternColorSpace extends GenericColorSpace{
             iw = 1;
         }
         
-        
-        
-//        //example: scooby doo file has rotation so follow old method
-//        if(affine.getShearX()!=0 || affine.getShearY()!=0){
-//            return setupTiling(PatternObj, inputs, matrix, streamData);
-//        }
-
-       
-
         final ObjectStore localStore = new ObjectStore();
         BufferedImage image;
         final DynamicVectorRenderer glyphDisplay;
@@ -639,26 +451,10 @@ public class PatternColorSpace extends GenericColorSpace{
         Rectangle2D fRect = new Rectangle2D.Double(rawRect.getX(), rawRect.getY(), imageW, imageH);
         
         if(isRotated){
-//            System.out.println("**********************");
-//            System.out.println("patternobj " + PatternObj.getObjectRefAsString());
-//            System.out.println("rawbox " + rawBBox[0] + " " + rawBBox[1] + " " + rawBBox[2] + " " + rawBBox[3]);
-//            System.out.println("bbox " + bbox[0] + " " + bbox[1] + " " + bbox[2] + " " + bbox[3]);
-//            System.out.println(affine);
-//            System.out.println("steps: " + rawXStep + " " + rawYStep);
-//            System.out.println(rawRect);
-//            System.out.println(boxRect);
-//            System.out.println("image dim " + imageW + " " + imageH + " " + iw + " " + ih);
-//            write(image, "rotated");
-            return new ShearedTexturePaint(image, fRect, rotatedAffine);
-            
+            return new ShearedTexturePaint(image, fRect, rotatedAffine);            
+        }else{
+            return new PdfTexturePaint(image, fRect);
         }
-
-//        BufferedImage sub = new BufferedImage(1500, 1500, BufferedImage.TYPE_INT_ARGB);
-//        final Graphics2D g3 = sub.createGraphics();
-//        glyphDisplay.setG2(g3);
-//        glyphDisplay.paint(null, null, null);
-
-        return new PdfTexturePaint(image, fRect);
     }
 
     
@@ -678,7 +474,6 @@ public class PatternColorSpace extends GenericColorSpace{
         
         //T3Renderer glyphDisplay=new T3Display(0,false,20,localStore);
         final T3Renderer glyphDisplay=new PatternDisplay(0,false,20,localStore);
-        glyphDisplay.setOptimisedRotation(false);
         
         try{
             glyphDecoder.setRenderer(glyphDisplay);

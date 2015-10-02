@@ -251,7 +251,8 @@ public class SignData {
 	 * This method is overidden to display messages about its this objects state.
 	 * Used after calling validate.
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		String result;
 		

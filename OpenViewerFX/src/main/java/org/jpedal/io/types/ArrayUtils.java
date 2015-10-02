@@ -39,7 +39,7 @@ import org.jpedal.utils.LogWriter;
 /**
  *
  */
-class ArrayUtils {
+public class ArrayUtils {
     
     
     static boolean handleIndirect(final int endPoint, final byte[] raw, int aa){
@@ -82,14 +82,14 @@ class ArrayUtils {
         return i;
     }
     
-    static int skipComment(final byte[] raw, int i) {
+    public static int skipComment(final byte[] raw, int i) {
         
         while(raw[i]!=10 && raw[i]!=13){
             i++;
         }
         
         //move cursor to start of text
-        while(raw[i]==10 || raw[i]==13 || raw[i]==32) {
+        while(raw[i]==10 || raw[i]==13 || raw[i]==32 || raw[i]==9) {
             i++;
         }
         
@@ -145,7 +145,15 @@ class ArrayUtils {
         
         return newValues;
     }
-    
+
+    public static int skipSpaces(final byte[] data, int start) {
+        //now skip any spaces to key or text
+        while(data[start]==10 || data[start]==13 || data[start]==32) {
+            start++;
+        }
+
+        return start;
+    }
 }
 
 

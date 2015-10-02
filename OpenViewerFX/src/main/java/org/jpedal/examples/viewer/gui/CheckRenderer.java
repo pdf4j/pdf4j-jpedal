@@ -123,7 +123,7 @@ public class CheckRenderer extends JPanel implements TreeCellRenderer {
 	  }
 
 
-	  static class TreeLabel extends JLabel {
+	  public static class TreeLabel extends JLabel {
 	    boolean isSelected;
 	    boolean hasFocus;
 

@@ -58,7 +58,6 @@ import org.jpedal.utils.LogWriter;
 
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
-import javafx.scene.shape.Path;
 import javax.imageio.metadata.IIOMetadataNode;
 import com.idrsolutions.image.jpeg2000.Jpeg2000Decoder;
 
@@ -1463,15 +1462,6 @@ public class GenericColorSpace  implements Cloneable, Serializable {
         }
         
         return rgbCS;
-    }
-
-    /**
-     * used by new JavaFX code to provide a Patterned image
-     * @param currentShape
-     * @return 
-     */
-    public BufferedImage getImageForPatternedShape(final Path currentShape) {
-        return null;
     }
 
     /**

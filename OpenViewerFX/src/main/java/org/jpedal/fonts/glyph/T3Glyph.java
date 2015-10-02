@@ -244,6 +244,6 @@ public class T3Glyph implements PdfGlyph
 
     @Override
     public Path getPath() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("getPath Not supported yet.");
     }
 }

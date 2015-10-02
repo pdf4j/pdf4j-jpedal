@@ -64,7 +64,7 @@ public interface PdfDecoderInt {
     /**
      * build number of this version
      */
-    String version = "6.4.28";
+    String version = "6.6b02";
     /**
      * flag to show extraction mode should include any text
      */
@@ -157,7 +157,6 @@ public interface PdfDecoderInt {
     int SUBSTITUTE_FONT_USING_FULL_FONT_NAME = 4;
     int SUBSTITUTE_FONT_USING_POSTSCRIPT_NAME_USE_FAMILY_NAME_IF_DUPLICATES= 5;
     
-    //<start-adobe>
     /**
      * returns object containing grouped text of last decoded page
      * - if no page decoded, a Runtime exception is thrown to warn user
@@ -166,7 +165,6 @@ public interface PdfDecoderInt {
      */
     PdfGroupingAlgorithms getGroupingObject() throws PdfException ;
 
-    //<end-adobe>
     /**
      * not part of API used internally
      *
@@ -191,9 +189,6 @@ public interface PdfDecoderInt {
      */
     TextLines getTextLines();
 
-    //<start-adobe>
-
-
     /**
      * returns object containing grouped text from background grouping - Please
      * see org.jpedal.examples.text for example code
@@ -201,8 +196,6 @@ public interface PdfDecoderInt {
     PdfGroupingAlgorithms getBackgroundGroupingObject();
 
     //
-
-    //<end-adobe>
 
     boolean isOpen();
 
@@ -254,8 +247,6 @@ public interface PdfDecoderInt {
      */
     int getInsetW();
     
-    
-    //<start-adobe>
         /**
          * Return amount to scroll window by when scrolling (default is 10).
          * @return int
@@ -280,7 +271,6 @@ public interface PdfDecoderInt {
          * used for non-PDF files to reset page
          */
         void resetForNonPDFPage(int pageCount);
-    //<end-adobe>
         
     void setPDFBorder(Border newBorder);
 
@@ -316,7 +306,6 @@ public interface PdfDecoderInt {
 
     boolean isHiResScreenDisplay();
     
-    //<start-adobe>
     /**
      * Deprecated on 04/07/2014, please use 
      * updateCursorBoxOnScreen(final int[] rectParams, final int outlineColor) instead
@@ -325,7 +314,7 @@ public interface PdfDecoderInt {
     void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor);
     
     void updateCursorBoxOnScreen(int[] rectParams, int outlineColor);
-    //<end-adobe>
+   
     void useHiResScreenDisplay(boolean value);
 
     void decodePageInBackground(int i) throws Exception;
@@ -380,14 +369,12 @@ public interface PdfDecoderInt {
     
     void setUserOffsets(int x, int y, int mode);
     
-    //<start-adobe>
     /**
      * Deprecated on 07/07/2014
      * please use getPages().setViewableArea instead.
      * @deprecated
      */
     AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
-    //<end-adobe>
     
     boolean hasEmbeddedFonts();
 
@@ -440,10 +427,6 @@ public interface PdfDecoderInt {
     
     String getPageDecodeStatusReport(int status);
     
-    //<start-adobe>
-    //public boolean setDisplayView(int displayView, int orientation);
-    //<end-adobe>
-    
     String getPDFVersion();
     
     ExternalHandlers getExternalHandler();
@@ -456,13 +439,9 @@ public interface PdfDecoderInt {
     
     void setPageParameters(float scaling, int pageNumber, int newRotation);
     
-    //<start-adobe>
     void setStatusBarObject(StatusBar statusBar);
-    //<end-adobe>
     
-    //<start-adobe>
     void setInset(int width, int height);
-    //<end-adobe>
     
     DecoderOptions getDecoderOptions();
     

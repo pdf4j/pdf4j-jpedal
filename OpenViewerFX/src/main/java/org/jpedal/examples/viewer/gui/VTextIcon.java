@@ -85,7 +85,8 @@ public class VTextIcon implements Icon, PropertyChangeListener {
 		fComponent.addPropertyChangeListener(this);
 	}
 	
- 	public String toString(){
+ 	@Override
+    public String toString(){
  		return fLabel;
  	}
 

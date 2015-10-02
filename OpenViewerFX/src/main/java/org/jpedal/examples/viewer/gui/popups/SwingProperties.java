@@ -160,7 +160,7 @@ public class SwingProperties extends JPanel {
     }
     
     //Text to Speech external handler
-    Speech speech;
+    final Speech speech;
             
     final Map reverseMessage =new HashMap();
     

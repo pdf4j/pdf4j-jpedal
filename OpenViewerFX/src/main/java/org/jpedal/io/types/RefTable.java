@@ -716,10 +716,9 @@ public class RefTable {
                 pointer=pdfObject.getInt(PdfDictionary.Prev);
                 
                 //a non-compressed object table can follow a compressed one so we need to allow for this
-                if(!isCompressedStream(pointer, (int)eof)) {
+                if(pointer!=-1 && !isCompressedStream(pointer, (int)eof)) {
                     return readLegacyReferenceTable(rootObj, pointer, (int) eof, currentPdfFile);
                 }
-               
             }
         }
         

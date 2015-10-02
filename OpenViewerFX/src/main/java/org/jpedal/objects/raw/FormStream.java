@@ -278,14 +278,9 @@ public class FormStream {
     		final T3Renderer glyphDisplay=new T3Display(0,false,20,localStore);
             
     		//fix for hires
-    		if(!useHires) {
-                glyphDisplay.setOptimisedRotation(false);
-            } else
-            //if(useHires)
-            {
+    		if(useHires){
                 glyphDisplay.setHiResImageForDisplayMode(useHires);
             }
-
 
             final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile,useHires,null); //switch to hires as well
             glyphDecoder.setParameters(false,true,15,0,false,false);
@@ -461,14 +456,49 @@ public class FormStream {
 
             if(matrix!=null){
 
-    			a = matrix[0];
-    			b = matrix[1];
-    			c = matrix[2];
-    			d = matrix[3];
-    			//scale so they offset correctly
-    			e = matrix[4]*scaling*pageScaling;
-    			f = matrix[5]*scaling*pageScaling;
+                //Added for odd case 22179
+                //pageScaling!=1 added to lock out of html as when not 1 html baseline is affected
+                if (pageScaling==1 && matrix[4] > 0 && matrix[5] > 0) {
+                    
+//                    final float[] BoundingBox = XObject.getFloatArray(PdfDictionary.BBox);
+                    final float[] BBox2 = formObj.getFloatArray(PdfDictionary.Rect);
+                    if (BBox2[1] > BBox2[3]) {
+                        float t = BBox2[1];
+                        BBox2[1] = BBox2[3];
+                        BBox2[3] = t;
+                    }
 
+                    if (BBox2[0] > BBox2[2]) {
+                        float t = BBox2[0];
+                        BBox2[0] = BBox2[2];
+                        BBox2[2] = t;
+                    }
+                    
+                    matrix[0] = (BBox2[2] - BBox2[0]) / (BBox[2] - BBox[0]);
+                    matrix[1] = 0;
+                    matrix[2] = 0;
+                    matrix[3] = (BBox2[3] - BBox2[1]) / (BBox[3] - BBox[1]);
+                    matrix[4] = (BBox2[0] - BBox[0]);
+                    matrix[5] = (BBox2[1] - BBox[1]);
+
+                    a = matrix[0];
+                    b = matrix[1];
+                    c = matrix[2];
+                    d = matrix[3];
+                    //scale so they offset correctly
+                    e = matrix[4];
+                    f = matrix[5];
+                    //pdfStreamDecoder.gs.CTM = new float[][]{{matrix[0],matrix[1],0},{matrix[2],matrix[3],0},{matrix[4],matrix[5],1}};
+                    //newClip=new Area(new Rectangle((int)BBox2[0],(int)BBox2[1],(int)((BBox2[2]-BBox2[0])+2),(int)((BBox2[3]-BBox2[1])+2)));                   
+                }else{
+                    a = matrix[0];
+                    b = matrix[1];
+                    c = matrix[2];
+                    d = matrix[3];
+                    //scale so they offset correctly
+                    e = matrix[4] * scaling * pageScaling;
+                    f = matrix[5] * scaling * pageScaling;
+                }
     			if(c!=0){
     				aa=new BufferedImage(height,width,BufferedImage.TYPE_INT_ARGB);
     				offset=width;
@@ -577,7 +607,6 @@ public class FormStream {
 
             glyphDecoder.setObjectValue(ValueTypes.ObjectStore,localStore);
 
-			glyphDisplay.setOptimisedRotation(false); //fix for hires
 			glyphDecoder.setRenderer(glyphDisplay);
 
 			/**read any resources*/

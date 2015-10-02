@@ -53,7 +53,7 @@ public class Tile {
     public byte[] data;
     public Progression progress;
 
-    public List<TileComponent> components = new ArrayList<TileComponent>();
+    public final List<TileComponent> components = new ArrayList<TileComponent>();
 
     public double getWidth() {
         return (tx1 - tx0);

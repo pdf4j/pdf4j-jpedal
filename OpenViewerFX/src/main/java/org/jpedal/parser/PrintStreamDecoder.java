@@ -48,10 +48,8 @@ import org.jpedal.objects.raw.PdfObject;
  */
 public interface PrintStreamDecoder {
 
-    //<start-server>
     void print(Graphics2D g2, AffineTransform scaling, int currentPrintPage,
                Rectangle userAnnot, CustomPrintHintingHandler customPrintHintingHandler, PdfDecoderInt pdf) throws PrinterException ;
-    //<end-server>
     
     void setObjectValue(int key, Object obj);
 

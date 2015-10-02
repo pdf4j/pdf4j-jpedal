@@ -107,24 +107,9 @@ public class T1Glyph extends BaseT1Glyph
                         if (!(fillPaint instanceof PdfTexturePaint) && ((Color) strokePaint).getRGB() != ((Color) fillPaint).getRGB() &&
                                 strokedPositions.containsKey(String.valueOf((int) g2.getTransform().getTranslateX()) + '-' + (int) g2.getTransform().getTranslateY())) {
 
-                            final Stroke fillStroke = g2.getStroke();
-
                             g2.setPaint(strokePaint);
-                            float w = 1 * (float)g2.getTransform().getScaleX();
-                            if (w < 0) {
-                                w = -w;
-                            }
-                            
-                            w += (32-(float)g2.getTransform().getScaleX());
-                            
-                            
-                            g2.setStroke(new BasicStroke(w));
                             g2.draw(path);
-
                             g2.setPaint(fillPaint);
-                            g2.setStroke(fillStroke);
-
-                            //System.out.println(this.getID()+" "+this.getGlyphName());
                         }
 
                     }
@@ -132,29 +117,9 @@ public class T1Glyph extends BaseT1Glyph
                 }
 
                 if (text_fill_type == GraphicsState.STROKE) {
-
-                    //ensure visible if just stroke
-                    if (text_fill_type != GraphicsState.FILL && scaling > 1.0f) {
-                        // System.out.println(">>"+glyfwidth+" "+scaling+" "+g2.getTransform()+" "+g2.getTransform().getScaleX());
-
-                    	 float w = 1 * (float)g2.getTransform().getScaleX();
-                         if (w < 0) {
-                             w = -w;
-                         }
-                         
-                         w += (32-(float)g2.getTransform().getScaleX());
-                         
-                         
-                         g2.setStroke(new BasicStroke(w));
-                        //g2.setStroke(new BasicStroke(200));
-                        //System.out.println(((scaling/g2.getTransform().getScaleX())));
-
-                    }
-
+                    
                     g2.draw(path);
-
                     strokePaint = g2.getPaint();
-
                     strokedPositions.put(String.valueOf((int) g2.getTransform().getTranslateX()) + '-' + (int) g2.getTransform().getTranslateY(), "x");
 
                 }

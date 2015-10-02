@@ -47,7 +47,7 @@ public abstract class SwingWorker {
         synchronized void clear() { thread = null; }
     }
     
-    private final ThreadVar threadVar;
+    final ThreadVar threadVar;
     
     /**
      * Get the value produced by the worker thread, or null if it

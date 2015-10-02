@@ -53,8 +53,8 @@ public class TileBand {
     public final byte type;
     public CodeBlockInfo codeBlockInfo;
     
-    List<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
-    List<Precinct> precincts = new ArrayList<Precinct>();
+    final List<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
+    final List<Precinct> precincts = new ArrayList<Precinct>();
     
     
     public TileBand(byte type){

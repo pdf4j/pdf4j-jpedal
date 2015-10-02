@@ -41,14 +41,12 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Class reads JPEG images as BufferedImage
- * <p>
- * Here is an example of how the code can be used:-
- * </p>
- * <br>
+ * Class reads Jpeg images as BufferedImage
+ *
+ * <h3>Example:</h3>
  * <pre><code>
  * JpegDecoder decoder = new JpegDecoder();
- * //Make NO assumptions about type of BufferedImage type returned (may change)
+ * // Make NO assumptions about type of BufferedImage type returned (may change)
  * BufferedImage decodedImage = decoder.read(jpegByteData);
  * </code></pre>
  *
@@ -62,13 +60,14 @@ public class JpegDecoder {
     private Info info;
 
     /**
-     * decodes JPEG image data as BufferedImage Make NO assumptions about type
-     * of BufferedImage type returned (may change)
+     * Decodes and returns the Jpeg image as a BufferedImage.
+     * <p>
+     * Make NO assumptions about type of BufferedImage type returned (may change)
      *
-     * @param jpegRawData A byte[] array containing the JPEG data
-     * @return BufferedImage to read image
-     * @throws Exception Provides for different exceptions thrown under java
-     * lang package
+     * @param jpegRawData A byte[] array containing the Jpeg data
+     * @return BufferedImage The decoded image
+     * @throws Exception
+     *
      */
     public BufferedImage read(byte[] jpegRawData) throws Exception {
         info = new Info();
@@ -78,6 +77,8 @@ public class JpegDecoder {
     }
 
     /**
+     * Not recommended for external use.
+     * <p>
      * decodes JPEG image data as non converted bytes <br/>
      * Please note: this method does not perform ycbcr/cmyk/ycck to RGB/gray
      * conversion Example: if ycbcr component image then returned byte array
@@ -96,6 +97,8 @@ public class JpegDecoder {
     }
 
     /**
+     * Not recommended for external use.
+     * <p>
      * decodes JPEG image data as converted(rgb/gray) bytes <br/>
      *
      * @param jpegRawData A byte[] array containing the JPEG data
@@ -263,7 +266,7 @@ public class JpegDecoder {
     }
 
     private byte[] getConvertedBytesFromInfo(Info info, Object[] YCBCR) {
-        int[] pixels;
+
         byte[] pixelsByte = null;
         int r, g, b, c, m, y, k, u, v, index, p = 0, maxLineX = info.maxLineX;
         double cc, mm, yy;
@@ -889,14 +892,26 @@ public class JpegDecoder {
         return component.codeBlock;
     }
 
-    public boolean IsInverted() {
+    /**
+     * Returns whether the data byte is inverted.
+     * @return Whether the data byte is inverted.
+     */
+    public boolean isInverted() {
         return cmykInverted;
     }
 
+    /**
+     * Not recommended for external use.
+     * @param inverted
+     */
     public void setInverted(boolean inverted) {
         this.cmykInverted = inverted;
     }
 
+    /**
+     * Returns the Jpeg information object
+     * @return The Jpeg information object
+     */
     public Info getInfo() {
         return info;
     }

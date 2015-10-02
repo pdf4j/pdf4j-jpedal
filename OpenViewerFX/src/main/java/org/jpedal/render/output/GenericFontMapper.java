@@ -62,9 +62,7 @@ public class GenericFontMapper implements org.jpedal.render.output.FontMapper {
     //list of font mappings to substitute fonts
     public static final Map<String, String> fontMappings = new HashMap<String,String>();
     public static final Map<String, Integer> fontSizeAdjustments = new HashMap<String, Integer>();
-    private static final Map<String, String> fontStyle = new HashMap<String,String>();
-    private static final Map<String, String> fontWeight = new HashMap<String,String>();
-
+    
     //original name in PDF
     private String rawFont;
 
@@ -177,7 +175,7 @@ public class GenericFontMapper implements org.jpedal.render.output.FontMapper {
            }
 
             //Font exists as it is in mappings
-        }else if(!directMapFont(rawFont)) {
+        }else if(!mapFont(rawFont)) {
             final String fontLessAttributes = findAttributes(rawFont);
 
             //Does the font name minus attributes exist in mappings?
@@ -291,29 +289,6 @@ public class GenericFontMapper implements org.jpedal.render.output.FontMapper {
     }
 
     /**
-     * Find out if there is a direct mapping to the given font
-     */
-    private boolean directMapFont(final String s)
-    {
-        final boolean result = mapFont(s);
-
-        if(!result) {
-            return false;
-        }
-
-        if(fontStyle.containsKey(s)) {
-            style = fontStyle.get(s);
-        }
-
-        if(fontWeight.containsKey(s)) {
-            weight = fontWeight.get(s);
-        }
-
-        return true;
-    }
-
-
-    /**
      * Search mappings for a one that sounds close.
      * @param fontName
      * @return
@@ -409,7 +384,7 @@ public class GenericFontMapper implements org.jpedal.render.output.FontMapper {
         return this.getStyle().equals(fontMapper.getStyle()) &&
                 this.getFont().equals(fontMapper.getFont()) &&
                 this.getWeight().equals(fontMapper.getWeight()) &&
-                this.isFontEmbedded() == fontMapper.isFontEmbedded();
+                isFontEmbedded == fontMapper.isFontEmbedded();
     }
 
 }

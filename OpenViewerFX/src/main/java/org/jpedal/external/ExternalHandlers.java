@@ -44,6 +44,7 @@ import org.jpedal.render.DynamicVectorRenderer;
 import java.util.Map;
 import org.jpedal.FileAccess;
 import org.jpedal.display.GUIModes;
+import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.acroforms.creation.SwingFormCreator;
 import org.jpedal.objects.raw.PdfObject;
@@ -54,6 +55,51 @@ import org.jpedal.render.SwingDisplay;
 import org.jpedal.utils.LogWriter;
 
 public class ExternalHandlers {
+
+    private static final ClassLoader loader;
+    
+    private static JavaFXSupport javaFXSupport;
+    
+    private static final String fxClassName="org.jpedal.fonts.glyph.javafx.JavaFXSupportImpl";
+    
+    private static final boolean isXFAPresent;
+    
+    static {
+        
+        loader = ExternalHandlers.class.getClassLoader();
+        /**
+         * javafx
+         */
+        final String fxClassPath="org/jpedal/fonts/glyph/javafx/JavaFXSupportImpl.class";
+        
+        if(loader.getResource(fxClassPath)!=null){
+            try {
+                javaFXSupport=(JavaFXSupport) loader.loadClass(fxClassName).newInstance();
+            } catch (Exception ex) {
+                
+                javaFXSupport=null;
+                
+                if(LogWriter.isOutput()){
+                    LogWriter.writeLog("[PDF] Unable to instance FX "+ex);
+                } 
+            }
+        }
+        
+        /**
+         * xfa
+         */
+        final String xfaClassPath="org/jpedal/objects/acroforms/AcroRendererXFA.class";
+        
+        isXFAPresent=loader.getResource(xfaClassPath)!=null;
+    }
+
+    public static boolean isXFAPresent() {
+       return isXFAPresent;
+    }
+    
+    public static JavaFXSupport getFXHandler() {
+        return javaFXSupport;
+    }
     
     FormFactory userFormFactory;
     
@@ -95,9 +141,7 @@ public class ExternalHandlers {
 
     private Map jpedalActionHandlers;
     
-    //<start-server>
     CustomPrintHintingHandler customPrintHintingHandler;
-    //<end-server>
     
     ColorHandler customColorHandler;//new ExampleColorHandler();
     
@@ -273,7 +317,7 @@ public class ExternalHandlers {
                 customMessageHandler = (CustomMessageHandler) newHandler;
                 break;
                 
-                //<start-server>
+            
             case Options.RenderChangeListener:
                 customRenderChangeListener = (RenderChangeListener) newHandler;
                 break;
@@ -281,7 +325,6 @@ public class ExternalHandlers {
             case Options.CustomPrintHintingHandler:
                 customPrintHintingHandler = (CustomPrintHintingHandler) newHandler;
                 break;
-                //<end-server>
                 
             case Options.CustomOutput:
                 customDVR = (DynamicVectorRenderer) newHandler;
@@ -332,10 +375,8 @@ public class ExternalHandlers {
             case Options.GlyphTracker:
                 return customGlyphTracker;
                 
-                //<start-server>
             case Options.CustomPrintHintingHandler:
                 return customPrintHintingHandler;
-                //<end-server>
             
             case Options.ShapeTracker:
                 return customShapeTracker;
@@ -442,18 +483,7 @@ public class ExternalHandlers {
         this.useXFA=useXFA;
     }
     
-    private static ClassLoader loader;
-    
-    private static boolean isXFAPresent;
     private static final String xfaClassName="org.jpedal.objects.acroforms.AcroRendererXFA";
-        
-    static{
-        loader = ExternalHandlers.class.getClassLoader();
-        final String xfaClassPath="org/jpedal/objects/acroforms/AcroRendererXFA.class";
-        
-        isXFAPresent=loader.getResource(xfaClassPath)!=null;
-        
-    }
     
     public void openPdfFile(final Object userExpressionEngine) {
         

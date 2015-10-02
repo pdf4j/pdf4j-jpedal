@@ -479,19 +479,6 @@ public class Dictionary {
         
         final int numberOfPairs=pairs;
         
-        if(debug){
-            final int length=data.length;
-            System.out.println("count="+pairs+"============================================\n");
-            for(int aa=j;aa<length;aa++){
-                System.out.print((char)data[aa]);
-                
-                if(aa>5 && data[aa-5]=='s' && data[aa-4]=='t' && data[aa-3]=='r'&& data[aa-2]=='e' && data[aa-1]=='a' && data[aa]=='m') {
-                    aa = length;
-                }
-            }
-            System.out.println("\n============================================");
-        }
-        
         //same routine used to count first and then fill with values
         boolean isCountOnly=false,skipToEnd=false;
         byte[][] keys=null,values=null;
@@ -516,21 +503,11 @@ public class Dictionary {
         while(true){
             
             //move cursor to start of text
-            while(data[start]==9 || data[start]==10 || data[start]==13 || data[start]==32 || data[start]==60) {
-                start++;
-            }
-            
+            start = getStart(data, start);
+
             //allow for comment
             if(data[start]==37){
-                while(data[start]!=10 && data[start]!=13){
-                    //System.out.println(data[start]+" "+(char)data[start]);
-                    start++;
-                }
-                
-                //move cursor to start of text
-                while(data[start]==9 || data[start]==10 || data[start]==13 || data[start]==32 || data[start]==60) {
-                    start++;
-                }
+                start = ArrayUtils.skipComment(data, start);
             }
             
             //exit at end
@@ -561,12 +538,9 @@ public class Dictionary {
             {
                 keys[pairs - 1] = tokenKey;
             }
-            
-            //now skip any spaces to key or text
-            while(data[start]==10 || data[start]==13 || data[start]==32) {
-                start++;
-            }
-            
+
+            start=ArrayUtils.skipSpaces(data,start);
+
             final boolean isDirect=data[start]==60 || data[start]=='[' || data[start]=='/';
             
             final byte[] dictData;
@@ -677,18 +651,13 @@ public class Dictionary {
                         }
                         
                         //handleColorSpaces(-1, valueObj,ref, 0, dictData,debug, -1,null, paddingString);
-                    }else if(isObject){
-                        
-                        final PdfObject valueObj=ObjectFactory.createObject(id, ref, pdfObject.getObjectType(), pdfObject.getID());
+                    }else if(isObject) {
+
+                        final PdfObject valueObj = ObjectFactory.createObject(id, ref, pdfObject.getObjectType(), pdfObject.getID());
                         valueObj.setID(id);
-                        readDictionaryFromRefOrDirect(id, valueObj,ref, 0, dictData, -1,objectReader);
-                        objs[pairs-1]=valueObj;
+                        readDictionaryFromRefOrDirect(id, valueObj, ref, 0, dictData, -1, objectReader);
+                        objs[pairs - 1] = valueObj;
                     }
-                    
-                    //lose >> at end
-                    //while(start<data.length && data[start-1]!='>' && data[start]!='>')
-                    //	start++;
-                    
                 }
                 
             }else{ //its 50 0 R
@@ -870,7 +839,17 @@ public class Dictionary {
         }
         
     }
-    
+
+    private static int getStart(byte[] data, int start) {
+
+        byte b=data[start];
+        while(b ==9 || b ==10 || b ==13 || b ==32 || b ==60) {
+            start++;
+            b=data[start];
+        }
+        return start;
+    }
+
     /**
      * @param id
      * @param pdfObject

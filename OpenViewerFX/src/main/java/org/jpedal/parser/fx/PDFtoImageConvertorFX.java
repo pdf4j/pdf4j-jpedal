@@ -32,8 +32,6 @@
  */
 package org.jpedal.parser.fx;
 
-import org.jpedal.render.FXDisplayForRasterizing;
-import org.jpedal.render.FXDisplay;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;

@@ -48,25 +48,18 @@ import org.jpedal.parser.Cmd;
  */
 abstract class GUIDisplay extends BaseDisplay implements DynamicVectorRenderer{
 
-    boolean isSwing=true; //reset in FXDisplay to false
-    
     public void drawUserContent(final int[] type1, final Object[] obj, final Color[] colors) throws PdfException {
         
         /**
          * cycle through items and add to display - throw exception if not valid
          */
         final int count = type1.length;
-        final boolean debug=false;
         int currentType;
         GraphicsState gs;
         
         for (int i = 0; i<count; i++) {
             
             currentType = type1[i];
-            
-            if(debug) {
-                System.out.println(i + " " + getTypeAsString(currentType) + ' ' + ' ' + obj[i]);
-            }
             
             switch(currentType){
                 case DynamicVectorRenderer.FILLOPACITY:
@@ -132,43 +125,4 @@ abstract class GUIDisplay extends BaseDisplay implements DynamicVectorRenderer{
             }
         }
     }
-    
-    private static String getTypeAsString(final int i) {
-        
-        String str = "Value Not set";
-        
-        switch(i){
-            case DynamicVectorRenderer.FILLOPACITY:
-                str="FILLOPACITY";
-                break;
-                
-            case DynamicVectorRenderer.STROKEOPACITY:
-                str="STROKEOPACITY";
-                break;
-                
-            case DynamicVectorRenderer.STROKEDSHAPE:
-                str="STROKEDSHAPE";
-                break;
-                
-            case DynamicVectorRenderer.FILLEDSHAPE:
-                str="FILLEDSHAPE";
-                break;
-                
-            case DynamicVectorRenderer.CUSTOM:
-                str="CUSTOM";
-                break;
-                
-            case DynamicVectorRenderer.IMAGE:
-                str="IMAGE";
-                break;
-                
-            case DynamicVectorRenderer.STRING:
-                str="String";
-                break;
-                
-        }
-        
-        return str;
-    }
-  
 }

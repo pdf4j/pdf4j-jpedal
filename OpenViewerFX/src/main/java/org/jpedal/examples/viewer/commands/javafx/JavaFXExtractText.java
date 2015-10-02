@@ -108,17 +108,17 @@ public class JavaFXExtractText extends GUIExtractText {
         wordList.setId("wordListExtraction");
         radButtons.getChildren().addAll(rectangle, table, wordList);
 
-        table.setPadding(new Insets(0, 0, 0, 45));
-        wordList.setPadding(new Insets(0, 0, 0, 45));
+        table.setPadding(new Insets(0,0,0,20));
+        wordList.setPadding(new Insets(0,0,0,45));
         border.setTop(radButtons);
 
         //Set up Selectedtext Area
         final TextArea selection = new TextArea();
         border.setCenter(selection);
-
+        
         //Setup bottom Radio Buttons and Bottom Buttons
         final VBox allBottom = new VBox();
-        final HBox bottomButtons = new HBox();
+        final HBox bottomButtons = new HBox(15);
         final HBox bottomRadioButtons = new HBox();
         final RadioButton extractAsXML = new RadioButton("Extract as XML");
         final RadioButton extractAsText = new RadioButton("Extract as Text");
@@ -138,7 +138,10 @@ public class JavaFXExtractText extends GUIExtractText {
         bottomButtons.setAlignment(Pos.BOTTOM_RIGHT);
         bottomButtons.getChildren().addAll(help, cancel, extractButton);
         allBottom.getChildren().addAll(bottomRadioButtons, bottomButtons);
-
+        
+        extractAsXML.setPadding(new Insets(0,0,0,10));
+        extractAsText.setPadding(new Insets(0,10,13,0));
+        bottomButtons.setPadding(new Insets(0,5,10,0));
         /**
          * Setup button listeners.
          */
@@ -180,7 +183,15 @@ public class JavaFXExtractText extends GUIExtractText {
 
         selection.setText(updateSelection(formatGroup.getSelectedToggle(), extractAsXML.isSelected(), decode_pdf, commonValues, currentGUI));
         border.setBottom(allBottom);
+       
+        BorderPane.setMargin(selection, new Insets(10,10,10,10));
+        BorderPane.setMargin(radButtons, new Insets(10,10,10,10));
+        BorderPane.setMargin(bottomRadioButtons, new Insets(10,10,10,10));
+        BorderPane.setMargin(bottomButtons, new Insets(10,10,10,10));
+        
         textExtractionOptions.show();
+       
+        
     }
 
     private static String updateSelection(final Toggle selected, final boolean isXML, final PdfDecoderInt decode_pdf, final Values commonValues, final GUIFactory currentGUI) {

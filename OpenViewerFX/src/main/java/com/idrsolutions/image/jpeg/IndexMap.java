@@ -38,7 +38,7 @@ package com.idrsolutions.image.jpeg;
 public class IndexMap {
     
     public int index;
-    public Object[] children;
+    public final Object[] children;
     
     public IndexMap(int index, Object[] children){
         this.index = index;

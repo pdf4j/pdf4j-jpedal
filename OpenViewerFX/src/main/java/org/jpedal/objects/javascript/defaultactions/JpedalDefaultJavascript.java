@@ -53,7 +53,10 @@ import org.mozilla.javascript.Scriptable;
  */
 
 public class JpedalDefaultJavascript{
-	// <start-demo><end-demo>
+	
+	/** added to make the testing be more predictable */
+	public static boolean testingStopAlertBoxes;
+	public static boolean testingSetStaticDate;
 	
 	private static final boolean DebugDefaultJavascript = false;
 
@@ -275,8 +278,7 @@ public class JpedalDefaultJavascript{
 			return "";
 		}
 		
-		final byte[] bytes = StringUtils.toBytes(arg1);
-		final double value = NumberUtils.parseDouble(0, bytes.length, bytes);
+		final double value = Double.parseDouble(arg1);
 		
 		//a seperator is used for dates, phone numbers, times, ete
 		int decimalPoints = -1,minWidth=0;

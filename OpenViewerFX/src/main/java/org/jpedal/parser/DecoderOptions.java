@@ -240,7 +240,6 @@ public class DecoderOptions {
         isXMLExtraction=true;
     }
 
-    //<start-adobe>
     /**
      * returns object containing grouped text of last decoded page
      * - if no page decoded, a Runtime exception is thrown to warn user
@@ -279,8 +278,7 @@ public class DecoderOptions {
             return new PdfGroupingAlgorithms(pdfBackgroundData, pageData, isXMLExtraction);
         }
     }
-    //<end-adobe>
-
+    
 
     public void set(final Map values) throws PdfException {
         //read values

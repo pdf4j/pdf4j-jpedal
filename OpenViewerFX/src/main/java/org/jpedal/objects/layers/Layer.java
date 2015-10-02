@@ -44,7 +44,7 @@ public class Layer {
 
     private final PdfLayerList layerList;
 
-    public String name;
+    public final String name;
     
     Layer(final String  name, final PdfLayerList layerList) {
 

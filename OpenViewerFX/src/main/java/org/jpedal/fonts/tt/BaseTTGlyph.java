@@ -48,9 +48,6 @@ public abstract class BaseTTGlyph {
     /**paths for the letter, marked as transient so it wont be serialized */
     transient Vector_Path paths=new Vector_Path(10);
 
-    /**paths for the letter, marked as transient so it wont be serialized */
-    transient Path pathsFX;
-
     protected boolean ttHintingRequired;
 
     public static boolean useHinting = true;
@@ -799,15 +796,15 @@ public abstract class BaseTTGlyph {
     }
 
     public void createPaths(final int[] pX, final int[] pY, final boolean[] onCurve, final boolean[] endOfContour, final int endIndex) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("createPaths Not supported yet.");
     }
 
     void clearPaths() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("clearPaths Not supported yet.");
     }
 
     public void render(final int text_fill_type, final Graphics2D g2, final float scaling, final boolean isFormGlyph) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("render Not supported yet."); 
     }
 
     public void setWidth(final float width) {
@@ -853,7 +850,7 @@ public abstract class BaseTTGlyph {
     }
 
     public Path getPath() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("getPath Not supported yet."); 
     }
 
     public int getGlyphNumber() {
@@ -865,7 +862,7 @@ public abstract class BaseTTGlyph {
     }
 
     public Area getShape() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("getShape Not supported yet.");
     }
 
     void createHintedGlyph() {

@@ -203,12 +203,13 @@ public class CCITT {
     private int processItem;
     private int compression = 2;
     private int changingElemSize;
-    private int bitP, bp, w, h, endianOrder, dim1, bitsToPut;
+    private int bitP, bp, dim1, bitsToPut;
+    private final int endianOrder, w;// h;
        
     public CCITT(int fillOrder, int w, int h) {
         this.endianOrder = fillOrder;
         this.w = w;
-        this.h = h;
+        //this.h = h;
         this.bitP = 0;
         this.bp = 0;
         this.prevItems = new int[w + 1];
@@ -243,9 +244,9 @@ public class CCITT {
 
         int a0, a1, b1, b2;
         int[] b = new int[2];
-        int entry, code, bits, color;
+        int entry, code, bits;
         boolean isWhite;
-        int currIndex = 0;
+        int currIndex;
         int temp[];
 
         dim1 = tiffT4Options & 0x01;
@@ -357,11 +358,9 @@ public class CCITT {
         bp = 0;
 
         int scanlineStride = (w + 7) / 8;
-        int bufferOffset = 0;
 
         int a0, a1, b1, b2;
         int entry, code, bits;
-        byte color;
         boolean isWhite;
         int currIndex;
         int temp[];
@@ -518,10 +517,9 @@ public class CCITT {
     }
 
     private void processNextLine(int lineOffset, int bitOffset) {
-        int bits = 0, code = 0, isT = 0;
+        int bits, code, isT;
         int current, entry, twoBits;
         boolean isWhite = true;
-        int dstEnd = 0;
 
         changingElemSize = 0;
 
@@ -572,7 +570,6 @@ public class CCITT {
                 current = readBalanceBits(4);
                 entry = FIRSTBLACKS[current];
 
-                isT = entry & 0x0001;
                 bits = (entry >>> 1) & 0x000f;
                 code = (entry >>> 5) & 0x07ff;
 
@@ -676,7 +673,7 @@ public class CCITT {
     }
 
     private int decodeWhiteCodeWord() {
-        int current, entry, bits, isT, twoBits, code = -1;
+        int current, entry, bits, isT, twoBits, code;
         int runLength = 0;
         boolean isWhite = true;
 
@@ -713,7 +710,7 @@ public class CCITT {
     }
 
     private int decodeBlackCodeWord() {
-        int current, entry, bits, isT, twoBits, code = -1;
+        int current, entry, bits, isT, code;
         int runLength = 0;
         boolean isWhite = false;
 
@@ -722,7 +719,6 @@ public class CCITT {
             entry = FIRSTBLACKS[current];
 
             // Get the 3 fields from the entry
-            isT = entry & 0x0001;
             bits = (entry >>> 1) & 0x000f;
             code = (entry >>> 5) & 0x07ff;
 
@@ -899,7 +895,7 @@ public class CCITT {
         int i1 = (b & LEFTBITS[bitsLeft]) << (bitsToGet - bitsLeft);
         int i2 = (next & CURBITS[bitsFromNextByte]) >>> (8 - bitsFromNextByte);
 
-        int i3 = 0;
+        int i3;
         if (bitsFromNext2NextByte != 0) {
             i2 <<= bitsFromNext2NextByte;
             i3 = (next2next & CURBITS[bitsFromNext2NextByte])

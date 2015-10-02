@@ -90,85 +90,6 @@ public class ImageOps {
 		return data;
 	}
 
-	private static  byte[] rotateOneBitImage(final int w, final int h, final byte[] data, final int newH, final int newW) {
-		final int bytesInRow=(w+7)/8;
-		final int newBytesInRow=(newW+7)/8;
-		
-		final byte[] newData=new byte[newBytesInRow*newH];
-
-		//read x,y and set as y,x
-		for(int y=0;y<h;y++){
-			for(int x=0;x<w;x++){
-
-				//read pixel in existing array as x,y
-				final int byteUsed=(((h-1)-y)*bytesInRow)+(x>>3);
-
-				final byte pixelByte=data[byteUsed];
-
-				//clever optimisation here when ready
-				//8 empty bits means ignore next 8 bits
-				if(pixelByte==0){
-					x += 7;
-				}else{
-					final int bitUsed=x & 7;
-
-					//if set we need to set in second array, set pixel in new array as y,x
-					if((pixelByte & bitCheck[bitUsed])== bitCheck[bitUsed]){
-
-						//read pixel in existing array as x,y
-						final int newByteUsed=(x*newBytesInRow)+(y>>3);
-
-						byte newPixelByte=newData[newByteUsed];
-
-						final int newBitUsed= y & 7;
-
-						//switch on
-						newPixelByte= (byte) (newPixelByte | bitCheck[newBitUsed]);
-
-						//write back
-						newData[newByteUsed]=newPixelByte;
-
-					}
-				}
-			}
-		}
-		
-		return newData;
-	}
-
-	private static byte[] rotateByteImage(final int w, final int h, int componentCount, final byte[] data){
-		
-		final int temp = (data.length/(w*h));
-		if(temp!=componentCount){
-			componentCount=temp;
-		}
-		
-		final int bytesInRow=w*componentCount;
-		final int newBytesInRow=h*componentCount;
-		final byte[] rotatedData = new byte[data.length];
-		
-		for(int y=0;y<h;y++){
-			for(int x=0;x<bytesInRow;x+=componentCount){
-				int c = 0;
-				
-				//ClockWise
-				final int convertPoint = ((x/componentCount)*(newBytesInRow))+(newBytesInRow-(y*componentCount)-componentCount);
-				
-				//Anti-ClockWise
-//				int convertPoint = (((w-1)-(x/componentCount))*newBytesInRow)+(y*componentCount);
-				
-				while(c<componentCount){
-					
-					//x=(x+c)
-					//y=(y*bytesInRow)
-					rotatedData[convertPoint+c] = data[(y*bytesInRow)+(x+c)];
-					c++;
-				}
-			}
-		}
-		return rotatedData;
-	}
-
 	public static byte[] invertImage(byte[] data, final int w, final int h, final int d,int comp, final byte[] index) {
         
         //either process or just return
@@ -189,28 +110,6 @@ public class ImageOps {
 		}else if(d==1){
 
 			return ImageOps.invertOneBitImage(w, h, data);
-
-		}
-		return null;
-	}
-
-	public static byte[] rotateImage(final byte[] data, final int w, final int h, final int d,int comp, final byte[] index) {
-		
-		//either process or just return
-		if(d==8){ //add in next
-			if(index!=null) {
-                comp = 1;
-            }
-			/**Rotated H and W are calcualted within method*/
-			return ImageOps.rotateByteImage(w, h, comp, data);
-
-		}else if(d==4){
-
-
-
-		}else if(d==1){
-			/**The W and H are swapped for the new values, this gives rotated coords*/
-			return ImageOps.rotateOneBitImage(w, h, data, w, h);
 
 		}
 		return null;

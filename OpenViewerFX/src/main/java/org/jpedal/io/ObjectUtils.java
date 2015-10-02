@@ -32,6 +32,7 @@
  */
 package org.jpedal.io;
 
+import org.jpedal.io.types.ArrayUtils;
 import org.jpedal.objects.raw.DecodeParmsObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
@@ -369,14 +370,7 @@ public class ObjectUtils {
             //allow for comment
             if(raw[jj]==37){
 
-                while(jj<length && raw[jj]!=10 && raw[jj]!=13) {
-                    jj++;
-                }
-
-                //move cursor to start of text
-                while(jj<length &&(raw[jj]==9 || raw[jj]==10 || raw[jj]==13 || raw[jj]==32 || raw[jj]==60)) {
-                    jj++;
-                }
+                jj = ArrayUtils.skipComment(raw, jj);
             }
 
             if(jj>5 && raw[jj-5]=='s' && raw[jj-4]=='t' && raw[jj-3]=='r' && raw[jj-2]=='e' && raw[jj-1]=='a' &&raw[jj]=='m') {

@@ -63,8 +63,8 @@ public class Info {
     //colorspace info
     public int enumerateCS;
     
-    public List<Integer> contiguousCodeStreamBoxes = new ArrayList<Integer>();
-    public List<Integer> tileOffsets = new ArrayList<Integer>();
+    public final List<Integer> contiguousCodeStreamBoxes = new ArrayList<Integer>();
+    public final List<Integer> tileOffsets = new ArrayList<Integer>();
     
     public Tile tileProcess;
       
@@ -76,8 +76,8 @@ public class Info {
     public Palette palette;
     public Cmap cmap;
     
-    public HashMap<Integer,Tile> tilesMap = new HashMap<Integer,Tile>();
+    public final HashMap<Integer,Tile> tilesMap = new HashMap<Integer,Tile>();
     
-    public HashMap<Integer,Integer> cDef = new HashMap<Integer,Integer>();
+    public final HashMap<Integer,Integer> cDef = new HashMap<Integer,Integer>();
     
 }

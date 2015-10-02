@@ -46,8 +46,4 @@ public interface T3Renderer extends DynamicVectorRenderer {
      */
     void lockColors(PdfPaint strokePaint, PdfPaint nonstrokePaint, boolean lockColour);
 
-    /**
-	 * used internally - please do not use
-	 */
-    void setOptimisedRotation(boolean value);
 }

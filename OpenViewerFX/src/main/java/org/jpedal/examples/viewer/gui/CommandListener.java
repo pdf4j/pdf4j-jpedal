@@ -32,33 +32,32 @@
  */
 package org.jpedal.examples.viewer.gui;
 
-
+import org.jpedal.external.ExternalHandlers;
+import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Viewer;
-import org.jpedal.examples.viewer.gui.javafx.JavaFXCommandListener;
 //
 
 /**
- * This class is a wrapper for SwingCommandListener and JavaFXCommandListener.
+ * This class is fxSupport wrapper for SwingCommandListener and JavaFXCommandListener.
  * single listener to execute all GUI commands and call Commands to execute
  */
 public class CommandListener {
 	
-    JavaFXCommandListener commandListenerFX;
-    //
-
+    CommandListenerImpl commandListener;
+    
 	public CommandListener(final Commands currentCommands) {
         if(Viewer.isFX()){
-            commandListenerFX = new JavaFXCommandListener(currentCommands);
-        }else{
-            //
+            JavaFXSupport fxSupport = ExternalHandlers.getFXHandler();
+            if(fxSupport!=null){
+                commandListener =  (CommandListenerImpl) fxSupport.getCommandHandler(currentCommands);
+            }
         }
+        //
 	}
 
-    //
-
-    public JavaFXCommandListener getJavaFXCommandListener(){
-        return commandListenerFX;
+    public CommandListenerImpl getCommandListener(){
+        return commandListener;
     }
     
 }

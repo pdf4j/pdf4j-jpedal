@@ -49,14 +49,21 @@ import java.util.*;
 import java.util.zip.Deflater;
 
 /**
- * Class writes bufferedimages as Fast deflated Png
- * <p>
- * Here is an example of how the code can be used:-
- * </p>
+ * Class writes BufferedImages as Fast deflated Png
+ *
+ * <h3>Example 1:</h3>
  * <pre><code>
  * PngEncoder encoder = new PngEncoder();
- * encoder.write(image_to_save, outputStream);
+ * encoder.write(image, outputStream);
  * </code></pre>
+ *
+ * <h3>Example 2 (8 bit quantisation compressed):</h3>
+ * <pre><code>
+ * PngEncoder encoder = new PngEncoder();
+ * encoder.setCompressed(true);
+ * encoder.write(image, outputStream);
+ * </code></pre>
+ *
  */
 public class PngEncoder {
 
@@ -66,14 +73,13 @@ public class PngEncoder {
     }
 
     /**
-     * writes image as PNG in outputstream
+     * Writes BufferedImage as Png to OutputStream
      * <p>
      * This method does not close the provided OutputStream after the write
      * operation has completed; it is the responsibility of the caller to close
-     * the stream,
-     * </p>
+     * the stream.
      *
-     * @param image BufferedImage to write image
+     * @param image BufferedImage The image to write
      * @param outputStream The stream to write the image to
      * @throws IOException if the image wasn't written
      */
@@ -86,17 +92,16 @@ public class PngEncoder {
     }
 
     /**
-     * Returns whether encoder uses 8 bit quantisation compression
-     * @return the compression used 
+     * Returns whether 8 bit quantisation compression is enabled
+     * @return Whether compression is enabled
      */
     public boolean isCompressed() {
         return compress;
     }
 
     /**
-     * writes image as 8 bit quantized
-     *
-     * @param compress compression default is false
+     * Set true to enable 8 bit quantisation compression in png generation
+     * @param compress If compression should be enabled
      */
     public void setCompressed(boolean compress) {
         this.compress = compress;
@@ -250,7 +255,7 @@ public class PngEncoder {
         final int dim = bh * bw;
         
         int[] intPixels;
-        byte[] pixels = null;
+        byte[] pixels;
         byte[] trnsBytes = null;
         int val;
         
@@ -384,10 +389,6 @@ public class PngEncoder {
                 }
             }            
         }
-        
-        pixels = null;
-        rgb = null;
-        argb = null;
 
         int bitDepth = 8;
         int colType = 3;
@@ -432,7 +433,7 @@ public class PngEncoder {
         outputStream.write(chunk.getCRCValue());
     }
     
-    public static Object[] getIndexedMap(int[][] pixel){
+    private static Object[] getIndexedMap(int[][] pixel){
         int h = pixel.length;
         int w = pixel[0].length;
         int [] temp;

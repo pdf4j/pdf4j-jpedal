@@ -38,7 +38,6 @@ import java.util.Map;
 import javafx.collections.ObservableList;
 
 import org.jpedal.examples.viewer.gui.generic.GUISearchList;
-import org.jpedal.utils.Messages;
 
 
 /**used by search function ro provide page number as tooltip*/
@@ -46,7 +45,7 @@ public class JavaFXSearchList extends javafx.scene.control.ListView implements G
 
 	private final Map textPages;
 	private final Map textAreas;
-	private String pageStr="Page";
+//	private String pageStr="Page";
 	//private int Length = 0;
     
     int status = NO_RESULTS_FOUND;
@@ -67,7 +66,7 @@ public class JavaFXSearchList extends javafx.scene.control.ListView implements G
 		
 		this.textPages=textPages;
 		this.textAreas=textAreas;
-		pageStr=Messages.getMessage("PdfViewerSearch.Page")+ ' ';
+//		pageStr=Messages.getMessage("PdfViewerSearch.Page")+ ' ';
 	}
 
 //	@Override

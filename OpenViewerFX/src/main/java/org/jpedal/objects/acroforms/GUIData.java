@@ -36,6 +36,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import org.jpedal.external.CustomFormPrint;
+import org.jpedal.external.ExternalHandlers;
 
 import org.jpedal.objects.PdfPageData;
 import static org.jpedal.objects.acroforms.ReturnValues.FORMOBJECTS_FROM_NAME;
@@ -155,12 +156,19 @@ public class GUIData {
 
         final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);//FT
 
+        final int formFactoryType=formFactory.getType();
+        
         final boolean[] flags = formObject.getFieldFlags();//Ff
 
-		//<start-noform>
+		//ExternalHandlers.isXFAPresent() will only be true in forms version of PDF2HTML
+        if(!ExternalHandlers.isXFAPresent() && (formFactory.getType()==FormFactory.HTML || formFactoryType==FormFactory.SVG)){
+                
+            if((formObject.getDictionary(PdfDictionary.RichMediaContent)!=null || subtype==PdfDictionary.Link)){
+                retComponent = formFactory.annotationButton(formObject);
+            }
 
         /** setup field */
-        if (subtype == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
+        }else if (subtype == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
 
             boolean isPushButton = false, isRadio = false;// hasNoToggleToOff = false, radioinUnison = false;
             if (flags != null) {
@@ -229,21 +237,11 @@ public class GUIData {
 
                 retComponent = formFactory.signature(formObject);
 
-            } else{
-
-                /**
-                //<end-noform>
-                if((formFactory.getType()==FormFactory.HTML || formFactory.getType()==FormFactory.SVG) &&
-                    (formObject.getDictionary(PdfDictionary.RichMediaContent)!=null || subtype==PdfDictionary.Link))
-                /**/	
+            } else{	
                 retComponent = formFactory.annotationButton(formObject);
-
-                //<start-noform>
             }
         }
-		//<end-noform>
-
-
+		
         if (retComponent != null) {
             formObject.setGUIComponent(retComponent,formFactory.getType());
             setGUIComp(formObject, retComponent);
@@ -667,28 +665,28 @@ public class GUIData {
     }
 
     protected void removeAllComponentsFromScreen() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("removeAllComponentsFromScreen Not supported yet.");
     }
 
     public void setAutoFontSize(final FormObject formObj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("setAutoFontSize Not supported yet."); 
     }
 
      public void renderFormsOntoG2(final Object raw, final int pageIndex, final int currentIndent,
                                   final int currentRotation, final Map componentsToIgnore, final FormFactory formFactory, final int pageHeight) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("renderFormsOntoG2Not supported yet."); 
     }
 
     public void setCustomPrintInterface(final CustomFormPrint customFormPrint) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("setCustomPrintInterface Not supported yet."); 
     }
 
     public void resetScaledLocation(final float scaling, final int i, final int i0) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("resetScaledLocation Not supported yet."); 
     }
 
     public void setRootDisplayComponent(final Object formsPane) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("setRootDisplayComponent Not supported yet."); 
     }
 
     /**
@@ -706,6 +704,6 @@ public class GUIData {
     }
 
     public void renderFormsOntoG2InHeadless(final Object raw, final int pageIndex, final int currentRotation, final Map componentsToIgnore, final FormFactory formFactory, final int pageHeight)  {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("renderFormsOntoG2InHeadless Not supported yet.");
     }
 }

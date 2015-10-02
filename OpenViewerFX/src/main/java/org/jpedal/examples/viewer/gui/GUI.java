@@ -1208,7 +1208,7 @@ public abstract class GUI implements GUIFactory {
             
             if(additionaValuesforPage!=null){
                 
-                FXDisplay fxDisplay=(FXDisplay) decode_pdf.getDynamicRenderer();
+               DynamicVectorRenderer fxDisplay= decode_pdf.getDynamicRenderer();
                 
                 try {
                     fxDisplay.drawAdditionalObjectsOverPage(additionaValuesforPage.getType(), null,additionaValuesforPage.getObj());

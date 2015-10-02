@@ -429,20 +429,16 @@ public class Commands {
                 viewStack.add((Integer) args[0], (Rectangle) args[1], (Integer) args[2]);
                 break;
             case FORWARD:
-                //<start-adobe>
                 //go forward to next viewed location
                 if (viewStack.forward() != null) {
                     decode_pdf.getFormRenderer().getActionHandler().changeTo(null, viewStack.forward().getPage(), viewStack.forward().getLocation(), viewStack.forward().getType(), false);
                 }
-                //<end-adobe>
                 break;
             case BACK:
-                //<start-adobe>
                 //go back to last viewed location
                 if (viewStack.back() != null) {
                     decode_pdf.getFormRenderer().getActionHandler().changeTo(null, viewStack.back().getPage(), viewStack.back().getLocation(), viewStack.back().getType(), false);
                 }
-                //<end-adobe>
                 break;
             case PAGECOUNT:
                 status = PageCount.execute(decode_pdf);

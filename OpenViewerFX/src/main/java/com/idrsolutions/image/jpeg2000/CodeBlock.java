@@ -124,6 +124,6 @@ public class CodeBlock {
     /**
      *
      */
-    public List<BlockData> dataList = new ArrayList<BlockData>();
+    public final List<BlockData> dataList = new ArrayList<BlockData>();
     
 }

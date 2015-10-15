@@ -38,8 +38,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 
-import javafx.scene.layout.Pane;
-
 import org.jpedal.exception.PdfException;
 
 import org.jpedal.external.Options;
@@ -868,7 +866,7 @@ public class GUIDisplay implements Display{
     }
 
     @Override
-    public void paintPage(final Pane box, final AcroRenderer formRenderer, final TextLines textLines) {
+    public void paintPage(final Object box, final AcroRenderer formRenderer, final TextLines textLines) {
         throw new UnsupportedOperationException("paintPage Not supported yet.");
     }
     

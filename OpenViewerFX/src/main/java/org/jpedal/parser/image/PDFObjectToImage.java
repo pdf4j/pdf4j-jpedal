@@ -72,7 +72,7 @@ public class PDFObjectToImage {
         
         final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile,useHiRes,null); //switch to hires as well
         
-        glyphDecoder.setParameters(parserOptions.isPageContent(),parserOptions.isRenderPage(), parserOptions.getRenderMode(), parserOptions.getExtractionMode(), false,parserOptions.useJavaFX());
+        glyphDecoder.setParameters(parserOptions.isPageContent(),parserOptions.isRenderPage(), parserOptions.getRenderMode(), parserOptions.getExtractionMode(), false,false);
         glyphDecoder.setObjectValue(ValueTypes.ObjectStore, localStore);
         glyphDisplay.setHiResImageForDisplayMode(useHiRes);
         glyphDecoder.setRenderer(glyphDisplay);

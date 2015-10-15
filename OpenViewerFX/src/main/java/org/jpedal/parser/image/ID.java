@@ -233,7 +233,7 @@ public class ID extends ImageDecoder {
                         gs.x=gs.CTM[2][0];
                         gs.y=gs.CTM[2][1];
 
-                        current.drawImage(parserOptions.getPageNumber(), image, gs, false, image_name, optionsApplied, -1);
+                        current.drawImage(parserOptions.getPageNumber(), image, gs, false, image_name, -1);
                     }else{
                         if(clippedImagesExtracted) {
                             generateTransformedImage(image, image_name);

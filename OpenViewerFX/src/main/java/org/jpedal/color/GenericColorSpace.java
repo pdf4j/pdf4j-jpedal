@@ -59,7 +59,6 @@ import org.jpedal.utils.LogWriter;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import javax.imageio.metadata.IIOMetadataNode;
-import com.idrsolutions.image.jpeg2000.Jpeg2000Decoder;
 
 import org.w3c.dom.NodeList;
 
@@ -1143,74 +1142,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
 
         BufferedImage image = null;
 
-        try {
-            Jpeg2000Decoder decoder = new Jpeg2000Decoder();
-            image = decoder.read(data);
-            IndexedColorMap = null;//make index null as we already processed
-        } catch (Exception ex) {
-
-            //
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in JPEG2000toImage  " + ex);
-            }
-        }
-        
-        if (image != null) {
-
-            //does not work correctly if indexed so we manipulate the data
-            //if you need to alter check  the images on page 42, 53, 71, 80, 89, 98, 107 and 114 are displayed in black
-            //infinite/Plumbing_Fixtures_2_V1_replaced.pdf
-            byte[] index = getIndexedMap();
-            if (index != null) {
-
-                if (value != ColorSpaces.DeviceRGB) {
-                    index = convertIndexToRGB(index);
-                    final int count = index.length;
-                    for (byte i = 0; i < count; i++) {
-                        index[i] = (byte) (index[i] ^ 255);
-                    }
-                }
-
-                data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-                image = ColorSpaceConvertor.convertIndexedToFlat(d, w, h, data, index, false, false);
-
-            }
-
-            image = cleanupImage(image, pX, pY);
-
-            //ensure white background
-            if (image.getType() == BufferedImage.TYPE_BYTE_INDEXED) {
-                final BufferedImage oldImage = image;
-                final int newW = image.getWidth();
-                final int newH = image.getHeight();
-                image = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
-                final Graphics2D g2 = (Graphics2D) image.getGraphics();
-                g2.setPaint(Color.WHITE);
-                g2.fillRect(0, 0, newW, newH);
-                g2.drawImage(oldImage, 0, 0, null);
-
-            }
-
-            ColorSpace cSpace = image.getColorModel().getColorSpace();
-            int csType = cSpace.getType();
-            int trnsType = image.getColorModel().getTransferType();
-            if (image.getType() == BufferedImage.TYPE_CUSTOM
-                    && (csType == ColorSpace.CS_sRGB || csType == ColorSpace.TYPE_RGB)
-                    && trnsType == DataBuffer.TYPE_BYTE) {
-                BufferedImage temp = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-                int[] tempData = ((DataBufferInt) temp.getRaster().getDataBuffer()).getData();
-                byte[] imgData = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-                int p = 0;
-                for (int i = 0; i < tempData.length; i++) {
-                    int rgb = ((imgData[p] & 0xFF) << 16) | ((imgData[p + 1] & 0xFF) << 8) | ((imgData[p + 2] & 0xFF));
-                    tempData[i] = rgb;
-                    p += 3;
-                }
-                image = temp;
-            } else {
-                image = ColorSpaceConvertor.convertToRGB(image);
-            }
-        }
+        //
 
         return image;
     }
@@ -1493,18 +1425,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     public BufferedImage JPEG2000ToImage(final byte[] data, final int pX, final int pY, final float[] decodeArray) throws PdfException {
            
         BufferedImage image=null;
-        
-        try {
-            Jpeg2000Decoder decoder = new Jpeg2000Decoder();
-            image = decoder.read(data);
-            image = cleanupImage(image, pX, pY);
-        } catch (Exception ex) {
-
-            //
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in JPEG2000toImage  " + ex);
-            }
-        }
+        //
         
         return image;
         

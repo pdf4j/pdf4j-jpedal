@@ -36,7 +36,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.Serializable;
-import javafx.scene.shape.Path;
 
 import org.jpedal.parser.Cmd;
 import org.jpedal.utils.LogWriter;
@@ -588,7 +587,7 @@ public class SwingShape implements Serializable, PdfShape
     }
 
     @Override
-    public Path getPath() {
+    public Object getPath() {
         return null;
     }
 }

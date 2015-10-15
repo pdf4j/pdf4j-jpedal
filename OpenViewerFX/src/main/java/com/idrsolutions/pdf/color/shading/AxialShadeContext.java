@@ -43,10 +43,10 @@ final float t0;
     final double y1;
     final double deltaX;
     final double deltaY;
-    final double deltaT;
+    //final double deltaT;
     final double multiXY;
-    final double textX;
-    final double textY;
+    //final double textX;
+    //final double textY;
 
     private final AffineTransform shadeAffine;
     private AffineTransform inversed;
@@ -56,8 +56,8 @@ final float t0;
         
         this.shadingColorSpace = shadingColorSpace;
         this.function = function;
-        this.textX = textX;
-        this.textY = textY;
+        //this.textX = textX;
+        //this.textY = textY;
 //        this.pageHeight = pageHeight;
 
         final float[] newDomain = shadingObject.getFloatArray(PdfDictionary.Domain);
@@ -72,7 +72,7 @@ final float t0;
 
         t0 = domain[0];
         t1 = domain[1];
-        deltaT = Math.abs(t1 - t0);
+        //deltaT = Math.abs(t1 - t0);
 
         if (mm == null) {
             shadeAffine = new AffineTransform();

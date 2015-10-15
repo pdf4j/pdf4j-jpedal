@@ -359,4 +359,8 @@
   <startViewerHeight value="-1"/>
   <!--Flag to track the side tab bar expanded width between sessions-->
   <trackSideTabExpandedSize value="false"/>
+  <!--Flag to set the JavaFX transition type-->
+  <transitionType value="None"/>
+  <!--Allow search result list to update during search (SWING VERSION ONLY)-->
+  <updateResultsDuringSearch value="true"/>
 </properties>

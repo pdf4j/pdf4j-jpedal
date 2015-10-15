@@ -902,7 +902,7 @@ public class Parser {
 
         res.setupResources(current, false, Resources, page, getIO());
 
-        currentDisplay.init(pageData.getMediaBoxWidth(page), pageData.getMediaBoxHeight(page), pageData.getRotation(page),options.getPageColor());
+        currentDisplay.init(pageData.getMediaBoxWidth(page), pageData.getMediaBoxHeight(page), options.getPageColor());
 
         if((!currentDisplay.isHTMLorSVG())&& (options.getTextColor()!=null)){
                 currentDisplay.setValue(DynamicVectorRenderer.ALT_FOREGROUND_COLOR, options.getTextColor().getRGB());

@@ -39,24 +39,20 @@ import java.awt.geom.Area;
 import java.awt.image.*;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.color.*;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.ErrorTracker;
 import org.jpedal.external.ImageDataHandler;
 import org.jpedal.external.ImageHandler;
-import org.jpedal.images.ImageOps;
 import org.jpedal.images.ImageTransformer;
 import org.jpedal.images.ImageTransformerDouble;
 import org.jpedal.images.SamplingFactory;
 import org.jpedal.io.*;
-import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfImageData;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.raw.*;
 import org.jpedal.parser.*;
 import org.jpedal.parser.image.data.ImageData;
 import org.jpedal.parser.image.utils.*;
-import org.jpedal.render.RenderUtils;
 import org.jpedal.utils.LogWriter;
 
 public class ImageDecoder extends BaseDecoder{
@@ -106,9 +102,6 @@ public class ImageDecoder extends BaseDecoder{
     
     /**flag to show raw images extracted*/
     boolean rawImagesExtracted=true;
-    
-    //used internally to show optimisations
-    int optionsApplied;
     
     /**name of current image in pdf*/
     String currentImage = "";
@@ -531,7 +524,7 @@ public class ImageDecoder extends BaseDecoder{
             final boolean isHTML=current.isHTMLorSVG();
             
             if(isHTML) {
-                current.drawImage(parserOptions.getPageNumber(), image, gs, false, image_name, optionsApplied, -3);
+                current.drawImage(parserOptions.getPageNumber(), image, gs, false, image_name, -3);
             }
             
             /**
@@ -644,7 +637,7 @@ public class ImageDecoder extends BaseDecoder{
                     gs.x=x;
                     gs.y=y;
                     
-                    current.drawImage(parserOptions.getPageNumber(),image,gs,false,image_name,optionsApplied, -2);
+                    current.drawImage(parserOptions.getPageNumber(),image,gs,false,image_name, -2);
                     
                 }
             }else{
@@ -677,7 +670,7 @@ public class ImageDecoder extends BaseDecoder{
                     if ((renderImages || !parserOptions.isPageContent())) {
                         gs.x=x;
                         gs.y=y;
-                        current.drawImage(parserOptions.getPageNumber(),image,gs,false,image_name,optionsApplied, -1);
+                        current.drawImage(parserOptions.getPageNumber(),image,gs,false,image_name, -1);
                     }
                     
                     /**save if required*/
@@ -814,7 +807,7 @@ public class ImageDecoder extends BaseDecoder{
                 if (renderImages || !parserOptions.isPageContent()) {
                     gs.x=x;
                     gs.y=y;
-                    current.drawImage(parserOptions.getPageNumber(),image,gs,false,image_name, optionsApplied, -1);
+                    current.drawImage(parserOptions.getPageNumber(),image,gs,false,image_name, -1);
                 }
                 
                 /**save if required*/
@@ -908,7 +901,9 @@ public class ImageDecoder extends BaseDecoder{
                 final float scaleX=(((float)w)/imageData.getpX());
                 final float scaleY=(((float)h)/imageData.getpY());
                 
-                if(scaleX<scaleY){
+                if(scaleX>100 || scaleY>100){
+                    //ignore 
+                }else if(scaleX<scaleY){
                     parserOptions.setSamplingUsed(scaleX);
                 }else{
                     parserOptions.setSamplingUsed(scaleY);
@@ -998,19 +993,9 @@ public class ImageDecoder extends BaseDecoder{
             }
             image = JPegImageDecoder.decode(name, w, h, arrayInverted, decodeColorData, data, decodeArray, imageData, XObject, errorTracker, parserOptions);
            
-            //set in makeImage so not set for JPEGS - we do it explicitly here
-            if(!isHTML){
-                optionsApplied=setRotationOptionsOnJPEGImage(gs, imageStatus, optionsApplied);
-            }
-            
         }else if(imageData.isJPX()){
             
             image = JPeg2000ImageDecoder.decode(name, w, h, decodeColorData, data, decodeArray, imageData, d);
-            
-            //set in makeImage so not set for JPEGS - we do it explicitly here
-            if(!isHTML){
-                optionsApplied=setRotationOptionsOnJPEGImage(gs, imageStatus, optionsApplied);
-            }
             
         } else { //handle other types
             
@@ -1029,7 +1014,7 @@ public class ImageDecoder extends BaseDecoder{
             if(image==null) {
                 return null;
             }
-            
+
             if(!current.isHTMLorSVG() && !parserOptions.renderDirectly() && (finalImagesExtracted || rawImagesExtracted)) {
                 saveImage(name, createScaledVersion, image, "jpg");
             }
@@ -1118,11 +1103,12 @@ public class ImageDecoder extends BaseDecoder{
             
             ConvertMaskToShape.convert(gs, current, parserOptions);
             image=null;
-            
+            imageData.setRemoved(true);
         }else if(h==2 && d==1 && ImageCommands.isRepeatingLine(data, h)) {
             ConvertImageToShape.convert(data, h, gs, current, parserOptions);
             
             image=null;
+            imageData.setRemoved(true);
         }else {
             image = MaskDecoder.createMaskImage(isDownsampled, (isPrinting && !allowPrintTransparency), gs, isType3Font, current,data, image, w, h, imageData, imageMask, d, decodeColorData, maskCol, name);
         }
@@ -1142,36 +1128,25 @@ public class ImageDecoder extends BaseDecoder{
     
     public void saveRawOneBitDataForResampling(boolean saveData, final ImageData imageData, byte[] index, boolean arrayInverted, GenericColorSpace decodeColorData, final byte[] maskCol, final PdfObject XObject) {
         
-        byte[] data=imageData.getObjectData();
-        
-        //copy and turn upside down first
-        final int count=data.length;
-        
-        byte[] turnedData=new byte[count];
-        System.arraycopy(data,0,turnedData,0,count);
-        
-        boolean isInverted=!saveData && (parserOptions.renderDirectly() || useHiResImageForDisplay) && RenderUtils.isInverted(gs.CTM);
-        
-        if(parserOptions.renderDirectly()){
-            isInverted=false;
-        }
-        
-        if(isInverted){//invert at byte level with copy
-            turnedData = ImageOps.invertImage(turnedData, imageData.getWidth(), imageData.getHeight(), imageData.getDepth(), 1, index);
-        }
-        
-        //invert all the bits if needed before we store
-        if(arrayInverted){
-            for(int aa=0;aa<count;aa++) {
-                turnedData[aa] = (byte) (turnedData[aa] ^ 255);
-            }
-        }
-        
         //cache if binary image (not Mask)
         if(decodeColorData.getID()==ColorSpaces.DeviceRGB && maskCol!=null && imageData.getDepth()==1 ){  //avoid cases like Hand_test/DOC028.PDF
-            
         }else if(((imageData.getWidth()<4000 && imageData.getHeight()<4000) || decodeColorData.getID()==ColorSpaces.DeviceGray) && !(XObject instanceof MaskObject)){ //limit added after silly sizes on Customers3/1773_A2.pdf
-            
+        
+            final byte[] data=imageData.getObjectData();
+
+            //copy and turn upside down first
+            final int count=data.length;
+
+            final byte[] turnedData=new byte[count];
+            System.arraycopy(data,0,turnedData,0,count);
+
+            //invert all the bits if needed before we store
+            if(arrayInverted){
+                for(int aa=0;aa<count;aa++) {
+                    turnedData[aa] = (byte) (turnedData[aa] ^ 255);
+                }
+            }
+        
             final String key = parserOptions.getPageNumber() + String.valueOf(imageCount);
             
             if(saveData){
@@ -1311,41 +1286,7 @@ public class ImageDecoder extends BaseDecoder{
             imageData.setpX(0);
             imageData.setpY(0);
         }
-    }
-    
-    /**
-     * needs to be explicitly set for JPEG images if getting image from object
-     */
-    static int setRotationOptionsOnJPEGImage(final GraphicsState gs, final int imageStatus, final int optionsApplied) {
-        
-        
-        if(imageStatus>0 && gs.CTM[0][0]>0 && gs.CTM[0][1]>0 && gs.CTM[1][1]>0 && gs.CTM[1][0]<0){
-            /**/
-            //we need a different op for Image and viewer as we handle in diff ways
-            if(imageStatus==IMAGE_getImageFromPdfObject){
-                //optionsApplied=optionsApplied+ PDFImageProcessing.IMAGE_INVERTED;
-                gs.CTM[0][1]=-gs.CTM[0][1];
-                //gs.CTM[1][0]=gs.CTM[1][0];
-                gs.CTM[1][1]=-gs.CTM[1][1];
-                gs.CTM[2][1] -= gs.CTM[1][1];
-                
-            }
-            /**/
-            
-        }else if(optionsApplied>0 && gs.CTM[0][0]<0 && gs.CTM[1][1]<0 && gs.CTM[0][1]==0 && gs.CTM[1][0]==0){ //fix for elfo.pdf
-            
-            //optionsApplied=optionsApplied+ PDFImageProcessing.IMAGE_INVERTED;
-            //gs.CTM[0][1]=-gs.CTM[0][1];
-            //gs.CTM[1][0]=gs.CTM[1][0];
-            gs.CTM[1][1]=-gs.CTM[1][1];
-            gs.CTM[2][1]=gs.CTM[2][1]-gs.CTM[1][1]+gs.CTM[1][0];
-            //gs.CTM[2][0]=gs.CTM[2][0]+30;
-            
-            gs.CTM[2][0] -= gs.CTM[0][1];
-        }
-        
-        return optionsApplied;
-    }
+    } 
     
     
     private void saveImage(final String name, final boolean createScaledVersion,
@@ -1365,7 +1306,7 @@ public class ImageDecoder extends BaseDecoder{
     /**
      * turn raw data into a BufferedImage
      */
-    private BufferedImage makeImage(final GenericColorSpace decodeColorData,int w,int h,int d, byte[] data, final int comp) {
+    private static BufferedImage makeImage(final GenericColorSpace decodeColorData, int w, int h, int d, byte[] data, final int comp) {
         
         //ensure correct size
         if(decodeColorData.getID()== ColorSpaces.DeviceGray){
@@ -1377,8 +1318,6 @@ public class ImageDecoder extends BaseDecoder{
         
         BufferedImage image = null;
         byte[] index =decodeColorData.getIndexedMap();
-        
-        optionsApplied=PDFImageProcessing.NOTHING;
         
         if (index != null) {
             image = IndexedImage.make(w, h, decodeColorData, index, d, data);

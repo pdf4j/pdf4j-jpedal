@@ -32,6 +32,7 @@
  */
 package org.jpedal.parser;
 
+import java.util.ArrayList;
 import org.jpedal.utils.NumberUtils;
 
 public class CommandParser {
@@ -607,11 +608,57 @@ public String generateOpAsString(final int p, final boolean loseSlashPrefix) {
 
     public float[] getValuesAsFloat() {
 
-        final float[] op=new float[operandCount];
-        for(int i=0;i<operandCount;i++) {
-            op[i] = parseFloat(i);
+        if (this.characterStream[opStart[0]] == 91) { // [0.0 0.0 0.0]
+
+            return readFloatArray();
+
+        } else {
+            final float[] op = new float[operandCount];
+            for (int i = 0; i < operandCount; i++) {
+                op[i] = parseFloat(i);
+            }
+
+            return op;
         }
 
+    }
+
+    private float[] readFloatArray() {
+        final int start = opStart[0];
+        final int end = this.opEnd[0];
+        int count = 0;
+        int startPtr, endPtr;
+        ArrayList values = new ArrayList();
+        for (int chars = start + 1; chars < end; chars++) {
+            
+            char c = (char) characterStream[chars];
+            
+            //gap
+            while (c != '.' && c != '-' && (c < '0' || c > '9')) {
+                chars++;
+                c = (char) characterStream[chars];
+            }
+            
+            startPtr = chars;
+            
+            //number
+            while (c == '.' || c == '-' || (c >= '0' && c <= '9')) {
+                chars++;
+                c = (char) characterStream[chars];
+            }
+            
+            endPtr = chars;
+            
+            count++;
+            
+            values.add(Float.valueOf(NumberUtils.parseFloat(startPtr, endPtr - startPtr, characterStream)));
+            
+        }
+        
+        final float[] op = new float[count];
+        for (int i = 0; i < count; i++) {
+            op[i] = ((Float) values.get(i)).floatValue();
+        }
         return op;
     }
 
@@ -625,10 +672,10 @@ public String generateOpAsString(final int p, final boolean loseSlashPrefix) {
     }
 
 
-    public final int parseInt(final int i){
+    public final int parseInt(){
 
-        final int start=opStart[i];
-        final int end =this.opEnd[i];
+        final int start=opStart[0];
+        final int end =this.opEnd[0];
 
         final byte[] stream=characterStream;
 

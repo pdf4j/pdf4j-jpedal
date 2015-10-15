@@ -38,7 +38,6 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import javafx.scene.shape.Path;
 
 import org.jpedal.color.PdfPaint;
 import org.jpedal.render.T3Display;
@@ -243,7 +242,7 @@ public class T3Glyph implements PdfGlyph
     }
 
     @Override
-    public Path getPath() {
+    public Object getPath() {
         throw new UnsupportedOperationException("getPath Not supported yet.");
     }
 }

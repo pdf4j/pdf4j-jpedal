@@ -42,7 +42,6 @@ import javax.swing.*;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.JPedalCustomDrawObject;
 import org.jpedal.fonts.PdfFont;
@@ -52,7 +51,6 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
-import org.jpedal.utils.Matrix;
 import org.jpedal.utils.Messages;
 import org.jpedal.utils.repositories.*;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
@@ -134,9 +132,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     private Vector_Double af2;
     private Vector_Double af3;
     private Vector_Double af4;
-    
-    /**image options*/
-    private Vector_Int imageOptions;
     
     /**TR for text*/
     private Vector_Int TRvalues;
@@ -346,10 +341,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 TRvalues = null;
             }
             
-            if(imageOptions!=null) {
-                imageOptions = null;
-            }
-            
             if(fs!=null) {
                 fs = null;
             }
@@ -436,8 +427,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         stroke=null;
         
         TRvalues=null;
-        
-        imageOptions=null;
         
         fs=null;
         
@@ -583,11 +572,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         
         if(this.areas!=null) {
             areas = this.areas.get();
-        }
-        
-        int[] imageOptions=null;
-        if(this.imageOptions!=null) {
-            imageOptions = this.imageOptions.get();
         }
         
         boolean isInitialised=false;
@@ -895,7 +879,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                                 newClip=false;
                             }
                             
-                            renderImage(afValues1, afValues2, afValues3,afValues4, pageObjects, imageOptions,currentObject, fillOpacity, x, y, iCount, afCount, imageUsed, i);
+                            renderImage(afValues1, afValues2, afValues3,afValues4, pageObjects,currentObject, fillOpacity, x, y, iCount, afCount, imageUsed, i);
                             
                             iCount++;
                             
@@ -1338,13 +1322,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     private void renderImage(final double[] afValues1, final double[] afValues2,
             final double[] afValues3, final double[] afValues4, final Object[] pageObjects,
-            final int[] imageOptions, Object currentObject, final float fillOpacity,
+             Object currentObject, final float fillOpacity,
             final float x, final float y, final int iCount, final int afCount, final int imageUsed, final int i){
         
-        int currentImageOption=PDFImageProcessing.NOTHING;
-        if(imageOptions!=null) {
-            currentImageOption = imageOptions[iCount];
-        }
         
         int sampling=1,w1=0,pY=0,defaultSampling=1;
         
@@ -1490,14 +1470,13 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             }
             
             if(img!=null) {
-                renderImage(imageAf, img, fillOpacity, null, x, y, currentImageOption);
+                renderImage(imageAf, img, fillOpacity, null, x, y);
             }
             
         }else{
             
             final AffineTransform before=g2.getTransform();
-            extraRot = false;
-            
+           
             if(pY>0){
                 
                 final double[] matrix=new double[6];
@@ -1513,11 +1492,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 
                 g2.setTransform(new AffineTransform(matrix));
                 
-            }else{
-                extraRot = true;
             }
             
-            renderImage(null,(BufferedImage)currentObject,fillOpacity,null,x,y,currentImageOption);
+            renderImage(null,(BufferedImage)currentObject,fillOpacity,null,x,y);
             g2.setTransform(before);
         }
     }
@@ -1842,7 +1819,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     @Override
     public int drawImage(final int pageNumber,BufferedImage image,
     final GraphicsState currentGraphicsState,
-    final boolean alreadyCached, final String name, int optionsApplied, final int previousUse) {
+    final boolean alreadyCached, final String name, final int previousUse) {
         
         if(previousUse!=-1) {
             return redrawImage(pageNumber, currentGraphicsState, name, previousUse);
@@ -1852,7 +1829,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         float CTM[][]=currentGraphicsState.CTM;
         
         final float x=currentGraphicsState.x;
-        final float y=currentGraphicsState.y;
+        float y=currentGraphicsState.y;
         
         final double[] nextAf=new double[6];
         
@@ -1865,21 +1842,14 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             key = rawKey + '_' + (currentItem + 1);
         }
         
-        if(imageOptions==null){
-            imageOptions=new Vector_Int(defaultSize);
-            imageOptions.setCheckpoint();
-        }
-        
-        imageOptions.addElement(optionsApplied);
-        
-        if(!useHiResImageForDisplay){
-            if(!alreadyCached && image.getHeight()>1 && ((optionsApplied & PDFImageProcessing.IMAGE_INVERTED) !=PDFImageProcessing.IMAGE_INVERTED)){
-        
-                if((pageRotation != 90 && pageRotation != 270) && type==3) {
-                    image = RenderUtils.invertImage(image);
-                }
-            }
-        }else{
+        final AffineTransform upside_down=new AffineTransform(CTM[0][0],CTM[0][1],CTM[1][0],CTM[1][1],0,0);
+            
+        upside_down.getMatrix(nextAf);
+
+        //System.out.println(y+" "+h+" "+nextAf[3]);
+        this.drawAffine(nextAf);
+            
+        if(useHiResImageForDisplay){
             
             final int w;
             final int h;
@@ -1891,34 +1861,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 w= (Integer) cachedWidths.get(key);
                 h= (Integer) cachedHeights.get(key);
             }
-                
-            if(optionsApplied==0){
-
-                //turn upside down
-                final AffineTransform image_at2 =new AffineTransform();
-                image_at2.scale(1,-1);
-                image_at2.translate(0,-image.getHeight());
-
-                final AffineTransformOp invert3= new AffineTransformOp(image_at2,  ColorSpaces.hints);
-
-                if(image.getType()==12){ //avoid turning into ARGB
-                    final BufferedImage source=image;
-                    image =new BufferedImage(source.getWidth(),source.getHeight(),source.getType());
-
-                    invert3.filter(source,image);
-                }else {
-                    image = invert3.filter(image, null);
-                }
-            }  
-
-            final float[][] scaleDown={{1f/w,0,0},{0,1f/h,0},{0,0,1}};
-            CTM=Matrix.multiply(scaleDown,CTM);
-            
-            final AffineTransform upside_down=new AffineTransform(CTM[0][0],CTM[0][1],CTM[1][0],CTM[1][1],0,0);
-            
-            upside_down.getMatrix(nextAf);
-            
-            this.drawAffine(nextAf);
             
             lastAf[0]=nextAf[0];
             lastAf[1]=nextAf[1];
@@ -2037,7 +1979,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         imageID.put(name, currentItem);
         
         //nore minus one as affine not yet done
-        storedImageValues.put("imageOptions-"+currentItem, optionsApplied);
         storedImageValues.put("imageAff-"+currentItem,nextAf);
         
         currentItem++;
@@ -2053,7 +1994,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         final float x=currentGraphicsState.x;
         final float y=currentGraphicsState.y;
         
-        imageOptions.addElement((Integer) storedImageValues.get("imageOptions-" + previousUse));
         
         if(useHiResImageForDisplay){
             
@@ -2386,12 +2326,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             
             stroke.setCheckpoint();
             
-            if(imageOptions==null) {
-                imageOptions = new Vector_Int(defaultSize);
-            }
-            
-            imageOptions.setCheckpoint();
-            
             if(TRvalues==null) {
                 TRvalues = new Vector_Int(defaultSize);
             }
@@ -2463,10 +2397,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         stroke_color.resetToCheckpoint();
         
         stroke.resetToCheckpoint();
-        
-        if(imageOptions!=null) {
-            imageOptions.resetToCheckpoint();
-        }
         
         if(TRvalues!=null) {
             TRvalues.resetToCheckpoint();
@@ -2983,8 +2913,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             
             BMvalues=(Vector_Int) RenderUtils.restoreFromStream(bis);
             
-            imageOptions = (Vector_Int) RenderUtils.restoreFromStream(bis);
-            
             TRvalues = (Vector_Int) RenderUtils.restoreFromStream(bis);
             
             fs = (Vector_Int) RenderUtils.restoreFromStream(bis);
@@ -3101,9 +3029,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         if(BMvalues!=null) {
             BMvalues.trim();
         }
-        if(imageOptions!=null) {
-            imageOptions.trim();
-        }
+        
         if(TRvalues!=null) {
             TRvalues.trim();
         }
@@ -3142,7 +3068,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         RenderUtils.writeToStream(bos,objectType);
         RenderUtils.writeToStream(bos,opacity);
         RenderUtils.writeToStream(bos,BMvalues);
-        RenderUtils.writeToStream(bos,imageOptions);
         RenderUtils.writeToStream(bos,TRvalues);
         
         RenderUtils.writeToStream(bos,fs);

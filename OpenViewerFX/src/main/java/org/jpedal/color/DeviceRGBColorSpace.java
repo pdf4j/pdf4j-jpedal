@@ -48,6 +48,7 @@ public class DeviceRGBColorSpace extends  GenericColorSpace{
     }
     
     public DeviceRGBColorSpace(){
+
         setType(ColorSpaces.DeviceRGB);
     }
     

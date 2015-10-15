@@ -87,7 +87,7 @@ public class JavaFXSupport {
         }
     }
 
-    private void setGUI(final int formType, final Object value, final Object guiComp, final int guiType) {
+    private static void setGUI(final int formType, final Object value, final Object guiComp, final int guiType) {
 
         if (GenericFormFactory.isTextForm(formType)) {
             ((TextInputControl) guiComp).setText((String) value);
@@ -102,11 +102,11 @@ public class JavaFXSupport {
         }
     }
 
-    public void setVisible(Object guiComp, boolean isVisible) {
+    public static void setVisible(Object guiComp, boolean isVisible) {
         ((Node) guiComp).setVisible(isVisible);
     }
 
-    public void select(Object guiComp, String selectedItem, int formType) {
+    public static void select(Object guiComp, String selectedItem, int formType) {
         if (formType == FormFactory.combobox) {
             ((ComboBox) guiComp).getSelectionModel().select(selectedItem);
         } else {
@@ -114,7 +114,7 @@ public class JavaFXSupport {
         }
     }
 
-    public String getSelectedItem(Object guiComp, int formType) {
+    public static String getSelectedItem(Object guiComp, int formType) {
         if (formType == FormFactory.combobox) {
             return (String) ((ComboBox) guiComp).getSelectionModel().getSelectedItem();
         } else {

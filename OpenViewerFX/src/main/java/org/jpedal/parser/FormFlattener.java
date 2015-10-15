@@ -45,6 +45,7 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
 public class FormFlattener {
@@ -58,6 +59,11 @@ public class FormFlattener {
      */
     public void drawFlattenedForm(final PdfStreamDecoder pdfStreamDecoder, final PdfObject form, final boolean isHTML, final PdfObject AcroRes) throws PdfException {
 
+        //Check org.jpedal.removeForms and stop rendering if form should be removed
+        if(exclusionOption!=FormExclusion.ExcludeNone && !showForm(form)){
+            return;
+        }
+        
         /**
          * ignore if not going to be drawn
          */
@@ -169,7 +175,7 @@ public class FormFlattener {
          */
         if(imgObj==null){
 
-            final String V = form.getTextStreamValue(PdfDictionary.V);
+            String V = form.getTextStreamValue(PdfDictionary.V);
 
             //if(V==null)
             //    V=form.getTextStreamValue(PdfDictionary.T);
@@ -387,7 +393,7 @@ public class FormFlattener {
                         break;
                     default:
                         x = BBox[0] + (matrix[4] * yScale);
-                        newClip = new Area(new Rectangle((int) BBox[0]-1, (int) BBox[1]-1, (int) ((BBox[2] - BBox[0]) + 3), (int) ((BBox[3] - BBox[1]) + 3)));
+                        newClip = new Area(new Rectangle((int) (BBox[0]-1), (int) (BBox[1]-1), (int) ((BBox[2] - BBox[0])+2), (int) ((BBox[3] - BBox[1])+2)));
                         break;
                 }
 
@@ -400,7 +406,10 @@ public class FormFlattener {
             pdfStreamDecoder.gs.CTM = new float[][]{{1,0,0},{0,1,0},{x,y,1}};
             newClip=new Area(new Rectangle((int)BBox[0],(int)BBox[1],(int)BBox[2],(int)BBox[3]));
         }
-        //newClip=new Area(new Rectangle(0,0,2000,2000));
+        
+        //Convert clip here
+        newClip = BaseDisplay.convertPDFClipToJavaClip(newClip);
+        
         drawForm(imgObj, form, pdfStreamDecoder, newClip, isHTML, BBox, x, y, formData, APobjN, oldGS);
       
     }
@@ -442,11 +451,11 @@ public class FormFlattener {
                 pdfStreamDecoder.gs.CTM[2][1]= y;
 
                 //-3 tells it to render to background image and thumbnail if present
-                pdfStreamDecoder.current.drawImage(pdfStreamDecoder.parserOptions.getPageNumber(), image, pdfStreamDecoder.gs, false, form.getObjectRefAsString(), 0, -3);
+                pdfStreamDecoder.current.drawImage(pdfStreamDecoder.parserOptions.getPageNumber(), image, pdfStreamDecoder.gs, false, form.getObjectRefAsString(), -3);
             
                 //add to SVG as external image if needed
                 if(pdfStreamDecoder.current.getBooleanValue(DynamicVectorRenderer.IsSVGMode)){
-                    pdfStreamDecoder.current.drawImage(pdfStreamDecoder.parserOptions.getPageNumber(), image, pdfStreamDecoder.gs, false, form.getObjectRefAsString(), 0, -2);            
+                    pdfStreamDecoder.current.drawImage(pdfStreamDecoder.parserOptions.getPageNumber(), image, pdfStreamDecoder.gs, false, form.getObjectRefAsString(), -2);            
                 }
             
             }
@@ -483,4 +492,45 @@ public class FormFlattener {
         pdfStreamDecoder.gs.setTextState(oldState);
         
     }
+    
+    private enum FormExclusion {
+        ExcludeNone, ExcludeForms, ExcludeAnnotations, ExcludeFormsAndAnnotations
+    }
+    
+    private static FormExclusion exclusionOption = FormExclusion.ExcludeNone;
+    
+    static {
+        String value = System.getProperty("org.jpedal.removeForms");
+        if (value != null && !value.isEmpty()) {
+            exclusionOption = FormExclusion.valueOf(value);
+
+        }
+    }
+    
+    private boolean showForm(final PdfObject form){
+        
+        switch (exclusionOption) {
+            case ExcludeFormsAndAnnotations:
+                //Show no annotations or forms
+                return false;
+            case ExcludeAnnotations:
+                //Show only forms
+                if (form.getParameterConstant(PdfDictionary.Type) == PdfDictionary.Annot && form.getNameAsConstant(PdfDictionary.FT) == -1) {
+                    return false;
+                }
+                break;
+            case ExcludeForms:
+                //Show only annotations
+                if (form.getNameAsConstant(PdfDictionary.FT) != -1) {
+                    return false;
+                }
+                break;
+            case ExcludeNone:
+                //Show both annotations and forms
+                break;
+        }
+
+        return true;
+    }
+    
 }

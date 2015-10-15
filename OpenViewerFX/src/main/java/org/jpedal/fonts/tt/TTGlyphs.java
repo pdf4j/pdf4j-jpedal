@@ -50,8 +50,6 @@ import org.jpedal.fonts.tt.hinting.TTVM;
 
 public class TTGlyphs extends PdfJavaGlyphs {
 
-    protected boolean hasGIDtoCID;
-
     protected int[] CIDToGIDMap;
 
     float[] FontBBox= {0f,0f,1000f,1000f};

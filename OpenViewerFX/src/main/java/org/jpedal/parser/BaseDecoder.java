@@ -47,10 +47,6 @@ public class BaseDecoder {
 //    public static final int TextPrint=20;
     public static final int GenerateGlyphOnRender=21;
 
-    //flag for some routines to show image or viewer
-    protected int imageStatus;
-    public static final int IMAGE_getImageFromPdfObject=1;
-    
     protected ParserOptions parserOptions=new ParserOptions();
 
     final GraphicsStates graphicsStates=new GraphicsStates(parserOptions);
@@ -72,11 +68,6 @@ public class BaseDecoder {
 
         multiplyer=value;
 
-    }
-
-    public void setIsImage(final int value) {
-
-        imageStatus=value;
     }
 
     public void setStreamType(final int value) {

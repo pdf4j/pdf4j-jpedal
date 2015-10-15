@@ -38,16 +38,13 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.FontHandler;
@@ -59,7 +56,6 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
-import org.jpedal.utils.Matrix;
 import org.jpedal.utils.repositories.Vector_Int;
 import org.jpedal.utils.repositories.Vector_Object;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
@@ -96,9 +92,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     //used to track end of PDF page in display
     protected static int endItem=-1;
 
-    /**raw page rotation*/
-    protected int pageRotation;
-
     Area lastClip;
     
     boolean hasClips;
@@ -112,8 +105,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     /**use hi res images to produce better quality display*/
     public boolean useHiResImageForDisplay;
-
-    boolean extraRot;
 
     //used by type3 fonts as identifier
     String rawKey;
@@ -178,10 +169,9 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
     
     @Override
-    public void init(final int width, final int height, final int rawRotation, final Color backgroundColor) {
+    public void init(final int width, final int height, final Color backgroundColor) {
     	w = width;
     	h = height;
-    	this.pageRotation = rawRotation;
     	this.backgroundColor = backgroundColor;
     }
 
@@ -454,7 +444,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     void renderImage(final AffineTransform imageAf, BufferedImage image, final float alpha,
-            final GraphicsState currentGraphicsState, final float x, final float y, final int optionsApplied) {
+            final GraphicsState currentGraphicsState, final float x, final float y) {
 
         final boolean renderDirect = (currentGraphicsState != null);
 
@@ -462,155 +452,48 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             return;
         }
 
-        final int w = image.getWidth();
-        final int h = image.getHeight();
-
-        //plot image (needs to be flipped as well as co-ords upside down)
-        //graphics less than 1 get swallowed if flipped
-        AffineTransform upside_down = new AffineTransform();
-
-        boolean applyTransform = false;
-
-        float CTM[][] = new float[3][3];
-        if (currentGraphicsState != null) {
-            CTM = currentGraphicsState.CTM;
-        }
-
-        //special case - ignore rotation
-        if (CTM[0][0] < 0 && CTM[1][1] < 0 && CTM[1][0] > -2 && CTM[1][0] < 0 && CTM[0][1] > 0 && CTM[0][1] < 10) {
-            CTM[0][1] = 0;
-            CTM[1][0] = 0;
-        }
-
         final AffineTransform before = g2.getTransform();
-
-        boolean invertInAff = false;
-
-        float dx = 0, dy = 0;
-
-        /**
-         * setup for printing
-         */
-        if (renderDirect || useHiResImageForDisplay) {
-
-            if (renderDirect) {
-
-                upside_down = null;
-
-                //Turn image around if needed (ie JPEG not yet turned)
-                if ((optionsApplied & PDFImageProcessing.IMAGE_INVERTED) != PDFImageProcessing.IMAGE_INVERTED) {
-
-                    if ((CTM[0][1] < 0 && CTM[1][0] > 0) && (CTM[0][0] * CTM[1][1] == 0)) {
-
-                        upside_down = new AffineTransform(CTM[0][0] / w, CTM[0][1] / w, -CTM[1][0] / h, CTM[1][1] / h, CTM[2][0] + CTM[1][0], CTM[2][1]);
-
-                    } else if ((CTM[0][1] != 0 || CTM[1][0] != 0)) {
-
-                        float[][] flip2 = {{1f / w, 0, 0}, {0, -1f / h, 0}, {0, 1f / h, 1}};
-                        final float[][] rot = {{CTM[0][0], CTM[0][1], 0},
-                        {CTM[1][0], CTM[1][1], 0},
-                        {0, 0, 1}};
-
-                        flip2 = Matrix.multiply(flip2, rot);
-                        upside_down = new AffineTransform(flip2[0][0], flip2[0][1], flip2[1][0], flip2[1][1], flip2[2][0], flip2[2][1]);
-
-                        if (image.getHeight() > 1) {
-                            dx = CTM[2][0] - image.getHeight() * flip2[1][0];
-                        } else {
-                            dx = CTM[2][0];
-                        }
-
-                        dy = CTM[2][1];
-                        dy += CTM[1][1];
-
-                    } else if ((CTM[0][0] * CTM[0][1] == 0 && CTM[1][1] * CTM[1][0] == 0) && (CTM[0][1] > 0 && CTM[1][0] > 0)) {
-                        float[][] flip2 = {{-1f / w, 0, 0}, {0, 1f / h, 0}, {1f / w, 0, 1}};
-                        final float[][] rot = {{CTM[0][0],
-                            CTM[0][1], 0},
-                        {CTM[1][0], CTM[1][1], 0},
-                        {0, 0, 1}};
-
-                        flip2 = Matrix.multiply(flip2, rot);
-                        upside_down = new AffineTransform(
-                                flip2[0][0], flip2[1][0],
-                                flip2[0][1], flip2[1][1],
-                                flip2[2][0], flip2[2][1]);
-
-                        dx = CTM[2][0] - image.getHeight() * flip2[0][1];
-                        dy = CTM[2][1];
-
-                    } else if (CTM[1][1] != 0) {
-                        invertInAff = true;
-                    }
-                }
-
-                if (upside_down == null) {
-                    upside_down = new AffineTransform(CTM[0][0] / w, CTM[0][1] / w,
-                            CTM[1][0] / h, CTM[1][1] / h, CTM[2][0], CTM[2][1]);
-                }
-            } else {
-                upside_down = imageAf;
-
-                invertInAff = false;
-            }
-
-            applyTransform = true;
-
-        }
-
+        
         final Composite c = g2.getComposite();
-
         renderComposite(alpha);
 
-        /**
-         * color type3 glyphs if not black
-         */
-        if (isType3Font && fillCol != null) {
-
-            image = T3ImageUtils.handleType3Image(image, fillCol);
-
-            if (image == null) {
-                return;
-            }
-        }
-
         if (renderDirect || useHiResImageForDisplay) {
-
-            if (invertInAff && (optionsApplied & PDFImageProcessing.IMAGE_INVERTED) != PDFImageProcessing.IMAGE_INVERTED) {
-
-                final double[] values = new double[6];
-                upside_down.getMatrix(values);
-
-                dx = (float) (values[4] + (values[1] * image.getWidth()));
-                dy = (float) (values[5] + (image.getHeight() * values[3]));
-
-                //correct rotation case
-                if (values[0] > 0 && values[1] > 0 && values[2] > 0 && values[3] < 0) {
-                    values[2] = -values[2];
-                }
-
-                values[3] = -values[3];
-
-                values[4] = 0;
-                values[5] = 0;
-
-                upside_down = new AffineTransform(values);
-
+        
+            AffineTransform upside_down;
+            
+            float CTM[][] = new float[3][3];
+            if (currentGraphicsState != null) {
+                CTM = currentGraphicsState.CTM;
+            }else{
+                double[] values=new double[6];
+                imageAf.getMatrix(values);
+                CTM[0][0]=(float) values[0];
+                CTM[0][1]=(float) values[1];
+                CTM[1][0]=(float) values[2];
+                CTM[1][1]=(float) values[3];
+                CTM[2][0]= x;
+                CTM[2][1]= y;
             }
+            
+            final int w = image.getWidth();
+            final int h = image.getHeight();
+   
+            final double[] values={CTM[0][0] / w, CTM[0][1] / w, -CTM[1][0] / h, -CTM[1][1] / h, 0, 0};
+            upside_down = new AffineTransform(values);
+            
+            g2.translate(CTM[2][0] + CTM[1][0], CTM[2][1] + CTM[1][1]);
 
             //allow user to over-ride
             boolean useCustomRenderer = customImageHandler != null;
 
-            g2.translate(dx, dy);
-
             if (useCustomRenderer) {
-                useCustomRenderer = customImageHandler.drawImageOnscreen(image, optionsApplied, upside_down, null, g2, renderDirect, objectStoreRef, isPrinting);
-            }
-
-            //exit if done
-            if (useCustomRenderer) {
-                g2.setComposite(c);
-                return;
+                useCustomRenderer = customImageHandler.drawImageOnscreen(image, 0, upside_down, null, g2, renderDirect, objectStoreRef, isPrinting);
+            
+                //exit if done
+                if (useCustomRenderer) {
+                    g2.setComposite(c);
+                    return;
+                }
             }
 
             //hack to make bw
@@ -702,11 +585,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             }
 
         } else {
-
-            if (applyTransform) {
-                final AffineTransformOp invert = new AffineTransformOp(upside_down, ColorSpaces.hints);
-                image = invert.filter(image, null);
-            }
 
             g2.drawImage(image, (int) x, (int) y, null);
 
@@ -1222,7 +1100,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     @Override
-    public int drawImage(final int pageNumber, final BufferedImage image, final GraphicsState currentGraphicsState, final boolean alreadyCached, final String name, final int optionsApplied, final int previousUse) {
+    public int drawImage(final int pageNumber, final BufferedImage image, final GraphicsState currentGraphicsState, final boolean alreadyCached, final String name, final int previousUse) {
 	return -1;
     }
 

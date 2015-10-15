@@ -49,6 +49,8 @@ public class ShadingObject extends PdfObject implements Serializable {
 
     byte[][] Functions;
 
+    float N=-1;
+	
     boolean[] Extend;
 
     public ShadingObject(final String ref) {
@@ -562,6 +564,40 @@ public class ShadingObject extends PdfObject implements Serializable {
                 throw new RuntimeException("Value not defined in getName(int,mode) in "+this);
         }
     }
+    
+     @Override
+    public int getObjectType() {
+		return PdfDictionary.Shading;
+	}
+    
+    @Override
+    public void setFloatNumber(final int id, final float value){
+
+        switch(id){
+
+       
+        	case PdfDictionary.N:
+		        	N=value;
+	    	break;
+    	
+            default:
+            	super.setFloatNumber(id, value);
+        }
+    }
+    
+    @Override
+    public float getFloatNumber(final int id){
+
+        switch(id){
+ 	
+	        case PdfDictionary.N:
+	        	return N;
+	        
+            default:
+            	return super.getFloatNumber(id);
+        }
+    }
+    
     
     @Override
     public boolean decompressStreamWhenRead() {

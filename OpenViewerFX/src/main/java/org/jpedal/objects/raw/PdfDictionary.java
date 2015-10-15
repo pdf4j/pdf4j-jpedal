@@ -1905,6 +1905,8 @@ public class PdfDictionary {
                     return VALUE_IS_INT;
                 } else if(type==PdfDictionary.Form || type==PdfDictionary.MK) {
                     return VALUE_IS_VARIOUS;
+                }else if(type==Shading) {
+                    return VALUE_IS_FLOAT;
                 } else {
                     return VALUE_IS_NAME;
                 }

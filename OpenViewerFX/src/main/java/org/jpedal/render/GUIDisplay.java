@@ -36,7 +36,6 @@ package org.jpedal.render;
 import java.awt.Color;
 import java.awt.Shape;
 import org.jpedal.color.PdfColor;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
@@ -99,7 +98,7 @@ abstract class GUIDisplay extends BaseDisplay implements DynamicVectorRenderer{
                     gs.x=imgObj.x;
                     gs.y=imgObj.y;
                     
-                    drawImage(this.rawPageNumber,imgObj.image, gs,false,"extImg"+i, PDFImageProcessing.NOTHING, -1);
+                    drawImage(this.rawPageNumber,imgObj.image, gs,false,"extImg"+i, -1);
                     
                     break;
                     

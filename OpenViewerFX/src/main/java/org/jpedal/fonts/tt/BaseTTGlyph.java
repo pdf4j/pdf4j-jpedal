@@ -35,7 +35,6 @@ package org.jpedal.fonts.tt;
 import java.awt.Graphics2D;
 import java.awt.geom.Area;
 import java.util.HashSet;
-import javafx.scene.shape.Path;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.tt.hinting.TTVM;
@@ -849,7 +848,7 @@ public abstract class BaseTTGlyph {
         return this.containsBrokenGlyfData;
     }
 
-    public Path getPath() {
+    public Object getPath() {
         throw new UnsupportedOperationException("getPath Not supported yet."); 
     }
 

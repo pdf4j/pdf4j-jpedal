@@ -3825,7 +3825,7 @@ public class FormObject extends PdfObject{
                 // Might need to be on FX Thread
                 if(guiType == FormFactory.JAVAFX){
                     if(fxSupport!=null){
-                        selectedItem=fxSupport.getSelectedItem(guiComp,formType);
+                        selectedItem= JavaFXSupport.getSelectedItem(guiComp, formType);
                     }
                 }else if (SwingUtilities.isEventDispatchThread()) {
                     if(formType==FormFactory.combobox){
@@ -3874,7 +3874,7 @@ public class FormObject extends PdfObject{
         if(formType==FormFactory.combobox || formType==FormFactory.list){
             if(guiType == FormFactory.JAVAFX){
                 if(fxSupport!=null){
-                        fxSupport.select(guiComp,selectedItem,formType);
+                        JavaFXSupport.select(guiComp, selectedItem, formType);
                     }
             }else if (SwingUtilities.isEventDispatchThread()) {
             if(formType==FormFactory.combobox){
@@ -3976,7 +3976,7 @@ public class FormObject extends PdfObject{
         if (guiComp != null) {
             if(guiType == FormFactory.JAVAFX){
                 if(fxSupport!=null){
-                    fxSupport.setVisible(guiComp,isVisible);
+                    JavaFXSupport.setVisible(guiComp, isVisible);
                 }
             }else{
                 ((JComponent)guiComp).setVisible(isVisible);

@@ -256,7 +256,7 @@ public class PropertiesFile {
       "Flag to turn on previews in single page mode when scrolling","previewOnSingleScroll","true",
       "Flag to show the bounding box of the mouse selection","showMouseSelectionBox","false",
       "Flag if we should spearate the cover of document when in facing mode","separateCoverOn","true",
-      "Flag to set the JavaFX transition type","transitionType","Fade",  
+      "Flag to set the JavaFX transition type","transitionType","None",  
         //These variables are used to track some settings between sessions
       "Flag to track the users scaling between sessions","trackScaling","false", //Viewer scaling
       "Scaling value to use on viewer start up, used/modified when tracking between sessions","startScaling","Fit Page", //Set starting scale when file opened
@@ -739,7 +739,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.6b02")){
+                        if(properties[position+1].equals("6.6b15")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

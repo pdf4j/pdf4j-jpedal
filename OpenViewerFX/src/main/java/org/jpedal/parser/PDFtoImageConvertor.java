@@ -109,7 +109,7 @@ public abstract class PDFtoImageConvertor {
          
         final PdfObject Resources=pdfObject.getDictionary(PdfDictionary.Resources);
 
-        imageDisplay=getDisplay(pageIndex, localStore);
+        imageDisplay=getDisplay(pageIndex, localStore,imageIsTransparent);
         
         if(!imageDisplay.isHTMLorSVG()){
         	
@@ -203,7 +203,7 @@ public abstract class PDFtoImageConvertor {
 
         setParams(scaling, pageData, pageIndex);        
         
-        final BufferedImage image=pageToImage(imageIsTransparent,currentImageDecoder,scaling,pdfObject);
+        final BufferedImage image=pageToImage(imageIsTransparent,currentImageDecoder,scaling,pdfObject,formRenderer);
 
         resultsFromDecode.update(currentImageDecoder, false);
         
@@ -217,8 +217,10 @@ public abstract class PDFtoImageConvertor {
             if(!formRenderer.getCompData().hasformsOnPageDecoded(pageIndex)){
                 formRenderer.createDisplayComponentsForPage(pageIndex,currentImageDecoder);
             }
-            
-            if (!formRenderer.getCompData().formsRasterizedForDisplay()) {
+           
+            if(isFX){
+                //done in fx image code
+            }else if (!formRenderer.getCompData().formsRasterizedForDisplay()) {
 
                 if (!formRenderer.useXFA()) {
 
@@ -235,7 +237,7 @@ public abstract class PDFtoImageConvertor {
                 } else {
                     formRenderer.getCompData().renderFormsOntoG2(image.getGraphics(), pageIndex, 0, displayRotation, null, null, pageData.getMediaBoxHeight(pageIndex));
                 }
-            } else if (!isFX){
+            } else {
                 
                 final java.util.List[] formsOrdered=formRenderer.getCompData().getFormList(true);
                 
@@ -267,11 +269,12 @@ public abstract class PDFtoImageConvertor {
         
     }
 
-    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore) {
+    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore, boolean isTransparent) {
         throw new UnsupportedOperationException(this+" Code should never be called ");
     }
     
-    public BufferedImage pageToImage(final boolean imageIsTransparent, final PdfStreamDecoder currentImageDecoder, final float scaling, final PdfObject pdfObject) throws PdfException {
+    public BufferedImage pageToImage(final boolean imageIsTransparent, final PdfStreamDecoder currentImageDecoder, final float scaling, 
+            final PdfObject pdfObject,final AcroRenderer formRenderer) throws PdfException {
         throw new UnsupportedOperationException(this+" Code should never be called ");
     }
     

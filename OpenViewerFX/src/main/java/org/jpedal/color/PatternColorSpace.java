@@ -334,7 +334,7 @@ public class PatternColorSpace extends GenericColorSpace{
     }
 
     private PdfPaint setupTilingNew(final PdfObject PatternObj, final byte[] streamData) {
-      
+
         float[][] mm;
         AffineTransform affine = new AffineTransform();
         AffineTransform rotatedAffine = new AffineTransform();
@@ -345,7 +345,10 @@ public class PatternColorSpace extends GenericColorSpace{
         } else {
             mm = new float[][]{{1f, 0f, 0f}, {0f, 1f, 0f}, {0f, 0f, 1f}};
         }
-        
+    
+        final ObjectStore localStore = new ObjectStore();
+        BufferedImage image;
+        DynamicVectorRenderer glyphDisplay;
         
         boolean isRotated = affine.getShearX()!=0 || affine.getShearY()!=0;
         
@@ -354,6 +357,8 @@ public class PatternColorSpace extends GenericColorSpace{
             affine = new AffineTransform();
             mm = new float[][]{{1f, 0f, 0f}, {0f, 1f, 0f}, {0f, 0f, 1f}};
         }
+        
+        //System.out.println("mm="+mm[0][0]+" "+mm[0][1]+" "+mm[1][0]+" "+mm[1][1]+" "+mm[2][0]+" "+mm[2][1]+" "+isRotated);
         
         final float[] rawBBox = PatternObj.getFloatArray(PdfDictionary.BBox);
 
@@ -404,14 +409,9 @@ public class PatternColorSpace extends GenericColorSpace{
         imageW = rawXStep == 0 ? rawRect.getWidth() : imageW;
         imageH = rawYStep == 0 ? rawRect.getWidth() : imageH;
 
-        imageW = imageW > 3000 ? 1500 : imageW;
-        imageH = imageH > 3000 ? 1500 : imageH;
+        imageW = imageW > 3000 ? 3000 : imageW;
+        imageH = imageH > 3000 ? 3000 : imageH;
         
-        //very small images return white
-//        if(imageW<0.5 && imageH<0.5){
-//            return new PdfColor(255,255,255);
-//        }
-
         int iw = (int) (imageW);
         iw = iw < 1 ? 1 : iw;
         int ih = (int) (imageH);
@@ -422,41 +422,42 @@ public class PatternColorSpace extends GenericColorSpace{
             iw = 1;
         }
         
-        final ObjectStore localStore = new ObjectStore();
-        BufferedImage image;
-        final DynamicVectorRenderer glyphDisplay;
-
-        if (affine.getScaleX() < 0 || affine.getScaleY() < 0) {
-            glyphDisplay = decodePatternContent(PatternObj, mm, streamData, localStore);
-            image = new BufferedImage(iw, ih, BufferedImage.TYPE_INT_ARGB);
-            final Graphics2D g2 = image.createGraphics();
-            glyphDisplay.setG2(g2);
-            AffineTransform moveAffine = new AffineTransform();
-            moveAffine.setToTranslation(-rawRect.getX(), -rawRect.getY());
-            glyphDisplay.paint(null, moveAffine, null);
-
-        } else {
-            glyphDisplay = decodePatternContent(PatternObj, null, streamData, localStore);
-            double[] rd = new double[6];
-            affine.getMatrix(rd);
-            rd[4] -= rawRect.getX();
-            rd[5] -= rawRect.getY();
-            AffineTransform rdAffine = new AffineTransform(rd);
-            image = new BufferedImage(iw, ih, BufferedImage.TYPE_INT_ARGB);
-            final Graphics2D g2 = image.createGraphics();
-            glyphDisplay.setG2(g2);
-            glyphDisplay.paint(null, rdAffine, null);
-
-        }
         Rectangle2D fRect = new Rectangle2D.Double(rawRect.getX(), rawRect.getY(), imageW, imageH);
-        
-        if(isRotated){
-            return new ShearedTexturePaint(image, fRect, rotatedAffine);            
-        }else{
-            return new PdfTexturePaint(image, fRect);
+        image = new BufferedImage(iw, ih, BufferedImage.TYPE_INT_ARGB);
+
+        if (isRotated) {
+            
+            glyphDisplay = decodePatternContent(PatternObj, null, streamData, localStore);
+            BufferedImage sing = glyphDisplay.getSingleImagePattern();
+            
+            if(sing!=null){
+                sing = RenderUtils.invertImage(sing);
+                return new ShearedTexturePaint(sing, fRect, rotatedAffine);
+            }else{
+                mm[2][0] = (float) (mm[2][0] - rawRect.getX());
+                mm[2][1] = (float) (mm[2][1] - rawRect.getY());
+                glyphDisplay = decodePatternContent(PatternObj, mm, streamData, localStore);
+                Graphics2D g2 = image.createGraphics();
+                glyphDisplay.setG2(g2);
+                glyphDisplay.paint(null, null, null);
+                return new ShearedTexturePaint(image, fRect, rotatedAffine);
+            }
+            
+        } else {
+            
+            mm[2][0] = (float) (mm[2][0] - rawRect.getX());
+            mm[2][1] = (float) (mm[2][1] - rawRect.getY());
+            glyphDisplay = decodePatternContent(PatternObj, mm, streamData, localStore);
+            Graphics2D g2 = image.createGraphics();
+            glyphDisplay.setG2(g2);
+            glyphDisplay.paint(null, null, null);
+            //System.out.println("texture "+fRect+" ");
+            return new ShearedTexturePaint(image, fRect, rotatedAffine);
         }
+                 
     }
 
+   
     
     
     private DynamicVectorRenderer decodePatternContent(final PdfObject PatternObj, final float[][] matrix, final byte[] streamData, final ObjectStore localStore) {
@@ -474,7 +475,7 @@ public class PatternColorSpace extends GenericColorSpace{
         
         //T3Renderer glyphDisplay=new T3Display(0,false,20,localStore);
         final T3Renderer glyphDisplay=new PatternDisplay(0,false,20,localStore);
-        
+        glyphDisplay.setHiResImageForDisplayMode(true);
         try{
             glyphDecoder.setRenderer(glyphDisplay);
             
@@ -543,4 +544,4 @@ public class PatternColorSpace extends GenericColorSpace{
         return new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,matrix,colorsReversed, CTM, false);
         
     }
-}
+    }

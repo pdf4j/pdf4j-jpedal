@@ -66,7 +66,7 @@ public class ConvertImageToShape {
 
         GeneralPath currentShape;
 
-        for (int col = 0; col < data.length / h; col++) {
+        for (int col = 0; col < data.length; col++) {
             int currentByte = (int) data[col] & 0xff;
             currentByte = ~currentByte & 0xff;
 

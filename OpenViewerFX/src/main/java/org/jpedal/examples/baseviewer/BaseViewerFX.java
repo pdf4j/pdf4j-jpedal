@@ -74,6 +74,7 @@ import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions.TransitionDirec
 import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions.TransitionType;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXInputDialog;
 import org.jpedal.exception.PdfException;
+import org.jpedal.external.PluginHandler;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.parser.DecoderOptions;
 
@@ -97,6 +98,8 @@ public class BaseViewerFX extends Application {
     
     private final org.jpedal.PdfDecoderFX pdf = new org.jpedal.PdfDecoderFX();
 
+    PluginHandler customPluginHandle=null;
+    
     /**
      * Enum to control how we fit the content to the page.
      * 
@@ -363,7 +366,7 @@ public class BaseViewerFX extends Application {
         final Button fitWidth = new Button("Fit to Width");
         final Button fitHeight = new Button("Fit to Height");
         final Button fitPage = new Button("Fit to Page");
-        final Button fullScreen = new Button("Full Screen");
+      
         ComboBox<String> transitionList = new ComboBox<String>();
 
         open.setId("open");
@@ -376,25 +379,7 @@ public class BaseViewerFX extends Application {
         fitWidth.setId("fitWidth");
         fitHeight.setId("fitHeight");
         fitPage.setId("fitPage");
-        fullScreen.setId("fullScreen");
-
-        /**
-         * Toggle Full-screen Mode
-         */
-        if(stage!=null){
-            fullScreen.setOnAction(new EventHandler<ActionEvent>() {
-                //Toggle between fullscreen and windowed
-                @Override
-                public void handle(final ActionEvent t) {
-                    if (stage.isFullScreen()) {
-                        stage.setFullScreen(false);
-                    } else {
-                        stage.setFullScreen(true);
-                    }
-                }
-            });
-        }
-
+        
         /**
          * Open the PDF File
          */
@@ -572,7 +557,7 @@ public class BaseViewerFX extends Application {
             transitionList.setValue(options.get(transitionType.ordinal()));
         }
         
-        toolbar.getItems().addAll(open, spacerLeft, back, pages, pageCount, forward, zoomIn, zoomOut, spacerRight, fullScreen, transitionList);
+        toolbar.getItems().addAll(open, spacerLeft, back, pages, pageCount, forward, zoomIn, zoomOut, spacerRight, transitionList);
         
         return toolbar;
     }
@@ -620,13 +605,21 @@ public class BaseViewerFX extends Application {
         
     }
 
-    private boolean openFile(final File input,String url, boolean isURL) {
+    private void openFile(final File input,String url, boolean isURL) {
         try {
             //Open the pdf file so we can check for encryption
             if(isURL){
                 pdf.openPdfFileFromURL(url,false);
             }else{
                 pdf.openPdfFile(input.getAbsolutePath());
+            }
+            
+            if(customPluginHandle!=null){
+                if(isURL){
+                    customPluginHandle.setFileName(url);
+                }else{
+                    customPluginHandle.setFileName(input.getAbsolutePath());
+                }
             }
             
             if(System.getProperty("org.jpedal.page") != null && !System.getProperty("org.jpedal.page").isEmpty()){
@@ -672,21 +665,22 @@ public class BaseViewerFX extends Application {
                 }
                 
             }
+
+            // Set up top bar values
+            ((Label)top.lookup("#pgCount")).setText("/" + pdf.getPageCount());
+            final ComboBox<String> pages = ((ComboBox<String>)top.lookup("#pages"));
+            pages.getItems().clear();
+            for(int i = 1; i <= pdf.getPageCount(); i++){
+                pages.getItems().add(String.valueOf(i));
+            }
+            // Goes to the first page and starts the decoding process
+            goToPage(currentPage);
+
         } catch (final PdfException ex) {
             ex.printStackTrace();
-            // If the pdf failed to open, don't decode it.
-            return true;
+
         }
-        // Set up top bar values
-        ((Label)top.lookup("#pgCount")).setText("/" + pdf.getPageCount());
-        final ComboBox<String> pages = ((ComboBox<String>)top.lookup("#pages"));
-        pages.getItems().clear();
-        for(int i = 1; i <= pdf.getPageCount(); i++){
-            pages.getItems().add(String.valueOf(i));
-        }
-        // Goes to the first page and starts the decoding process
-        goToPage(currentPage);
-        return false;                
+
     }
  
     /**
@@ -918,4 +912,7 @@ public class BaseViewerFX extends Application {
         pdf.setEffect(pdfBorder); 
     }
     
+    public void addExternalHandler(PluginHandler customPluginHandle){
+        this.customPluginHandle=customPluginHandle;
+    }
 }

@@ -37,7 +37,6 @@ import org.jpedal.color.PdfPaint;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.io.Serializable;
-import javafx.scene.shape.Path;
 
 
 /**
@@ -122,7 +121,7 @@ public class MarkerGlyph implements PdfGlyph, Serializable {
     }
 
     @Override
-    public Path getPath() {
+    public Object getPath() {
         throw new UnsupportedOperationException("getPath Not supported yet.");
     }
 }

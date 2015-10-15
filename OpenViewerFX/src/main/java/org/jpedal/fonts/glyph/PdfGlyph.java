@@ -34,7 +34,6 @@ package org.jpedal.fonts.glyph;
 
 import java.awt.*;
 import java.awt.geom.Area;
-import javafx.scene.shape.Path;
 
 import org.jpedal.color.PdfPaint;
 
@@ -85,5 +84,5 @@ public interface PdfGlyph {
 
     boolean containsBrokenData();
 
-    Path getPath();
+    Object getPath();
 }

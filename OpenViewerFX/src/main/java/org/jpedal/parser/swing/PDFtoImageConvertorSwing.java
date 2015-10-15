@@ -44,6 +44,7 @@ import org.jpedal.color.ColorSpaces;
 import org.jpedal.exception.PdfException;
 import org.jpedal.render.*;
 import org.jpedal.io.ObjectStore;
+import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.*;
 
@@ -56,8 +57,9 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
     }
 
     @Override
-    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore) {
-        return imageDisplay = new ImageDisplay(pageIndex,true, 5000, localStore);
+    public DynamicVectorRenderer getDisplay(final int pageIndex, final ObjectStore localStore,boolean isTransparent) {
+       
+        return imageDisplay = new ImageDisplay(pageIndex,!isTransparent, 5000, localStore); //note !isTransparent as actually addBackground
         
     }
 
@@ -119,7 +121,8 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
     
     
     @Override
-    public BufferedImage pageToImage(final boolean imageIsTransparent, final PdfStreamDecoder currentImageDecoder, final float scaling, final PdfObject pdfObject) throws PdfException {
+    public BufferedImage pageToImage(final boolean imageIsTransparent, final PdfStreamDecoder currentImageDecoder, final float scaling,
+            final PdfObject pdfObject,final AcroRenderer formRenderer) throws PdfException {
 
         final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 

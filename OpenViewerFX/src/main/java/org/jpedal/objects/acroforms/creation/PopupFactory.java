@@ -311,7 +311,7 @@ public class PopupFactory {
                 current.setGraphicsState(GraphicsState.FILL, gs.getAlpha(GraphicsState.FILL), PdfDictionary.Darken);
             }
 
-            current.drawImage(pageNumber, image, gs, false, form.getObjectRefAsString(), 0, -1);
+            current.drawImage(pageNumber, image, gs, false, form.getObjectRefAsString(), -1);
 
             if (form.getParameterConstant(PdfDictionary.Subtype) == PdfDictionary.Highlight) {
                 current.setGraphicsState(GraphicsState.STROKE, gs.getAlpha(GraphicsState.STROKE), PdfDictionary.Normal);

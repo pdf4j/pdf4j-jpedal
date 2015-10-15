@@ -34,7 +34,6 @@ package org.jpedal.fonts.glyph;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
-import javafx.scene.shape.Path;
 import org.jpedal.color.PdfPaint;
 
 /**
@@ -71,7 +70,7 @@ public abstract class BaseT1Glyph implements Serializable, PdfGlyph
     }
 
     @Override
-    public Path getPath() {
+    public Object getPath() {
         throw new UnsupportedOperationException("getPath Not supported yet.");
     }
     

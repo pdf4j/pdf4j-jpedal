@@ -482,7 +482,7 @@ public class RefTable {
             i=0;
             
             //allow for bum data at start
-            while(Bytes[i]==13 || Bytes[i]==10 || Bytes[i]==9) {
+            while(Bytes[i]==13 || Bytes[i] == 32  || Bytes[i]==10 || Bytes[i]==9) {
                 i++;
             }
             

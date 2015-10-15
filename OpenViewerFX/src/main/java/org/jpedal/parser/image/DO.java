@@ -162,10 +162,10 @@ public class DO extends ImageDecoder {
                         }
 
                         if(parserOptions.renderDirectly()){ //in own bit as other code not needed
-                            current.drawImage(parserOptions.getPageNumber(), image, gs, false, name, optionsApplied, -1);
+                            current.drawImage(parserOptions.getPageNumber(), image, gs, false, name, -1);
                         }else{
 
-                            final int id = current.drawImage(parserOptions.getPageNumber(), image, gs, false, name, optionsApplied,previousUse);
+                            final int id = current.drawImage(parserOptions.getPageNumber(), image, gs, false, name, previousUse);
 
                             /**
                              * store last usage in case it reappears unless it is transparent

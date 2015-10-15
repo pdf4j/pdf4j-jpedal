@@ -203,8 +203,10 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
     }
     
     @Override
-    public void paintPage(final Pane box, final AcroRenderer formRenderer, final TextLines textLines) {
+    public void paintPage(final Object rawBox, final AcroRenderer formRenderer, final TextLines textLines) {
         final boolean debugPane=false;
+        
+        final Pane box=(Pane)rawBox;
         
         final Group fxPane=((FXDisplay)currentDisplay).getFXPane();
         String pageNumberStr = String.valueOf(pageNumber);
@@ -340,6 +342,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         
         setPageSize(pageNumber, scaling);
 
+        lastFormPage = -1;
 //        if(displayView==SINGLE_PAGE){
 //            
 //            int[] singlePageSize=pdf.getMaximumSize();

@@ -511,7 +511,7 @@ public class Tj extends BaseDecoder {
                 int idx=glyphData.getRawInt();
                 
                 if(!glyphs.isCorrupted()){
-                    if(currentFontData.isCIDFont() && !glyphs.isIdentity()){
+                    if(currentFontData.isCIDFont() && !glyphs.isIdentity() && !glyphs.hasGIDtoCID()){ //should only be use dif no CIDtoGID used in mapping
                         final int mappedIdx=glyphs.getConvertedGlyph(idx);
                         
                         if(mappedIdx!=-1) {

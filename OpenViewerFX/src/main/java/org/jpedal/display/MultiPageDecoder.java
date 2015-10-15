@@ -516,7 +516,7 @@ public abstract class MultiPageDecoder {
 
         try {
 
-            currentDisplay.init(pageData.getMediaBoxWidth(pageNumber), pageData.getMediaBoxHeight(pageNumber),pageData.getRotation(pageNumber),options.getPageColor());
+            currentDisplay.init(pageData.getMediaBoxWidth(pageNumber), pageData.getMediaBoxHeight(pageNumber),options.getPageColor());
 
             currentDisplay.setValue(DynamicVectorRenderer.ALT_BACKGROUND_COLOR, options.getPageColor().getRGB());
             if(options.getTextColor()!=null){

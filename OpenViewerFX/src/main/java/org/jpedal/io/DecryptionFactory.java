@@ -192,12 +192,15 @@ public class DecryptionFactory {
             //use StmF values in preference
             int keyLength=this.keyLength;
 
-            if(rev==4 && StmFObj!=null){
-                final int lenKey=StmFObj.getInt(PdfDictionary.Length);
-                if(lenKey!=-1) {
-                    keyLength = lenKey;
-                }
-            }
+//            if(rev==4 && StmFObj!=null){
+//                final int lenKey=StmFObj.getInt(PdfDictionary.Length);
+//                if(lenKey!=-1) {
+//                    keyLength = lenKey;
+//                    if(keyLength>32){
+//                        keyLength = keyLength >>3;
+//                    }
+//                }
+//            }
 
             count=16;
             encryptionKey=calculateKey(O,P,ID);
@@ -302,14 +305,16 @@ public class DecryptionFactory {
         }else if(rev>=3){
 
             //use StmF values in preference
-            int keyLength=this.keyLength;
-            if(rev==4 && StmFObj!=null){
-                final int lenKey=StmFObj.getInt(PdfDictionary.Length);
-                if(lenKey!=-1) {
-                    keyLength = lenKey;
-                }
-
-            }
+            final int keyLength=this.keyLength;
+//            if(rev==4 && StmFObj!=null){
+//                final int lenKey=StmFObj.getInt(PdfDictionary.Length);
+//                if(lenKey!=-1) {
+//                    keyLength = lenKey;
+//                    if(keyLength>32){
+//                        keyLength = keyLength >>3;
+//                    }
+//                }
+//            }
 
             userPasswd=inputValue;
             final byte[] nextKey = new byte[keyLength];
@@ -864,10 +869,13 @@ public class DecryptionFactory {
 
                 //use CF values in preference
 
-                final int AESLength=AESObj.getInt(PdfDictionary.Length);
-                if(AESLength!=-1) {
-                    keyLength = AESLength;
-                }
+//                final int AESLength=AESObj.getInt(PdfDictionary.Length);
+//                if(AESLength!=-1) {
+//                    keyLength = AESLength;
+//                    if(keyLength>32){
+//                        keyLength = AESLength >>3;
+//                    }
+//                }
 
                 final String cryptName=AESObj.getName(PdfDictionary.CFM);
 

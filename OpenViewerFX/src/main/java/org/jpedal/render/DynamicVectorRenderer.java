@@ -173,10 +173,10 @@ public interface DynamicVectorRenderer  {
 	//public abstract Rectangle getCombinedAreas(Rectangle targetRectangle, boolean justText);
 
 	/*setup renderer*/
-	void init(int x, int y, int rawRotation, Color backgroundColor);
+	void init(int x, int y, Color backgroundColor);
 	
 	/* save image in array to draw */
-	int drawImage(int pageNumber, BufferedImage image, GraphicsState currentGraphicsState, boolean alreadyCached, String name, int optionsApplied, int previousUse);
+	int drawImage(int pageNumber, BufferedImage image, GraphicsState currentGraphicsState, boolean alreadyCached, String name, int previousUse);
 
 	/**
 	 * return which part of page drawn onto

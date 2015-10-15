@@ -35,9 +35,7 @@ package org.jpedal.parser.shape;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import javafx.scene.shape.Path;
 import org.jpedal.color.ColorSpaces;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.external.ShapeTracker;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
@@ -128,7 +126,7 @@ public class F {
             currentDrawShape.closeShape();
             
             Shape currentShape=null;
-            Path fxPath=null;
+            Object fxPath=null;
             
             /**
              * fx alternative
@@ -282,15 +280,15 @@ public class F {
          * draw the shape as image
          */
         final GraphicsState gs1 =new GraphicsState();
-        gs1.CTM=new float[][]{{smaskImage.getWidth(),0,1},{0,smaskImage.getHeight(),1},{0,0,0}};
+        gs1.CTM=new float[][]{{smaskImage.getWidth(),0,1},{0,-smaskImage.getHeight(),1},{0,0,0}};
         
         gs1.x=fx;
-        gs1.y=fy-smaskImage.getHeight();
+        gs1.y=fy;
         
         //add as image
         gs1.CTM[2][0]= gs1.x;
         gs1.CTM[2][1]= gs1.y;
-        current.drawImage(parserOptions.getPageNumber(),smaskImage, gs1,false, "F", PDFImageProcessing.IMAGE_INVERTED, -1);
+        current.drawImage(parserOptions.getPageNumber(),smaskImage, gs1,false, "F", -1);
         
         smaskImage.flush();
         

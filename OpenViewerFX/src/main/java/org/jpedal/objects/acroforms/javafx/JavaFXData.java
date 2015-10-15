@@ -284,7 +284,7 @@ public class JavaFXData extends GUIData {
         }
 
         // needed as code called recursively otherwise
-        if (forceRedraw || currentScaling != lastScaling || currentRotation != oldRotation || currentIndent != oldIndent){// || SwingUtilities.isEventDispatchThread()) {
+//        if (forceRedraw || currentScaling != lastScaling || currentRotation != oldRotation || currentIndent != oldIndent){// || SwingUtilities.isEventDispatchThread()) {
             
             oldRotation = currentRotation;
             lastScaling = currentScaling;
@@ -337,7 +337,7 @@ public class JavaFXData extends GUIData {
                     }
                 }
             }
-        }
+//        }
     }
 
     @Override

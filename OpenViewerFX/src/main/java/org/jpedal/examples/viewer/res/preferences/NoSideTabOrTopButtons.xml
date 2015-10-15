@@ -31,7 +31,7 @@
   <!--Flag to allow the viewer to auto update-->
   <automaticupdate value="true"/>
   <!--Value shows what version of the library is being used-->
-  <currentversion value="6.6b02"/>
+  <currentversion value="6.6b15"/>
   <!--Show message when using tiffs-->
   <showtiffmessage value="true"/>
   <!--The maximum number of viewers when using the multi viewer example-->
@@ -359,4 +359,8 @@
   <startViewerHeight value="-1"/>
   <!--Flag to track the side tab bar expanded width between sessions-->
   <trackSideTabExpandedSize value="false"/>
+  <!--Flag to set the JavaFX transition type-->
+  <transitionType value="None"/>
+  <!--Allow search result list to update during search (SWING VERSION ONLY)-->
+  <updateResultsDuringSearch value="true"/>
 </properties>

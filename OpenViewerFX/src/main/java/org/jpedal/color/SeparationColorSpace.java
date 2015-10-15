@@ -51,7 +51,6 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.util.*;
-import com.idrsolutions.image.jpeg2000.Jpeg2000Decoder;
 
 /**
  * handle Separation ColorSpace and some DeviceN functions
@@ -426,39 +425,9 @@ public class SeparationColorSpace extends GenericColorSpace {
     public BufferedImage  JPEG2000ToRGBImage(final byte[] data,int w,int h, final float[] decodeArray, final int pX, final int pY, final int d) throws PdfException{
         
         
-        BufferedImage image;
+        BufferedImage image=null;
         
-        try{
-           
-            Jpeg2000Decoder decoder = new Jpeg2000Decoder();
-            image = decoder.read(data);
-            IndexedColorMap = null;//make index null as we already processed
-            
-            
-            if(IndexedColorMap==null){ //avoid on index colorspaces
-                image=cleanupImage(image,pX,pY);
-            }
-            
-            final int iw = image.getWidth();
-            final int ih = image.getHeight();
-            
-            final DataBufferByte rgb = (DataBufferByte) image.getRaster().getDataBuffer();
-            final byte[] rawData=rgb.getData();
-            
-            //convert the image
-            if(getID()==ColorSpaces.DeviceN){
-                image=createImageN(iw, ih, rawData);
-            }else{
-                image=createImage(iw, ih, rawData, false);
-            }
-        } catch (final Exception ee) {
-            image = null;
-            
-            //<end-demo>
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in JPEG2000ToRGBImage: " + ee);
-            }
-        }
+        //
         
         return image;
         

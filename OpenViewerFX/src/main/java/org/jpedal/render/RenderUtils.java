@@ -58,7 +58,7 @@ public class RenderUtils {
         }
     }
 
-    static BufferedImage invertImage(BufferedImage image) {
+    public static BufferedImage invertImage(BufferedImage image) {
 
 //    	if((CTM[0][0]==0 || CTM[1][1]==0) || (isRotated(CTM) && !isInverted(CTM))) {
 //    		return image;

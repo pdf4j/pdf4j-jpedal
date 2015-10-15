@@ -37,8 +37,6 @@ import org.jpedal.render.DynamicVectorRenderer;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
-import javafx.scene.layout.Pane;
-
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.text.TextLines;
@@ -100,7 +98,7 @@ public interface Display {
 
     void resetViewableArea();
 
-    void paintPage(Pane box, AcroRenderer formRenderer, TextLines textLines);
+    void paintPage(Object box, AcroRenderer formRenderer, TextLines textLines);
     
     void paintPage(Graphics2D g2, AcroRenderer formRenderer, TextLines textLines);
     

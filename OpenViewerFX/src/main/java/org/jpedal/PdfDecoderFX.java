@@ -670,15 +670,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     @Override
     public BufferedImage getPageAsImage(final int pageIndex) throws PdfException {
         
-        final BufferedImage img=getPageAsImage(pageIndex, false);
+        return getPageAsImage(pageIndex, false);
         
-        //just incase also rendered
-        if(pages!=null){
-            final AcroRenderer formRenderer=externalHandlers.getFormRenderer();
-            formRenderer.getCompData().resetScaledLocation(pages.getOldScaling(), displayRotation, 0);
-        }
-        
-        return img;
     }
     //
     /**
@@ -886,7 +879,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
         final DynamicVectorRenderer currentDisplay= fileAccess.getDynamicRenderer();
         
-        currentDisplay.init(mediaW,max_y,displayRotation,options.getPageColor());
+        currentDisplay.init(mediaW,max_y,options.getPageColor());
         
         if(!currentDisplay.isHTMLorSVG()){
             currentDisplay.setValue(DynamicVectorRenderer.ALT_BACKGROUND_COLOR, options.getPageColor().getRGB());

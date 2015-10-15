@@ -61,7 +61,7 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
 
     // save image in array to draw
     @Override
-    public final int drawImage(final int pageNumber, final BufferedImage image, final GraphicsState gs, final boolean alreadyCached, final String name, final int optionsApplied, final int previousUse) {
+    public final int drawImage(final int pageNumber, final BufferedImage image, final GraphicsState gs, final boolean alreadyCached, final String name, final int previousUse) {
 
         //track objects
         int iw = (int) gs.CTM[0][0];
@@ -91,7 +91,7 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
 
         blendMode=gs.getBMValue();
 
-        renderImage(null, image, gs.getAlpha(GraphicsState.FILL), gs, gs.x, gs.y, optionsApplied);
+        renderImage(null, image, gs.getAlpha(GraphicsState.FILL), gs, gs.x, gs.y);
 
         return -1;
 

@@ -33,7 +33,6 @@
 package org.jpedal.objects;
 
 import java.awt.Shape;
-import javafx.scene.shape.Path;
 
 /**
  * allow us to have both Swing or javaFX implementations of Shape
@@ -70,7 +69,7 @@ public interface PdfShape {
 
     void addBezierCurveY(float parseFloat, float parseFloat0, float parseFloat1, float parseFloat2);
 
-    Path getPath();
+    Object getPath();
 
     boolean adjustLineWidth();
 

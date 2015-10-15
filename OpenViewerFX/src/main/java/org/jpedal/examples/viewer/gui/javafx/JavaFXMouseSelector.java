@@ -46,7 +46,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jpedal.PdfDecoderFX;
@@ -82,12 +81,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
     //Variables to keep track of multiple clicks
     private int clickCount;
     private long lastTime = -1;
-
-    //Page currently under the mouse
-    private int pageMouseIsOver = -1;
-
-    //Page currently being highlighted
-    private int pageOfHighlight = -1;
 
     //Find current highlighted page
     private boolean startHighlighting;
@@ -126,7 +119,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
     }
     ContextMenu cm;
-    private ContextMenu createRightClickMenu() {
+    private void createRightClickMenu() {
         
         /**
          * Setup Items and Menus.
@@ -407,7 +400,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
                 //cm.getItems().addAll(new SeparatorMenuItem(),speakHighlighted);
             }
         }
-        return cm;
+
     }
     
     @Override
@@ -587,9 +580,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
                 }
 
-                //Ensure this is reset to -1 regardless
-                pageOfHighlight = -1;
-
             } else if ((e.getButton().equals(MouseButton.SECONDARY)) &&
                  (currentGUI.getProperties().getValue("allowRightClick").toLowerCase().equals("true"))) {
                     if(cm==null){
@@ -630,15 +620,14 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
             }
 
             //Point values = getCoordsOnPage(e.getX(), e.getY(), commonValues.getCurrentPage());
-            if (pageMouseIsOver == pageOfHighlight) {
-                // Adjust to center of decode_pdf
-                final int pagenumber = decode_pdf.getPageNumber();
-                final int crx = decode_pdf.getPdfPageData().getCropBoxX(pagenumber);
-                final int cry = decode_pdf.getPdfPageData().getCropBoxY(pagenumber);
-                commonValues.m_x2 = (int) e.getX() + crx;
-                commonValues.m_y2 = (int) e.getY() + cry;
-            }
-
+           
+            // Adjust to center of decode_pdf
+            final int pagenumber = decode_pdf.getPageNumber();
+            final int crx = decode_pdf.getPdfPageData().getCropBoxX(pagenumber);
+            final int cry = decode_pdf.getPdfPageData().getCropBoxY(pagenumber);
+            commonValues.m_x2 = (int) e.getX() + crx;
+            commonValues.m_y2 = (int) e.getY() + cry;
+            
             if (commonValues.isPDF()) {
                 decode_pdf.setCursor(Cursor.TEXT);
                 generateNewCursorBox();
@@ -698,484 +687,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 //        point.setY(y);
 //        return point;
     }
-    
-    @SuppressWarnings("unused")
-    private Point getPageCoordsInContinuousDisplayMode(double x, double y, int page){
-        
-        final Display pages= decode_pdf.getPages();
-        
-       
-            final int[] flag = new int[2];
-            
-            flag[0] = GUI.CURSOR;
-            flag[1]=0;
-            
-            //In continuous pages are centred so we need make
-            double xAdjustment = (decode_pdf.getWidth()/2) - (decode_pdf.getPdfPageData().getScaledCropBoxWidth(page)/2);
-            if(xAdjustment<0) {
-                xAdjustment = 0;
-            } else{
-                //This adjustment is the correct position.
-                //Offset removed to that when used later we get either offset unaltered or correct position
-                xAdjustment -= pages.getXCordForPage(page);
-            }
-            Rectangle pageArea = new Rectangle(pages.getXCordForPage(page)+xAdjustment,
-                    pages.getYCordForPage(page),
-                    decode_pdf.getPdfPageData().getScaledCropBoxWidth(page),
-                    decode_pdf.getPdfPageData().getScaledCropBoxHeight(page));
-            if(pageArea.contains(x,y)){
-                //set displayed
-                flag[1] = 1;
-            }
-            
-            
-            
-            if(flag[1]==0){
-                if(y<pageArea.getY() && page>1){
-                    while(flag[1]==0 && page>1){
-                        page--;
-                        pageArea = new Rectangle(pages.getXCordForPage(page)+xAdjustment,
-                                pages.getYCordForPage(page),
-                                decode_pdf.getPdfPageData().getScaledCropBoxWidth(page),
-                                decode_pdf.getPdfPageData().getScaledCropBoxHeight(page));
-                        if(pageArea.contains(x,y)){
-                            //set displayed
-                            flag[1] = 1;
-                        }
-                    }
-                }else{
-                    if(y>pageArea.getY()+pageArea.getHeight() && page<commonValues.getPageCount()){
-                        while(flag[1]==0 && page<commonValues.getPageCount()){
-                            page++;
-                            pageArea = new Rectangle(pages.getXCordForPage(page)+xAdjustment,
-                                    pages.getYCordForPage(page),
-                                    decode_pdf.getPdfPageData().getScaledCropBoxWidth(page),
-                                    decode_pdf.getPdfPageData().getScaledCropBoxHeight(page));
-                            if(pageArea.contains(x,y)){
-                                //set displayed
-                                flag[1] = 1;
-                            }
-                        }
-                    }
-                }
-            
-            
-            //Set highlighting page
-            if(pageOfHighlight==-1 && startHighlighting){
-                pageOfHighlight = page;
-            }
-            
-            //Keep track of page mouse is over at all times
-            pageMouseIsOver = page;
-            
-        }
-            
-        //Tidy coords for multipage views
-        y= ((pages.getYCordForPage(page)+decode_pdf.getPdfPageData().getScaledCropBoxHeight(page))+decode_pdf.getInsetH())-y;
-            
-        currentGUI.setMultibox(flag);
-
-        final float scaling=currentGUI.getScaling();
-        final int inset= GUI.getPDFDisplayInset();
-        final int rotation=currentGUI.getRotation();
-        
-        //Apply inset to values
-        int ex=adjustForAlignment((int)x, decode_pdf)-inset;
-        double ey=y-inset;
-        
-        this.page_data = decode_pdf.getPdfPageData();
-        final int mediaH = page_data.getMediaBoxHeight(commonValues.getCurrentPage());
-        
-        //undo any viewport scaling
-        if(commonValues.maxViewY!=0){ // will not be zero if viewport in play
-            ex=(int)(((ex-(commonValues.dx*scaling))/commonValues.viewportScale));
-            ey=(int)((mediaH-((mediaH-(ey/scaling)-commonValues.dy)/commonValues.viewportScale))*scaling);
-        }
-        
-        //Apply page scale to value
-        x=(int)((ex)/scaling);
-        y=(int)((ey/scaling));
-        
-        
-        final int cropX = page_data.getCropBoxX(commonValues.getCurrentPage());
-        final int cropY = page_data.getCropBoxY(commonValues.getCurrentPage());
-        final int cropW = page_data.getCropBoxWidth(commonValues.getCurrentPage());
-        final int cropH = page_data.getCropBoxHeight(commonValues.getCurrentPage());
-        //Apply rotation to values
-        if(rotation==90){
-            final double tmp=(x+cropY);
-            x = (y+cropX);
-            y =tmp;
-        }else if((rotation==180)){
-            x =(cropW+cropX)-x;
-            y =(y+cropY);
-        }else if((rotation==270)){
-            final double tmp=(cropH+cropY)-x;
-            x =(cropW+cropX)-y;
-            y =tmp;
-        }else{
-            x = (x+cropX);
-            if(decode_pdf.getDisplayView()==Display.SINGLE_PAGE) {
-                y = (cropH + cropY) - y;
-            } else {
-                y = (cropY) + y;
-            }
-        }
-        
-        final Point point = new Point();
-        point.setX(x);
-        point.setY(y);
-        return point;
-    }
-    
-    @SuppressWarnings("unused")
-    private Point getPageCoordsInSingleDisplayMode(double x, double y, final int page){
-        
-            final int[] flag = new int[2];
-            
-            flag[0] = GUI.CURSOR;
-            flag[1]=0;
-            
-            final int pageWidth;
-        final int pageHeight;
-        if (currentGUI.getRotation()%180==90) {
-                pageWidth = decode_pdf.getPdfPageData().getScaledCropBoxHeight(page);
-                pageHeight = decode_pdf.getPdfPageData().getScaledCropBoxWidth(page);
-            } else {
-                pageWidth = decode_pdf.getPdfPageData().getScaledCropBoxWidth(page);
-                pageHeight = decode_pdf.getPdfPageData().getScaledCropBoxHeight(page);
-            }
-            
-            final Rectangle pageArea = new Rectangle(
-                    (decode_pdf.getBoundsInLocal().getWidth()/2) - (pageWidth/2),
-                    decode_pdf.getInsetH(),
-                    pageWidth,
-                    pageHeight);
-            
-            if (pageArea.contains(x,y))
-                //set displayed
-            {
-                flag[1] = 1;
-            } else
-                //set not displayed
-            {
-                flag[1] = 0;
-            }
-            
-            //Set highlighting page
-            if(pageOfHighlight==-1 && startHighlighting){
-                pageOfHighlight = page;
-            }
-            
-            //Keep track of page the mouse is over at all times
-            pageMouseIsOver = page;
-            
-            currentGUI.setMultibox(flag);
-        
-        
-        final float scaling=currentGUI.getScaling();
-        final int inset= GUI.getPDFDisplayInset();
-        final int rotation=currentGUI.getRotation();
-        
-        
-        //Apply inset to values
-        int ex=adjustForAlignment((int)x,decode_pdf)-inset;
-        double ey=y-inset;
-        
-        this.page_data = decode_pdf.getPdfPageData();
-        final int mediaH = page_data.getMediaBoxHeight(commonValues.getCurrentPage());
-        
-        //undo any viewport scaling
-        if(commonValues.maxViewY!=0){ // will not be zero if viewport in play
-            ex=(int)(((ex-(commonValues.dx*scaling))/commonValues.viewportScale));
-            ey=(int)((mediaH-((mediaH-(ey/scaling)-commonValues.dy)/commonValues.viewportScale))*scaling);
-        }
-        
-        //Apply page scale to value
-        x=(int)((ex)/scaling);
-        y=(int)((ey/scaling));
-        
-        final int cropX = page_data.getCropBoxX(commonValues.getCurrentPage());
-        final int cropY = page_data.getCropBoxY(commonValues.getCurrentPage());
-        final int cropW = page_data.getCropBoxWidth(commonValues.getCurrentPage());
-        final int cropH = page_data.getCropBoxHeight(commonValues.getCurrentPage());
-        
-        //Apply rotation to values
-        if(rotation==90){
-            final double tmp=(x+cropY);
-            x = (y+cropX);
-            y =tmp;
-        }else if((rotation==180)){
-            x =(cropW+cropX)-x;
-            y =(y+cropY);
-        }else if((rotation==270)){
-            final double tmp=(cropH+cropY)-x;
-            x =(cropW+cropX)-y;
-            y =tmp;
-        }else{
-            x = (x+cropX);
-            if(decode_pdf.getDisplayView()==Display.SINGLE_PAGE) {
-                y = (cropH + cropY) - y;
-            } else {
-                y = (cropY) + y;
-            }
-        }
-        
-        final Point point = new Point();
-        point.setX(x);
-        point.setY(y);
-        return point;
-    }
-    
-    @SuppressWarnings("unused")
-    private Point getPageCoordsInFacingDisplayMode(double x, double y){
-        
-        final int[] flag = new int[2];
-        flag[0] = GUI.CURSOR;
-        
-            //get raw w and h
-            final int rawW;
-        final int rawH;
-        if (currentGUI.getRotation()%180==90) {
-                rawW = decode_pdf.getPdfPageData().getCropBoxHeight(1);
-                rawH = decode_pdf.getPdfPageData().getCropBoxWidth(1);
-            } else {
-                rawW = decode_pdf.getPdfPageData().getCropBoxWidth(1);
-                rawH = decode_pdf.getPdfPageData().getCropBoxHeight(1);
-            }
-            
-            float scaling = decode_pdf.getScaling();
-            
-            final double pageHeight = scaling*rawH;
-            final double pageWidth = scaling*rawW;
-            final int yStart = decode_pdf.getInsetH();
-            
-            //move so relative to center
-            double left = (decode_pdf.getWidth()/2) - (pageWidth/2);
-            double right = (decode_pdf.getWidth()/2) + (pageWidth/2);
-            
-            if(decode_pdf.getDisplayView()==Display.FACING){
-            	 left = (decode_pdf.getWidth()/2);
-            	 if(decode_pdf.getPageNumber()!=1 || decode_pdf.getPageCount()==2) {
-                     left -= (pageWidth);
-                 }
-            	 
-                 right = (decode_pdf.getWidth()/2) + (pageWidth);
-            }
-            
-            if (x >= left && x <= right &&
-                    y >= yStart && y <= yStart + pageHeight)
-                //set displayed
-            {
-                flag[1] = 1;
-            } else
-                //set not displayed
-            {
-                flag[1] = 0;
-            }
-        
-        currentGUI.setMultibox(flag);
-    
-        scaling=currentGUI.getScaling();
-        final int inset= GUI.getPDFDisplayInset();
-        final int rotation=currentGUI.getRotation();
-        
-        
-        //Apply inset to values
-        int ex=adjustForAlignment((int)x,decode_pdf)-inset;
-        double ey=y-inset;
-        
-        this.page_data = decode_pdf.getPdfPageData();
-        final int mediaH = page_data.getMediaBoxHeight(commonValues.getCurrentPage());
-        
-        //undo any viewport scaling
-        if(commonValues.maxViewY!=0){ // will not be zero if viewport in play
-            ex=(int)(((ex-(commonValues.dx*scaling))/commonValues.viewportScale));
-            ey=(int)((mediaH-((mediaH-(ey/scaling)-commonValues.dy)/commonValues.viewportScale))*scaling);
-        }
-        
-        //Apply page scale to value
-        x=(int)((ex)/scaling);
-        y=(int)((ey/scaling));
-        
-        final int cropX = page_data.getCropBoxX(commonValues.getCurrentPage());
-        final int cropY = page_data.getCropBoxY(commonValues.getCurrentPage());
-        final int cropW = page_data.getCropBoxWidth(commonValues.getCurrentPage());
-        final int cropH = page_data.getCropBoxHeight(commonValues.getCurrentPage());
-        
-        //Apply rotation to values
-        if(rotation==90){
-            final double tmp=(x+cropY);
-            x = (y+cropX);
-            y =tmp;
-        }else if((rotation==180)){
-            x =(cropW+cropX)-x;
-            y =(y+cropY);
-        }else if((rotation==270)){
-            final double tmp=(cropH+cropY)-x;
-            x =(cropW+cropX)-y;
-            y =tmp;
-        }else{
-            x = (x+cropX);
-            if(decode_pdf.getDisplayView()==Display.SINGLE_PAGE) {
-                y = (cropH + cropY) - y;
-            } else {
-                y = (cropY) + y;
-            }
-        }
-        
-        final Point point = new Point();
-        point.setX(x);
-        point.setY(y);
-        return point;
-    }
-    
-    @SuppressWarnings("unused")
-    private Point getPageCoordsInContinuousFacingDisplayMode(double x, double y, int page){
-        
-        final Display pages= decode_pdf.getPages();
-        
-
-            final int[] flag = new int[2];
-            
-            flag[0] = GUI.CURSOR;
-            flag[1]=0;
-            
-            //Check if we are in the region of the left or right pages
-            if(page != 1 && x>(decode_pdf.getWidth()/2) && page<commonValues.getPageCount()){// && x>pageArea.x){
-                page++;
-            }
-            
-            //Set the adjustment for page position
-            double xAdjustment = (decode_pdf.getWidth()/2) - (decode_pdf.getPdfPageData().getScaledCropBoxWidth(page))-(decode_pdf.getInsetW());
-            
-            //Unsure if this is needed. Still checking
-            if(xAdjustment<0){
-                System.err.println("x adjustment is less than 0");
-                xAdjustment = 0;
-            }
-            
-            //Check to see if pagearea contains the mouse
-            Rectangle pageArea = new Rectangle(pages.getXCordForPage(page)+xAdjustment,
-                    pages.getYCordForPage(page),
-                    decode_pdf.getPdfPageData().getScaledCropBoxWidth(page),
-                    decode_pdf.getPdfPageData().getScaledCropBoxHeight(page));
-            if(pageArea.contains(x,y)){
-                //set displayed
-                flag[1] = 1;
-            }
-            
-            
-            //If neither of the two current pages contain the mouse start checking the other pages
-            //Could be improved to minimise on the loops and calls to decode_pdf.getPageOffsets(page)
-            if(flag[1]==0){
-                if(y<pageArea.getY() && page>1){
-                    while(flag[1]==0 && page>1){
-                        page--;
-                        xAdjustment = (decode_pdf.getWidth()/2) - (decode_pdf.getPdfPageData().getScaledCropBoxWidth(page))-(decode_pdf.getInsetW());
-                        if(xAdjustment<0) {
-                            xAdjustment = 0;
-                        }
-                        pageArea = new Rectangle(pages.getXCordForPage(page)+xAdjustment,
-                                pages.getYCordForPage(page),
-                                decode_pdf.getPdfPageData().getScaledCropBoxWidth(page),
-                                decode_pdf.getPdfPageData().getScaledCropBoxHeight(page));
-                        if(pageArea.contains(x,y)){
-                            //set displayed
-                            flag[1] = 1;
-                        }
-                        
-                    }
-                }else{
-                    if(y>pageArea.getY()+pageArea.getHeight() && page<commonValues.getPageCount()){
-                        while(flag[1]==0 && page<commonValues.getPageCount()){
-                            page++;
-                            xAdjustment = (decode_pdf.getWidth()/2) - (decode_pdf.getPdfPageData().getScaledCropBoxWidth(page))-(decode_pdf.getInsetW());
-                            if(xAdjustment<0) {
-                                xAdjustment = 0;
-                            }
-                            pageArea = new Rectangle(pages.getXCordForPage(page)+xAdjustment,
-                                    pages.getYCordForPage(page),
-                                    decode_pdf.getPdfPageData().getScaledCropBoxWidth(page),
-                                    decode_pdf.getPdfPageData().getScaledCropBoxHeight(page));
-                            if(pageArea.contains(x,y)){
-                                //set displayed
-                                flag[1] = 1;
-                            }
-                            
-                        }
-                    }
-                }
-            }
-            
-            //Set highlighting page
-            if(pageOfHighlight==-1 && startHighlighting){
-                pageOfHighlight = page;
-            }
-            
-            //Keep track of page mouse is over at all times
-            pageMouseIsOver = page;
-            
-            //Tidy coords for multipage views
-            y= (((pages.getYCordForPage(page)+decode_pdf.getPdfPageData().getScaledCropBoxHeight(page))+decode_pdf.getInsetH()))-y;
-            
-            x -= ((pages.getXCordForPage(page))-decode_pdf.getInsetW());
-            
-            currentGUI.setMultibox(flag);
-            
-        
-        
-        final float scaling=currentGUI.getScaling();
-        final int inset= GUI.getPDFDisplayInset();
-        final int rotation=currentGUI.getRotation();
-        
-        
-        //Apply inset to values
-        int ex=adjustForAlignment((int)x,decode_pdf)-inset;
-        double ey=y-inset;
-        this.page_data = decode_pdf.getPdfPageData();
-        final int cropW = page_data.getCropBoxWidth(commonValues.getCurrentPage());
-        final int cropH = page_data.getCropBoxHeight(commonValues.getCurrentPage());
-        
-        //undo any viewport scaling
-        if(commonValues.maxViewY!=0){ // will not be zero if viewport in play
-            ex=(int)(((ex-(commonValues.dx*scaling))/commonValues.viewportScale));
-            ey=(int)((cropH-((cropH-(ey/scaling)-commonValues.dy)/commonValues.viewportScale))*scaling);
-        }
-        
-        //Apply page scale to value
-        x=(int)((ex)/scaling);
-        y=(int)((ey/scaling));
-        
-        final int cropX = page_data.getCropBoxX(commonValues.getCurrentPage());
-        final int cropY = page_data.getCropBoxY(commonValues.getCurrentPage());
-        
-        //Apply rotation to values
-        if(rotation==90){
-            final double tmp=(x+cropY);
-            x = (y+cropX);
-            y =tmp;
-        }else if((rotation==180)){
-            x =(cropW+cropX)-x;
-            y =(y+cropY);
-        }else if((rotation==270)){
-            final double tmp=(cropH+cropY)-x;
-            x =(cropW+cropX)-y;
-            y =tmp;
-        }else{
-            x = (x+cropX);
-            if(decode_pdf.getDisplayView()==Display.SINGLE_PAGE) {
-                y = (cropH + cropY) - y;
-            } else {
-                y = (cropY) + y;
-            }
-        }
-        final Point point = new Point();
-        point.setX(x);
-        point.setY(y);
-        return point;
-    }
-    
+  
     /**
      * Checks to see whether the primary mouse button or any other key that
      * is not the secondary mouse button or the middle mouse button is pressed,

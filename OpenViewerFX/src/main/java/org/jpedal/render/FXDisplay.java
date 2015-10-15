@@ -52,7 +52,6 @@ import javafx.scene.transform.Transform;
 //import javafx.stage.Modality;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.PatternColorSpace;
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.exception.PdfException;
 //import org.jpedal.examples.viewer.gui.javafx.dialog.FXMessageDialog;
 import org.jpedal.fonts.PdfFont;
@@ -147,7 +146,7 @@ public class FXDisplay extends GUIDisplay {
     @Override
     public int drawImage(final int pageNumber, final BufferedImage image,
     final GraphicsState currentGraphicsState,
-    final boolean alreadyCached, final String name, final int optionsApplied, final int previousUse) {
+    final boolean alreadyCached, final String name, final int previousUse) {
 
         this.rawPageNumber =pageNumber;
         float CTM[][]=currentGraphicsState.CTM;
@@ -160,25 +159,11 @@ public class FXDisplay extends GUIDisplay {
         final ImageView im1View = new ImageView(fxImage);
         
         // Stores the affine used on the image to use on the clip later
-        float[] affine = new float[6];
-        
-        if(optionsApplied==PDFImageProcessing.IMAGE_INVERTED){
-            affine = new float[]{CTM[0][0]/imageW,CTM[0][1]/imageW,
-                CTM[1][0]/imageH,CTM[1][1]/imageH,
-                CTM[2][0],CTM[2][1]};
-            
-            im1View.getTransforms().setAll(Transform.affine(affine[0], affine[1], affine[2], affine[3], affine[4], affine[5]));  
-        }else if(optionsApplied==PDFImageProcessing.NOTHING){
-            
-            affine = new float[]{CTM[0][0]/imageW,CTM[0][1]/imageW,
+        float[] affine = {CTM[0][0]/imageW,CTM[0][1]/imageW,
                 -CTM[1][0]/imageH,-CTM[1][1]/imageH,
                 CTM[2][0]+CTM[1][0],CTM[2][1]+CTM[1][1]};
             
-            im1View.getTransforms().setAll(Transform.affine(affine[0], affine[1], affine[2], affine[3], affine[4], affine[5]));
-           
-        }else{
-            //
-        }
+        im1View.getTransforms().setAll(Transform.affine(affine[0], affine[1], affine[2], affine[3], affine[4], affine[5]));
         
         setClip(currentGraphicsState, affine, im1View);
         setBlendMode(currentGraphicsState, im1View);
@@ -454,10 +439,17 @@ public class FXDisplay extends GUIDisplay {
             
             // System.out.println("embeddedGlyph = "+ embeddedGlyph+" "+at+" "+Trm[0][0]);
 
-            final Path path=embeddedGlyph.getPath();
+            final Path path=(Path) embeddedGlyph.getPath();
 
+            if(path==null){
+                //
+                
+                return;
+            }
+            
             path.setFillRule(FillRule.EVEN_ODD);
-
+            
+           
             if(type!=DynamicVectorRenderer.TRUETYPE){
                   path.getTransforms().setAll(Transform.affine(textScaling[0],textScaling[1],textScaling[2],textScaling[3],textScaling[4],textScaling[5]));        
             }else{

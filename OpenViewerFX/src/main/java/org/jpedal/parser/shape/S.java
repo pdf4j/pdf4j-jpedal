@@ -34,7 +34,6 @@ package org.jpedal.parser.shape;
 
 import java.awt.*;
 import java.awt.geom.Area;
-import javafx.scene.shape.Path;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfShape;
 import org.jpedal.parser.Cmd;
@@ -57,7 +56,7 @@ public class S {
                 currentDrawShape.closeShape();
             }
             
-            Path fxPath=null;
+            Object fxPath=null;
             
             float realLineWidth=-1;
             /**

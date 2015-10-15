@@ -829,7 +829,6 @@ public class PdfStreamDecoder extends BaseDecoder{
                                     //imageDecoder.setFloatValue(SamplingUsed, samplingUsed);
                                     //imageDecoder.setFileHandler(currentPdfFile);
                                     imageDecoder.setRenderer(current);
-                                    imageDecoder.setIsImage(imageStatus);
                                     
                                     imageDecoder.setParameters(parserOptions.isRenderPage(), parserOptions.getRenderMode(), parserOptions.getExtractionMode(), isPrinting,isType3Font,useHiResImageForDisplay);
                                     imageDecoder.setParams(parserOptions);
@@ -1067,11 +1066,11 @@ public class PdfStreamDecoder extends BaseDecoder{
                 //break;
                 
             case Cmd.J :
-                J.execute(false, parser.parseInt(0), gs);
+                J.execute(false, parser.parseInt(), gs);
                 break;
                 
             case Cmd.j :
-                J.execute(true, parser.parseInt(0), gs);
+                J.execute(true, parser.parseInt(), gs);
                 break;
                 
             case Cmd.l :
@@ -1431,7 +1430,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 break;
                 
             case Cmd.Tr :
-                final int value= TR.execute(parser.parseInt(0), gs);
+                final int value= TR.execute(parser.parseInt(), gs);
                 if (parserOptions.isRenderPage() && !parserOptions.renderDirectly()) {
                     current.drawTR(value);
                 }

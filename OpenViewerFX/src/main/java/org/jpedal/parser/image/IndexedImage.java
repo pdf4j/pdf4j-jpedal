@@ -66,8 +66,10 @@ public class IndexedImage {
             //workout size and check in range
             //int size =decodeColorData.getIndexSize()+1;
             
-            //pick out daft setting of totally empty iamge and ignore
-            if(d==8 && decodeColorData.getIndexSize()==0 && decodeColorData.getID()==ColorSpaces.DeviceRGB){
+            //pick out daft setting of totally empty image and ignore
+            if(d==8 && decodeColorData.getIndexSize()==0 && 
+                    decodeColorData.getID()==ColorSpaces.DeviceRGB
+                   && decodeColorData.getRawColorSpacePDFType()!=ColorSpaces.ICC){
                 
                 boolean hasPixels=false;
                 

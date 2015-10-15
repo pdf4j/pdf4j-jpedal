@@ -38,7 +38,6 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.util.Arrays;
-import org.jpedal.images.ImageOps;
 import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.utils.LogWriter;
 
@@ -97,7 +96,7 @@ class ThreeComponentImage {
         }
         
         BufferedImage image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-        data=ImageOps.checkSize(data,w,h,3);
+        data=checkSize(data,w,h,3);
         final Raster raster = ColorSpaceConvertor.createInterleavedRaster(data, w, h);
         image.setData(raster);
         
@@ -165,6 +164,18 @@ class ThreeComponentImage {
             
         }
         return image;
+    }
+    
+    private static byte[] checkSize(byte[] data, final int w, final int h, final int comp) {
+
+        final int correctSize=w*h*comp;
+        if(data.length<correctSize){
+            final byte[] newData=new byte[correctSize];
+            System.arraycopy(data,0,newData,0,data.length);
+            data=newData;
+        }
+
+        return data;
     }
     
 }

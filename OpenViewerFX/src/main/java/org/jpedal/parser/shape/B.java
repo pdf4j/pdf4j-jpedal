@@ -34,7 +34,6 @@ package org.jpedal.parser.shape;
 
 import java.awt.Shape;
 import java.awt.geom.Area;
-import javafx.scene.shape.Path;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfShape;
@@ -65,7 +64,7 @@ public class B {
             }
 
             
-            Path fxPath=null;
+            Object fxPath=null;
             
             /**
              * fx alternative

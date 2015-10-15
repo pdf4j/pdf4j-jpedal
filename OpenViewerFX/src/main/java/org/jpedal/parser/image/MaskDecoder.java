@@ -188,8 +188,13 @@ public class MaskDecoder {
         */
         final int maskW=newMask.getInt(PdfDictionary.Width);
         final int maskH=newMask.getInt(PdfDictionary.Height);
-        final int maskD=newMask.getInt(PdfDictionary.BitsPerComponent);
-       
+        int maskD=newMask.getInt(PdfDictionary.BitsPerComponent);
+        
+        final boolean isImageMask=newMask.getBoolean(PdfDictionary.ImageMask); //for example, see  Case 22754
+        if(isImageMask){
+            maskD=1;
+        }
+        
         //needs to be 'normalised to 8  bit'
         if(maskD!=8){
             maskData=ColorSpaceConvertor.normaliseTo8Bit(maskD, maskW, maskH, maskData);

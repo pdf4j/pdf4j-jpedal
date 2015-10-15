@@ -52,6 +52,8 @@ import org.jpedal.fonts.tt.Table;
 
 public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
+    protected boolean hasGIDtoCID;
+
     /**shapes we have already drawn to speed up plotting, or <code>null</code> if there are none*/
     private Area[] cachedShapes;
     private AffineTransform[] cachedAt;
@@ -797,5 +799,9 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
     public Table getTable(final int LOCA) {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    public boolean hasGIDtoCID() {
+        return hasGIDtoCID;
     }
 }

@@ -105,7 +105,7 @@ public class FXStartup extends Application {
     
     public void start(final Stage initstage){
         
-        final boolean showSplashScreen  = false;
+        boolean showSplashScreen  = false;
         
         if(showSplashScreen){
             System.out.println("Starting the SplashScreen");

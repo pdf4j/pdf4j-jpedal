@@ -32,7 +32,6 @@
  */
 package org.jpedal.parser.image;
 
-import org.jpedal.constants.PDFImageProcessing;
 import org.jpedal.exception.PdfException;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
@@ -187,16 +186,21 @@ public class MaskUtils {
 //            System.out.println(PdfDictionary.showAsConstant(bmValue));
 //        }
 
+        gs1.CTM[1][1]=-gs1.CTM[1][1];
+        gs1.CTM[2][1] -= gs1.CTM[1][1];
+            
         //separate call needed to paint image on thumbnail or background image in HTML/SVG
         if(current.isHTMLorSVG()){
-            current.drawImage(parserOptions.getPageNumber(),image,gs1,false,name,PDFImageProcessing.IMAGE_INVERTED, -3);
+            
+            current.drawImage(parserOptions.getPageNumber(),image,gs1,false,name, -3);
 
-            gs1.CTM[1][1]=-gs1.CTM[1][1];
-            gs1.CTM[2][1] -= gs1.CTM[1][1];
-            current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name,0, -2);
+            current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -2);
 
         }else{
-            current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, PDFImageProcessing.IMAGE_INVERTED, -1);
+            
+            gs1.y = gs1.CTM[2][1];
+            
+            current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -1);
         }
 
         if(isChanged){

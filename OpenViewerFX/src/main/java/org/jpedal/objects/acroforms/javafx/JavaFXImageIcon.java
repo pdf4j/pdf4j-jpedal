@@ -260,9 +260,13 @@ public class JavaFXImageIcon extends ImageView {
 				final BufferedImage rootImageSelectedAWT = FormStream.decode(formObject,currentpdffile, selObj, subtype,newWidth,newHeight,offsetImage,1);
 				final BufferedImage imageSelectedAWT = FormStream.rotate(rootImageSelectedAWT,iconRotation);
                 
-                rootImageSelected = SwingFXUtils.toFXImage(rootImageSelectedAWT, null);
-                imageSelected = SwingFXUtils.toFXImage(imageSelectedAWT, null);
+                if(rootImageSelectedAWT!=null){
+                    rootImageSelected = SwingFXUtils.toFXImage(rootImageSelectedAWT, null);
+                }
                 
+                if(imageSelectedAWT!=null){
+                    imageSelected = SwingFXUtils.toFXImage(imageSelectedAWT, null);
+                }
 			}//icon rotation is always defined in the constructor so we dont need to change it
 		}
 	}

@@ -37,7 +37,10 @@ import org.jpedal.color.PdfPaint;
 import org.jpedal.io.ObjectStore;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.Map;
+import org.jpedal.objects.GraphicsState;
 
 public class T3Display extends SwingDisplay implements T3Renderer{
 
@@ -86,4 +89,21 @@ public class T3Display extends SwingDisplay implements T3Renderer{
         fillCol=new PdfColor (nonstrokeColor.getRed(),nonstrokeColor.getGreen(),nonstrokeColor.getBlue());
 
     }
+    
+     @Override
+     void renderImage(final AffineTransform imageAf, BufferedImage image, final float alpha,
+            final GraphicsState currentGraphicsState, final float x, final float y) {
+
+        
+        /**
+         * color type3 glyphs if not black
+         */
+        if (image !=null && fillCol != null) {
+
+            image = T3ImageUtils.handleType3Image(image, fillCol);
+
+        }
+        
+        super.renderImage(imageAf, image, alpha, currentGraphicsState,  x, y);
+     }
 }

@@ -739,7 +739,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.6b15")){
+                        if(properties[position+1].equals("6.6b16")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

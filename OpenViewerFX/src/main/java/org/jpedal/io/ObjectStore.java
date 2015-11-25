@@ -182,9 +182,7 @@ public class ObjectStore {
             }
 
         }catch(final Exception e){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to create temp dir at " + temp_dir+ ' ' +e);
-            }
+            LogWriter.writeLog("Unable to create temp dir at " + temp_dir+ ' ' +e);
         }
     }
 
@@ -301,10 +299,8 @@ public class ObjectStore {
             a.close();
 
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to save CMYK jpeg " + name+ ' ' +e);
-            }
-
+            LogWriter.writeLog("Unable to save CMYK jpeg " + name+ ' ' +e);
+            
             isSuccessful=false;
         }
 
@@ -573,9 +569,7 @@ public class ObjectStore {
             }
 
         }catch(final Exception e){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " flushing files");
-            }
+            LogWriter.writeLog("Exception " + e + " flushing files");
         }
     }
 
@@ -648,9 +642,7 @@ public class ObjectStore {
             tempFileNames.put(file_name,"#");
 
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " writing image " + image + " as " + file_name);
-            }
+            LogWriter.writeLog("Exception " + e + " writing image " + image + " as " + file_name);
         }
 
         //save unclipped copy or make sure only original
@@ -703,9 +695,7 @@ public class ObjectStore {
                 to.write(buffer, 0, bytes_read);
             }
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " copying file");
-            }
+            LogWriter.writeLog("Exception " + e + " copying file");
         }
 
         //close streams
@@ -713,9 +703,7 @@ public class ObjectStore {
             to.close();
             from.close();
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " closing files");
-            }
+            LogWriter.writeLog("Exception " + e + " closing files");
         }
     }
 
@@ -746,9 +734,7 @@ public class ObjectStore {
                 to.write(buffer, 0, bytes_read);
             }
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " copying file");
-            }
+            LogWriter.writeLog("Exception " + e + " copying file");
         }
 
         //close streams
@@ -756,9 +742,7 @@ public class ObjectStore {
             to.close();
             from.close();
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " closing files");
-            }
+            LogWriter.writeLog("Exception " + e + " closing files");
         }
     }
 
@@ -780,9 +764,7 @@ public class ObjectStore {
             from = new BufferedInputStream(new FileInputStream(source));
             to = new BufferedOutputStream(new FileOutputStream(destination));
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " copying file");
-            }
+            LogWriter.writeLog("Exception " + e + " copying file");
         }
 
         copy(from, to);
@@ -797,9 +779,7 @@ public class ObjectStore {
                 to.write(buffer, 0, bytes_read);
             }
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " copying file");
-            }
+            LogWriter.writeLog("Exception " + e + " copying file");
         }
 
         //close streams
@@ -807,10 +787,7 @@ public class ObjectStore {
             to.close();
             from.close();
         } catch (final Exception e) {
-
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " closing files");
-            }
+            LogWriter.writeLog("Exception " + e + " closing files");
         }
     }
 
@@ -829,9 +806,7 @@ public class ObjectStore {
                 image=DefaultImageHelper.read(file_name);
 
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " loading " + current_image);
-                }
+                LogWriter.writeLog("Exception " + e + " loading " + current_image);
             }
         } else {
             image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
@@ -902,22 +877,15 @@ public class ObjectStore {
             tempFileNames.put(file_name,"#");
 
         } catch (final Exception e) {
-            e.printStackTrace();
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog(" Exception " + e + " writing image " + image + " with type " + image.getType());
-            }
+            LogWriter.writeLog(" Exception " + e + " writing image " + image + " with type " + image.getType());
+            
             was_error = true;
 
         }catch (final Error ee) {
 
-            //
-
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Error " + ee + " writing image " + image + " with type " + image.getType());
-            }
-
+            LogWriter.writeLog("Error " + ee + " writing image " + image + " with type " + image.getType());
+            
             was_error = true;
-
         }
 
         //save unclipped copy
@@ -977,9 +945,7 @@ public class ObjectStore {
             }
 
         }catch(final Exception e){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " flushing files");
-            }
+            LogWriter.writeLog("Exception " + e + " flushing files");
         }
     }
 
@@ -989,14 +955,8 @@ public class ObjectStore {
         try {
             super.finalize();
         } catch (final Throwable e) {
-
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
-
 
         flush();
 
@@ -1033,11 +993,7 @@ public class ObjectStore {
 
                 //
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         return data;
@@ -1074,12 +1030,7 @@ public class ObjectStore {
 
 
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
     }
@@ -1113,12 +1064,7 @@ public class ObjectStore {
 
 
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
 
@@ -1161,11 +1107,7 @@ public class ObjectStore {
 
                 //
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
 

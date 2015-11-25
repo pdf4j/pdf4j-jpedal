@@ -86,19 +86,14 @@ public class RenderUtils {
             }catch(final Exception e){
                 failed=true;
                 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in handling image "+e);
-                }
+                LogWriter.writeLog("Exception in handling image "+e);
             }
             if(failed){
                 try{
                     invert3 = new AffineTransformOp(image_at2,null);
                     image = invert3.filter(image,null);
                 }catch(final Exception e){
-                    //
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Caught a Exception " + e);
-                    }
+                    LogWriter.writeLog("Caught a Exception " + e);
                 }
             }
         }

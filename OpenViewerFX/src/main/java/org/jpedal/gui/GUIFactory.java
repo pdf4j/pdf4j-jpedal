@@ -54,8 +54,8 @@ public interface GUIFactory {
     int NAVBAR = 1;
     int PAGES = 2;
     
-    
-    //<start-demo><end-demo>
+    boolean deletePropertiesOnExit=false;
+    boolean alwaysShowMouse=false;
     
     
     /**
@@ -138,8 +138,6 @@ public interface GUIFactory {
      * set page number at bottom of screen
      */
     void setPageNumber();
-
-    //
 
     /**
      * allow access to root frame if required

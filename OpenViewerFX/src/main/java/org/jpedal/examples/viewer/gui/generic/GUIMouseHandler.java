@@ -37,6 +37,7 @@ public interface GUIMouseHandler {
 
 	void setupMouse();
 
+    void dispose();
 	//void updateRectangle();
 
 	//void setupExtractor();

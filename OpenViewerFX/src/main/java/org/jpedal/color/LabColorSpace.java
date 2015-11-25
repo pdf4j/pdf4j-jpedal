@@ -168,9 +168,7 @@ public class LabColorSpace extends GenericColorSpace {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
-            }
+            LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
         }
         
         return image;
@@ -224,9 +222,7 @@ public class LabColorSpace extends GenericColorSpace {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
-            }
+            LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
         }
         
         return image;

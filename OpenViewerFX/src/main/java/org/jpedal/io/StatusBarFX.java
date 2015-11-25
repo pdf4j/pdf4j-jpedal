@@ -158,7 +158,7 @@ public class StatusBarFX
 			});
 	
 		}
-		if( debug_level > debug_level_to_use && LogWriter.isOutput()) {
+		if( debug_level > debug_level_to_use) {
             LogWriter.writeLog(progress_bar);
         }
 	}

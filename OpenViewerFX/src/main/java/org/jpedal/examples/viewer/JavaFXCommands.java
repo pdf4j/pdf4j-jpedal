@@ -253,8 +253,7 @@ public class JavaFXCommands extends Commands {
                     break;
             }
         } else {
-
-            //<start-demo><end-demo>
+            throw new RuntimeException("Swing Called JavaFXCommands");           
         }
 
         //Mark as executed is not running in thread

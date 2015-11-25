@@ -240,20 +240,14 @@ public class InfoObject extends PdfObject {
                         }
 
                     break;
-
             }
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
         switch(pdfKeyType){
-
 
             default:
                 super.setConstant(pdfKeyType,id);
@@ -606,8 +600,6 @@ public class InfoObject extends PdfObject {
 //                break;
 
      //   }
-
-        //
 
         //convert
         switch(mode){

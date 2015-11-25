@@ -47,6 +47,7 @@ import org.jpedal.utils.LogWriter;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import org.jpedal.JDeliHelper;
 import org.jpedal.objects.raw.*;
 import org.jpedal.parser.image.utils.ArrayUtils;
 
@@ -143,9 +144,7 @@ public class JPEGDecoder {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
-            }
+            LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
         }
         
         return image;
@@ -160,11 +159,7 @@ public class JPEGDecoder {
             bos.flush();
             bos.close();
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: "+e.getMessage());
         }
     }
     
@@ -175,11 +170,7 @@ public class JPEGDecoder {
             bos.flush();
             bos.close();
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: "+e.getMessage());
         }
     }
     
@@ -218,9 +209,7 @@ public class JPEGDecoder {
             iin.close();
             
         }catch(final Exception ee){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem closing  " + ee);
-            }
+            LogWriter.writeLog("Problem closing  " + ee);
         }
         
         return ras;
@@ -271,22 +260,13 @@ public class JPEGDecoder {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
-            }
+            LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
         }
         
         return image;
     }
-    
-    //
-    public static byte[] getBytesFromJPEG(final byte[] data, GenericColorSpace decodeColorData,final PdfObject XObject) {
-        
-//        try{
-//        FileOutputStream fos=new FileOutputStream("/Users/markee/Desktop/"+XObject.getObjectRefAsString()+".png");
-//        fos.write(data);
-//        fos.close();
-//        }catch(Exception e){}
+   
+    private static byte[] getBytesFromJPEGWithImageIO(final byte[] data, GenericColorSpace decodeColorData,final PdfObject XObject) {
         
         byte[] db=null;
         Raster ras=null;
@@ -331,10 +311,27 @@ public class JPEGDecoder {
         return db;
         
     }
-    /**/
     
-    //
-    
+    //our version
+    public static byte[] getBytesFromJPEG(final byte[] data, GenericColorSpace decodeColorData,final PdfObject XObject) {
+        
+        byte[] db=null;
+        try {
+            
+            boolean isInverted = ArrayUtils.isArrayInverted(XObject.getFloatArray(PdfDictionary.Decode));
+            boolean isMask=XObject instanceof MaskObject;
+            db = JDeliHelper.getBytesFromJPEG(isInverted, data, isMask);
+            if(db==null){
+                db=getBytesFromJPEGWithImageIO(data, decodeColorData, XObject);   
+            }
+           
+        } catch (Exception e) {
+            LogWriter.writeLog("Exception with JPeg Image "+e);
+        }
+        
+        return db;
+        
+    }
 }
 
 

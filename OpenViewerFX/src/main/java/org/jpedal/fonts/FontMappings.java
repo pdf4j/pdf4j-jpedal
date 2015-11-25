@@ -152,9 +152,7 @@ public class FontMappings {
             }
             
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to read org.jpedal.fontmaps " + e.getMessage());
-            }
+            LogWriter.writeLog("Unable to read org.jpedal.fontmaps " + e.getMessage());
         }
         
         // pick up D options and use settings
@@ -165,13 +163,11 @@ public class FontMappings {
             if (fontDirs != null) {
                 failed = FontMappings.addFonts(fontDirs, failed);
             }
-            if (failed != null && LogWriter.isOutput()) {
+            if (failed != null) {
                 LogWriter.writeLog("Could not find " + failed);
             }
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to read FontDirs " + e.getMessage());
-            }
+            LogWriter.writeLog("Unable to read FontDirs " + e.getMessage());
         }
     }
     
@@ -430,9 +426,7 @@ public class FontMappings {
         
         try {
             if (fontDirs == null) { // idiot safety test
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Null font parameter passed");
-                }
+                LogWriter.writeLog("Null font parameter passed");
                 
                 fontSubstitutionAliasTable.clear();
                 fontSubstitutionLocation.clear();
@@ -457,9 +451,7 @@ public class FontMappings {
                 }
             }
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to run setFontDirs " + e.getMessage());
-            }
+            LogWriter.writeLog("Unable to run setFontDirs " + e.getMessage());
         }
         
         return failed;
@@ -534,16 +526,12 @@ public class FontMappings {
             // see if root dir exists
             dir = loader.getResourceAsStream(fontPath);
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Looking for root " + fontPath);
-            }
+            LogWriter.writeLog("Looking for root " + fontPath);
             
             // if it does, look for sub-directories
             if (in != null) {
                 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Adding fonts fonts found in  tt,t1c,t1 sub-directories of "+ fontPath);
-                }
+                LogWriter.writeLog("Adding fonts fonts found in  tt,t1c,t1 sub-directories of "+ fontPath);
                 
                 hasFonts = true;
                 
@@ -597,48 +585,30 @@ public class FontMappings {
                             }
                             
                         } catch (final Exception e) {
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception " + e+ " reading substitute fonts");
-                            }
-                            
-                            System.out.println("Exception " + e+ " reading substitute fonts");
-                            // <start-demo>
-                            // 
-                            // <end-demo>
+                            LogWriter.writeLog("Exception " + e+ " reading substitute fonts");
                         }finally {
                             if(in!=null){
                                 try {
                                     in.close();
                                 } catch (final IOException e) {
-                                    //tell user and log
-                                    if(LogWriter.isOutput()) {
-                                        LogWriter.writeLog("Exception: "+e.getMessage());
-                                    }
-                                    //
+                                    LogWriter.writeLog("Exception: "+e.getMessage());
                                 }
                             }
                         }
-                    }
-                    
+                    }   
                 }
-            } else if(LogWriter.isOutput()) {
+            } else {
                 LogWriter.writeLog("No fonts found at " + fontPath);
             }
             
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception adding substitute fonts "+ e.getMessage());
-            }
+            LogWriter.writeLog("Exception adding substitute fonts "+ e.getMessage());
         }finally {  //close streams if open
             if(in!=null){
                 try {
                     in.close();
                 } catch (final IOException e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }
             
@@ -646,11 +616,7 @@ public class FontMappings {
                 try {
                     dir.close();
                 } catch (final IOException e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }
         }
@@ -696,18 +662,11 @@ public class FontMappings {
                 in = new FileInputStream(fontPath + currentFont);
                 
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: "+e.getMessage());
+            
                 failed=true;
             } catch (final Error err) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Error: "+err.getMessage());
-                }
-                err.printStackTrace(System.out);
+                LogWriter.writeLog("Error: "+err.getMessage());
                 
                 failed=true;
             }
@@ -749,22 +708,14 @@ public class FontMappings {
                         try {
                             postscriptNames = StandardFonts.readNamesFromFont(type, fontPath + currentFont, PdfDecoderInt.SUBSTITUTE_FONT_USING_POSTSCRIPT_NAME);
                         } catch (final Exception e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: "+e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: "+e.getMessage());
                         }
                         
                         String[] familyNames =null;
                         try {
                             familyNames = StandardFonts.readNamesFromFont(type, fontPath + currentFont, PdfDecoderInt.SUBSTITUTE_FONT_USING_FAMILY_NAME);
                         } catch (final Exception e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: "+e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: "+e.getMessage());
                         }
                         
                         int fontCount=0;
@@ -846,11 +797,7 @@ public class FontMappings {
                         try {
                             fontNames = StandardFonts.readNamesFromFont(type, fontPath + currentFont, fontSubstitutionMode);
                         } catch (final Exception e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: "+e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: "+e.getMessage());
                         }
                         
                         if(fontNames!=null){
@@ -878,11 +825,7 @@ public class FontMappings {
                     try {
                         fontNames = StandardFonts.readNamesFromFont(type, fontPath + currentFont, fontSubstitutionMode);
                     } catch (final Exception e) {
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: "+e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: "+e.getMessage());
                     }
                     
                     if(fontNames!=null){
@@ -906,7 +849,7 @@ public class FontMappings {
                         }
                     }
                 }
-            } else if(LogWriter.isOutput()){
+            } else{
                 LogWriter.writeLog("No fonts found at " + fontPath);
             }
         }
@@ -916,11 +859,7 @@ public class FontMappings {
             try {
                 in.close();
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: "+e.getMessage());
             }
         }
     }
@@ -956,18 +895,12 @@ public class FontMappings {
                     // System.out.println("Found a match!");
                     String fontName = entry.getName();
                     final int i = fontName.lastIndexOf('/');
-                    fontName = fontName.substring(i + 1);
-                    //
-                    retValue.add(fontName);
+                    
+                    retValue.add(fontName.substring(i + 1));
                 }
             }
-        } else {
-            // Does not start with "jar:"
-            // Dont know - should not happen
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Path: " + s);
-            }
-        }
+        } 
+        
         return retValue;
     }
     

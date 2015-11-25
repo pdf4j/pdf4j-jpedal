@@ -85,4 +85,6 @@ public interface GUISearchWindow {
     void setSearchText(String s);
 	
     void setUpdateListDuringSearch(boolean updateListDuringSearch);
+    
+    public void dispose();
 }

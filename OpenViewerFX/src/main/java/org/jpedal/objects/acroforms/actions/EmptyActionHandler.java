@@ -156,7 +156,6 @@ public class EmptyActionHandler implements ActionHandler {
                     aData = aData.getDictionary(PdfDictionary.D);
                 }else if(eventType == MOUSERELEASED){
                     aData = aData.getDictionary(PdfDictionary.U);
-                    // <start-demo><end-demo>
                 }
             }
         }
@@ -224,7 +223,10 @@ public class EmptyActionHandler implements ActionHandler {
                 } else if (command == PdfDictionary.Launch) {
 
                     LogWriter.writeFormLog("{stream} launch activate action NOT IMPLEMENTED", FormStream.debugUnimplemented);
-                    // <start-demo><end-demo>
+                    
+                    if (FormStream.debugUnimplemented) {
+                        System.out.println("{internal only} launch activate action NOT IMPLEMENTED");
+                    }
                     
                 } else if (command == PdfDictionary.SetOCGState) {
                     
@@ -262,11 +264,7 @@ public class EmptyActionHandler implements ActionHandler {
                             SoundHandler.PlaySound(soundObj.getDecodedStream());
                             
                         } catch (final Exception e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: " + e.getMessage());
                         }
                     }
                     
@@ -275,7 +273,6 @@ public class EmptyActionHandler implements ActionHandler {
                 }
             } else if(command!=-1){
                 LogWriter.writeFormLog("{stream} Activate Action UNKNOWN command "+aData.getName(PdfDictionary.S)+ ' ' +formObj.getObjectRefAsString(), FormStream.debugUnimplemented);
-                // <start-demo><end-demo>
             }
         }
     }
@@ -317,11 +314,7 @@ public class EmptyActionHandler implements ActionHandler {
                             try {
                                 decode_pdf.decodePage(-1);
                             } catch (final Exception e) {
-                                //tell user and log
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception: " + e.getMessage());
-                                }
-                                //
+                                LogWriter.writeLog("Exception: " + e.getMessage());
                             }
                         }
                     };
@@ -356,9 +349,8 @@ public class EmptyActionHandler implements ActionHandler {
             
         }else if(name == PdfDictionary.AcroForm_FormsJSGuide) {//AcroForm:FormsJSGuide
             
-        } else {
-            // <start-demo><end-demo>
-            
+        } else if (FormStream.debugUnimplemented) {
+            System.out.println("{internal only} Named Action NOT IMPLEMENTED " + aData.getName(PdfDictionary.N)+ ' ' +decode_pdf.getFileName());
         }
     }
     
@@ -1354,7 +1346,7 @@ public class EmptyActionHandler implements ActionHandler {
         if (fieldsToHide.length != whetherToHide.length) {
             //this will exit internally only and the production version will carry on regardless.
             LogWriter.writeFormLog("{custommouselistener} number of fields and nuber of hides or not the same", FormStream.debugUnimplemented);
-            //<start-demo><end-demo>
+            
             return;
         }
         
@@ -1446,7 +1438,10 @@ public class EmptyActionHandler implements ActionHandler {
                         tmp = new Component[compsToSubmit.length + compsToAdd.length];
                         if (compsToAdd.length > 1) {
                             LogWriter.writeFormLog("(internal only) SubmitForm multipul components with same name", FormStream.debugUnimplemented);
-                            //<start-demo><end-demo>
+                            
+                            if (FormStream.debugUnimplemented) {
+                                org.jpedal.objects.acroforms.utils.ConvertToString.printStackTrace(1);
+                            }
                         }
                         for (int k = 0; i < tmp.length; k++) {
                             if (k < compsToSubmit.length) {
@@ -1472,7 +1467,6 @@ public class EmptyActionHandler implements ActionHandler {
                         text.append(((AbstractButton) aCompsToSubmit).getText());
                     } else if (aCompsToSubmit != null) {
                         LogWriter.writeFormLog("(internal only) SubmitForm field form type not accounted for", FormStream.debugUnimplemented);
-                        //<start-demo><end-demo>
                     }
                 }
             }

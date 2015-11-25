@@ -1111,13 +1111,9 @@ public class Type1C extends Type1{
                 }
                 
             }catch(final Exception e){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("3.Unable to open "+substituteFont+' '+e);
-                }
+                LogWriter.writeLog("3.Unable to open "+substituteFont+' '+e);
             }catch(final Error err){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("3.Unable to open "+substituteFont+' '+err);
-                }
+                LogWriter.writeLog("3.Unable to open "+substituteFont+' '+err);
             }
             
             if(jarFile==null){
@@ -1203,12 +1199,7 @@ public class Type1C extends Type1{
                 
                 
             } catch (final Exception e) {
-                
-                e.printStackTrace(System.out);
-                
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF]Substitute font="+substituteFont+"Type 1 exception=" + e);
-                }
+                LogWriter.writeLog("[PDF]Substitute font="+substituteFont+"Type 1 exception=" + e);
             }
             
         }else if(pdfFontDescriptor!=null){
@@ -1223,11 +1214,7 @@ public class Type1C extends Type1{
                         readType1FontFile(stream);
                     }
                 } catch (final Exception e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }else{
                 
@@ -1236,12 +1223,12 @@ public class Type1C extends Type1{
                     final byte[] stream=currentPdfFile.readStream(FontFile3,true,true,false, false,false, FontFile3.getCacheName(currentPdfFile.getObjectReader()));
                     if(stream!=null){ //if it fails, null returned
                         //check for type1c or ottf
-                        if(stream.length>3 && stream[0]==70 && stream[1]==84 && stream[2]==84 && stream[3]==79){
-                            //
-                        }else {
+                        //if(stream.length>3 && stream[0]==70 && stream[1]==84 && stream[2]==84 && stream[3]==79){
+                           
+                        //}else {
                             //assume all standard cff for moment
                             readType1CFontFile(stream,null);
-                        }
+                        //}
                     }
                 }
             }
@@ -1276,11 +1263,7 @@ public class Type1C extends Type1{
         try{
             readEmbeddedFont(pdfFontDescriptor);
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: "+e.getMessage());
         }
         
         //setWidths(pdfObject);
@@ -1331,9 +1314,7 @@ public class Type1C extends Type1{
     @SuppressWarnings("PointlessBooleanExpression")
     private void readType1CFontFile(final byte[] fontDataAsArray, final FontData fontDataAsObject) throws Exception{
         
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("Embedded Type1C font used");
-        }
+        LogWriter.writeLog("Embedded Type1C font used");
         
         glyphs.setis1C(true);
         
@@ -1361,7 +1342,7 @@ public class Type1C extends Type1{
             minor = fontDataAsObject.getByte(1);
         }
         
-        if ((major != 1 || minor != 0) && LogWriter.isOutput()) {
+        if (major != 1 || minor != 0) {
             LogWriter.writeLog("1C  format "+ major+ ':' + minor+ " not fully supported");
         }
         
@@ -1684,11 +1665,7 @@ public class Type1C extends Type1{
                         }
                     }
                 }catch(final Exception e){
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
                 
             }
@@ -2474,15 +2451,13 @@ public class Type1C extends Type1{
         
         /**/
 		//handle CIDS first
-		if(isCID && charset>8000){
+        if(hasCIDToGIDMap){ //see 22986
 			glyphNames = new int[nGlyphs];
 			glyphNames[0] = 0;
 
 			for (i = 1; i < nGlyphs; ++i) {
 				glyphNames[i] = i;//getWord(fontData, top, 2);
-				//top += 2;
-           //     System.out.println(i+" ");
-				}
+			}
 
 		// read appropriate non-CID charset
 		}else if (charset == 0) {

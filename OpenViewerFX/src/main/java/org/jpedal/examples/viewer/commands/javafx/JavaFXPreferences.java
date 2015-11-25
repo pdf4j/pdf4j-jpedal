@@ -497,12 +497,8 @@ public class JavaFXPreferences {
                     try {
                 		properties.writeDoc();
                 	} catch (final Exception e1) {
-                		//<start-demo><end-demo>
-                                
-                             if(LogWriter.isOutput()) { 
-                                 LogWriter.writeLog("Exception attempting to Write proterties: " + e1); 
-                             }    
-                	}
+                		LogWriter.writeLog("Exception attempting to Write proterties: " + e1); 
+                    }
                 }
                 
                 /**
@@ -528,11 +524,7 @@ public class JavaFXPreferences {
                     try {
                         properties.writeDoc();
                     } catch (final Exception e2) {
-                        //<start-demo><end-demo>
-                        
-                         if(LogWriter.isOutput()) { 
-                                 LogWriter.writeLog("Exception attempting to Write proterties: " + e2); 
-                             } 
+                        LogWriter.writeLog("Exception attempting to Write proterties: " + e2); 
                     }
                     if (GUI.showMessages) {
 
@@ -1593,10 +1585,7 @@ public class JavaFXPreferences {
                 propValue = propValue.replaceAll("[^0-9]", "");
                 defaultDPITF.setText(Integer.parseInt(propValue) + "dpi");
             } catch (final Exception e) {
-                //
-                 if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception attempting Load Printing Settings: " + e);
-                }
+                LogWriter.writeLog("Exception attempting Load Printing Settings: " + e);
             }
         }
 

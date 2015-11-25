@@ -104,11 +104,7 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
                     page = 1;
                 }
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         
@@ -136,11 +132,7 @@ public class JavaFXDefaultActionHandler extends DefaultActionHandler {
                         }
                         
                     } catch (final Exception e) {
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                     
                     /** reset as rotation may change! */

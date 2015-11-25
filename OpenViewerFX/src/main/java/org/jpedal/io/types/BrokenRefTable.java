@@ -46,19 +46,15 @@ public class BrokenRefTable {
      */
     public static String findOffsets(final RandomAccessBuffer pdf_datafile, final Offsets offset) throws PdfSecurityException {
 
-    	if(LogWriter.isOutput()) {
-            LogWriter.writeLog("Corrupt xref table - trying to find objects manually");
-        }
-
+    	LogWriter.writeLog("Corrupt xref table - trying to find objects manually");
+        
         String root_id = "",line=null;
         int pointer,i=0;
 
         try {
             pdf_datafile.seek(0);
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading line");
-            }
+            LogWriter.writeLog("Exception " + e + " reading line");
         }
         
         while (true) {
@@ -67,9 +63,7 @@ public class BrokenRefTable {
                 i = (int) pdf_datafile.getFilePointer();
                 line = pdf_datafile.readLine();
             } catch (final Exception e) {
-            	if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " reading line");
-                }
+            	LogWriter.writeLog("Exception " + e + " reading line");
             }
             if (line == null) {
                 break;

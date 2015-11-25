@@ -43,7 +43,6 @@ import org.jpedal.objects.raw.NamesObject;
 import org.jpedal.objects.raw.ObjectFactory;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
 import org.jpedal.utils.StringUtils;
 
@@ -378,10 +377,6 @@ public class Dictionary {
                     
                     if(debugFastCode) {
                         System.out.println(padding + "Data not yet loaded");
-                    }
-                    
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (2)");
                     }
                     
                     i=length;
@@ -729,10 +724,6 @@ public class Dictionary {
                             if(rawDictData==null){
                                 pdfObject.setFullyResolved(false);
                                 
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (12)");
-                                }
-                                
                                 return data.length;
                             }
                             
@@ -1008,10 +999,6 @@ public class Dictionary {
                     //allow for data in Linear object not yet loaded
                     if (data == null) {
                         pdfObject.setFullyResolved(false);
-                        
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (11)");
-                        }
                         
                         return raw.length;
                     }

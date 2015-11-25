@@ -241,6 +241,8 @@ public class PdfFont implements Serializable {
     
     private int[] CIDToGIDMap;
     
+    boolean hasCIDToGIDMap;
+    
     /**
      * used to show truetype used for type 0 CID
      */
@@ -684,9 +686,7 @@ public class PdfFont implements Serializable {
             try{
                 CIDstream.close();
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("2.Problem reading encoding for CID font "+fontID+ ' ' +encodingName+" Check CID.jar installed "+e);
-                }
+                LogWriter.writeLog("2.Problem reading encoding for CID font "+fontID+ ' ' +encodingName+" Check CID.jar installed "+e);
             }
         }
         
@@ -705,10 +705,7 @@ public class PdfFont implements Serializable {
                 line = CIDstream.readLine();
                 //System.out.println(line);
             } catch (final Exception e) {
-//
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] Error reading line from font");
-                }
+                LogWriter.writeLog("[PDF] Error reading line from font "+e.getMessage());
             }
             
             if (line == null) {
@@ -795,12 +792,9 @@ public class PdfFont implements Serializable {
                         //entry++;
                         //}
                         //}
-                    }else{
-                        //
-                        
                     }
                 }catch(final Exception ef){
-                    ef.getStackTrace();
+                    LogWriter.writeLog("Exception "+ef);
                 }
             }
             
@@ -863,9 +857,8 @@ public class PdfFont implements Serializable {
                                         ? Integer.valueOf(mapped_char, 16) : Integer.parseInt(mapped_char);
                                 return_value = String.valueOf((char) val);
                             } catch (final Exception e) {
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception in handling char value "+e);
-                                }
+                                LogWriter.writeLog("Exception in handling char value "+e);
+                                
                                 return_value = "";
                             }
                         } else {
@@ -1139,6 +1132,8 @@ public class PdfFont implements Serializable {
             defaultWidth=.5f;
         }
         
+        final PdfObject FontDescriptor = Descendent.getDictionary(PdfDictionary.FontDescriptor);
+        
         /**set CIDtoGIDMap*/
         final PdfObject CIDToGID=Descendent.getDictionary(PdfDictionary.CIDToGIDMap);
         if(CIDToGID!=null){
@@ -1161,6 +1156,7 @@ public class PdfFont implements Serializable {
                     CMapName=handleCIDEncoding(new FontObject(PdfDictionary.Identity_H),null);
                 }
             }
+            hasCIDToGIDMap=true;
         }
         
         //code is unfinished by MArk - I was originally going to map onto font in
@@ -1177,6 +1173,9 @@ public class PdfFont implements Serializable {
         if(ordering!=null){
             if(CIDToGID==null && ordering.contains("Identity")){
                 
+            }else if(FontDescriptor.getDictionary(PdfDictionary.CIDSet)!=null && ordering.contains("CNS1")){  
+                //Case 23149 - something of a hack to fix Zinio issue and will probably need more work
+                hasDoubleBytes=true;
             }else if(ordering.contains("Japan")){
                 
 //                char[] c=new char[]{12498,12521,12462,12494,35282,12468,32,80,114,111,32,87,54};
@@ -1201,23 +1200,17 @@ public class PdfFont implements Serializable {
                 glyphs.setIsIdentity(true);
             }
             
-            if(substituteFontFile!=null && LogWriter.isOutput()) {
+            if(substituteFontFile!=null) {
                 LogWriter.writeLog("Using font "+substituteFontFile+" for "+ordering);
             }
             
         }
         
-        /**set other values*/
-        if (Descendent != null) {
-            
-            final PdfObject FontDescriptor = Descendent.getDictionary(PdfDictionary.FontDescriptor);
-            
-            /**read other info*/
-            if(FontDescriptor!=null) {
-                setBoundsAndMatrix(FontDescriptor);
-                setName( FontDescriptor);
-            }
-        }
+        if(FontDescriptor!=null) {
+             setBoundsAndMatrix(FontDescriptor);
+             setName( FontDescriptor);
+         }
+        
     }
 
     /**read in width values*/

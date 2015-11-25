@@ -123,7 +123,6 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
         
         @Override
         public void run() {
-            // <start-demo><end-demo>
             
             resultsList.setStatus(GUISearchList.SEARCH_INCOMPLETE);
             final boolean searchingInBackground = backGroundSearch;
@@ -267,7 +266,14 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                     
                 }
                 
-                // 
+                /**
+                 * show time and memory usage
+                 */
+                if(GUI.debugFX){
+                    System.out.println("Search memory="+((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000)+ 'K');
+                    //  System.out.println("Search time="+(((float) Math.abs(((System.currentTimeMillis() - startTime) / 100))) / 10)+ 's');
+                    System.out.println("Found "+resultsList.getResultCount()+" Search Results");
+                }
                 
             }catch(final Exception e){
                 e.printStackTrace();
@@ -1032,9 +1038,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to set propeties values " + e);
-                    }
+                    LogWriter.writeLog("Attempting to set propeties values " + e);
                 }
             }
 
@@ -1166,4 +1170,9 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
         this.updateListDuringSearch = updateListDuringSearch;
     }
     
+    @Override
+    public void dispose(){
+        //Added as needed for swing. No code yet
+        
+    }
 }

@@ -122,10 +122,7 @@ public class SaveFile {
                     fis.close();
                     fos.close();
                 } catch (final IOException e2) {
-                    //e2.printStackTrace();
-                    if(LogWriter.isOutput()) { 
-                         LogWriter.writeLog("Exception attempting close IOStream: " + e2); 
-                     } 
+                    LogWriter.writeLog("Exception attempting close IOStream: " + e2); 
                 }
 
                 finished = true;

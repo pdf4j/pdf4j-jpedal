@@ -304,8 +304,8 @@ public class Offsets extends Vector_Int{
                             if(isValid){
                                 storeObjectOffset(current, id, generation, false,false);
                                 xref.addElement( id);
-                            }else{
-                                //
+                            }else if(LogWriter.isRunningFromIDE) {
+                                LogWriter.writeLog(current + " " + id + " is bum reference");
                             }
                         }
 
@@ -329,11 +329,7 @@ public class Offsets extends Vector_Int{
             pdf_datafile.seek(start);
             pdf_datafile.read(buffer); //get next chars
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         return buffer;

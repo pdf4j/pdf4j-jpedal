@@ -263,11 +263,7 @@ public class NamesObject extends PdfObject {
             }
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
@@ -520,7 +516,6 @@ public class NamesObject extends PdfObject {
 
   //      }
 
-        //
 
         //convert
         switch(mode){

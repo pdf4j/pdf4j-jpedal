@@ -194,7 +194,17 @@ public class Commands {
     public static final int BUY = 999;
     //997-999 handled in executeDemoVersionCommands(final int ID, Object[] args)
     
-    //
+    
+    //>=1000 handled in executeDebugCommands(final int ID, Object[] args)
+    public static final int TOGGLE = 1000;
+    public static final int SET = 1001;
+    public static final int RESET = 1002;
+    public static final int ACCELERATIONON = 1003;
+    public static final int ACCELERATIONOFF = 1004;
+    public static final int SHOWFORMNAMES = 1006;
+    public static final int DELETEPROPERTIESONEXIT = 1007;
+    public static final int ALWAYSSHOWMOUSE = 1008;
+    //>=1000 handled in executeDebugCommands(final int ID, Object[] args)
     
     //status values returned by command
     public static final Integer FIRST_DOCUMENT_SEARCH_RESULT_NOW_SHOWN = 1;
@@ -496,7 +506,30 @@ public class Commands {
         return status;
     }
     
-    //<start-demo><end-demo>
+    private void executeDebugCommands(final int ID, Object[] args){
+        
+        switch (ID) {
+            case TOGGLE:
+                Toggle.execute(args, decode_pdf);
+                break;
+            case SET:
+                SetCommand.execute(args, currentGUI, decode_pdf, commonValues);
+                break;
+            case RESET:
+                Reset.execute(args, commonValues, decode_pdf);
+                break;
+            //
+            case SHOWFORMNAMES:
+                ShowFormNames.execute(args, decode_pdf);
+                break;
+            case DELETEPROPERTIESONEXIT:
+                DeletePropertiesOnExit.execute(args);
+                break;
+            case ALWAYSSHOWMOUSE:
+                AlwaysShowMouse.execute(args);
+                break;
+        }
+    }
     
     //<link><a name="commands" />
     /**
@@ -530,11 +563,8 @@ public class Commands {
             }
         }
         
-        if(Viewer.isFX()){
-            
-            //<start-demo><end-demo>
-
-        }else{
+        if(!Viewer.isFX()){
+         
             if(ID < FIRSTPAGE){
                 status = executeMenuBarCommands(ID, args);
             }else if(ID < QUALITY){
@@ -551,8 +581,9 @@ public class Commands {
                 status = executeViewerFunctionalityCommands(ID, args);
             }else if(ID < 1000){ //Use hard coded value for a debug value remvoed during build
                 executeDemoVersionCommands(ID, args);
+            } else {
+                executeDebugCommands(ID, args);
             }
-            //<start-demo><end-demo>
         }
         
         //Mark as executed is not running in thread
@@ -604,7 +635,6 @@ public class Commands {
             currentGUI.setViewerTitle(null);
         } catch (final Exception e) {
             LogWriter.writeLog("Exception " + e + " getting paths");
-            //
         }
 
         /**
@@ -709,10 +739,7 @@ public class Commands {
             }
             
         } catch (final IOException e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[PDF] Exception " + e + " scanning URL " + pdfUrl);
-            }
-            e.printStackTrace();
+            LogWriter.writeLog("[PDF] Exception " + e + " scanning URL " + pdfUrl);
         }
         
         return isLinear;

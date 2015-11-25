@@ -78,8 +78,6 @@ public class PdfLayerList {
     private int layerCount;
     private Object[] order;
 
-    //
-
     private PdfObjectReader currentPdfFile;
 
     private Layer[] layers;
@@ -621,8 +619,6 @@ public class PdfLayerList {
                             }
                         }
                     }
-                } else {
-                    //
                 }
                 //layerCount++;
 

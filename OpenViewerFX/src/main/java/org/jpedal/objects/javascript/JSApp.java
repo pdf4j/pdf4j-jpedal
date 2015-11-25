@@ -112,8 +112,6 @@ public class JSApp{
             System.out.println("JSApp.alert(cMsg, nIcon, nType)");
         }
 
-        // <start-demo><end-demo>
-
 		final int javaIcon;
 		final int javaButtonType;
 

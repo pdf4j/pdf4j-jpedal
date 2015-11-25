@@ -539,9 +539,7 @@ public class Type1 extends PdfFont {
     /** Handle encoding for type1 fonts */
     protected final void readType1FontFile(final byte[] content) throws Exception {
         
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("Embedded Type1 font used "+getBaseFontName());
-        }
+        LogWriter.writeLog("Embedded Type1 font used "+getBaseFontName());
         
         final BufferedReader br =new BufferedReader(new StringReader(new String(content)));
         
@@ -590,9 +588,7 @@ public class Type1 extends PdfFont {
             try{
                 br.close();
             }catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " closing stream");
-                }
+                LogWriter.writeLog("Exception " + e + " closing stream");
             }
         }
         
@@ -916,9 +912,8 @@ public class Type1 extends PdfFont {
         if(charstringStart==-1){
             this.isFontSubstituted=false;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No glyph data found");
-            }
+            LogWriter.writeLog("No glyph data found");
+        
         }else {
             glyphCount=extractFontData(skipBytes,cont,charstringStart,rd,l,nd);
         }
@@ -985,10 +980,7 @@ public class Type1 extends PdfFont {
             try {
                 forceBold = Boolean.parseBoolean(val);
             } catch(final NumberFormatException e) {
-                //Do nothing
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Caught an Exception " + e);
-                }
+                LogWriter.writeLog("Exception " + e);
             }
         }
         
@@ -1016,9 +1008,8 @@ public class Type1 extends PdfFont {
         try {
             return Integer.parseInt(val);
         } catch(final NumberFormatException e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in handling Integer in Type1 "+e);
-            }
+            LogWriter.writeLog("Exception in handling Integer in Type1 "+e);
+            
             return null;
         }
     }
@@ -1048,9 +1039,8 @@ public class Type1 extends PdfFont {
             return Double.parseDouble(val);
         } catch(final NumberFormatException e) {
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in handling real in Type1 "+e);
-            }
+            LogWriter.writeLog("Exception in handling real in Type1 "+e);
+            
             return null;
         }
     }
@@ -1091,9 +1081,8 @@ public class Type1 extends PdfFont {
                     result[j] = Integer.parseInt(stringValues[j].split("\\.")[0]);
                 } catch(final NumberFormatException e) {
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception in handling IntArray "+e);
-                    }
+                    LogWriter.writeLog("Exception in handling IntArray "+e);
+                    
                     result[j] = -1;
                 }
             }

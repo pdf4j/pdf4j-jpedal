@@ -190,9 +190,7 @@ public class JavaFXPageNavigator {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to set propeties values " + e);
-                    }
+                    LogWriter.writeLog("Attempting to set propeties values " + e);
                 }
             }
         }
@@ -214,9 +212,7 @@ public class JavaFXPageNavigator {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to set propeties values " + e);
-                    }
+                    LogWriter.writeLog("Attempting to set propeties values " + e);
                 }
             }
         }
@@ -290,8 +286,8 @@ public class JavaFXPageNavigator {
 							currentGUI.setPageNumber();
 
 							//Display new page
-                            //
-
+                            //((PdfDecoder)decode_pdf).repaint();
+                            
 						} else {
 							/**
 							 * adjust for double jump on facing

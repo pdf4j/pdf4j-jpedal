@@ -132,10 +132,7 @@ public class FXDisplay extends GUIDisplay {
                     try {
                         drawUserContent(type, obj, colors);
                     } catch (final PdfException e) {
-                        //tell user and log
-                        if (LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception with additional objects: " + e.getMessage());
-                        }
+                        LogWriter.writeLog("Exception with additional objects: " + e.getMessage());
                     }
                 }
             });
@@ -442,7 +439,9 @@ public class FXDisplay extends GUIDisplay {
             final Path path=(Path) embeddedGlyph.getPath();
 
             if(path==null){
-                //
+                if(LogWriter.isRunningFromIDE){
+                    System.out.println("Null FX path in "+embeddedGlyph);
+                }
                 
                 return;
             }

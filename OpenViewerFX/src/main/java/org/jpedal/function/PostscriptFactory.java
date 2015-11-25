@@ -107,7 +107,104 @@ public class PostscriptFactory {
 	}
 
 
-	//
+	/** main method to run the software as standalone application *
+	public static void main(String[] args) {
+
+	}
+
+	static{
+
+		String[] cmds = new String[]{
+			"abs","add","atan","ceiling","cos","cvi","cvr","div","exp","floor","idiv",
+			"ln","log","mod","mul","neg","sin","sqrt","sub","round", "truncate","and",
+			"bitshift","eq","false","ge","gt","le","lt","ne","not","or","true", "xor",
+			"if", "ifelse","copy","exch","pop","dup","index","roll"};
+
+
+		// generate a unique checksum for each based on first 4 characters
+		Map checkvalues=new HashMap();
+
+
+		int commandCount = cmds.length;
+
+		// build table of values
+		for(int i=0;i<commandCount;i++){
+			int key=0;
+			int keyLength=cmds[i].length();
+			if(keyLength>4)
+				keyLength=4;
+
+			for(int j=0;j<keyLength;j++)
+				key = key + (cmds[i].charAt(j)-(int)'a')*scale[j];
+
+			Integer mappedKey =new Integer(key);
+
+			if(checkvalues.containsKey(mappedKey)){
+				System.out.println("Duplicate on "+checkvalues.get(mappedKey)+" "+cmds[i]);
+			}
+
+			checkvalues.put(mappedKey,cmds[i]);
+
+			System.out.println("\n//unique id for "+cmds[i]);
+
+
+			if(cmds[i].length()>4)
+				System.out.println("final protected static int PS_"+cmds[i].substring(0,4)+" = "+mappedKey+";");
+			else
+				System.out.println("final protected static int PS_"+cmds[i]+" = "+mappedKey+";");
+		}
+
+		// build cases
+
+		System.out.println("//identify command\nprotected static int getCommandID(int value) {\nint id = -1;\nswitch (value) {");
+		for(int i=0;i<commandCount;i++){
+			int key=0;
+			int keyLength=cmds[i].length();
+			if(keyLength>3)
+				keyLength=3;
+
+			for(int j=0;j<keyLength;j++)
+				key = key + (cmds[i].charAt(j)-(int)'a')*scale[j];
+
+			if(cmds[i].length()>4){
+				System.out.println("case PS_"+cmds[i].substring(0,4)+":");
+				System.out.println("id=PS_"+cmds[i].substring(0,4)+";");
+			}else{
+				System.out.println("case PS_"+cmds[i]+":");
+				System.out.println("id=PS_"+cmds[i]+";");
+			}
+			System.out.println("break;");
+		}
+
+		System.out.println("\n}\nreturn id;\n}");
+
+
+		// build getString
+
+		//System.out.println("//identify command\nprotected static int getCommandID(int value) {\nint id = -1;\nswitch (value) {");
+		for(int i=0;i<commandCount;i++){
+			int key=0;
+			int keyLength=cmds[i].length();
+			if(keyLength>3)
+				keyLength=3;
+
+			for(int j=0;j<keyLength;j++)
+				key = key + (cmds[i].charAt(j)-(int)'a')*scale[j];
+
+			if(cmds[i].length()>4){
+				System.out.println("case PS_"+cmds[i].substring(0,4)+":");
+			}else{
+				System.out.println("case PS_"+cmds[i]+":");
+			}
+			System.out.println("str=\""+cmds[i]+"\";");
+
+			System.out.println("break;");
+		}
+
+		System.out.println("\n}\nreturn id;\n}");
+	}
+
+	/**/
 
 	//unique id for abs
     protected static final int PS_abs = 317044;
@@ -463,8 +560,9 @@ public class PostscriptFactory {
                 push((int) first & (int) second, PS_INTEGER);
             } else if (fType == PS_BOOLEAN && sType == PS_BOOLEAN) {
                 push((int) first & (int) second, PS_BOOLEAN);
-            } else {
-				//
+            } else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_and");
 			}
 
 			break;
@@ -484,7 +582,10 @@ public class PostscriptFactory {
 			sType = currentType;
 
 			if(fType!=PS_INTEGER || sType!=PS_INTEGER){
-				//
+				// should never happend, will exit
+                if(LogWriter.isRunningFromIDE){
+                    throw new RuntimeException("Critical error in PS_bits");
+                }
 			}
 
 			if(shift>0) {
@@ -554,8 +655,9 @@ public class PostscriptFactory {
 
 			}else if(fType==PS_INTEGER && firstInt==0){
 				//no need to do anything
-			}else{
-				//
+			} else if(LogWriter.isRunningFromIDE){
+				// never expected to happend, while dealing with PDF
+				throw new RuntimeException("Critical error in PS_copy");
 			}
 
 
@@ -708,8 +810,9 @@ public class PostscriptFactory {
 				}else{
 					push(0, PS_BOOLEAN);
 				}
-			} else {
-				//
+			} else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_ge");
 			}
 			break;
 
@@ -728,8 +831,9 @@ public class PostscriptFactory {
 				}else{
 					push(0, PS_BOOLEAN);
 				}
-			} else {
-				//
+			} else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_gt");
 			}
 			break;
 
@@ -785,8 +889,9 @@ public class PostscriptFactory {
 				}else{
 					push(0, PS_BOOLEAN);
 				}
-			} else {
-				//
+			} else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_le");
 			}
 			break;
 
@@ -804,8 +909,9 @@ public class PostscriptFactory {
 				}else{
 					push(0, PS_BOOLEAN);
 				}
-			} else {
-				//
+			} else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_lt");
 			}
 			break;
 
@@ -934,8 +1040,9 @@ public class PostscriptFactory {
                 push((int) first | (int) second, PS_BOOLEAN);
             } else if (fType == PS_INTEGER && sType == PS_INTEGER) {
                 push((int) first | (int) second, PS_INTEGER);
-            } else{
-				//
+            } else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_or");
 			}
 			break;
 
@@ -1061,8 +1168,9 @@ public class PostscriptFactory {
 				push((firstInt^secondInt),PS_BOOLEAN);
 			} else if (fType == PS_INTEGER && sType == PS_INTEGER){
 				push((firstInt^secondInt),PS_INTEGER);
-			} else {
-				//
+			} else if(LogWriter.isRunningFromIDE){
+				// should never happend, will exit
+				throw new RuntimeException("Critical error in PS_xor");
 			}
 
 			break;
@@ -1182,8 +1290,8 @@ public class PostscriptFactory {
 		int amount=popInt();
 		int numberOfElements=popInt();
 
-		if(numberOfElements<0){
-			//
+		if(numberOfElements<0 && LogWriter.isRunningFromIDE){
+			throw new RuntimeException("-> Roll : critical error");
 		}
 		
 		// allow for case when rolling over a larger number than elements on stack
@@ -1347,19 +1455,14 @@ public class PostscriptFactory {
                         }
 
 						}catch(final Exception e){
-                            if (LogWriter.isOutput()) {
-                                LogWriter.writeLog("Caught an Exception " + e);
-                            }
-
-							//
+                            LogWriter.writeLog("Exception " + e);
 						}
 					}else{ //execute commands
 						//System.out.println(" ID value : " + ID);
 						final int result=execute(ID);
 
-						//
-						if(result==-1){
-							//
+						if(result==-1 && LogWriter.isRunningFromIDE){
+							throw new RuntimeException("Unsupported command with value "+PostscriptUtils.toString(ID));
 						}
 					}
 
@@ -1397,7 +1500,9 @@ public class PostscriptFactory {
 	private void push(final double number, final int type) {
 
 		if(stkPtr>99 || stkTypePtr>99){ //error
-			//<start-demo><end-demo>
+			if(LogWriter.isRunningFromIDE){
+                throw new RuntimeException("Stack or stackType overflow");
+            }
 		}else{
 			stack[stkPtr]=number;
 			stackType[stkTypePtr] = type;
@@ -1421,14 +1526,18 @@ public class PostscriptFactory {
 
 		stkTypePtr--;
 
-		if(stkTypePtr<0){ //error
-			//<start-demo><end-demo>
+		if(stkTypePtr<0){
+            if(LogWriter.isRunningFromIDE){ //error
+                throw new RuntimeException("Stack type underflow");
+            }
 		} else {
             currentType = stackType[stkTypePtr];
         }
 
 		if(stkPtr<0 ){ //error
-			//<start-demo><end-demo>
+			if(LogWriter.isRunningFromIDE){
+                throw new RuntimeException("Stack underflow");
+            }
 
 		}else {
             value = stack[stkPtr];

@@ -2102,8 +2102,12 @@ public class PdfDictionary {
                 return VALUE_IS_TEXTSTREAM;
 
             case Properties:
-                return VALUE_IS_DICTIONARY_PAIRS;
-
+                if(type==Form){
+                   return VALUE_IS_MIXED_ARRAY; 
+                }else{
+                    return VALUE_IS_DICTIONARY_PAIRS;
+                }
+            
             case PV:
             	return PdfDictionary.VALUE_IS_DICTIONARY;
 
@@ -2445,12 +2449,8 @@ public class PdfDictionary {
     				}
     			//}
     		}catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
-    		}
+                LogWriter.writeLog("Exception: " + e.getMessage());
+            }
     	}
 
     	return type;

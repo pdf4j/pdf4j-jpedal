@@ -56,7 +56,7 @@ import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-//
+
 import org.jpedal.parser.*;
 
 import org.jpedal.render.*;
@@ -147,8 +147,9 @@ public class Parser {
     private final boolean useJavaFX;
     private boolean warnOnceOnForms;
     private PdfObject structTreeRootObj;
-    //
-
+    
+    //private HTMLMarkedContentGenerator htmlMarkedContent;
+    
     /**
      * return scaleup factor applied to last Hires image of page generated
      *
@@ -205,8 +206,15 @@ public class Parser {
         
     }
 
-    //
-
+    /**
+     * NOT PART OF API - added for client and only works in custom build
+     * tells software to generate glyph when first rendered not when decoded.
+     * Should not need to be called in general usage
+     */
+    protected void setGenerateGlyphOnRender(final boolean generateGlyphOnRender) {
+        this.generateGlyphOnRender=generateGlyphOnRender;
+    }
+    
     /**
      *
      * Please do not use for general usage. Use setPageParameters(scalingValue, pageNumber) to set page scaling
@@ -223,15 +231,7 @@ public class Parser {
             final boolean layersChanged=layers.setZoom(newScaling);
 
             if(layersChanged){
-//                try {
                     decodePage(-1);
-////                } catch (final Exception e) {
-////                    //tell user and log
-////                    if(LogWriter.isOutput()) {
-////                        LogWriter.writeLog("Exception: " + e.getMessage());
-////                    }
-////                    //
-////                }
             }
         }
     }
@@ -241,15 +241,10 @@ public class Parser {
     void decodePageInBackground(final int i) throws PdfException {
 
         if (fileAcces.isDecoding()) {
-            if(LogWriter.isOutput()){
-                LogWriter.writeLog("[PDF]WARNING - this file is being decoded already in foreground");
-                LogWriter.writeLog("[PDF]Multiple access not recommended - use  waitForDecodingToFinish() to check");
-            }
-
+            LogWriter.writeLog("[PDF]WARNING - this file is being decoded already in foreground");
+            LogWriter.writeLog("[PDF]Multiple access not recommended - use  waitForDecodingToFinish() to check");     
         } else if (isBackgroundDecoding) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[PDF]WARNING - this file is being decoded already in background");
-            }
+            LogWriter.writeLog("[PDF]WARNING - this file is being decoded already in background");
         } else {
 
             try{
@@ -258,10 +253,8 @@ public class Parser {
                 /** check in range */
                 if (i > fileAcces.getPageCount()) {
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Page out of bounds");
-                    }
-
+                    LogWriter.writeLog("Page out of bounds");
+                    
                 } else {
 
                     /** get pdf object id for page to decode */
@@ -317,11 +310,7 @@ public class Parser {
                 }
 
             }catch(final PdfException e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }finally {
                 isBackgroundDecoding = false;
             }
@@ -339,9 +328,8 @@ public class Parser {
 
         // make sure in range
         if (pageIndex > fileAcces.getPageCount() || pageIndex < 1) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Page " + pageIndex + " not in range");
-            }
+            LogWriter.writeLog("Page " + pageIndex + " not in range");
+            
         } else {
 
             if (getIO() == null) {
@@ -632,8 +620,35 @@ public class Parser {
 
         final PdfPageData pageData=fileAcces.getPdfPageData();
 
-        //
-        {
+        if(customDVR!=null){
+
+            currentDisplay=customDVR;
+
+            /**intercept code to render and image and flag text as invisible or visible*/
+            if (customDVR.isHTMLorSVG()) {// Special case for HTML and SVG to allow for the available text modes.
+
+
+                fileAcces.setDVR(currentDisplay);
+
+                /**
+                 * flag if content is structured so we can use this in HTML
+                 */             
+                this.structTreeRootObj=res.getPdfObject(PdfResources.StructTreeRootObj);
+                if(structTreeRootObj!=null){
+                    this.fileAcces.getIO().checkResolved(structTreeRootObj);
+                }
+                
+//                if(1==2 && structTreeRootObj!=null && htmlMarkedContent==null && structTreeRootObj.getDictionary(PdfDictionary.ParentTree)!=null){
+//                    //System.out.println("HTML file containts Structured content");
+//                    htmlMarkedContent=new org.jpedal.objects.structuredtext.HTMLMarkedContentGenerator(); 
+//                    
+//                    
+//                    //do document level work here
+//                    htmlMarkedContent.getMarkedContentTree( res,  pageData, fileAcces.getIO());
+//        
+//                } 
+            }
+        }else{
             currentDisplay=fileAcces.getDynamicRenderer();
         }
 
@@ -647,10 +662,8 @@ public class Parser {
         final int page=rawPage;
 
         if (fileAcces.isDecoding()) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[PDF]WARNING - this file is being decoded already - use  waitForDecodingToFinish() to check");
-            }
-
+            LogWriter.writeLog("[PDF]WARNING - this file is being decoded already - use  waitForDecodingToFinish() to check");
+            
         } else {
 
             PdfObject pdfObject=fileAcces.linearParser.getLinearPageObject();
@@ -667,24 +680,20 @@ public class Parser {
                     handleJSInLayer(formRenderer, layers);
                 }
 
-                //<start-demo><end-demo>
-
                 fileAcces.setLastPageDecoded(page);
 
                 decodeStatus = "";
 
-                // <start-demo><end-demo>
-
+                DevFlags.currentPage = page;
+                
                 /** flush renderer */
                 currentDisplay.flush();
 
                 /** check in range */
                 if (page > fileAcces.getPageCount() || page < 1) {
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Page out of bounds");
-                    }
-
+                    LogWriter.writeLog("Page out of bounds");
+                    
                     fileAcces.setDecoding(false);
 
                 } else{
@@ -724,14 +733,19 @@ public class Parser {
                             textLines.setLineAreas(null);
                         }
 
-                        //
+                        
+//                        if(htmlMarkedContent!=null){
+//                            current.setObjectValue(ValueTypes.MarkedContent,htmlMarkedContent.getLookup());
+//                            htmlMarkedContent.traverseContentTree(structTreeRootObj,current);
+//                        }
+                       
                         current.decodePageContent(pdfObject);
                         
                     } catch (final Error err) {
                         decodeStatus = decodeStatus+ "Error in decoding page "+ err;
                     } catch (final PdfException e) {
 
-                        //
+                        LogWriter.writeLog("Exception "+e.getMessage());
 
                         //cascade up so we can show in viewer
                         if(e.getMessage()!=null && e.getMessage().contains("JPeg 2000")){
@@ -785,18 +799,16 @@ public class Parser {
                         if(specialMode!= SpecialOptions.NONE &&
                                 specialMode!= SpecialOptions.SINGLE_PAGE &&
                                 page!=fileAcces.getPageCount()) {
-                                //
+                            formRenderer.createDisplayComponentsForPage(page + 1, current);
                         }
-                        
-                        // }
                     }
                 }
             } catch (PdfException ex) {
                 Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
 
-                //
-
+                DevFlags.fileLoaded = true;
+                
                 fileAcces.setDecoding(false);
 
                 if(statusBar!=null) {
@@ -891,8 +903,8 @@ public class Parser {
 
         externalHandlers.addHandlers(current);
 
-        //
-
+        current.setBooleanValue(ValueTypes.GenerateGlyphOnRender, generateGlyphOnRender);
+        
         current.setObjectValue(ValueTypes.Name, fileAcces.getFilename());
         current.setIntValue(ValueTypes.PageNum, page);
         current.setRenderer(currentDisplay);

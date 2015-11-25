@@ -627,12 +627,8 @@ public class ImageTransformerDouble {
                 
             } catch (final Exception e) {
                 LogWriter.writeLog("Exception " + e + " extracting clipped image with values x="+x+" y="+y+" w="+w+" h="+h+" from image "+current_image);
-
-                //<end-demo>
-
             }catch(final Error err){
                 LogWriter.writeLog("Exception " + err + " extracting clipped image with values x=" + x + " y=" + y + " w=" + w + " h=" + h + " from image " + current_image);
-                //<end-demo>
             }
         }
 

@@ -128,7 +128,7 @@ public class OpenFile {
                     }
                 } catch (final Exception e) {
                     failed = true;
-                    //
+                    LogWriter.writeLog("Unable to open as URL " + newFile+ ' ' +e);
                 }
 
                 if (failed) {
@@ -171,11 +171,7 @@ public class OpenFile {
 
                             }
                         } catch (final InterruptedException e) {
-                            // 
-                            
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception attempting to open file: " + e);
-                            }
+                            LogWriter.writeLog("Exception attempting to open file: " + e);
                         }
                     }
 
@@ -316,11 +312,7 @@ public class OpenFile {
 
                         processPage(commonValues, decode_pdf, currentGUI, thumbnails);
                     } catch (final PdfException e) {
-                        // 
-                        
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception attempting to open file: " + e);
-                        }
+                        LogWriter.writeLog("Exception attempting to open file: " + e);
                     }
                 }
 
@@ -374,11 +366,7 @@ public class OpenFile {
 
                                 }
                             } catch (final InterruptedException e) {
-                                // 
-                                
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception attempting to open file: " + e);
-                                }
+                                LogWriter.writeLog("Exception attempting to open file: " + e);
                             }
                         }
 
@@ -405,9 +393,7 @@ public class OpenFile {
                             } catch (final IOException e) {
                                 file = new File(parent, filename);
 
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception in IO "+e);
-                                }
+                                LogWriter.writeLog("Exception in IO "+e);
                             }
                         }
                     } else {
@@ -452,19 +438,11 @@ public class OpenFile {
                                 try {
                                     Thread.sleep(100);
                                 } catch (final InterruptedException e) {
-                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                    if(LogWriter.isOutput()) {
-                                        LogWriter.writeLog("Exception attempting to open file: " + e);
-                                    }
+                                    LogWriter.writeLog("Exception attempting to open file: " + e);
                                 }
                             }
                         } catch (final IOException e1) {
-                            // 
-                            
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception attempting to open file: " + e1);
-                            }
-                            
+                            LogWriter.writeLog("Exception attempting to open file: " + e1);
                         }
                     } else { // no file selected so redisplay old
                         //
@@ -503,7 +481,6 @@ public class OpenFile {
 
         } catch (final Exception e) {
             LogWriter.writeLog("Exception " + e + " getting paths");
-            //
         }
 
         /**
@@ -614,10 +591,8 @@ public class OpenFile {
                 commonValues.setCurrentPage(1);
             }
         } catch (final Exception e) {
-            e.printStackTrace();
-            System.err.println(Messages.getMessage("PdfViewerError.Exception") + ' ' + e + ' ' + Messages.getMessage("PdfViewerError.DecodeFile"));
-
-            //<start-demo><end-demo>
+            
+            LogWriter.writeLog(Messages.getMessage("PdfViewerError.Exception") + ' ' + e + ' ' + Messages.getMessage("PdfViewerError.DecodeFile"));
         }
         //}
 
@@ -691,11 +666,7 @@ public class OpenFile {
                                             try {
                                                 Thread.sleep(500);
                                             } catch (final InterruptedException e) {
-                                                //<start-demo><end-demo>
-                                                
-                                                if(LogWriter.isOutput()) {
-                                                    LogWriter.writeLog("Exception attempting to open file: " + e);
-                                                }
+                                                LogWriter.writeLog("Exception attempting to open file: " + e);
                                             }
                                         }
                                     }
@@ -770,7 +741,7 @@ public class OpenFile {
                         }
                     } catch (final Exception e) {
                         currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.UrlError") + " file=" + selectedFile + '\n' + e.getMessage());
-                        //<start-demo><end-demo>
+                        
                         decode_pdf.closePdfFile();
                         fileCanBeOpened = false;
                     }
@@ -804,8 +775,6 @@ public class OpenFile {
                         try {
                             decode_pdf.openPdfFile(commonValues.getSelectedFile());
                         } catch (final RuntimeException e) {
-
-                            //
 
                             //customise message for missing bouncycastle error
                             final String message;
@@ -934,9 +903,8 @@ public class OpenFile {
             }
 
         } catch (final PdfException e) {
-            System.err.println(("Exception " + e + " opening file"));
-            //<start-demo><end-demo>
-
+            LogWriter.writeLog(("Exception " + e + " opening file"));
+            
             if (currentGUI.isSingle()) {
 
                 if (GUI.showMessages) {
@@ -1161,9 +1129,7 @@ public class OpenFile {
             } catch (final Exception e) {
                 failed=true;
 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in handling URL "+e);
-                }
+                LogWriter.writeLog("Exception in handling URL "+e);
             }
 
             if(failed){

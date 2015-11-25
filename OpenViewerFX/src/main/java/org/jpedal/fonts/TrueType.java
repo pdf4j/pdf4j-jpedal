@@ -106,14 +106,7 @@ public class  TrueType extends PdfFont {
             }
             
         } catch (final Exception e) {
-            System.err.println("Exception " + e + " reading "+substituteFontFile+" Check cid  jar installed");
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading "+substituteFontFile+" Check cid  jar installed");
-            }
-            
-            if(ExternalHandlers.throwMissingCIDError && e.getMessage()!=null && e.getMessage().contains("kochi")) {
-                throw new Error(e);
-            }
+            LogWriter.writeLog("Exception " + e + " reading "+substituteFontFile+" Check cid  jar installed");
         }
         
         if(from==null) {
@@ -143,11 +136,7 @@ public class  TrueType extends PdfFont {
             isFontEmbedded=true;
             
         } catch (final Exception e) {
-            System.err.println("Exception " + e + " reading "+substituteFontFile+" Check cid  jar installed");
-            
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading "+substituteFontFile+" Check cid  jar installed");
-            }
+            LogWriter.writeLog("Exception " + e + " reading "+substituteFontFile+" Check cid  jar installed");
             
             if(ExternalHandlers.throwMissingCIDError && e.getMessage()!=null && e.getMessage().contains("kochi")) {
                 throw new Error(e);
@@ -252,13 +241,9 @@ public class  TrueType extends PdfFont {
                         }
                         
                     }catch(final Exception e){
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("1.Unable to open "+substituteFont+' '+e);
-                        }
+                        LogWriter.writeLog("1.Unable to open "+substituteFont+' '+e);
                     }catch(final Error err){
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("1.Unable to open "+substituteFont+' '+err);
-                        }
+                        LogWriter.writeLog("1.Unable to open "+substituteFont+' '+err);
                     }
                     
                     if(jarFile==null) {
@@ -305,10 +290,6 @@ public class  TrueType extends PdfFont {
         //process the font data
         try {
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Embedded TrueType font used");
-            }
-            
             readFontData(fontDataAsArray,fontDataAsObject);
             
             isFontEmbedded=true;
@@ -321,9 +302,8 @@ public class  TrueType extends PdfFont {
             
             isFontEmbedded=false;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " processing TrueType font");
-            }
+            LogWriter.writeLog("Exception " + e + " processing TrueType font");
+           
         }
     }
     

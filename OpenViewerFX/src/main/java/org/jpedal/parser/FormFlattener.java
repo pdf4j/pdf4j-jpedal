@@ -177,9 +177,10 @@ public class FormFlattener {
 
             String V = form.getTextStreamValue(PdfDictionary.V);
 
-            //if(V==null)
-            //    V=form.getTextStreamValue(PdfDictionary.T);
-
+            if(V==null && type == PdfDictionary.FreeText){
+                V=form.getTextStreamValue(PdfDictionary.Contents);
+            }
+            
             if (DA != null || (V != null && !V.isEmpty())) {
 
                 final ReadOnlyTextIcon textIcon = new ReadOnlyTextIcon(form,0, pdfStreamDecoder.currentPdfFile, AcroRes);

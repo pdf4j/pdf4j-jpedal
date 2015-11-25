@@ -253,10 +253,7 @@ public class UpdateDialog extends JDialog {
 				try {
 					BrowserLauncher.openURL("http://www.idrsolutions.com/jpedal-builds/");
 				} catch (final Exception e1) {
-					//
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to launch browser " + e);
-                    }
+					LogWriter.writeLog("Attempting to launch browser " + e);
                 }
 			}
 		});
@@ -286,11 +283,8 @@ public class UpdateDialog extends JDialog {
 					try {
 						BrowserLauncher.openURL("http://www.idrsolutions.com/jpedal-builds/");
 					} catch (final Exception e1) {
-						//
-                        if (LogWriter.isOutput()) {
-                            LogWriter.writeLog("Attempting to launch browser " + e1);
-                        }
-					}
+						LogWriter.writeLog("Attempting to launch browser " + e1);
+                    }
 				}
 			}
 

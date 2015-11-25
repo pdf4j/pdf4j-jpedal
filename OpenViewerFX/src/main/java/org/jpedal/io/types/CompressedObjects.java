@@ -218,9 +218,7 @@ public class CompressedObjects {
                         }catch(final Exception ee){
                             refIsvalid=false;
 
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Ref is invalid "+ee);
-                            }
+                            LogWriter.writeLog("Ref is invalid "+ee);
                         }
                     }
 

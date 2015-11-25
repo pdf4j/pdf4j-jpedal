@@ -210,9 +210,7 @@ public class DecryptionFactory {
             try {
                 md = MessageDigest.getInstance("MD5");
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " with digest");
-                }
+                LogWriter.writeLog("Exception " + e + " with digest");
             }
 
             md.update(encrypted);
@@ -380,11 +378,7 @@ public class DecryptionFactory {
                 }
                 
             } catch (final NoSuchAlgorithmException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
 
@@ -403,7 +397,7 @@ public class DecryptionFactory {
             if(isUserPassword){
 
                 //tell if not default value
-                if(encryptionPassword!=null && encryptionPassword.length>0 && LogWriter.isOutput()) {
+                if(encryptionPassword!=null && encryptionPassword.length>0) {
                     LogWriter.writeLog("Correct user password supplied ");
                 }
 
@@ -419,10 +413,8 @@ public class DecryptionFactory {
             }
 
         }else{
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Correct owner password supplied");
-            }
-
+            LogWriter.writeLog("Correct owner password supplied");
+            
             isFileViewable=true;
             isPasswordSupplied=true;
             extractionIsAllowed=true;
@@ -564,12 +556,8 @@ public class DecryptionFactory {
 
         }catch(final Exception e){
 
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
+            
             throw new PdfSecurityException("Exception "+e+" generating encryption key");
         }
 
@@ -695,18 +683,14 @@ public class DecryptionFactory {
         isEncrypted = true;
         isFileViewable = false;
 
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("File has encryption settings");
-        }
-
+        LogWriter.writeLog("File has encryption settings");
+        
         //test if encrypted with password (not certificate)
         if(firstValue==PdfDictionary.Standard){
             try{
                 verifyAccess();
             }catch(final PdfSecurityException e){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("File requires password "+e);
-                }
+                LogWriter.writeLog("File requires password "+e);
             }
         }else if(certificate!=null){
 
@@ -768,11 +752,7 @@ public class DecryptionFactory {
 
                     encryptionKey = md.digest();
                 }catch (final Exception e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -826,11 +806,7 @@ public class DecryptionFactory {
                     bis=new BufferedInputStream(new FileInputStream(tempFile2));
 
                 } catch (final IOException e1) {
-                    //
-                    
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception " + e1 + " in decrypt");
-                    }
+                    LogWriter.writeLog("Exception " + e1 + " in decrypt");
                 }
             }
 
@@ -904,11 +880,7 @@ public class DecryptionFactory {
                         try {
                             bis.skip(16);
                         } catch (final IOException e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: " + e.getMessage());
                         }
                     }else{
                         final int origLen=data.length;
@@ -1080,9 +1052,7 @@ public class DecryptionFactory {
                 newString = decrypt(newString, objectRef, false, null, false, true);
             }
         }catch(final Exception e){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to decrypt string in Object " + objectRef + ' ' + new String(newString)+ ' ' +e);
-            }
+            LogWriter.writeLog("Unable to decrypt string in Object " + objectRef + ' ' + new String(newString)+ ' ' +e);
         }
 
         return newString;
@@ -1117,12 +1087,8 @@ public class DecryptionFactory {
                 final File file = new File(fileName);
                 //System.out.println("PdfFileReader - deleting file "+fileName);
                 file.delete();
-                if (LogWriter.isOutput() && file.exists()) {
-                    LogWriter.writeLog("Unable to delete temp file " + fileName);
-                }
             }
         }
-
     }
 
     public void dispose() {

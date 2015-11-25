@@ -128,11 +128,7 @@ public class Type3 extends PdfFont {
                 try {
                     glyphDecoder.readResources(Resources,false);
                 } catch (final PdfException e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }
             
@@ -197,11 +193,7 @@ public class Type3 extends PdfFont {
                         glyphs.setT3Glyph(key,otherKey, glyph);
                         
                     }catch(final Exception e){
-                        e.printStackTrace(System.out);
-                        
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception "+e+" is Type3 font code");
-                        }
+                        LogWriter.writeLog("Exception "+e+" is Type3 font code");
                     }
                 }
                 

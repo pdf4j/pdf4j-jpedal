@@ -200,8 +200,6 @@ public class ColorObjectDecoder {
 
                 break;
             }
-
-            //
         }
         return i;
     }
@@ -324,10 +322,8 @@ public class ColorObjectDecoder {
                 System.out.println(padding + "Data not yet loaded");
             }
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[Linearized] " + number + ' ' + generation + " R not yet available (9)");
-            }
-
+            LogWriter.writeLog("[Linearized] " + number + ' ' + generation + " R not yet available (9)");
+            
             i=raw.length;
         }else{
 
@@ -655,11 +651,7 @@ public class ColorObjectDecoder {
                 stream = decryption.decrypt(stream, pdfObject.getObjectRefAsString(), false, null, false, false);
             }
         } catch (final PdfSecurityException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         pdfObject.setDecodedStream(stream);
@@ -689,11 +681,7 @@ public class ColorObjectDecoder {
                 nRaw = decryption.decrypt(nRaw, pdfObject.getObjectRefAsString(), false, null, false, false);
             }
         } catch (final PdfSecurityException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         pdfObject.setDecodedStream(nRaw);

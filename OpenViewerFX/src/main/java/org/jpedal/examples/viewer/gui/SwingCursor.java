@@ -198,11 +198,8 @@ public class SwingCursor {
         	try {
         		url = p.toURI().toURL();
         	} catch (final MalformedURLException e) {
-        		//
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception attempting get path for image " + e);
-                }
-        	}
+        		LogWriter.writeLog("Exception attempting get path for image " + e);
+            }
         }
 
         if(url==null){
@@ -215,10 +212,7 @@ public class SwingCursor {
              	try {
              		url = p.toURI().toURL();
              	} catch (final MalformedURLException e) {
-             		//
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception attempting get path for image " + e);
-                    }
+             		LogWriter.writeLog("Exception attempting get path for image " + e);
                 }
             }
         }
@@ -240,10 +234,8 @@ public class SwingCursor {
                     return ImageIO.read(getURLForImage("grab32.png"));
                 } catch (final Exception e) {
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception in getting image "+e);
-                    }
-
+                    LogWriter.writeLog("Exception in getting image "+e);
+                    
                     return null;
                 }
             case GRABBING_CURSOR:
@@ -251,10 +243,8 @@ public class SwingCursor {
                     return ImageIO.read(getURLForImage("grabbing32.png"));
                 } catch (final Exception e) {
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception in getting image "+e);
-                    }
-
+                    LogWriter.writeLog("Exception in getting image "+e);
+                    
                     return null;
                 }
             default:

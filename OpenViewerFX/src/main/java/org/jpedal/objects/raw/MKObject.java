@@ -55,7 +55,15 @@ public class MKObject extends FormObject {
 
 	private PdfObject I;
 
-	// <start-demo><end-demo>
+	
+	@Override
+    public String toString(){
+		return "BC="+org.jpedal.objects.acroforms.utils.ConvertToString.convertArrayToString(getFloatArray(PdfDictionary.BC))+
+			" BG="+org.jpedal.objects.acroforms.utils.ConvertToString.convertArrayToString(getFloatArray(PdfDictionary.BG))+
+			" AC="+getTextStreamValue(PdfDictionary.AC)+" CA="+getTextStreamValue(PdfDictionary.CA)+
+			" RC="+getTextStreamValue(PdfDictionary.RC)+
+			" TP="+TP+" R="+R+" I="+I;
+	}
 	
 	/** creates a copy of this MKObject but in a new Object so that changes wont affect this MkObject*/
 	@Override
@@ -461,8 +469,6 @@ public class MKObject extends FormObject {
 //                break;
 
       //  }
-
-        //
 
         //convert
         switch(mode){

@@ -251,7 +251,7 @@ public class PdfGroupingAlgorithms {
 		int c, n;
 		String separator;
         float diff;
-
+        
         //work through objects and eliminate shadows or roll together overlaps
 		for (int p = 0; p < count; p++) {
 
@@ -269,11 +269,13 @@ public class PdfGroupingAlgorithms {
 
 					//item to test against
 					n = items[p2];
-					if ((!isUsed[n]) && (!isUsed[c])) {
+                    
+                    //Ignore fragments that have been used or have no width
+                    if ((f_x1[n] != f_x2[n]) && (!isUsed[n]) && (!isUsed[c])) {
 
-						float fontDiff=this.fontSize[n]-fontSize[c];
-						if(fontDiff<0) {
-                            fontDiff=-fontDiff;
+                        float fontDiff = this.fontSize[n] - fontSize[c];
+                        if (fontDiff < 0) {
+                            fontDiff = -fontDiff;
                         }
 
                         diff = (f_x2[n] - f_x1[n]) - (f_x2[c] - f_x1[c]);
@@ -285,41 +287,41 @@ public class PdfGroupingAlgorithms {
 						if (fontDiff==0 && (midX > f_x1[n])&& (midX < f_x2[n])
 							&& (diff< 10)
 							&& (midY < f_y1[n])&& (midY > f_y2[n])) {
-							
-							isUsed[n] = true;
-							
-							//pick up drowned text items (item inside another)			
-						} else {
-				
+
+                            isUsed[n] = true;
+
+                            //pick up drowned text items (item inside another)			
+                        } else {
+
 							final boolean a_in_b =
 								(f_x1[n] > f_x1[c])&& (f_x2[n] < f_x2[c])
 									&& (f_y1[n] < f_y1[c])&& (f_y2[n] > f_y2[c]);
 							final boolean b_in_a =
 								(f_x1[c] > f_x1[n])&& (f_x2[c] < f_x2[n])
 									&& (f_y1[c] < f_y1[n])&& (f_y2[c] > f_y2[n]);
-							
-							//merge together
-							if (a_in_b || b_in_a) {
-								//get order right - bottom y2 underneath
-								if (f_y2[c] > f_y2[n]) {
+
+                            //merge together
+                            if (a_in_b || b_in_a) {
+                                //get order right - bottom y2 underneath
+                                if (f_y2[c] > f_y2[n]) {
 									separator =getLineDownSeparator(content[c],content[n],isXMLExtraction);
 									if((!avoidSpaces)||(separator.indexOf(' ')==-1)){
 										merge(c,n,separator,true);
-									}
-								} else {
+                                    }
+                                } else {
 									separator =getLineDownSeparator(content[n],content[c],isXMLExtraction);
 									if(!avoidSpaces || separator.indexOf(' ')==-1){
 										merge(n,c,separator,true);
-									}
-								}
-								
-								//recalculate as may have changed
-								midX = (f_x1[c] + f_x2[c]) / 2;
-								midY = (f_y1[c] + f_y2[c]) / 2;
-								
-							}
-						}
-					}
+                                    }
+                                }
+
+                                //recalculate as may have changed
+                                midX = (f_x1[c] + f_x2[c]) / 2;
+                                midY = (f_y1[c] + f_y2[c]) / 2;
+
+                            }
+                        }
+                    }
 				}
 			}
 		}
@@ -367,7 +369,7 @@ public class PdfGroupingAlgorithms {
 	 * merge 2 text fragments together and update co-ordinates
 	 */
     private void merge(final int m, final int c, final String separator, final boolean moveFont) {
-
+        
 			//update co-ords
 			if (f_x1[m] > f_x1[c]) {
                 f_x1[m] = f_x1[c];
@@ -1305,7 +1307,16 @@ public class PdfGroupingAlgorithms {
             final int ptr = textValue.indexOf(' ');
 
             if (ptr > 0) {
-                pt += ptr * (Float.parseFloat(char_width) / textValue.length());
+                
+                if(textValue.length()==2){ //Catch for issue 22796.
+                    //This is an estimate, the only other way to achieve this is
+                    //to get the font for each bit of text so we can determine 
+                    //the length of the characters used to be 100% accurate but 
+                    //the font data is not accessible from here.
+                    pt += Float.parseFloat(char_width)*0.7;
+                }else{
+                    pt += ptr * (Float.parseFloat(char_width) / textValue.length());
+                }
             }
         }
 
@@ -2848,7 +2859,6 @@ public class PdfGroupingAlgorithms {
 		 * now loop through all lines merging
 		 */
         int ClastChar,MlastChar,CFirstChar;
-		final boolean debug=false;
 
 		for (int i = count - 2; i > -1; i--) {
 			
@@ -2860,18 +2870,7 @@ public class PdfGroupingAlgorithms {
 
 				//-1 if no chars
 				ClastChar=getLastChar(content[child]);
-				if(debug){
-
-					CFirstChar=getFirstChar(content[child]);
-					MlastChar=getLastChar(content[master]);
-
-                    final StringBuilder child_textX = Strip.stripXML(content[child],isXMLExtraction);
-					final String master_textX =Strip.stripXML(content[master],isXMLExtraction).toString();
-
-					//
-                    
-				}
-
+				
 				if (ClastChar!=-1) {
 					
 					addAlignmentFormatting(estimateParagraphs, middlePage, f_x1, f_x2, quarter, child);
@@ -3195,7 +3194,7 @@ public class PdfGroupingAlgorithms {
                         //System.out.println("j2=="+j2);
 						i=items[j2];
 
-						if(!isUsed[i] && c!=i && this.writingMode[c]==this.writingMode[i]){
+						if(!isUsed[i] && c!=i && this.writingMode[c]==this.writingMode[i] && f_x1[i]!=f_x2[i]){
 
 							//amount of variation in bottom of text
 							//int baseLineDifference = (int) (f_y2[i] - f_y2[c]);
@@ -4279,7 +4278,7 @@ public class PdfGroupingAlgorithms {
 
             //Create pattern to match search term with two words before and after
             final Pattern teaserTerm = Pattern.compile("(?:\\S+\\s)?\\S*(?:\\S+\\s)?\\S*" + searchValue + "\\S*(?:\\s\\S+)?\\S*(?:\\s\\S+)?", options);
-
+            
             //So long as text data is not null
             if (searchText != null) {
 
@@ -4551,6 +4550,8 @@ public class PdfGroupingAlgorithms {
                             + teaser.substring(teaseStarts, teaseEnds) + "</b>"
                             + teaser.substring(teaseEnds, teaser.length());
                 }
+                
+                teaserFinder.region(termEnds+1, teaserFinder.regionEnd());
             }
         }
         

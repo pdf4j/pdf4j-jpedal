@@ -70,17 +70,17 @@ public class SamplingFactory {
         if(newLevel==null) {
             newLevel = System.getProperty("org.jpedal.downsample");
         }
-
+        
 		if(newLevel!=null){
-			if(newLevel.equals("high")) {
+			if(newLevel.equals("high") || newLevel.equals("\"high\"")) {
                 downsampleLevel = high;
-            } else if(newLevel.equals("medium")) {
+            } else if(newLevel.equals("medium") || newLevel.equals("\"medium\"")) {
                 downsampleLevel = medium;
-            } else if(newLevel.equals("none")) {
+            } else if(newLevel.equals("none") || newLevel.equals("\"none\"")) {
                 downsampleLevel = none;
-            } else if(newLevel.equals("print_disable")) {
+            } else if(newLevel.equals("print_disable") || newLevel.equals("\"print_disable\"")) {
                 isPrintDownsampleEnabled = false;
-            } else if(newLevel.equals("print_enable")) {
+            } else if(newLevel.equals("print_enable")|| newLevel.equals("\"print_enable\"")) {
                 isPrintDownsampleEnabled = true;
             }
         }

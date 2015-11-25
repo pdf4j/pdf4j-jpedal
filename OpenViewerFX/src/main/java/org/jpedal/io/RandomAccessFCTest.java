@@ -63,11 +63,7 @@ public class RandomAccessFCTest implements RandomAccessBuffer {
             mb = fc.map( FileChannel.MapMode.READ_ONLY, 0L, fc.size( ) );
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
 
@@ -110,25 +106,16 @@ public class RandomAccessFCTest implements RandomAccessBuffer {
         try {
             super.finalize();
         } catch (final Throwable e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //ensure removal actual file
         try {
             close();
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
-
-    } /**/
+    }
 
     @Override
     public long length() throws IOException {

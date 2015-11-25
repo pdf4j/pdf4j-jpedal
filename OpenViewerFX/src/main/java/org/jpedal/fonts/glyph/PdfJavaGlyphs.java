@@ -614,8 +614,9 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
 
     public int readEmbeddedFont(final boolean TTstreamisCID, final byte[] fontDataAsArray, final FontData fontData) {
-        //
-        return 0;
+        
+        throw new RuntimeException("readEmbeddedFont in PdfJavaGlyphs should not be called");
+        
     }
 
     public void setIsSubsetted(final boolean b) {
@@ -700,9 +701,8 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
     @SuppressWarnings("UnusedParameters")
     public float getTTWidth(final String charGlyph, final int rawInt, final String displayValue, final boolean b) {
 
-        //<start-demo>
-
-        return 0;  //To change body of created methods use File | Settings | File Templates.
+        throw new RuntimeException("getTTWidth should not be called");
+        
     }
 
     @SuppressWarnings({"UnusedParameters", "UnusedDeclaration"})

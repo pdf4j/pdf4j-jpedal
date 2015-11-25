@@ -395,7 +395,6 @@ public class TTGlyphFX extends BaseTTGlyph implements PdfGlyph, Serializable{
 //                        //tell user and log
 //                        if(LogWriter.isOutput())
 //                            LogWriter.writeLog("Exception: "+e.getMessage());
-//                        //
 //                    }
 //                }
             }
@@ -423,6 +422,11 @@ public class TTGlyphFX extends BaseTTGlyph implements PdfGlyph, Serializable{
         createGlyph(false);
 
         return pathsFX;
+    }
+    
+     @Override
+    public boolean hasHintingApplied() {
+        return this.hasHintingApplied;
     }
 
 }

@@ -224,9 +224,8 @@ public class LZWDecoder {
         } catch(final ArrayIndexOutOfBoundsException e) {
             // Strip not terminated as expected: return EndOfInformation code.
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("LZW value out of bounds "+e);
-            }
+            LogWriter.writeLog("LZW value out of bounds "+e);
+            
             return 257;
         }
     }

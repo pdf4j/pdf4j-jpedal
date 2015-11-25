@@ -68,22 +68,18 @@ class ThreeComponentImage {
             d=8;
             
         }
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("Converting 3 comp colorspace to sRGB index=" + Arrays.toString(index));
-        }
+        
+        LogWriter.writeLog("Converting 3 comp colorspace to sRGB index=" + Arrays.toString(index));
         
         //work out from size what sort of image data we have
         if (w * h == data.length) {
             image = makeIndexImage(d, index, w, h, data);
         } else{
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Converting data to sRGB " + data.length + " depth=" + d);
-            }
+            LogWriter.writeLog("Converting data to sRGB " + data.length + " depth=" + d);
             
             image =makeImage(d, data, w, h);
-            
-            
+           
         }
         return image;
     }

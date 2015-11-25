@@ -60,10 +60,7 @@ public class JPegImageDecoder {
         BufferedImage image=null;
         
         //handle JPEGS
-        
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("JPeg Image " + name + ' ' + w + "W * " + h + 'H' + " arrayInverted=" + arrayInverted);
-        }
+        LogWriter.writeLog("JPeg Image " + name + ' ' + w + "W * " + h + 'H' + " arrayInverted=" + arrayInverted);
         
         /**
         try {
@@ -112,11 +109,9 @@ public class JPegImageDecoder {
                     }
                 }catch(final Exception e){
                     errorTracker.addPageFailureMessage("Unable to use alt colorspace with " + name + " to JPEG");
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    
+                    LogWriter.writeLog("Exception: " + e.getMessage());
+                    
                     if(image!=null){
                         image.flush();
                     }
@@ -138,11 +133,9 @@ public class JPegImageDecoder {
                 //image=simulateOP(image);
             }catch(final Exception e){
                 errorTracker.addPageFailureMessage("Problem converting " + name + " to JPEG");
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                
+                LogWriter.writeLog("Exception: " + e.getMessage());
+                
                 image.flush();
                 image=null;
             }

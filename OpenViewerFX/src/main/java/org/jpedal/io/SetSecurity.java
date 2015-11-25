@@ -60,9 +60,7 @@ public class SetSecurity {
             
         } catch (final Exception e) {
             
-            if(LogWriter.isOutput()){
-                LogWriter.writeLog("Unable to run custom security provider " + altSP+" Exception " + e);
-            }
+            LogWriter.writeLog("Unable to run custom security provider " + altSP+" Exception " + e);
             
             throw new RuntimeException("This PDF file is encrypted and JPedal needs an additional library to \n" +
                     "decode on the classpath (we recommend bouncycastle library).\n" +

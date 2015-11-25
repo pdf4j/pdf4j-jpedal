@@ -43,7 +43,7 @@ import org.jpedal.display.Display;
  */
 public class PageMoveTracker {
     
-    final java.util.Timer t2 = new java.util.Timer();
+    java.util.Timer t2 = null;
     TimerTask listener;
     
     /**
@@ -53,9 +53,14 @@ public class PageMoveTracker {
         if(t2!=null) {
             t2.cancel();
         }
+        t2 = null;
     }
     
     void startTimer(final Display pages,final int  pageNumber, final FileAccess fileAccess) {
+        
+        if(t2==null) {
+            t2 = new java.util.Timer();
+        }
         
         //turn if off if running
         if (listener != null) {

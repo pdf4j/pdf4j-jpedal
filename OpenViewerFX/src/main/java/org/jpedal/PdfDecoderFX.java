@@ -30,7 +30,6 @@
  * PdfDecoderFX.java
  * ---------------
  */
-
 package org.jpedal;
 
 import org.jpedal.external.FXExternalHandlers;
@@ -39,7 +38,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
@@ -94,7 +92,6 @@ import org.jpedal.objects.acroforms.actions.*;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.outlines.OutlineData;
 import org.jpedal.objects.raw.PdfObject;
-//
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.parser.DecoderResults;
 import org.jpedal.render.DynamicVectorRenderer;
@@ -112,8 +109,6 @@ import org.w3c.dom.Document;
  *  We recommend you access JPedal using only public methods listed in API
  */
 public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecoderInt {
-    
-    ///
     
     private Image previewImage;
 
@@ -223,7 +218,16 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         }
     }
     
-    //
+    /**
+     * return markedContent object as XML Document
+     * @return Document containing XML structure with data
+     * Not implemented in PdfDecoderFx - use PDFDecoderServer
+     */
+    @Override
+    public Document getMarkedContent() {
+        
+        throw new RuntimeException("Not implemented in PdfDecoderFX - use PdfDecoderServer");
+    }
     
     @Override
     public ExternalHandlers getExternalHandler() {
@@ -335,7 +339,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
         customFXHandle.setVvalue((rectangle.y)/height);
         
-        //<end-demo>
+        //System.out.println("scroll to "+rectangle.y+ ' ' +height+ ' ' +customFXHandle.getVvalue()+ ' ' +customFXHandle.getLayoutBounds()+ ' ');
         
         // customFXHandle.setHmax(500);
         customFXHandle.setHvalue(rectangle.x/width);
@@ -350,26 +354,18 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         /**
          * see if mac
          */
-        
-            final String name = System.getProperty("os.name");
-            if (name.equals("Mac OS X")) {
-                DecoderOptions.isRunningOnMac = true;
-            } else if (name.startsWith("Windows")) {
-                DecoderOptions.isRunningOnWindows = true;
-            }else if (name.startsWith("AIX")) {
-                DecoderOptions.isRunningOnAIX = true;
-            } else {
-                if (name.equals("Linux")) {
-                    DecoderOptions.isRunningOnLinux = true;
-                }
+        final String name = System.getProperty("os.name");
+        if (name.equals("Mac OS X")) {
+            DecoderOptions.isRunningOnMac = true;
+        } else if (name.startsWith("Windows")) {
+            DecoderOptions.isRunningOnWindows = true;
+        }else if (name.startsWith("AIX")) {
+            DecoderOptions.isRunningOnAIX = true;
+        } else {
+            if (name.equals("Linux")) {
+                DecoderOptions.isRunningOnLinux = true;
             }
-//        } catch (final Exception e) {
-//            //tell user and log
-//            if(LogWriter.isOutput()) {
-//                LogWriter.writeLog("Exception: " + e.getMessage());
-//            }
-//            //
-//        }
+        }
         
         /**
          * get version number so we can avoid bugs in various versions
@@ -377,15 +373,12 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         try{
             DecoderOptions.javaVersion=Float.parseFloat(System.getProperty("java.specification.version"));
         }catch(final NumberFormatException e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
-        // <start-demo><end-demo>
-        
+        if(LogWriter.isRunningFromIDE){
+            org.jpedal.DevFlags.addShutdownHook();
+        }      
     }
     
     /**
@@ -395,12 +388,11 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     @Override
     public void resetViewableArea() {
         
-        //<start-demo><end-demo>
+        throw new RuntimeException("resetViewableArea called in PdfDecoderFx");
         
         //swingPainter.resetViewableArea(this, fileAccess.getPdfPageData());
         
     }
-
 
     /**
      * Deprecated on 07/07/2014
@@ -409,8 +401,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      */
     @Override
     public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
-        
-        //<start-demo><end-demo>
         
         return null;
         //return swingPainter.setViewableArea(viewport, this, fileAccess.getPdfPageData());
@@ -841,16 +831,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         if(layers!=null){
             final boolean layersChanged=layers.setZoom(scalingdpi.removeScaling(scaling));
             
-            if(layersChanged){
-             //   try {
-                    decodePage(-1);
-//                } catch (final Exception e) {
-//                    //tell user and log
-//                    if(LogWriter.isOutput()) {
-//                        LogWriter.writeLog("Exception: " + e.getMessage());
-//                    }
-//                    //
-//                }
+            if(layersChanged){        
+                decodePage(-1);
             }
         }
         
@@ -970,20 +952,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     @Override
     public DynamicVectorRenderer getDynamicRenderer(final boolean reset) {
         
-        return fileAccess.getDynamicRenderer(reset);
+        return fileAccess.getDynamicRenderer();
         
-    }
-    
-    /**
-     * Override setCursor so that we can turn on and off
-     */
-    public static void setPDFCursor(final Cursor c){
-        //<start-demo><end-demo>
-        
-        if(SingleDisplayFX.allowChangeCursor){
-            //@swing
-//            this.setCursor(c);
-        }
     }
     
     //All Pdf decoder to remember the default for current settings
@@ -1270,10 +1240,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
                 postOpen();
                 
             } catch (final PdfException e) {
-                //
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " opening file");
-                }
+                LogWriter.writeLog("Exception " + e + " opening file");
             }
         }
     }
@@ -1436,11 +1403,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             
             is = url.openStream();
         }catch(final IOException e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         final boolean flag= fileAccess.readFile(supportLinearized, is, rawFileName, null);
@@ -1475,11 +1438,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             
             is = url.openStream();
         }catch(final IOException e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         preOpen();
@@ -1872,7 +1831,9 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     @Override
     public boolean getPageDecodeStatus(final int status) {
         
-        //
+        if(DevFlags.testing && status==(org.jpedal.parser.DecodeStatus.NonEmbeddedCIDFonts)){
+            return false;
+        }
         
         return resultsFromDecode.getPageDecodeStatus(status);
         
@@ -2044,15 +2005,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         }
     }
     
-    /**
-     * make screen scroll to ensure point is visible
-     */
-    public static void ensurePointIsVisible(final Point p){
-        //<start-demo><end-demo>
-        //@swing
-//        super.scrollRectToVisible(new Rectangle(p.x,y_size-p.y,scrollInterval,scrollInterval));
-    }
-    
     //
     
     /**
@@ -2136,7 +2088,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             return;
         }
         
-        //<start-demo><end-demo>
+        throw new RuntimeException(" updateCursorBoxOnScreen called in PdfDecoderFxm please call updateCursorBoxOnScreenFX instead");
         
     }
     
@@ -2202,7 +2154,13 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         this.myBorder=newBorder;
     }
     
-    //
+    /**
+     * Enables/Disables hardware acceleration of screen rendering (default is on)
+     */
+    @Override
+    public void setHardwareAccelerationforScreen(final boolean useAcceleration) {
+        options.useHardwareAcceleration(useAcceleration);
+    }
     
     /**return amount to scroll window by when scrolling (default is 10)*/
     @Override

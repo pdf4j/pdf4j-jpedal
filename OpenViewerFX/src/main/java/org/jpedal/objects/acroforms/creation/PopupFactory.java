@@ -201,11 +201,7 @@ public class PopupFactory {
         try {
             commentIcon = ImageIO.read(PopupFactory.class.getResource(iconFile));
         } catch (final IOException e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         //Set color of annotation

@@ -72,11 +72,7 @@ public class FontData {
             fullLength = (int) fontFile.length();
 
         }catch( final Exception e ){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //if small read all
@@ -125,11 +121,7 @@ public class FontData {
                 fontFile.read(fontData);
 
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //            }
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
 
             offset=pointer;
@@ -153,11 +145,7 @@ public class FontData {
                 fontFile.read(fontData);
 
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //            }
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
             offset=pointer;
 
@@ -194,11 +182,7 @@ public class FontData {
             try {
                 fontFile.close();
             } catch (final IOException e) {
-                //tell user and log
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
     }

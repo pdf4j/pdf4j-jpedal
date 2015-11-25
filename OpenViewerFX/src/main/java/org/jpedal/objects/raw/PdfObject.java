@@ -111,7 +111,7 @@ public class PdfObject implements Cloneable{
     
     private String Creator, Parent,Name, S, Title;
     private byte[] rawCreator,rawParent,rawName, rawS, rawTitle;
-    public static boolean debug;
+    public static final boolean debug=false;
     
     protected String ref;
     int intRef,gen;
@@ -320,7 +320,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getDictionary in " + this);
+                }
                 
                 return null;
         }
@@ -400,7 +402,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setIntNumber in " + this);
+                }
         }
     }
     
@@ -414,7 +418,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown key " + id + " with value=" + value + " passed into setFloatNumber in " + this);
+                }
         }
     }
     
@@ -457,7 +463,10 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getInt in " + this);
+                }
+                
                 return PdfDictionary.Unknown;
         }
     }
@@ -471,7 +480,10 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getFloatNumber in " + this);
+                }
+                
                 return PdfDictionary.Unknown;
         }
     }
@@ -483,7 +495,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getBoolean in " + this);
+                }
         }
         
         return false;
@@ -496,11 +510,11 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setBoolean in " + this);
+                }
         }
     }
-    
-    
     
     public void setDictionary(final int id, final PdfObject value){
         
@@ -538,7 +552,9 @@ public class PdfObject implements Cloneable{
                 
                 setOtherValues(value);
                 
-                //
+                if(debug){
+                    throw new RuntimeException("unknown value "+id+" passed into setDictionary in "+this);
+                }
         }
     }
     
@@ -583,14 +599,6 @@ public class PdfObject implements Cloneable{
     public boolean hasStream() {
         return hasStream;
     }
-    
-    
-    //    public int setConstant(int pdfKeyType, int keyStart, int keyLength, byte[] raw) {
-    //
-    //        //
-    //
-    //        return PdfDictionary.Unknown;
-    //    }
     
     public int setConstant(final int pdfKeyType, final int keyStart, final int keyLength, final byte[] raw) {
         
@@ -668,11 +676,7 @@ public class PdfObject implements Cloneable{
             }
             
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         return id;
@@ -781,7 +785,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getFloatArray in " + this);
+                }
         }
         
         return deepCopy(array);
@@ -794,7 +800,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getKeyArray in " + this);
+                }
         }
         
         return null;
@@ -807,7 +815,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getDoubleArray in " + this);
+                }
         }
         
         return deepCopy(array);
@@ -820,7 +830,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getBooleanArray in " + this);
+                }
         }
         
         return deepCopy(array);
@@ -833,7 +845,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getIntArray in " + this);
+                }
         }
         
         return deepCopy(array);
@@ -889,7 +903,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setFloatArray in " + this);
+                }
         }
         
     }
@@ -924,7 +940,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setIntArray in " + this);
+                }
         }
         
     }
@@ -935,7 +953,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setBooleanArray in " + this);
+                }
         }
         
     }
@@ -946,7 +966,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setDoubleArray in " + this);
+                }
         }
         
     }
@@ -964,9 +986,10 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setMixedArray in " + this);
+                }
         }
-        
     }
     
     
@@ -984,7 +1007,9 @@ public class PdfObject implements Cloneable{
                 
         }
         
-        //
+        if(debug && data==null) {
+            throw new RuntimeException("unknown value " + id + " passed into getFloatArray in PdfFontObject");
+        }
         
         //convert
         switch(mode){
@@ -1072,7 +1097,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getName in " + this);
+                }
         }
         
         return str;
@@ -1094,7 +1121,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getStringKey in " + this);
+                }
         }
         
         return str;
@@ -1143,7 +1172,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getTextStreamValue in " + this);
+                }
         }
         
         return str;
@@ -1178,9 +1209,8 @@ public class PdfObject implements Cloneable{
                     //throw new RuntimeException("xx="+currentKey+" id="+id);
                     otherValues.put(currentKey,value);
                     //System.out.println("id="+id+" "+value+" "+type+" "+objType+" "+this+" "+otherValues);
-                }else{
-                    
-                    //
+                }else if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setName in " + this);
                 }
         }
         
@@ -1202,7 +1232,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setStringKey in " + this);
+                }
         }
         
     }
@@ -1226,7 +1258,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setTextStreamValue in " + this);
+                }
         }
         
     }
@@ -1248,11 +1282,7 @@ public class PdfObject implements Cloneable{
                 
                 //System.out.println(new String(cached));
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
             
             return cached;
@@ -1340,11 +1370,7 @@ public class PdfObject implements Cloneable{
                 gen = NumberUtils.parseInt(keyStart, j, data);
                 
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }   
         }
         
@@ -1364,8 +1390,9 @@ public class PdfObject implements Cloneable{
                 return new PdfArrayIterator(Filter);
                 
             default:
-                //
-                
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getMixedArray in " + this);
+                }
                 return null;
         }
     }
@@ -1389,7 +1416,9 @@ public class PdfObject implements Cloneable{
             
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setKeyArray in " + this);
+                }
         }
     }
     
@@ -1403,7 +1432,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setStringArray in " + this);
+                }
         }
     }
     
@@ -1417,7 +1448,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getStringArray in " + this);
+                }
         }
         
         return null;
@@ -1432,7 +1465,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into getObjectArray in " + this);
+                }
         }
         
         return null;
@@ -1449,7 +1484,9 @@ public class PdfObject implements Cloneable{
                 
             default:
                 
-                //
+                if(debug) {
+                    throw new RuntimeException("unknown value " + id + " passed into setObjectArray in " + this);
+                }
         }
     }
     
@@ -1467,11 +1504,7 @@ public class PdfObject implements Cloneable{
             o = super.clone();
         }
         catch( final CloneNotSupportedException e ){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         return o;
@@ -1616,11 +1649,7 @@ public class PdfObject implements Cloneable{
                 
                 //System.out.println("cached file size="+tmpFile.length()+" "+this.getObjectRefAsString());
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }finally{
                 //remove at end
                 if(tmpFile!=null) {

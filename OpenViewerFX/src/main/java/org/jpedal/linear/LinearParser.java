@@ -88,11 +88,7 @@ public class LinearParser {
             try{
                 Thread.sleep(500);
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         
@@ -217,12 +213,8 @@ public class LinearParser {
             }
             
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-            
+            LogWriter.writeLog("Exception: " + e.getMessage());
+           
             isPageAvailable=false;
         }
         

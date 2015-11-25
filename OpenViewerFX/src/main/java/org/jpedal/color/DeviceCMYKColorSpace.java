@@ -43,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jpedal.JDeliHelper;
 
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.objects.raw.PdfObject;
@@ -102,21 +103,15 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
             CMYK = new ICC_ColorSpace(p);
 
         } catch (final IOException e) {
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e);
-            }
-            //
-
+            LogWriter.writeLog("Exception " + e);
+            
             throw new RuntimeException("Problem setting CMYK Colorspace with message " + e + " Possible cause file cmyk.icm corrupted");
         } finally {
             if (stream != null) {
                 try {
                     stream.close();
                 } catch (final IOException e) {
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception " + e);
-                    }
-                    //
+                    LogWriter.writeLog("Exception " + e);
                 }
             }
         }
@@ -196,75 +191,75 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
 
         }
 
-        //
-        //old code still used by OpenFXViewer
         if ((lastC == c) && (lastM == m) && (lastY == y) && (lastK == k)) {
             //no change
         } else {
+            rawValues = new float[4];
+            rawValues[0] = c;
+            rawValues[1] = m;
+            rawValues[2] = y;
+            rawValues[3] = k;
 
-            //store values
-            rawValues=new float[4];
-            rawValues[0]=c;
-            rawValues[1]=m;
-            rawValues[2]=y;
-            rawValues[3]=k;
+            lastC = c;
+            lastM = m;
+            lastY = y;
+            lastK = k;
 
-            if(c==0 && y==0 && m==0 && k==0) {
-                this.currentColor = new PdfColor(1.0f, 1.0f, 1.0f);
-            }else if(c==1 && y==1 && m==1 && k==1){
-                this.currentColor=new PdfColor(0.0f,0.0f,0.0f);
+            int cc = (int) (c * 255);
+            int mm = (int) (m * 255);
+            int yy = (int) (y * 255);
+            int kk = (int) (k * 255);
 
-            }else{
-                if(c>.99) {
-                    c=1.0f;
-                } else if(c<0.01) {
-                    c=0.0f;
+            int[] bb = JDeliHelper.convertCMYKtoRGB(cc, mm, yy, kk);
+            if (bb == null) {
+                convertCMYKToRGBWithJavaProfiles();
+            } else {
+                this.currentColor = new PdfColor(bb[0], bb[1], bb[2]);
+            }         
         }
-                if(m>.99) {
-                    m=1.0f;
-                } else if(m<0.01) {
-                    m=0.0f;
-                }
-                if(y>.99) {
-                    y=1.0f;
-                } else if(y<0.01) {
-                    y=0.0f;
-                }
-                if(k>.99) {
-                    k=1.0f;
-                } else if(k<0.01) {
-                    k=0.0f;
-                }
-
-                //we store values to speedup operation
-                float[] rgb=null;
-                
-                if(rgb==null){
-                    final float[] cmykValues = {c,m,y,k};
-                    rgb=CMYK.toRGB(cmykValues);
-                    
-                    //check rounding
-                    for(int jj=0;jj<3;jj++){
-                        if(rgb[jj]>.99) {
-                            rgb[jj]=1.0f;
-                        } else if(rgb[jj]<0.01) {
-                            rgb[jj]=0.0f;
     }
-                    }
-                }
-                currentColor=new PdfColor(rgb[0],rgb[1],rgb[2]);
 
-            }
-            lastC=c;
-            lastM=m;
-            lastY=y;
-            lastK=k;
+    private void convertCMYKToRGBWithJavaProfiles() {
+        if (c > .99) {
+            c = 1.0f;
+        } else if (c < 0.01) {
+            c = 0.0f;
         }
-
-
-/**/
-  
- }
+        if (m > .99) {
+            m = 1.0f;
+        } else if (m < 0.01) {
+            m = 0.0f;
+        }
+        if (y > .99) {
+            y = 1.0f;
+        } else if (y < 0.01) {
+            y = 0.0f;
+        }
+        if (k > .99) {
+            k = 1.0f;
+        } else if (k < 0.01) {
+            k = 0.0f;
+        }
+        
+        //we store values to speedup operation
+        float[] rgb = null;
+        
+        if (rgb == null) {
+            final float[] cmykValues = {c, m, y, k};
+            rgb = CMYK.toRGB(cmykValues);
+            
+            //check rounding
+            for (int jj = 0; jj < 3; jj++) {
+                if (rgb[jj] > .99) {
+                    rgb[jj] = 1.0f;
+                } else if (rgb[jj] < 0.01) {
+                    rgb[jj] = 0.0f;
+                }
+            }
+            
+            currentColor = new PdfColor(rgb[0], rgb[1], rgb[2]);
+        }
+    }
     
     /**
      * <p>
@@ -303,16 +298,21 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
             pixelCount = dataSize - 3;
         }
         
-         //
-        
-        
+            
+        final byte[] output = JDeliHelper.convertCMYK2RGB(w, h, pixelCount, data);
+        if(output!=null){
+            return output;
+        }else{
+            return convertCMYK2RGBWithJavaProfiles(w, h, pixelCount, data);
+        }      
+    }
+
+    static byte[] convertCMYK2RGBWithJavaProfiles(final int w, final int h, int pixelCount, final byte[] data) {
         /**
          * set colorspaces and color models using profiles if set
          */
         final ColorSpace CMYK = DeviceCMYKColorSpace.getColorSpaceInstance();
-
         int C, M, Y, K, lastC = -1, lastM = -1, lastY = -1, lastK = -1;
-
         byte[] rgbData = new byte[w * h * 3];
         int j = 0;
         float[] RGB = {0f, 0f, 0f};
@@ -350,7 +350,6 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
             j += 3;
 
         }
-
         return rgbData;
     }
 

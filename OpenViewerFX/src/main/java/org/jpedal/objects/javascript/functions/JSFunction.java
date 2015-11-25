@@ -116,7 +116,14 @@ public class JSFunction {
 
     public static void debug(final String str){
 
-    	//
+    	if(LogWriter.isRunningFromIDE){
+            System.out.println("[javascript] "+str);
+            org.jpedal.objects.acroforms.utils.ConvertToString.printStackTrace(2);
+
+            if(str.startsWith("Unknown") && 1 == 1) {
+                    throw new RuntimeException("Exception");
+                }
+        }
     }
 
     /**apply one of more matching patterns and return where a match*/
@@ -522,7 +529,11 @@ public class JSFunction {
     				//allow for null value in Date
     				if(useDefaultValues && nextVal==null){
     					paddedValue= String.valueOf(gc.get(Calendar.HOUR));
-    					// <start-demo><end-demo>
+    					/** added to make the testing be more predictable */
+    					if(org.jpedal.objects.javascript.defaultactions.JpedalDefaultJavascript.testingSetStaticDate){
+    						paddedValue = "10";
+							//new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+    					}
     				}else {
                         paddedValue = padString(nextVal, 2);
                     }
@@ -535,7 +546,11 @@ public class JSFunction {
     				//allow for null value in Date
     				if(useDefaultValues && nextVal==null){
     					paddedValue= String.valueOf(gc.get(Calendar.HOUR_OF_DAY));
-    					// <start-demo><end-demo>
+    					/** added to make the testing be more predictable */
+    					if(org.jpedal.objects.javascript.defaultactions.JpedalDefaultJavascript.testingSetStaticDate){
+    						paddedValue = "10";
+							//new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+    					}
     					paddedValue=padString(paddedValue,2);
     					isValid = verifyNumberInRange(paddedValue,0,23);
     				}else{
@@ -547,7 +562,11 @@ public class JSFunction {
     				//allow for null value in Date
     				if(useDefaultValues && nextVal==null){
     					paddedValue= String.valueOf(gc.get(Calendar.MINUTE));
-    					// <start-demo><end-demo>
+    					/** added to make the testing be more predictable */
+    					if(org.jpedal.objects.javascript.defaultactions.JpedalDefaultJavascript.testingSetStaticDate){
+    						paddedValue = "10";
+							//new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+    					}
     					paddedValue=padString(paddedValue,2);
     					isValid = verifyNumberInRange(paddedValue,0,59);
     				}else{
@@ -583,7 +602,11 @@ public class JSFunction {
     				//allow for null value in Date
     				if(useDefaultValues && nextVal==null){
     					paddedValue= String.valueOf(gc.get(Calendar.SECOND));
-    					// <start-demo><end-demo>
+    					/** added to make the testing be more predictable */
+    					if(org.jpedal.objects.javascript.defaultactions.JpedalDefaultJavascript.testingSetStaticDate){
+    						paddedValue = "10";
+							//new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+    					}
     					
     					paddedValue=padString(paddedValue,2);
     					isValid = verifyNumberInRange(paddedValue,0,59);
@@ -606,7 +629,11 @@ public class JSFunction {
     				//allow for null value in Date
     				if(useDefaultValues && nextVal==null){
     					nextVal= String.valueOf(gc.get(Calendar.YEAR));
-    					// <start-demo><end-demo>
+    					/** added to make the testing be more predictable */
+    					if(org.jpedal.objects.javascript.defaultactions.JpedalDefaultJavascript.testingSetStaticDate){
+    						nextVal = "2010";
+//							new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+    					}
     					isValid = verifyNumberInRange(nextVal,0,9999);
 
     				}else{
@@ -667,10 +694,8 @@ public class JSFunction {
                             }
     					}catch(final Exception e){
 
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception in handling JSscript "+e);
-                            }
-
+                            LogWriter.writeLog("Exception in handling JSscript "+e);
+                            
     						paddedValue = null;
     						isValid=false;
     					}

@@ -207,11 +207,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
             try {
                 line = br.readLine();
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
             
             if (line == null) {
@@ -235,16 +231,13 @@ public class T1Glyphs extends PdfJavaGlyphs {
             try{
                 br.close();
             }catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " closing stream");
-                }
+                LogWriter.writeLog("Exception " + e + " closing stream");
             }
         }
         
         if(fontData!=null) {
             fontData.close();
         }
-        
         
         return fontNames;
     }

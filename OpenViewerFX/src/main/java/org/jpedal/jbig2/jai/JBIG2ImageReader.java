@@ -440,16 +440,7 @@ public class JBIG2ImageReader extends ImageReader {
 					w = newW;
 
 				} catch (Exception e) {
-
-					// <start-full><start-demo>
-					System.err.println("xx=" + xx + " yy=" + yy + " jj=" + jj + " ptr=" + ((yy + (y * sampling)) * origLineLength) + (((x * sampling) + (xx * comp) + jj)) + '/' + data.length);
-
-					// System.err.println("index="+index);
-					System.err.println(((yy + (y * sampling)) * origLineLength) + " " + (((x * sampling) + (xx * comp) + jj)));
-					System.err.println("w=" + w + " h=" + h + " sampling=" + sampling + " x=" + x + " y=" + y);
-					// System.out.println("xx="+xx+" yy="+yy);
 					e.printStackTrace();
-					// <end-demo><end-full>
 				}
 			}
 		}

@@ -336,7 +336,7 @@ public class PdfStreamDecoder extends BaseDecoder{
             
         }catch(final Error err){
             
-            //
+            LogWriter.writeLog("Error "+err);
             
             if (ExternalHandlers.throwMissingCIDError && err.getMessage()!=null && err.getMessage().contains("kochi")) {
                 throw err;
@@ -642,7 +642,10 @@ public class PdfStreamDecoder extends BaseDecoder{
                             
                         case Cmd.SHADING_COMMAND:
                             
-                            //
+                            // Internal tests can disable images to speed up conversion
+                            if (System.getProperty("testsDisableImages") != null) {
+                                break;
+                            }
                             
                             if(!getSamplingOnly && parserOptions.isRenderPage()){
                                 
@@ -870,25 +873,17 @@ public class PdfStreamDecoder extends BaseDecoder{
                     }
                 } catch (final Exception e) {
                     
-                    //
-                    
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("[PDF] " + e + " Processing token >" + Cmd.getCommandAsString(commandID) + "<>" + parserOptions.getFileName() + " <" + parserOptions.getPageNumber());
-                    }
+                    LogWriter.writeLog("[PDF] " + e + " Processing token >" + Cmd.getCommandAsString(commandID) + "<>" + parserOptions.getFileName() + " <" + parserOptions.getPageNumber());
                     
                     //only exit if no issue with stream
-                    if(isDataValid){
-                        //
-                    }else {
+                    if(!isDataValid){
                         dataPointer = streamSize;
                     }
                     
                 } catch (final OutOfMemoryError ee) {
                     errorTracker.addPageFailureMessage("Memory error decoding token stream "+ee);
                     
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("[MEMORY] Memory error - trying to recover");
-                    }
+                    LogWriter.writeLog("[MEMORY] Memory error - trying to recover");
                 }
                 
                 //save for next command

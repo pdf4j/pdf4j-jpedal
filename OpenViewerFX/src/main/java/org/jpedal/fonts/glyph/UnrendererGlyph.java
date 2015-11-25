@@ -120,4 +120,9 @@ public class UnrendererGlyph implements PdfGlyph, Serializable {
     public Object getPath() {
         throw new UnsupportedOperationException("getPath Not supported yet."); 
     }
+    
+    @Override
+    public boolean hasHintingApplied() {
+        return false;
+    }
 }

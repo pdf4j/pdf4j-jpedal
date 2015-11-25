@@ -54,9 +54,8 @@ public class IndexedImage {
         
         BufferedImage image=null;
         
-        if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Indexed " + w + ' ' + h);
-            }
+        LogWriter.writeLog("Indexed " + w + ' ' + h);
+        
             
             /**convert index to rgb if CMYK or ICC*/
             if(!decodeColorData.isIndexConverted()){
@@ -64,7 +63,6 @@ public class IndexedImage {
             }
             
             //workout size and check in range
-            //int size =decodeColorData.getIndexSize()+1;
             
             //pick out daft setting of totally empty image and ignore
             if(d==8 && decodeColorData.getIndexSize()==0 && 
@@ -111,11 +109,7 @@ public class IndexedImage {
                     image = ColorSpaceConvertor.convertIndexedToFlat(d,w, h, data, index,false,false);
                 }
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         return image;
     }

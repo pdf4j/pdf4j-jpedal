@@ -129,9 +129,7 @@ public class TextStream {
                                 System.out.println(padding + "Data not yet loaded");
                             }
                             
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (7)");
-                            }
+                            LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (7)");
                             
                             return raw.length;
                         }
@@ -233,9 +231,7 @@ public class TextStream {
                                 bottomHex -= 48;
                             }else{
                                 
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Unexpected number " + (char) data[start]);
-                                }
+                                LogWriter.writeLog("Unexpected number " + (char) data[start]);
                                 
                                 return i;
                             }
@@ -285,11 +281,7 @@ public class TextStream {
                                 }
                             }
                         } catch (final PdfSecurityException e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: " + e.getMessage());
                         }
                     }
                     
@@ -305,11 +297,7 @@ public class TextStream {
                 }
                 
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         return i;
@@ -397,10 +385,6 @@ public class TextStream {
 
                     if(debugFastCode) {
                         System.out.println(padding + "Data not yet loaded");
-                    }
-
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (6)");
                     }
 
                     return raw.length;

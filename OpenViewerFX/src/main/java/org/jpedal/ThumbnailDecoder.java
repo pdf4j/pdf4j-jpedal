@@ -91,11 +91,7 @@ public class ThumbnailDecoder {
             g.dispose();
             
         } catch (final PdfException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         return newImg;

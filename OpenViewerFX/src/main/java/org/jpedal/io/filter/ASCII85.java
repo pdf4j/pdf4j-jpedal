@@ -235,10 +235,7 @@ public class ASCII85 extends BaseFilter implements PdfFilter {
                 }
             }
         } catch (final Exception e) {
-            e.printStackTrace();
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing Ascii85Decode filter ");
-            }
+            LogWriter.writeLog("Exception " + e + " accessing Ascii85Decode filter ");
         }
 
     }

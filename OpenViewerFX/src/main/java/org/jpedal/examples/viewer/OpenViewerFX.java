@@ -72,6 +72,9 @@ import org.jpedal.utils.Messages;
  */
 public class OpenViewerFX extends Viewer implements ViewerInt{
 
+    //flag if OS or commerical - DO NOT remove quotes as will break code
+    public static boolean isOpenFX = OpenViewerFX.class.getResourceAsStream("/org/jpedal/examples/viewer/Open"+"Viewer"+"FX.class")!= null;
+    
     static {
         checkUserJavaVersion();
         isFX = true;
@@ -164,11 +167,11 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
         try {
             Messages.setBundle(ResourceBundle.getBundle("org.jpedal.international.messages"));
         } catch (final Exception e) {
-            //
+            
             LogWriter.writeLog("Exception " + e + " loading resource bundle.\n"
                     + "Also check you have a file in org.jpedal.international.messages to support Locale=" + java.util.Locale.getDefault());
         }
-        
+         
         //
 
         decode_pdf = new PdfDecoderFX();

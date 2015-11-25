@@ -135,11 +135,7 @@ public class TTGlyph extends BaseTTGlyph implements PdfGlyph, Serializable{
                 }
                 //org.jpedal.gui.ShowGUIMessage.showGUIMessage("glyf "+ '/' +paths.size(),img,"glyf "+ '/' +paths.size()+ '/' +compCount);
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }/***/
 
@@ -177,13 +173,9 @@ public class TTGlyph extends BaseTTGlyph implements PdfGlyph, Serializable{
                 }
                 //org.jpedal.gui.ShowGUIMessage.showGUIMessage("glyf "+ '/' +paths.size(),img,"glyf "+ '/' +paths.size()+ '/' +compCount);
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
-        }/***/
+        }
 
 
         //if(idx==2060)
@@ -575,11 +567,7 @@ public class TTGlyph extends BaseTTGlyph implements PdfGlyph, Serializable{
                         org.jpedal.gui.ShowGUIMessage.showGUIMessage(key,img,key);
 
                     }catch(final Exception e){
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                 }
             }
@@ -668,18 +656,17 @@ public class TTGlyph extends BaseTTGlyph implements PdfGlyph, Serializable{
     //        }
     //	}
 
-
-
-
-
     public void flushArea() {
         glyphShape=null;
     }
 
-    //<start-demo><end-demo>
-
     @Override
     void clearPaths() {
         paths.clear();
+    }
+    
+    @Override
+    public boolean hasHintingApplied() {
+        return this.hasHintingApplied;
     }
 }

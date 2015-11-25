@@ -274,10 +274,8 @@ public class BaseViewerFX extends Application {
         fileLoc.setId("file_location");
         bottom.getChildren().add(fileLoc);
         
-        
         scene=new Scene(root, w*FXscaling, h*FXscaling);
         
-        //
         return scene;
     }
     

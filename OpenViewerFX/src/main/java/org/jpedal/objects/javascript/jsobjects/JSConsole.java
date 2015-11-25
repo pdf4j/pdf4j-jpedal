@@ -42,9 +42,6 @@ public class JSConsole {
     private JDialog consoleDialog;
     private JTextArea consoleArea;
 
-    // <end-demo>
-
-
     // This isn't part of the Adobe JS API, but is a common method in web JS
 	public void log(final String s) {
 

@@ -71,11 +71,7 @@ public class CertificateReader {
                     }
                 }
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         

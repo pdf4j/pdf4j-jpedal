@@ -75,12 +75,7 @@ class JavaFXMultiPageDecoder extends MultiPageDecoder {
         try{
             pdf.decodePage(page);
         } catch (Exception ex) {
-            
-            //
-            
-            if(LogWriter.isOutput()){
-                LogWriter.writeLog("Exception in JavaFX multipage view "+ex);
-            }
+            LogWriter.writeLog("Exception in JavaFX multipage view "+ex);
         }      
     }  
     

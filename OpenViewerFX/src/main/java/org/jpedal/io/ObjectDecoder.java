@@ -54,11 +54,10 @@ public class ObjectDecoder implements Serializable {
     
     static final byte[] endPattern = { 101, 110, 100, 111, 98, 106 }; //pattern endobj
     
-    //
-    public static final boolean debugFastCode =false; //objRef.equals("68 0 R")
+    //not final in IDE but in build do our static analysis does not flag as dead debug code
+    //which we  want compiler to ooptimise out
+    public static final boolean debugFastCode=false; //objRef.equals("68 0 R")
     
-    /**/
-
     private int pdfKeyType, PDFkeyInt;
     
     /**used in debugging output*/
@@ -90,7 +89,7 @@ public class ObjectDecoder implements Serializable {
         //used to debug issues by printing out details for obj
         //(set to non-final above)
         //debugFastCode =pdfObject.getObjectRefAsString().equals("5 0 R");
-        
+         
         if(debugFastCode) {
             padding += "   ";
         }
@@ -1051,7 +1050,7 @@ public class ObjectDecoder implements Serializable {
         
         if(pdfObject!=null && pdfObject.getStatus()!=PdfObject.DECODED){
             
-            final byte[] raw=pdfObject.getUnresolvedData();
+            byte[] raw=pdfObject.getUnresolvedData();
 
             //flag now done and flush raw data
             pdfObject.setStatus(PdfObject.DECODED);
@@ -1092,11 +1091,50 @@ public class ObjectDecoder implements Serializable {
                 }else if(raw[raw.length-1]=='R'){
                     objectRef=new String(raw);
                     pdfObject.setRef(objectRef);
+                }else if(raw[0]!='<' && raw[raw.length-1]=='>'){
+                    ////see case 23155 (encrypted annot needs obj ref appended so we can decrypt string later)
+                    extractRefFromEnd(raw,pdfObject,objectReader);
+                    return;
                 }
                 
                 Dictionary.readDictionaryFromRefOrDirect(-1,pdfObject,objectRef, 0, raw , -1,objectReader);
                 
             }
+        }
+    }
+
+    /**
+     * see case 23155 (encrypted annot needs obj ref appended so we can decrypt string later)
+     */
+    private static void extractRefFromEnd(byte[] raw, final PdfObject pdfObject, PdfFileReader objectReader) {
+        
+        String objectRef;
+        
+        //scan along to find number
+        int ptr=0;
+        final int len=raw.length;
+        for(int jj=0;jj<len;jj++){
+            
+            if(raw[jj]>='0' && raw[jj]<='9'){
+                ptr=jj;
+                jj=len;
+            }
+        }
+        //check first non-number is R
+        int end=ptr;
+        while((raw[end]>='0' && raw[end]<='9') || raw[end]==' ' || raw[end]==10 || raw[end]==13 || raw[end]==9) {
+            end++;
+        }
+        //and store if it is a ref
+        if(raw[end]=='o' && raw[end+1]=='b' && raw[end+2]=='j') {
+            objectRef=new String(raw, 0, end)+"R";
+            int newArrayLen=raw.length-end-4;
+            byte[] newArray=new byte[newArrayLen];
+            System.arraycopy(raw, end+4, newArray, 0, newArrayLen);
+            raw=newArray;
+            pdfObject.setRef(objectRef);
+
+            Dictionary.readDictionaryFromRefOrDirect(-1,pdfObject,objectRef, 0, raw , -1,objectReader);
         }
     }
     

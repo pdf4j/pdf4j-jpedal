@@ -54,6 +54,7 @@ import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.BrowserLauncher;
 import org.jpedal.utils.JavaFXHelper;
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 
 /**
@@ -113,8 +114,8 @@ public class PageFlow {
                                 try {
                                     BrowserLauncher.openURL(Messages.getMessage("PdfViewer.PageFlowJarsNeeded.Link"));
                                 } catch (final Exception e1) {
+                                    LogWriter.writeLog("Exception " + e1.getMessage());
                                     currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.ErrorWebsite"));
-                                    //
                                 }
                             }
                         };

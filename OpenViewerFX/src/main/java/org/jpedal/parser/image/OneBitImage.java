@@ -49,9 +49,7 @@ class OneBitImage {
     
     static  BufferedImage make(int d, int w, int h, byte[] data) throws RuntimeException {
         
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("comp=1 and d= " + d);
-        }
+        LogWriter.writeLog("comp=1 and d= " + d);
         
         BufferedImage image;
         

@@ -143,15 +143,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
                 //noinspection UnusedAssignment
                 transformedGlyph2=null;
 
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
-
-                //<end-demo>
-
-
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
 
             //save so we can reuse if it occurs again in this TJ command
@@ -204,9 +196,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
             }
 
         }catch(final Exception ee){
-            ee.printStackTrace(System.out);
-
-            //
+            LogWriter.writeLog("Exception "+ee);
         }
 
         //if(glyph.equals("fl"))
@@ -276,10 +266,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
             width=currentHmtx.getWidth(idx);
 
         }catch(final Exception e){
-            //<end-demo>
-             if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Attempting to read width " + e);
-            }
+            LogWriter.writeLog("Attempting to read width " + e);
         }
 
         return width;
@@ -309,11 +296,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
             width=currentHmtx.getUnscaledWidth(idx);
 
         }catch(final Exception e){
-            //<end-demo>
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Attempting to read width " + e);
-            }
-
+            LogWriter.writeLog("Attempting to read width " + e);
         }
 
         return width;

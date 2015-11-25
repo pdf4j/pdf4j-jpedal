@@ -182,11 +182,9 @@ public class PageNavigator {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to set propeties values " + e);
+                    LogWriter.writeLog("Attempting to set propeties values " + e);
+                }
             }
-        }
-    }
         }
     }
 
@@ -206,10 +204,8 @@ public class PageNavigator {
                    try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to set propeties values " + e);
-            }
-        }
+                    LogWriter.writeLog("Attempting to set propeties values " + e);           
+                }
             }
         }
     }

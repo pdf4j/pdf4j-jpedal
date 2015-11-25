@@ -52,9 +52,7 @@ public class VisitWebsite {
                 
             } catch (final Exception e1) {
                 currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.ErrorWebsite"));
-                // 
             }
-
         }
     }
 }

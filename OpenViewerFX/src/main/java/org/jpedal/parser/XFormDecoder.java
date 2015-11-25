@@ -361,12 +361,8 @@ public class XFormDecoder {
             }
 
         } catch (final Error e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
+            
             pdfStreamDecoder.parserOptions.imagesProcessedFully=false;
             pdfStreamDecoder.errorTracker.addPageFailureMessage("Error " + e + " in DO");
 
@@ -375,11 +371,8 @@ public class XFormDecoder {
             }
         } catch (final PdfException e) {
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e);
-            }
-
-            //<start-demo><end-demo>
+            LogWriter.writeLog("Exception " + e);
+            
             pdfStreamDecoder.parserOptions.imagesProcessedFully=false;
             pdfStreamDecoder.errorTracker.addPageFailureMessage("Error " + e + " in DO");
         }

@@ -143,13 +143,7 @@ public class Info {
                 try {
                     BrowserLauncher.openURL(Messages.getMessage("PdfViewer.VisitWebsite"));
                 } catch (final Exception e1) {
-                    //currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.ErrorWebsite"));
-
-                    //
-                    
-                    if(LogWriter.isOutput()) { 
-                         LogWriter.writeLog("Exception attempting launch browser: " + e1); 
-                     } 
+                    LogWriter.writeLog("Exception attempting launch browser: " + e1); 
                 }
             }
 

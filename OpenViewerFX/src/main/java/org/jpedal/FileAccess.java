@@ -125,8 +125,7 @@ public class FileAccess {
 
     final ExternalHandlers externalHandlers;
 
-    //
-
+   
     private final PdfResources res;
 
     private final DecoderOptions options;
@@ -190,7 +189,6 @@ public class FileAccess {
             objectStoreRef.storeFileName("r" + System.currentTimeMillis());
 
         } catch (final PdfException e) {
-            //
             throw new PdfException("[PDF] OpenPdfArray generated exception "
                     + e.getMessage());
         }
@@ -208,7 +206,7 @@ public class FileAccess {
     }
     
     /**
-     * gets DynamicVector Object - NOT PART OF API and subject to change (DO NOT USE)
+     * gets DynamicVector Object - NOT PART OF API (used by ULC for Swing) and subject to change (DO NOT USE)
      */
     DynamicVectorRenderer getDynamicRenderer(final boolean reset) {
 
@@ -243,9 +241,8 @@ public class FileAccess {
 
             this.filename = "ImageInputStream" + System.currentTimeMillis();
 
-
-            // 
-
+            org.jpedal.DevFlags.currentFile = this.filename;
+            
             res.flush();
             res.flushObjects();
 
@@ -274,8 +271,8 @@ public class FileAccess {
         
         isOpen = false;
 
-        // 
-
+        org.jpedal.DevFlags.currentFile = filename;
+        
         this.filename = filename;
         res.flush();
         res.flushObjects();
@@ -636,12 +633,8 @@ public class FileAccess {
             try {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+e.getMessage());
-                }
-                //
-
+                LogWriter.writeLog("Exception: "+e.getMessage());
+                
                 //ensure will exit loop
                 isDecoding = false;
             }
@@ -740,11 +733,7 @@ public class FileAccess {
                 }
 
             } catch (final IOException e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] Exception " + e + " opening URL ");
-                }
-
-                e.printStackTrace();
+                LogWriter.writeLog("[PDF] Exception " + e + " opening URL ");
             }
         }
         return false;
@@ -861,10 +850,8 @@ public class FileAccess {
             // read and log the version number of pdf used
             final String pdfVersion = currentPdfFile.getObjectReader().getType();
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Pdf version : " + pdfVersion);
-            }
-
+            LogWriter.writeLog("Pdf version : " + pdfVersion);
+            
             if (pdfVersion == null) {
                 currentPdfFile = null;
                 isDecoding = false;
@@ -931,10 +918,8 @@ public class FileAccess {
 
                 if (pdfObject != null) {
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Pages being read from "+pdfObject+ ' '+pdfObject.getObjectRefAsString());
-                    }
-
+                    LogWriter.writeLog("Pages being read from "+pdfObject+ ' '+pdfObject.getObjectRefAsString());
+                    
                     pageNumber = 1; // reset page number for metadata
 
                     //flush annots before we reread
@@ -954,7 +939,7 @@ public class FileAccess {
                     }
                     
                     //pageNumber = 0; // reset page number for metadata;
-                    if (pageCount == 0 && LogWriter.isOutput()) {
+                    if (pageCount == 0) {
                         LogWriter.writeLog("No pages found");
                     }
                 }
@@ -963,8 +948,8 @@ public class FileAccess {
                 if (formRenderer != null) {
                     pageCount=formRenderer.openFile(pageCount,options.getInsetW(), options.getInsetH(), pageData, currentPdfFile, res.getPdfObject(PdfResources.AcroFormObj));
 
-                    //
-
+                    DevFlags.formsLoaded=false;
+                   
                 }
                 
                 pageData.setPageCount(pageCount);
@@ -992,8 +977,8 @@ public class FileAccess {
 
         isOpen = false;
 
-        // 
-
+        org.jpedal.DevFlags.currentFile = filename;
+        
         //System.out.println(filename);
 
         this.filename = filename;

@@ -446,12 +446,9 @@ private static final int plusInt = 43;
             data=value.getBytes(enc);
             
         } catch (final UnsupportedEncodingException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: "+e.getMessage());
         }
+        
         return data;
     }
     

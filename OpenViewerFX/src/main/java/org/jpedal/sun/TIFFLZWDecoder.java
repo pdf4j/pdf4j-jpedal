@@ -74,13 +74,10 @@ public class TIFFLZWDecoder
 			final int code = ( nextData >> ( nextBits - bitsToGet ) ) & andTable[bitsToGet - 9];
 			nextBits -= bitsToGet;
 			return code;
-		}
-		catch( final ArrayIndexOutOfBoundsException e )
-		{
+		}catch( final ArrayIndexOutOfBoundsException e ){
 
-			if(LogWriter.isOutput()) {
-				LogWriter.writeLog("LZW out of bounds "+e);
-			}
+			LogWriter.writeLog("LZW out of bounds "+e);
+			
 			// Strip not terminated as expected: return EndOfInformation code.
 			return 257;
 		}

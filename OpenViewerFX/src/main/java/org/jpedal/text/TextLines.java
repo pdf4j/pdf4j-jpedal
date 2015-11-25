@@ -39,6 +39,7 @@ import java.awt.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
 public class TextLines {
@@ -891,7 +892,7 @@ public class TextLines {
                                                 }
                                                 break;
                                             case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
-                                                //
+                                                LogWriter.writeLog("THIS TEXT DIRECTION HAS NOT BEEN IMPLEMENTED YET (Right to Left)");
                                                 break;
                                             case PdfData.VERTICAL_TOP_TO_BOTTOM:
                                                 if(backward){
@@ -953,7 +954,7 @@ public class TextLines {
                                                 }
                                                 break;
                                             case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
-                                                //
+                                                LogWriter.writeLog("THIS TEXT DIRECTION HAS NOT BEEN IMPLEMENTED YET (Right to Left)");
                                                 break;
                                             case PdfData.VERTICAL_TOP_TO_BOTTOM:
                                                 // if going backwards
@@ -1177,7 +1178,7 @@ public class TextLines {
                                                 }
                                                 break;
                                             case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
-                                                //
+                                                LogWriter.writeLog("THIS TEXT DIRECTION HAS NOT BEEN IMPLEMENTED YET (Right to Left)");
                                                 break;
                                             case PdfData.VERTICAL_TOP_TO_BOTTOM:
                                                 if(backward){
@@ -1239,7 +1240,7 @@ public class TextLines {
                                                 }
                                                 break;
                                             case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
-                                                //
+                                                LogWriter.writeLog("THIS TEXT DIRECTION HAS NOT BEEN IMPLEMENTED YET (Right to Left)");
                                                 break;
                                             case PdfData.VERTICAL_TOP_TO_BOTTOM:
                                                 // if going backwards

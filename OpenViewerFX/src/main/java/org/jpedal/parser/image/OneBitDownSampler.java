@@ -192,7 +192,7 @@ class OneBitDownSampler {
         decodeColorData.setIndex(null, 0);
         
         //remap Separation as already converted here
-        if(decodeColorData.getID()==ColorSpaces.Separation){
+        if(decodeColorData.getID()==ColorSpaces.Separation || decodeColorData.getID()==ColorSpaces.DeviceN){
             decodeColorData=new DeviceRGBColorSpace();
             
             //needs to have these settings if 1 bit not indexed

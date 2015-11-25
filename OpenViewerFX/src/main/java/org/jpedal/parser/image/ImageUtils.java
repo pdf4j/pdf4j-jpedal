@@ -70,8 +70,6 @@ public class ImageUtils {
             }else if(angle==270){
                 g2.drawImage(savedImage,-diff,-diff,null);
 
-            }else{
-                //
             }
         }
 

@@ -235,12 +235,8 @@ public class ImageTransformer {
                 invert.filter(current_image,destImage);
                 current_image=destImage;
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
-
+                LogWriter.writeLog("Exception: " + e.getMessage());
+                
                 failed=true;
             }
             if(failed){
@@ -248,10 +244,7 @@ public class ImageTransformer {
                     invert = new AffineTransformOp(image_at,null);
                     current_image = invert.filter(current_image,null);
                 }catch(final Exception e){
-                    //
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }

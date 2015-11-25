@@ -71,9 +71,25 @@ public class ObjectUtils {
         }
         return array;
     }
+    
+    public static byte[] readRawValue(final int j, final byte[] data, final int start) {
+
+        byte[] newString;
+        final int stringLength = j - start;
+
+        if (stringLength < 1) {
+            return new byte[0];
+        }
+
+        newString = new byte[stringLength];
+
+        System.arraycopy(data, start, newString, 0, stringLength);
+
+        return newString;
+    }
 
     public static byte[] readEscapedValue(final int j, final byte[] data, final int start, final boolean keepReturns) {
-        byte[] newString;
+        
         //see if escape values
         boolean escapedValues=false;
         for(int aa=start;aa<j;aa++){
@@ -85,97 +101,93 @@ public class ObjectUtils {
         }
 
         if(!escapedValues){ //no escapes so fastest copy
-            final int stringLength=j-start;
-
-            if(stringLength<1) {
-                return new byte[0];
-            }
-
-            newString=new byte[stringLength];
-
-            System.arraycopy(data, start, newString, 0, stringLength);
-        }else{ //translate escaped chars on copy
-
-            int jj=0; //max length
-            final int stringLength=j-start;
-            newString=new byte[stringLength];
-
-            for(int aa=start;aa<j;aa++){
-
-                if(data[aa]=='\\'){ //convert escaped chars
-
-                    aa++;
-
-                    //allow for bum data in unicode stream
-                    if(data[aa]==13  && data[aa+1]!='\\'  && newString[0]==-2 && newString[1]==-1){
-                        aa++;
-                    }
-
-                    final byte nextByte=data[aa];
-                    if(nextByte=='b') {
-                        newString[jj] = '\b';
-                    } else if(nextByte=='n') {
-                        newString[jj] = '\n';
-                    } else if(nextByte=='t') {
-                        newString[jj] = '\t';
-                    } else if(nextByte=='r') {
-                        newString[jj] = '\r';
-                    } else if(nextByte=='f') {
-                        newString[jj] = '\f';
-                    } else if(nextByte=='\\') {
-                        newString[jj] = '\\';
-                    } else if(nextByte>47 && nextByte<58){ //octal
-
-                        final StringBuilder octal=new StringBuilder(3);
-
-                        boolean notOctal=false;
-                        for(int ii=0;ii<3;ii++){
-
-                            if(data[aa]=='\\' || data[aa]==')' || data[aa]<'0' || data[aa]>'9') //allow for less than 3 values
-                            {
-                                ii = 3;
-                            } else{
-                                octal.append((char)data[aa]);
-
-                                //catch for odd values
-                                if(data[aa]>'7') {
-                                    notOctal = true;
-                                }
-
-                                aa++;
-                            }
-                        }
-                        //move back 1
-                        aa--;
-                        //isOctal=true;
-                        if(notOctal) {
-                            newString[jj] = (byte) Integer.parseInt(octal.toString());
-                        } else {
-                            newString[jj] = (byte) Integer.parseInt(octal.toString(), 8);
-                        }
-
-                    }else if(!keepReturns && (nextByte==13 || nextByte==10)){ //ignore bum data
-                        jj--;
-                    }else {
-                        newString[jj] = nextByte;
-                    }
-
-                    jj++;
-                }else if(!keepReturns && (data[aa]==13 || data[aa]==10)){ //convert returns to spaces
-                    newString[jj]=32;
-                    jj++;
-                }else{
-                    newString[jj]=data[aa];
-                    jj++;
-                }
-            }
-
-            //now resize
-            final byte[] rawString=newString;
-            newString=new byte[jj];
-
-            System.arraycopy(rawString, 0, newString, 0, jj);
+            return readRawValue(j, data, start);
+        }else{             
+            return convertEscapedValues(j, start, data, keepReturns);
         }
+    }
+
+    public static byte[] convertEscapedValues(final int j, final int start, final byte[] data, final boolean keepReturns) throws NumberFormatException {
+        
+        byte[] newString;
+        //translate escaped chars on copy
+        
+        int jj=0; //max length
+        final int stringLength=j-start;
+        newString=new byte[stringLength];
+        for(int aa=start;aa<j;aa++){
+            
+            if(data[aa]=='\\'){ //convert escaped chars
+                
+                aa++;
+                
+                //allow for bum data in unicode stream
+                if(data[aa]==13  && data[aa+1]!='\\'  && newString[0]==-2 && newString[1]==-1){
+                    aa++;
+                }
+                
+                final byte nextByte=data[aa];
+                if(nextByte=='b') {
+                    newString[jj] = '\b';
+                } else if(nextByte=='n') {
+                    newString[jj] = '\n';
+                } else if(nextByte=='t') {
+                    newString[jj] = '\t';
+                } else if(nextByte=='r') {
+                    newString[jj] = '\r';
+                } else if(nextByte=='f') {
+                    newString[jj] = '\f';
+                } else if(nextByte=='\\') {
+                    newString[jj] = '\\';
+                } else if(nextByte>47 && nextByte<58){ //octal
+                    
+                    final StringBuilder octal=new StringBuilder(3);
+                    
+                    boolean notOctal=false;
+                    for(int ii=0;ii<3;ii++){
+                        
+                        if(data[aa]=='\\' || data[aa]==')' || data[aa]<'0' || data[aa]>'9') //allow for less than 3 values
+                        {
+                            ii = 3;
+                        } else{
+                            octal.append((char)data[aa]);
+                            
+                            //catch for odd values
+                            if(data[aa]>'7') {
+                                notOctal = true;
+                            }
+                            
+                            aa++;
+                        }
+                    }
+                    //move back 1
+                    aa--;
+                    //isOctal=true;
+                    if(notOctal) {
+                        newString[jj] = (byte) Integer.parseInt(octal.toString());
+                    } else {
+                        newString[jj] = (byte) Integer.parseInt(octal.toString(), 8);
+                    }
+                    
+                }else if(!keepReturns && (nextByte==13 || nextByte==10)){ //ignore bum data
+                    jj--;
+                }else {
+                    newString[jj] = nextByte;
+                }
+                
+                jj++;
+            }else if(!keepReturns && (data[aa]==13 || data[aa]==10)){ //convert returns to spaces
+                newString[jj]=32;
+                jj++;
+            }else{
+                newString[jj]=data[aa];
+                jj++;
+            }
+        }
+        //now resize
+        final byte[] rawString=newString;
+        newString=new byte[jj];
+        System.arraycopy(rawString, 0, newString, 0, jj);
         return newString;
     }
 

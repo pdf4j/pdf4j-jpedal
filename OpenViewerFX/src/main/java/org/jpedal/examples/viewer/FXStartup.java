@@ -84,21 +84,25 @@ public class FXStartup extends Application {
     {
         final String imgPath;
         final String barColour;
-        //
-        //setup reader image
-        imgPath="/org/jpedal/examples/viewer/res/OSFXSplash.png"; 
-        barColour =("-fx-accent: purple;");
-        /*
-         */
-        final ImageView splash = new ImageView(getClass().getResource(imgPath).toExternalForm());
-        loadProgress = new ProgressBar();
-        loadProgress.setPrefWidth(SPLASH_WIDTH);
-        progressText = new Label("All modules are loaded.");
-        loadProgress.setStyle(barColour);
-        splashLayout = new VBox();
-        splashLayout.getChildren().addAll(splash, loadProgress, progressText);
-        progressText.setAlignment(Pos.CENTER);
-        splashLayout.setEffect(new DropShadow());  
+        
+        if (OpenViewerFX.isOpenFX == false) {
+            //setup viewer image
+            imgPath = "/org/jpedal/examples/viewer/res/viewerFXSplash.png";
+            barColour = ("-fx-accent: blue;");
+        } else{
+            //setup reader image
+            imgPath = "/org/jpedal/examples/viewer/res/OSFXSplash.png";
+            barColour = ("-fx-accent: purple;");  
+        }
+            final ImageView splash = new ImageView(getClass().getResource(imgPath).toExternalForm());
+            loadProgress = new ProgressBar();
+            loadProgress.setPrefWidth(SPLASH_WIDTH);
+            progressText = new Label("All modules are loaded.");
+            loadProgress.setStyle(barColour);
+            splashLayout = new VBox();
+            splashLayout.getChildren().addAll(splash, loadProgress, progressText);
+            progressText.setAlignment(Pos.CENTER);
+            splashLayout.setEffect(new DropShadow());
     }
 
     @Override

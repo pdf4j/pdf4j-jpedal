@@ -66,11 +66,7 @@ public class RandomAccessFileChannelBuffer implements RandomAccessBuffer {
                 }
             }
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
 
@@ -107,25 +103,16 @@ public class RandomAccessFileChannelBuffer implements RandomAccessBuffer {
         try {
             super.finalize();
         } catch (final Throwable e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //ensure removal actual file
         try {
             close();
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
-
-    } /**/
+    }
 
     @Override
     public long length() throws IOException {

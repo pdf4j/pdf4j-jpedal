@@ -119,7 +119,24 @@ public class JpedalDefaultJavascript{
 		date.setTime(jsDate);
 		//jsDate = null;//delete the variable so it does not get used
 		
-		// <start-demo><end-demo>
+		/** added to make the testing be more predictable */
+		if(testingSetStaticDate){
+			final Calendar yesterday = Calendar.getInstance();
+			yesterday.roll(Calendar.DAY_OF_YEAR, false);//roll back one day
+			if(date.get(Calendar.YEAR)>yesterday.get(Calendar.YEAR) ||
+					(date.get(Calendar.YEAR)==yesterday.get(Calendar.YEAR) &&
+					date.get(Calendar.DAY_OF_YEAR)>yesterday.get(Calendar.DAY_OF_YEAR))){
+				date = Calendar.getInstance();
+				date.set(2010,10,10,10,10,10);//year,month,date,hrs,mins,secs
+			}
+			
+//			Date currentDate = new Date(System.currentTimeMillis());
+//			currentDate.setDate(currentDate.getDate()-1);
+//			
+//			if(date.after(currentDate)){
+//				date = new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+//			}
+		}
 		
 		// replace the javascript format string with a java format string to produce the required output.
 		//we need to do this as some chars represent different types of data in each
@@ -190,7 +207,23 @@ public class JpedalDefaultJavascript{
 			org.mozilla.javascript.Context.throwAsScriptRuntimeEx( new RuntimeException( "Not a Date()" ));
 		}
 		
-		// <start-demo><end-demo>
+		/** added to make the testing be more predictable */
+		if(testingSetStaticDate){
+			final Calendar yesterday = Calendar.getInstance();
+			yesterday.roll(Calendar.DATE, false);//roll back one day
+			if(date.get(Calendar.YEAR)>yesterday.get(Calendar.YEAR) ||
+					(date.get(Calendar.YEAR)==yesterday.get(Calendar.YEAR) &&
+							date.get(Calendar.DAY_OF_YEAR)>yesterday.get(Calendar.DAY_OF_YEAR))){
+				date = Calendar.getInstance();
+				date.set(2010,10,10,10,10,10);//year,month,date,hrs,mins,secs
+			}
+			
+//			Date currentDate = new Date(System.currentTimeMillis());
+//			currentDate.setDate(currentDate.getDate()-1);
+//			if(date.after(currentDate)){
+//				date = new Date(110,10,10,10,10,10);//year,month,date,hrs,mins,secs
+//			}
+		}
 		
 		final SimpleDateFormat df = new SimpleDateFormat(format[index]);
 		

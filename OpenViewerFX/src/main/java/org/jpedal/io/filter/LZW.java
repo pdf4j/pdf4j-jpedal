@@ -131,11 +131,7 @@ public class LZW extends BaseFilter implements PdfFilter {
     @Override
     public void decode(final BufferedInputStream bis, final BufferedOutputStream streamCache, final String cacheName, final Map cachedObjects) throws Exception{
 
-        if (rows * columns == 1) {
-
-            //
-         
-        } else { // version for no parameters
+        if (rows * columns != 1) {
 
             /**
              * decompress cached object

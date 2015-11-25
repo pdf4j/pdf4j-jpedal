@@ -75,12 +75,7 @@ public class RandomAccessMemoryMapBuffer implements RandomAccessBuffer {
             }
 
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 		//close streams
 		try {
@@ -91,19 +86,13 @@ public class RandomAccessMemoryMapBuffer implements RandomAccessBuffer {
                 from.close();
             }
 		} catch (final Exception e) {
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " closing files");
-            }
-		}
+			LogWriter.writeLog("Exception " + e + " closing files");
+        }
 
         try {
             init();
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
 
@@ -154,23 +143,15 @@ public class RandomAccessMemoryMapBuffer implements RandomAccessBuffer {
         try {
             super.finalize();
         } catch (final Throwable e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //ensure removal actual file
         try {
 			close();
 		} catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-		}
+            LogWriter.writeLog("Exception: " + e.getMessage());
+        }
 
     } /**/
 
@@ -276,11 +257,7 @@ public class RandomAccessMemoryMapBuffer implements RandomAccessBuffer {
             buf.seek(0);
             buf.read(bytes);
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         return bytes;

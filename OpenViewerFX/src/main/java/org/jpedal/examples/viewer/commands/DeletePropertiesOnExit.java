@@ -41,9 +41,7 @@ public class DeletePropertiesOnExit {
 
     public static void execute(final Object[] args) {
         if (args == null) {
-            //<start-demo>
-        } else {
-
+            GUI.deletePropertiesOnExit = true;
         }
     }
 }

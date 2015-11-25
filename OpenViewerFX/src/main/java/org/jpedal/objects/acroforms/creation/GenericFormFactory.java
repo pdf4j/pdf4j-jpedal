@@ -140,6 +140,9 @@ public abstract class GenericFormFactory {
         return null;
     }
     
+    public Object generateBorderfromForm(final FormObject form, final float scaling) {
+        throw new RuntimeException("generateBorderfromForm(final FormObject form, final float scaling) called in GenericFormFactory - not implemented in "+this);
+    }
     
     public void setOptions(final EnumSet formSettings) {
         throw new RuntimeException("setOptions(EnumSet formSettings) called in GenericFormFactory - not implemented in "+this);

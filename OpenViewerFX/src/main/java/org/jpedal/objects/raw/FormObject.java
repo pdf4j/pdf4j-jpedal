@@ -977,11 +977,7 @@ public class FormObject extends PdfObject{
             }
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
@@ -1523,7 +1519,7 @@ public class FormObject extends PdfObject{
         case PdfDictionary.FT:
 
             //setup first time
-            //
+           
             return null;
 
         case PdfDictionary.H:
@@ -1805,8 +1801,7 @@ public class FormObject extends PdfObject{
 
    //     }
 
-        //
-
+        
         //convert
         switch(mode){
             case PdfDictionary.STANDARD:
@@ -3078,8 +3073,6 @@ public class FormObject extends PdfObject{
                     } else if (rawOpt[ii] instanceof byte[]) {
                         OptString[ii] = StringUtils.getTextString((byte[]) rawOpt[ii], false);
 
-                    } else if (rawOpt[ii] != null) {
-                        //
                     }
                 }
             }
@@ -3502,8 +3495,6 @@ public class FormObject extends PdfObject{
                     }
                     
                     getDictionary(PdfDictionary.MK).setTextStreamValue(PdfDictionary.CA,StringUtils.toBytes(inVal));
-
-                    // <start-demo><end-demo>
             }
         }
         
@@ -3626,8 +3617,6 @@ public class FormObject extends PdfObject{
 	public void setfillColor(final Object newColor){
 		//added so that the fillColor NativeArray is called, this never seems to be called but 
 		//without it the NativeArray one will not work.
-		
-		// <start-demo><end-demo>
 		
 		//code below should work if ever called.
 		if(newColor!=null){
@@ -3782,11 +3771,7 @@ public class FormObject extends PdfObject{
                     
                 }
         }catch(final Exception ee){
-            
-            //
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Caught an Exception " + ee);
-            }
+            LogWriter.writeLog("Exception " + ee);
         }
     }
 

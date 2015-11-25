@@ -208,12 +208,9 @@ public class PdfResources {
                 outlineData.readOutlineFileMetadata(OutlinesObj, currentPdfFile);
 
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " accessing outline ");
-                }
+                LogWriter.writeLog("Exception " + e + " accessing outline ");
+                
                 outlineData = null;
-
-                //
             }
         }
 

@@ -443,10 +443,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                     scaling= (int)Float.parseFloat(numberValue);
                 }catch(final Exception ex){
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception in handling scaling "+ex);
-                    }
-
+                    LogWriter.writeLog("Exception in handling scaling "+ex);
+                    
                     scaling=-1;
                     //its got characters in it so get first valid number string
                     final int length=numberValue.length();
@@ -470,9 +468,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                             scaling = (int)Float.parseFloat(numberValue);
                         }catch(final Exception e1){
 
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception in handling scaling "+e1);
-                            }
+                            LogWriter.writeLog("Exception in handling scaling "+e1);
+                           
                             scaling=-1;
                         }
                     }

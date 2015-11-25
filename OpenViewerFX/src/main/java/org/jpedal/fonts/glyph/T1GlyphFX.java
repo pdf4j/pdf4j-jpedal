@@ -362,4 +362,9 @@ public class T1GlyphFX extends BaseT1Glyph
         
         return currentPath;
     }
+     
+     @Override
+    public boolean hasHintingApplied() {
+        return false;
+    }
 }

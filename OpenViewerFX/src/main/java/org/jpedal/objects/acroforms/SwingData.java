@@ -344,7 +344,7 @@ public class SwingData extends GUIData {
                 			try {
 								Thread.sleep(100);
 							} catch (final InterruptedException e) {
-								//
+								LogWriter.writeLog("Exception "+e.getMessage());
 							}
                 		}
                 		
@@ -396,16 +396,11 @@ public class SwingData extends GUIData {
                         final BufferedImage commentIcon = ImageIO.read(getClass().getResource("/org/jpedal/objects/acroforms/res/comment.png"));
                         g2.drawImage(commentIcon, formObject.getBoundingRectangle().x, pageData.getCropBoxHeight(page) - formObject.getBoundingRectangle().y, formObject.getBoundingRectangle().width, formObject.getBoundingRectangle().height, null);
                     } catch (final Exception e) {
-                        //tell user and log
-                        if (LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                 }
             }
         
-
         if (formObject.getFloatArray(PdfDictionary.C) == null) {
             formObject.setFloatArray(PdfDictionary.C, new float[]{255, 255, 0});
         }

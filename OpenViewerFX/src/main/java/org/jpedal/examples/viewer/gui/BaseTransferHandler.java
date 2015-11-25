@@ -49,6 +49,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.gui.GUIFactory;
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -116,7 +117,8 @@ public class BaseTransferHandler extends TransferHandler {
 				return transferable.getTransferData(listFlavor);		
 			}
 		} catch (final Exception e) {
-			//
+			LogWriter.writeLog("Caught exception decoding transfer:"+e.getMessage());
+			
 			return null;
 		}
 		

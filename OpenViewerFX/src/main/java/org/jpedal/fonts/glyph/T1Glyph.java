@@ -267,4 +267,9 @@ public class T1Glyph extends BaseT1Glyph
             return 0;
         }
     }
+    
+    @Override
+    public boolean hasHintingApplied() {
+        return false;
+    }
 }

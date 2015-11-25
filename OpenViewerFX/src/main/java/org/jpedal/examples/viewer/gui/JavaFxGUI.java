@@ -164,8 +164,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     private boolean sideTabBarOpenByDefault;
     private String startSelectedTab = "Pages";
 
-    //<start-demo><end-demo>
-
     //use new GUI layout
     public static String windowTitle;
 
@@ -232,8 +230,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     private boolean hasPageChanged;
     private ToolBar navToolBar;
     private ToolBar pagesToolBar;
-
-    //
 
     //The main JavaFX Stage
     private final Stage stage;
@@ -1105,7 +1101,9 @@ public class JavaFxGUI extends GUI implements GUIFactory {
          */
         setupComboBoxes();
 
-        //
+        if(LogWriter.isRunningFromIDE){
+            nameElements();
+        }
 
         /**
          * Initialise the Swing Buttons *
@@ -1318,7 +1316,18 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         fxButtons.disableUnimplementedItems(ALL);
     }
 
-//	
+    private void nameElements() {
+
+        ((JavaFXMenuItems) menuItems).getCurrentMenuFX().setId("menuBar");
+
+        pageCounter2.setId("pageCounter");
+
+        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS) {
+            rotationBox.setName("rotationBox");
+            scalingBox.setName("scalingBox");
+        }
+    }
+
     /**
      * method being called from within init to create other tool bars to add to
      * display
@@ -1460,8 +1469,13 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     @Override
     public void setMultibox(final int[] flags) {
 
-        //
-
+        //debug code for formclicktests
+        if (GUI.alwaysShowMouse) {
+            multiboxfx.getChildren().clear();
+            multiboxfx.getChildren().add(coordsFX);
+            return;
+        }
+        
         //deal with flags
         if (flags.length > 1 && flags[0] == CURSOR) {
             //if no change, return
@@ -1568,10 +1582,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 stage.getIcons().add(fontIcon);
 
             } catch (final Exception e) {
-                //
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception attempting to set Icon " + e);
-                }
+                LogWriter.writeLog("Exception attempting to set Icon " + e);
             }
         }
 
@@ -1735,11 +1746,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 //                    updateUI();
                     decode_pdf.decodePage(pageNumber);
                 } catch (final Exception e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             } else if (displayView == Display.CONTINUOUS || displayView == Display.CONTINUOUS_FACING) {
                 try {
@@ -2031,7 +2038,9 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 //        double h = pageContainer.getContent().getBoundsInLocal().getHeight();
 //        System.out.println("scrolling " + pageContainer.getVvalue() + " height of container: " + h);
 //        adjustGroupToCenter();
-        //
+        if (LogWriter.isRunningFromIDE) {
+            System.out.println("Memory usage after zoom=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000);
+        }
 
     }
 
@@ -2705,8 +2714,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
     }
 
-    //
-
     /* (non-Javadoc)
      * @see org.jpedal.examples.viewer.gui.swing.GUIFactory#getFrame()
      */
@@ -3011,8 +3018,8 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                     try {
                         BrowserLauncher.openURL(Messages.getMessage("PdfViewer.SupportLink.Link"));
                     } catch (final Exception ex) {
+                        LogWriter.writeLog("Exception "+ex.getMessage());
                         showMessageDialog(Messages.getMessage("PdfViewer.ErrorWebsite"));
-                        //
                     }
                 }
             };
@@ -3162,10 +3169,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 propValue = propValue.replaceAll("[^0-9]", "");
                 defaultDPI = Integer.parseInt(propValue);
             } catch (final Exception e) {
-                //
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception attempting get properties value" + e);
-                }
+                LogWriter.writeLog("Exception attempting get properties value" + e);
             }
         }
 
@@ -4573,7 +4577,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 //                LogWriter.writeLog("Not yet coded for display view option "+displayView);
 //            }
 //            
-//            //<end-demo>
 //        }
 //        
 //        // Account for drop shadow

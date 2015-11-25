@@ -147,9 +147,7 @@ public class CMAP extends Table {
 
         //read 'cmap' table
         if(startPointer==0){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No CMAP table found");
-            }
+            LogWriter.writeLog("No CMAP table found");
         }else{
 
             id=currentFontFile.getNextUint16();//id

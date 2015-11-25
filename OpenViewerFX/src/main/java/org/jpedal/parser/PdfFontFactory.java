@@ -129,10 +129,8 @@ public class PdfFontFactory {
 
             if(fontType==PdfDictionary.Unknown){
 
-            	if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Font type not supported");
-                }
-
+            	LogWriter.writeLog("Font type not supported");
+                
                 currentFontData=new PdfFont(currentPdfFile);
             }
 
@@ -217,10 +215,8 @@ public class PdfFontFactory {
 
             }catch(final Exception e){
 
-            	if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] Problem " + e + " reading Font  type " + StandardFonts.getFontypeAsString(fontType));
-                }
-
+            	LogWriter.writeLog("[PDF] Problem " + e + " reading Font  type " + StandardFonts.getFontypeAsString(fontType));
+                
                 errorTracker.addPageFailureMessage("Problem " + e + " reading Font type " + StandardFonts.getFontypeAsString(fontType));
             }
         }
@@ -344,10 +340,8 @@ public class PdfFontFactory {
 
         }else if(FontMappings.enforceFontSubstitution){
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("baseFont=" + baseFont + " fonts added= " + FontMappings.fontSubstitutionTable);
-            }
-
+            LogWriter.writeLog("baseFont=" + baseFont + " fonts added= " + FontMappings.fontSubstitutionTable);
+            
             throw new PdfFontException("No substitute Font found for font="+baseFont+ '<');
         }
         return fontType;

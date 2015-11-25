@@ -137,11 +137,7 @@ public abstract class MultiPageDecoder {
         try {
             semaphore.acquire();
         } catch (InterruptedException ex) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + ex.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + ex.getMessage());
         }
         
         this.displayView=displayView;
@@ -190,11 +186,7 @@ public abstract class MultiPageDecoder {
             try {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         
@@ -239,19 +231,12 @@ public abstract class MultiPageDecoder {
                     } catch (final Exception e) {
                         
                         multiDisplayOptions.setRunning(false);
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }catch(final Error err){
                         multiDisplayOptions.setRunning(false);
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Error: " + err.getMessage());
-                        }
                         
-                         //
+                        LogWriter.writeLog("Error: " + err.getMessage());
                     }finally{
                         semaphore.release();
                     }
@@ -302,8 +287,10 @@ public abstract class MultiPageDecoder {
 
             // detect if restarted
             if ((originalStart != multiDisplayOptions.getStartViewPage())&& (originalEnd != multiDisplayOptions.getEndViewPage())) {
-                // 
-
+                if(debugLayout) {
+                    System.out.println("Worker detected change to page range to " + multiDisplayOptions.getStartViewPage() + ' ' + multiDisplayOptions.getEndViewPage());
+                }
+                
                 page = multiDisplayOptions.getStartViewPage();
                 originalEnd = multiDisplayOptions.getEndViewPage()+1;
 
@@ -341,7 +328,10 @@ public abstract class MultiPageDecoder {
                 break;
             }
 
-            //
+            if(originalStart>originalEnd) {
+                break;
+            }
+            
             if (page > 0 && page < pdf.getPageCount()+1) {
                 decodeMorePages(page, originalStart, originalEnd);
             }
@@ -387,11 +377,7 @@ public abstract class MultiPageDecoder {
                                 pg.drawImage(pdf.getPageAsImage(page),0,0,pageW[page]+1, pageH[page]+1,null);
                             }
                         } catch(final Exception e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: " + e.getMessage());
                         }
 
                         facingDragCachedImages[ref] = image;
@@ -553,17 +539,9 @@ public abstract class MultiPageDecoder {
             currentDisplay.flagDecodingFinished();
 
         } catch (final Exception ex) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + ex.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + ex.getMessage());
         } catch (final Error err) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + err.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + err.getMessage());
         }
 
         currentPageViews.put(pageNumber,currentDisplay);

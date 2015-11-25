@@ -107,7 +107,7 @@ public class SH {
             newColorSpace.setPrinting(isPrinting);
             
             /**setup shading object*/ 
-            final PdfPaint shading=new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,gs.CTM,false, gs.CTM,true);
+            final PdfPaint shading=new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,gs.CTM,false);
             
             //see 18992 and /Users/markee/PDFdata/test_data/sample_pdfs_html/general/test22.pdf
             if(gs.CTM[0][0]==0 && gs.CTM[0][1]>0 && gs.CTM[1][0]>0 && gs.CTM[1][1]==0 && current.getMode().equals(DynamicVectorRenderer.Mode.SMASK)){
@@ -126,11 +126,7 @@ public class SH {
             current.drawShape(shadeShape, gs, Cmd.F);
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
 }

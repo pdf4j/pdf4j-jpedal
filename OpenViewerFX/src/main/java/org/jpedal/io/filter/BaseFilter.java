@@ -293,10 +293,7 @@ public class BaseFilter {
 				case 15:
                     //implemented inside main code body
 					break;
-				default:
-
-					//
-				break;
+				
 				}
 
 				//add to output and update line
@@ -308,11 +305,8 @@ public class BaseFilter {
 			bos.close();
 
 		}catch(final Exception e){
-			e.printStackTrace();
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing Predictor");
-            }
-		}
+			LogWriter.writeLog("Exception " + e + " accessing Predictor");
+        }
 	}
 
 
@@ -509,10 +503,7 @@ public class BaseFilter {
 				case 15:
                     //implemented inside main code body
 					break;
-				default:
-
-					//
-				break;
+				
 				}
 
 				//add to output and update line
@@ -521,12 +512,8 @@ public class BaseFilter {
 			}
 
 		}catch(final Exception e){
-			e.printStackTrace();
-			
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing Predictor");
-            }
-		}
+			LogWriter.writeLog("Exception " + e + " accessing Predictor");
+        }
 
         return count;
 	}

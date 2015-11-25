@@ -356,10 +356,9 @@ public class StandardFonts {
                                     "UTF-16"));
             
             // trap problems
-            if (input_stream == null && LogWriter.isOutput()) {
+            if (input_stream == null) {
                 LogWriter.writeLog("Unable to open "+ file_name+ " to read standard encoding");
             }
-            
             
             //read in lines and place in map tables for fast lookup
             while (true) {
@@ -428,18 +427,14 @@ public class StandardFonts {
                 }
             }
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf");
-            }
+            LogWriter.writeLog("Exception " + e + " reading lookup table for pdf");
         }
         
         if(input_stream!=null){
             try{
                 input_stream.close();
             }catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
-                }
+                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
             }
         }
     }
@@ -476,7 +471,7 @@ public class StandardFonts {
             usesGlyphlist=true;
             
             // trap problems
-            if (input_stream == null && LogWriter.isOutput()) {
+            if (input_stream == null) {
                 LogWriter.writeLog("Unable to open standard_encoding.cfg from jar");
             }
             
@@ -590,18 +585,14 @@ public class StandardFonts {
             }
             
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for "+idx);
-            }
+            LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for "+idx);
         }
         
         if(input_stream!=null){
             try{
                 input_stream.close();
             }catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
-                }
+                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
             }
         }
     }
@@ -808,9 +799,7 @@ public class StandardFonts {
             try{
                 input_stream.close();
             }catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
-                }
+                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
             }
         }
         
@@ -833,9 +822,7 @@ public class StandardFonts {
                 loadStandardFont(fileNumber);
                 
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] " + e + " problem reading lookup table for pdf font "+fontName+ ' ' +fontName);
-                }
+                LogWriter.writeLog("[PDF] " + e + " problem reading lookup table for pdf font "+fontName+ ' ' +fontName);
             }
         }
     }
@@ -873,7 +860,7 @@ public class StandardFonts {
                                 enc));
                 
                 // trap problems
-                if (input_stream == null && LogWriter.isOutput()) {
+                if (input_stream == null) {
                     LogWriter.writeLog("Unable to open glyphlist.cfg from jar");
                 }
                 
@@ -901,10 +888,7 @@ public class StandardFonts {
                     }
                 }
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
-                }
-                e.printStackTrace(System.out);
+                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
             }
         }
         
@@ -912,12 +896,9 @@ public class StandardFonts {
             try{
                 input_stream.close();
             }catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
-                }
+                LogWriter.writeLog("Exception " + e + " reading lookup table for pdf  for abobe map");
             }
-        }
-        
+        }    
     }
     /**
      * @return Returns the adobe mapping for truetype case 3,1
@@ -1083,11 +1064,7 @@ public class StandardFonts {
                             }
  
                     }catch(final Exception e){
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: "+e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: "+e.getMessage());
                     }
                 }else{
                     for(int ii=0;ii<charCount;ii++){ //delete any excess values
@@ -1238,9 +1215,8 @@ public class StandardFonts {
             return num;
         } catch (final NumberFormatException e) {
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in handling cid id "+e);
-            }
+            LogWriter.writeLog("Exception in handling cid id "+e);
+            
             return -1;
         }
     }
@@ -1309,12 +1285,7 @@ public class StandardFonts {
             input_stream.close();
             
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: "+e.getMessage());
         }
-    }
-    
+    }    
 }

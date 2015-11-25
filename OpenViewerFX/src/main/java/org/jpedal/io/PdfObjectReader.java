@@ -123,11 +123,8 @@ public class PdfObjectReader {
                 tempFileName=null;
             }
         }catch( final Exception e ){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " closing file");
-            }
+            LogWriter.writeLog("Exception " + e + " closing file");
         }
-        
     }
     
     /**
@@ -242,9 +239,7 @@ public class PdfObjectReader {
             
         }catch( final Exception e ){
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing file");
-            }
+            LogWriter.writeLog("Exception " + e + " accessing file");
             
             throw new PdfException( "Exception " + e + " accessing file" );
         }
@@ -274,9 +269,7 @@ public class PdfObjectReader {
             //this.eof = pdf_datafile.length();
             
         }catch( final Exception e ){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing file");
-            }
+            LogWriter.writeLog("Exception " + e + " accessing file");
             
             throw new PdfException( "Exception " + e + " accessing file" );
         }
@@ -326,9 +319,7 @@ public class PdfObjectReader {
             //this.eof = pdf_datafile.length();
             
         }catch( final Exception e ){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing file");
-            }
+            LogWriter.writeLog("Exception " + e + " accessing file");
             
             throw new PdfException( "Exception " + e + " accessing file" );
         }
@@ -379,15 +370,11 @@ public class PdfObjectReader {
             
         }catch( final Exception e ){
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " accessing file");
-            }
+            LogWriter.writeLog("Exception " + e + " accessing file");
             
             throw new PdfException( "Exception " + e + " accessing file" );
         }
     }
-    
-    
     
     /**handle onto JS object*/
     private Javascript javascript;

@@ -871,8 +871,36 @@ public class JavaFXMenuItems extends GUIMenuItems {
 
 //		}
 
-		//
+		if(includeAll && GUI.debugFX){
+			
+			//menu option for debugging viewport
+			final Menu debugViewport = new Menu("Debug");
+			addToMainMenu(debugViewport);
 
+			// toggle viewport border
+			addMenuItem(debugViewport,"Toggle viewport border","",Commands.TOGGLE);
+
+			//setViewport option button
+			addMenuItem(debugViewport,"Set viewport","",Commands.SET);
+
+			//reset vieport option button
+			addMenuItem(debugViewport,"Reset viewport","Resets the viewport to the default value",Commands.RESET);
+
+			//switch for testing hardware acceleration
+			addMenuItem(debugViewport,"Enable acceleration","Enable Hardware diplay acceleration for screen",Commands.ACCELERATIONON);
+
+			//switch for testing hardware acceleration
+			addMenuItem(debugViewport,"Disable acceleration","Disable Hardware diplay acceleration for screen",Commands.ACCELERATIONOFF);
+
+			addMenuItem(debugViewport,"Show form NAMES","displays a list of all the forms names",Commands.SHOWFORMNAMES);
+
+            //delete properties file on exit
+            addMenuItem(debugViewport,"Wipe properties on exit","deletes the properties file on exit",Commands.DELETEPROPERTIESONEXIT);
+
+            addMenuItem(debugViewport,"Always show mouse coords","prevents anything other than mouse coordinates displaying in the multibox",Commands.ALWAYSSHOWMOUSE);
+
+		}
+		
 		helpMenu = new Menu(Messages.getMessage("PdfViewerHelpMenu.text"));
 		addToMainMenu(helpMenu);
 

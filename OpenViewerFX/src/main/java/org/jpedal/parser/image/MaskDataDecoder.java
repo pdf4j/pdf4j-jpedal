@@ -162,7 +162,8 @@ class MaskDataDecoder {
                         }
                     }
                 }else if(nComp==4){
-                    //
+                    //does nothing in LGPL library   
+                    org.jpedal.JDeliHelper.processJPEG(dim, data, p, maskArray, output);
                 }
                 break;
         }
@@ -170,8 +171,6 @@ class MaskDataDecoder {
         
     }
 
-    
-    
     static byte[] applySMask(byte[] maskData, final ImageData imageData,final GenericColorSpace decodeColorData, final PdfObject newSMask, final PdfObject XObject) {
         
         byte[] objectData=imageData.getObjectData();
@@ -351,7 +350,7 @@ class MaskDataDecoder {
                     maskData[ii]=(byte) (maskData[ii]^255);
                 }
             }
-        }else if(!imageData.isDCT() && !imageData.isJPX()){
+        }else if(!imageData.isDCT() && !imageData.isJPX() && d!=1){ //we do not want to convert 1 bit
             
             //convert the data to rgb (last parameter is used in CalRGB so left in to make method same in all)
             objectData=decodeColorData.dataToRGBByteArray(objectData,w,h,false);

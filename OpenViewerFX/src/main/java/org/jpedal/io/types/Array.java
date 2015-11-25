@@ -238,10 +238,8 @@ public class Array extends ObjectDecoder{
                 if(arrayData==null){
                     pdfObject.setFullyResolved(false);
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (14)");
-                    }
-
+                    LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (14)");
+                    
                     return raw.length;
                 }
 
@@ -876,7 +874,20 @@ public class Array extends ObjectDecoder{
             keyStart++;
         }
 
-        byte[] newValues= ObjectUtils.readEscapedValue(j2, arrayData, keyStart, isID);
+        byte[] newValues;
+
+        //@mark 23155 (locked down to this case)
+        if(decryption!= null && !isID && !pdfObject.isInCompressedStream() && pdfObject.getObjectType() == PdfDictionary.Page && arrayData[j2]=='<' && arrayData[j2+1]=='<'){
+        
+            newValues = ObjectUtils.readRawValue(j2, arrayData, keyStart);
+
+            if (newValues[0] == '<' && newValues[1] == '<') {
+                //see case 23155 (encrypted annot needs obj ref appended so we can decrypt string later)
+                newValues = appendObjectRef(pdfObject, newValues);
+            }
+        }else{
+            newValues = ObjectUtils.readEscapedValue(j2, arrayData, keyStart, isID);
+        }
 
         if(debugFastCode) {
             System.out.println(padding + "<1.Element -----" + currentElement + '/' + elementCount + "( j2=" + j2 + " ) value=" + new String(newValues) + '<');
@@ -895,11 +906,7 @@ public class Array extends ObjectDecoder{
                     newValues = decryption.decrypt(newValues, pdfObject.getObjectRefAsString(), false, null, false, false);
                 }
             } catch (final PdfSecurityException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
 
             //convert Strings in Order now
@@ -941,6 +948,26 @@ public class Array extends ObjectDecoder{
             }
         }
         return j2;
+    }
+
+    /**
+     * //see case 23155 (encrypted annot needs obj ref appended so we can decrypt string later)
+            
+     */
+    private static  byte[] appendObjectRef(final PdfObject pdfObject, byte[] newValues) {
+        
+        String s=pdfObject.getObjectRefAsString();
+        final int len=newValues.length;
+        final int strLen=s.length()-1;
+        final int newLength=strLen+4+newValues.length;
+        byte[] adjustedArray=new byte[newLength];
+        System.arraycopy(s.getBytes(), 0,  adjustedArray,0, strLen);
+        System.arraycopy("obj ".getBytes(), 0,  adjustedArray,strLen,4);
+        System.arraycopy(newValues, 0,  adjustedArray,strLen+4, len);
+        newValues=adjustedArray;
+        
+        return newValues;
+        
     }
 
     private void initObjectArray(final int elementCount) {

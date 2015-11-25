@@ -65,9 +65,7 @@ public class ColorSpaceConvertor {
      */
     public static BufferedImage convertFromICCCMYK(final int width, final int height,byte[] data) {
 
-        if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Converting ICC/CMYK colorspace to sRGB ");
-            }
+        LogWriter.writeLog("Converting ICC/CMYK colorspace to sRGB ");
         
         try {
 
@@ -82,11 +80,7 @@ public class ColorSpaceConvertor {
             return profileConvertCMYKImageToRGB(data, width, height);
             
         } catch (final Exception ee) {
-
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception  " + ee + " converting from ICC colorspace");
-            }
-            ee.printStackTrace();
+            LogWriter.writeLog("Exception  " + ee + " converting from ICC colorspace");
         }
 
         return null;
@@ -122,20 +116,11 @@ public class ColorSpaceConvertor {
                 new ColorConvertOp(ColorSpaces.hints).filter(raw_image, image);
                 //image = raw_image;
             } catch (final Exception e) {
-
-                e.printStackTrace();
-
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " converting to RGB");
-                }
+                LogWriter.writeLog("Exception " + e + " converting to RGB");
             } catch (final Error ee) {
 
-                ee.printStackTrace();
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Error " + ee + " converting to RGB");
-                }
-                //
-
+                LogWriter.writeLog("Error " + ee + " converting to RGB");
+                
                 image=null;
             }
         }
@@ -163,9 +148,7 @@ public class ColorSpaceConvertor {
                 final ColorConvertOp xformOp = new ColorConvertOp(null);
                 xformOp.filter(raw_image, image);
             } catch (final Exception e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " creating argb image");
-                }
+                LogWriter.writeLog("Exception " + e + " creating argb image");
             }
         }
 
@@ -261,9 +244,7 @@ public class ColorSpaceConvertor {
             image.setData(raster);
 
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
-            }
+            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
         }
 
         return image;
@@ -323,9 +304,7 @@ public class ColorSpaceConvertor {
             image.setData(raster);
 
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
-            }
+            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
         }
 
         return image;
@@ -439,11 +418,7 @@ public class ColorSpaceConvertor {
             image.setData(raster);
 
         } catch (final Exception e) {
-            e.printStackTrace();
-
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
-            }
+            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
         }
 
         return image;
@@ -543,11 +518,7 @@ public class ColorSpaceConvertor {
                     break;
                     
                 default:
-                    //
-                    
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("unknown comp= " + d);
-                    }
+                    LogWriter.writeLog("unknown comp= " + d);
             }
             
             data=newData;
@@ -879,10 +850,7 @@ public class ColorSpaceConvertor {
             final ColorConvertOp xformOp = new ColorConvertOp(null);
             xformOp.filter(raw_image, image);
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " converting image");
-            }
-
+            LogWriter.writeLog("Exception " + e + " converting image");
         }
         return image;
     }

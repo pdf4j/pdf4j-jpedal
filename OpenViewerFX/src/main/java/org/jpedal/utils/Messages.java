@@ -75,14 +75,14 @@ public class Messages {
                             message=bundle.getString(key);
                         }
 		}catch(final Exception e){
-			//
-
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-                        }
-            //
-		}
+			
+			if(LogWriter.isRunningFromIDE && !reportedValueMissing.contains(key)){
+				System.err.println("error resource bundle expected for key "+key);
+				reportedValueMissing.add(key);
+			}
+			
+            LogWriter.writeLog("Exception: "+e.getMessage()+" key="+key);
+        }
 		
 		//trap for 1.3 or missing
 		if(message==null){
@@ -92,12 +92,8 @@ public class Messages {
 				message=messages.get(key);
 				
 			}catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+e.getMessage());
-                }
-                //
-			}
+                LogWriter.writeLog("Exception: "+e.getMessage());
+            }
 		}
 		
 		//if still null use message key

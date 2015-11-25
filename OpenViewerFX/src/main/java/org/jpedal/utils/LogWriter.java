@@ -38,8 +38,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jpedal.*;
-
 /**
  * <p>logs all activity. And some low level variables/methods
  * as it is visible to all classes.
@@ -68,6 +66,11 @@ public class LogWriter
      */
     private static final Set<String> filterValues = getFilterSet();
     
+    public static final boolean isRunningFromIDE=System.getProperty("debugInIDE")!=null && 
+            System.getProperty("debugInIDE").equalsIgnoreCase("true") &&
+            LogWriter.class.getResource("LogWriter.class").toString().startsWith("file:");
+    //public static final boolean isRunningFromIDE=true;
+    
     /**
      * Creates a set of filter values from JVM argument -Dorg.jpedal.inclusiveLogFilters.
      * The arguments are passed in as comma-separated values.
@@ -85,70 +88,83 @@ public class LogWriter
         return filterSet;
     }
     
+    /**
+     * @deprecated - should not be used
+     * @return 
+     */
     public static final boolean isOutput(){
         return verbose || logScanner!=null;
         
     }
     
     ///////////////////////////////////////////////
-    public static final void writeLog( final String message )
-    {
+    public static final void writeLog(final String message) {
+
+        if (isRunningFromIDE && message.contains("Exception")) {
+            System.out.println("[Exception] "+ message);
         
+        }else if (verbose || logScanner != null) {
+            writeMessage(message);
+        }
+    }
+    
+    ///////////////////////////////////////////////
+    private static void writeMessage(final String message) {
+
         /**
          * ignore any logging if we have set some inclusive values with
          *
          * -Dorg.jpedal.inclusiveLogFilters="memory,error"
          *
-         * Values are case-insensitve and example above would only output messages containing 'memory' or 'error')
+         * Values are case-insensitve and example above would only output
+         * messages containing 'memory' or 'error')
          */
-        if(filterValues != null && message != null){
+        if (filterValues != null && message != null) {
             boolean found = false;
-            
-            for(final String s : filterValues){
-                if(message.toLowerCase().contains(s)){
+
+            for (final String s : filterValues) {
+                if (message.toLowerCase().contains(s)) {
                     found = true;
                     break;
                 }
             }
-            if(!found){
+            if (!found) {
                 return;
             }
         }
-        
-        //implement your own version of org.jpedal.utils.LogScanner
+
+    //implement your own version of org.jpedal.utils.LogScanner
         //and set will then allow you to track any error messages
-        if(logScanner!=null) {
+        if (logScanner != null) {
             logScanner.message(message);
         }
-        
+
         /**
-         * write message to pane if client active
-         * and put to front
+         * write message to pane if client active and put to front
          */
-        if(verbose) {
-            System.out.println( message );
+        if (verbose) {
+            System.out.println(message);
         }
-        
-        if( log_name != null )
-        {
-            
+
+        if (log_name != null) {
+
             //write message
             final PrintWriter log_file;
-            try
-            {
-                log_file = new PrintWriter( new FileWriter( log_name, true ) );
-                
-                if(!testing) {
-                    log_file.println(TimeNow.getTimeNow()+ ' ' +message);		//write date to the log
+            try {
+                log_file = new PrintWriter(new FileWriter(log_name, true));
+
+                if (!testing) {
+                    log_file.println(TimeNow.getTimeNow() + ' ' + message);		//write date to the log
                 }
-                log_file.println( message );
+                log_file.println(message);
                 log_file.flush();
                 log_file.close();
-            }catch( final Exception e ){
-                System.err.println( "Exception " + e + " attempting to write to log file " + log_name );
+            } catch (final Exception e) {
+                System.err.println("Exception " + e + " attempting to write to log file " + log_name);
             }
-            
+
         }
+       
     }
     
     //////////////////////////////////////////////
@@ -175,7 +191,6 @@ public class LogWriter
         
         //write out info
         if(!testing){
-            //
             writeLog( "Software started - " + TimeNow.getTimeNow() );
         }
         writeLog( "=======================================================" );

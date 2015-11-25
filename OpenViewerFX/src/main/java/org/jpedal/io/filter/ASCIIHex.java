@@ -81,10 +81,7 @@ public class ASCIIHex extends BaseFilter implements PdfFilter {
             }
 
         } catch (final Exception e) {
-        	if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading ASCII stream ");
-            }
-
+        	LogWriter.writeLog("Exception " + e + " reading ASCII stream ");
         }
 
         if (mappingStream != null) {
@@ -92,11 +89,7 @@ public class ASCIIHex extends BaseFilter implements PdfFilter {
                 mappingStream.close();
                 bis.close();
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: "+e.getMessage());
             }
         }
 
@@ -194,11 +187,7 @@ public class ASCIIHex extends BaseFilter implements PdfFilter {
             }
 
         } catch (final IOException e1) {
-
-        	if(LogWriter.isOutput()) {
-                LogWriter.writeLog("IO exception in RunLength "+e1);
-            }
+        	LogWriter.writeLog("IO exception in RunLength "+e1);
         }
     }
-
 }

@@ -131,11 +131,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
                     gc.fillRect(x, y, width, height);
                     but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
                 } catch (final Exception e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -207,11 +203,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
 
                     but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
                 } catch (final Exception e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -275,11 +267,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
                     gc.fillRect(x, y + (height / 2), width, 1);
                     but.setGraphic(new JavaFXImageIcon(but, form, canvas.snapshot(params, null), 0));
                 } catch (final Exception e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -343,10 +331,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
                 commentIcon = ImageIO.read(getClass().getResource("/org/jpedal/objects/acroforms/res/note.png"));
             }
         } catch (final Exception e) {
-            //tell user and log
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //Set color of annotation
@@ -403,9 +388,6 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
                     return createAnnotationInk(form);
                 case PdfDictionary.StrickOut :
                     return createAnnotationStrikeOut(form);
-                default:
-                    //
-                    break;
             }
         }
         

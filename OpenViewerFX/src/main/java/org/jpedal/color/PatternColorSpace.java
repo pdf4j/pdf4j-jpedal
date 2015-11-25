@@ -506,13 +506,8 @@ public class PatternColorSpace extends GenericColorSpace{
             glyphDecoder.decodePageContent(currentGraphicsState, streamData);
             
         } catch (final PdfException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: "+e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: "+e.getMessage());
         }
-        
         
         //flush as image now created
         return glyphDisplay;
@@ -541,7 +536,7 @@ public class PatternColorSpace extends GenericColorSpace{
             newColorSpace=new DeviceCMYKColorSpace();
         }
         
-        return new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,matrix,colorsReversed, CTM, false);
+        return new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,matrix,colorsReversed);
         
     }
-    }
+}

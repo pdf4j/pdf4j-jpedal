@@ -178,7 +178,6 @@ public class DefaultActionHandler implements ActionHandler {
                     aData = aData.getDictionary(PdfDictionary.D);
                 }else if(eventType == MOUSERELEASED){
                     aData = aData.getDictionary(PdfDictionary.U);
-                    // <start-demo><end-demo>
                 }
             }
         }
@@ -285,11 +284,7 @@ public class DefaultActionHandler implements ActionHandler {
                                         viewer.openDefaultFile(ObjectStore.temp_dir+target);
                                         
                                     }catch(final Exception e){
-                                        //tell user and log
-                                        if(LogWriter.isOutput()) {
-                                            LogWriter.writeLog("Exception: " + e.getMessage());
-                                        }
-                                        //
+                                        LogWriter.writeLog("Exception: " + e.getMessage());
                                     }
                                     
                                 }else if(DecoderOptions.isRunningOnMac){
@@ -301,21 +296,16 @@ public class DefaultActionHandler implements ActionHandler {
                             
                         }
                     } catch (final Exception e) {
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     } catch (final Error err) {
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Error: " + err.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Error: " + err.getMessage());
                     }
                    
                     LogWriter.writeFormLog("{stream} launch activate action NOT IMPLEMENTED", FormStream.debugUnimplemented);
-                    // <start-demo><end-demo>
+                    
+                    if (FormStream.debugUnimplemented) {
+                        System.out.println("{internal only} launch activate action NOT IMPLEMENTED");
+                    }
                     
                 } else if (command == PdfDictionary.SetOCGState) {
                     
@@ -353,11 +343,7 @@ public class DefaultActionHandler implements ActionHandler {
                             SoundHandler.PlaySound(soundObj.getDecodedStream());
                             
                         } catch (final Exception e) {
-                            //tell user and log
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: " + e.getMessage());
                         }
                     }
                     
@@ -366,7 +352,6 @@ public class DefaultActionHandler implements ActionHandler {
                 }
             } else if(command!=-1){
                 LogWriter.writeFormLog("{stream} Activate Action UNKNOWN command "+aData.getName(PdfDictionary.S)+ ' ' +formObj.getObjectRefAsString(), FormStream.debugUnimplemented);
-                // <start-demo><end-demo>
             }
         }
     }
@@ -410,11 +395,7 @@ public class DefaultActionHandler implements ActionHandler {
                             try {
                                 decode_pdf.decodePage(-1);
                             } catch (final Exception e) {
-                                //tell user and log
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception: " + e.getMessage());
-                                }
-                                //
+                                LogWriter.writeLog("Exception: " + e.getMessage());
                             }
                         }
                     };
@@ -488,8 +469,7 @@ public class DefaultActionHandler implements ActionHandler {
             }
           
         } else {
-            // <start-demo><end-demo>
-            
+            LogWriter.writeLog("{internal only} Named Action NOT IMPLEMENTED " + aData.getName(PdfDictionary.N)+ ' ' +decode_pdf.getFileName());
         }
     }
     
@@ -514,11 +494,8 @@ public class DefaultActionHandler implements ActionHandler {
             BrowserLauncher.openURL(url);
         } catch (final Exception e1) {
             showMessageDialog(Messages.getMessage("PdfViewer.ErrorWebsite"));
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e1.getMessage());
-            }
-            //
+            
+            LogWriter.writeLog("Exception: " + e1.getMessage());
         }
     }
     
@@ -1171,11 +1148,7 @@ public class DefaultActionHandler implements ActionHandler {
                     page = 1;
                 }
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         
@@ -1185,7 +1158,6 @@ public class DefaultActionHandler implements ActionHandler {
             (decode_pdf.getPageCount()!=1 && (decode_pdf.getDisplayView() != Display.SINGLE_PAGE || (decode_pdf.getDisplayView() == Display.SINGLE_PAGE && decode_pdf.getlastPageDecoded()!=page))))
                 && (page > 0 && page < decode_pdf.getPageCount()+1)) {
                     try {
-                        // <start-demo><end-demo>
                         
                         //
                         
@@ -1197,11 +1169,7 @@ public class DefaultActionHandler implements ActionHandler {
                         }
                         
                     } catch (final Exception e) {
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                     
                     /** reset as rotation may change! */
@@ -1614,7 +1582,7 @@ public class DefaultActionHandler implements ActionHandler {
         if (fieldsToHide.length != whetherToHide.length) {
             //this will exit internally only and the production version will carry on regardless.
             LogWriter.writeFormLog("{custommouselistener} number of fields and nuber of hides or not the same", FormStream.debugUnimplemented);
-            //<start-demo><end-demo>
+            
             return;
         }
         
@@ -1725,7 +1693,6 @@ public class DefaultActionHandler implements ActionHandler {
                         tmp = new Component[compsToSubmit.length + compsToAdd.length];
                         if (compsToAdd.length > 1) {
                             LogWriter.writeFormLog("(internal only) SubmitForm multipul components with same name", FormStream.debugUnimplemented);
-                            //<start-demo><end-demo>
                         }
                         for (int k = 0; i < tmp.length; k++) {
                             if (k < compsToSubmit.length) {
@@ -1751,7 +1718,6 @@ public class DefaultActionHandler implements ActionHandler {
                         text.append(((AbstractButton) aCompsToSubmit).getText());
                     } else if (aCompsToSubmit != null) {
                         LogWriter.writeFormLog("(internal only) SubmitForm field form type not accounted for", FormStream.debugUnimplemented);
-                        //<start-demo><end-demo>
                     }
                 }
             }
@@ -1760,11 +1726,7 @@ public class DefaultActionHandler implements ActionHandler {
             try {
                 BrowserLauncher.openURL(submitURL + "?en&q=" + text);
             } catch (final Exception e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
     }

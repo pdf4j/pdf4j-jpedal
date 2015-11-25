@@ -181,8 +181,7 @@ public class GUIDisplay implements Display{
             case TURNOVER_ON:
                 return multiDisplayOptions.isTurnoverOn();
             default:
-                //
-                return false;
+                throw new RuntimeException("GetBoolean called with unknown value "+option);
         }
     }
 
@@ -196,7 +195,7 @@ public class GUIDisplay implements Display{
                 multiDisplayOptions.setTurnoverOn(value);
                 return;
             default:
-                //
+                throw new RuntimeException("setBoolean called with unkown value "+value);
         }
     }
     

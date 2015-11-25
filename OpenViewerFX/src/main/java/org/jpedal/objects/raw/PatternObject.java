@@ -239,11 +239,7 @@ public class PatternObject extends XObject {
             }
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
@@ -438,8 +434,6 @@ public class PatternObject extends XObject {
 //                break;
             
     //    }
-
-        //
 
         //convert
         switch(mode){

@@ -281,13 +281,6 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
                     t_y2 = mediaH - cropY;
                 }
 
-                //<start-demo>
-                /**
-                  <end-demo>
-                if(GUI.showMessages)
-                    currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.FindDemo"));
-                textToFind=null;
-                /**/
                 int searchType = SearchType.DEFAULT;
 
                 final int caseSensitiveOption = currentGUI.showConfirmDialog(Messages.getMessage("PdfViewercase.message"),

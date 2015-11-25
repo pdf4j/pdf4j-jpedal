@@ -91,10 +91,7 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
 				return openFiles(files);
 			}
 		} catch (final Exception e) {
-			//
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception attempting to import data " + e);
-            }
+			LogWriter.writeLog("Exception attempting to import data " + e);
         }
 		
 		return false;
@@ -146,7 +143,7 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
                     try {
                         currentCommands.handleTransferedFile(file);
                     } catch (final Exception e) {
-                        //
+                        LogWriter.writeLog("Exception e "+e.getMessage());
 
                         final int result;
                         if (allowedFiles.size() == 1) {
@@ -164,10 +161,7 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
                                 try {
                                     internalFrame.setClosed(true);
                                 } catch (final PropertyVetoException f) {
-                                    //
-                                    if (LogWriter.isOutput()) {
-                                        LogWriter.writeLog("Exception attempting getframes" + e);
-                                    }
+                                    LogWriter.writeLog("Exception attempting getframes" + e);
                                 }
                                 break;
                             }

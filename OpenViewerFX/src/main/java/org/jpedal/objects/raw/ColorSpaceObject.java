@@ -300,23 +300,17 @@ public class ColorSpaceObject extends PdfObject {
                             
                         }
                     
-
                     break;
 
             }
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
         switch(pdfKeyType){
 
-        
         case PdfDictionary.Alternate:
         	Alternate=PDFvalue;
     		break;
@@ -588,8 +582,6 @@ public class ColorSpaceObject extends PdfObject {
 //                break;
 
       //  }
-
-        //
 
         //convert
         switch(mode){

@@ -132,11 +132,7 @@ public class SoundHandler {
             
             line.open(ais.getFormat());
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         line.start();
@@ -147,12 +143,9 @@ public class SoundHandler {
             try {
                 nBytesRead = ais.read(abData, 0, abData.length);
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
+            
             if (nBytesRead >= 0) {
                 // do not comment out this line -> (no code == no sound)
                 line.write(abData, 0, nBytesRead);

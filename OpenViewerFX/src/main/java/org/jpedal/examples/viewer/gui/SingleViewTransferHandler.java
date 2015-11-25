@@ -42,6 +42,7 @@ import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.exception.PdfException;
 import org.jpedal.gui.GUIFactory;
+import org.jpedal.utils.LogWriter;
 
 public class SingleViewTransferHandler extends BaseTransferHandler{
 
@@ -75,7 +76,7 @@ public class SingleViewTransferHandler extends BaseTransferHandler{
 				}
 			}
 		} catch (final Exception e) {
-			//
+			LogWriter.writeLog("Exception e "+e.getMessage());
 			return false;
 		}
 		

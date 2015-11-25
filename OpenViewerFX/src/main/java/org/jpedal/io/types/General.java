@@ -216,10 +216,6 @@ public class General {
                             System.out.println(padding + "Data not yet loaded");
                         }
 
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("[Linearized] " + objRef + " not yet available (4)");
-                        }
-
                         i=length;
                         break;
                     }
@@ -329,11 +325,7 @@ public class General {
                 jj = Dictionary.readDictionaryFromRefOrDirect(-1,pdfObject, objRef,jj , data, PDFkeyInt,objectReader);
 
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
             //tests after isNUmber ensure we handle /N << /1 15 0 R /Off 16 0 R>> in next test
         }else if(isNumber && (pdfObject.getID()!=4384 ||( PDFkeyInt != PdfDictionary.D && PDFkeyInt != PdfDictionary.N && PDFkeyInt != PdfDictionary.R))){

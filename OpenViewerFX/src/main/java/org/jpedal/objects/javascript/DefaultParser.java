@@ -103,8 +103,6 @@ public class DefaultParser implements ExpressionEngine
             return messageCode;
         }
 
-        //
-
         if(js.startsWith("AFSpecial_")) {
             new AFSpecial(acro, formObject).execute(js, args, type, eventType, keyPressed);
         } else if(command.startsWith("AFPercent_")) {

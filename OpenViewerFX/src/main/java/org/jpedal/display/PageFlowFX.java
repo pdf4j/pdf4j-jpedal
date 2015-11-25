@@ -753,11 +753,7 @@ public class PageFlowFX extends AnchorPane{
                     try {
                         Thread.sleep(40); // 25fps
                     } catch (final Exception e) {
-                        //tell user and log
-                        if (LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
 
                     //Pick up if destination changed
@@ -809,11 +805,7 @@ public class PageFlowFX extends AnchorPane{
             return SwingFXUtils.toFXImage(result, new WritableImage(result.getWidth(), result.getHeight()));
 
         } catch (final Exception e) {
-            //tell user and log
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         return null;
     }
@@ -845,11 +837,7 @@ public class PageFlowFX extends AnchorPane{
                 try {
                     Thread.sleep(100);
                 } catch (final InterruptedException e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -927,11 +915,7 @@ public class PageFlowFX extends AnchorPane{
                             }
                             pagesInMemory--;
 
-                            //tell user and log
-                            if (LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                            //
+                            LogWriter.writeLog("Exception: " + e.getMessage());
                         }
                     }
 
@@ -978,11 +962,7 @@ public class PageFlowFX extends AnchorPane{
                                 Thread.sleep(10);
                             } catch (final InterruptedException e) {
 
-                                //tell user and log
-                                if (LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception: " + e.getMessage());
-                                }
-                                //
+                                LogWriter.writeLog("Exception: " + e.getMessage());
                             }
                         }
                     }

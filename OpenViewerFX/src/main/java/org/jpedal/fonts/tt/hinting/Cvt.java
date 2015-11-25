@@ -34,6 +34,7 @@ package org.jpedal.fonts.tt.hinting;
 
 import org.jpedal.fonts.tt.Table;
 import org.jpedal.fonts.tt.FontFile2;
+import org.jpedal.utils.LogWriter;
 
 
 public class Cvt extends Table {
@@ -88,10 +89,9 @@ public class Cvt extends Table {
     public void putInPixels(final int key, final int value) {
         if (key >= 0 && key < cvt.length) {
             cvt[key] = value;
-        }else {
-            //
+        }else if(LogWriter.isRunningFromIDE){
+            System.err.println("Cvt.putInPixels(): Key out of range. (" + key + ')');
         }
-
     }
 
     /**
@@ -103,10 +103,9 @@ public class Cvt extends Table {
         value = (int)((value*scale)+0.5);
         if (key >= 0 && key < cvt.length) {
             cvt[key] = value;
-        }else {
-            //
+        }else if(LogWriter.isRunningFromIDE){
+            System.err.println("Cvt.putInFUnits(): Key out of range. (" + key + ')');
         }
-
     }
 
     /**
@@ -117,13 +116,19 @@ public class Cvt extends Table {
     public int get(final int key) {
         if (key >= 0 && key < cvt.length) {
             return cvt[key];
-        }else if (!messageDisplayed){ //only for first case
-            //
+        }else if (!messageDisplayed && LogWriter.isRunningFromIDE){ //only for first case
+            System.err.println("Cvt.get(): Key out of range. ("+key+ ')');
             messageDisplayed=true;
         }
 
         return 0;
     }
 
-    //<start-demo><end-demo>
+    String[] getCVTForDebug() {
+        final String[] result = new String[cvt.length];
+        for (int i=0; i<cvt.length; i++) {
+            result[i] = i+": "+cvt[i]+"       ("+ java.text.NumberFormat.getNumberInstance().format(cvt[i] / 64d)+ ')';
+        }
+        return result;
+    }
 }

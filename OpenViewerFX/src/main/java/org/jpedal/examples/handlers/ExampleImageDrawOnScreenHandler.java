@@ -40,6 +40,7 @@ import org.jpedal.color.ColorSpaces;
 import java.awt.image.*;
 import java.awt.geom.AffineTransform;
 import java.awt.*;
+import org.jpedal.utils.LogWriter;
 
 /**
  * example code to plugin external image handler. Code to enable commented out in Viewer
@@ -107,7 +108,7 @@ public class ExampleImageDrawOnScreenHandler implements org.jpedal.external.Imag
 						}catch(final Error err){
 							imageProcessed=false;
 
-							//
+							LogWriter.writeLog("Exception e "+err.getMessage());
 						}
 					
 					if(imageProcessed){

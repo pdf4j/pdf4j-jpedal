@@ -291,11 +291,7 @@ public class Summary extends javax.swing.JPanel {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }//GEN-LAST:event_showCertificate
 

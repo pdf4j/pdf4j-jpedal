@@ -209,11 +209,7 @@ public class JavaFXSummary extends javafx.scene.layout.Pane{
                     keyDescription, publicKey, x509Data, sha1Digest, md5Digest);
 
        }catch(final Exception e){
-            //tell user and log
-           if(LogWriter.isOutput()) {
-               LogWriter.writeLog("Exception: " + e.getMessage());
-           }
-           //
+            LogWriter.writeLog("Exception: " + e.getMessage());
        }
 
 

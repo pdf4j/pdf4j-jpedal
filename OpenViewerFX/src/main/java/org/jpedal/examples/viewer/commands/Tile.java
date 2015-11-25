@@ -89,11 +89,7 @@ public class Tile {
                         }
                     }
                 } catch (final PropertyVetoException e) {
-                    //
-                    
-                     if(LogWriter.isOutput()) { 
-                         LogWriter.writeLog("Exception attempting to set size" + e); 
-                     } 
+                    LogWriter.writeLog("Exception attempting to set size" + e); 
                 }
             }
         }

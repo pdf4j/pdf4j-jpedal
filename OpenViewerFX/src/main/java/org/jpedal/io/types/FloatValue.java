@@ -36,7 +36,6 @@ import static org.jpedal.io.ObjectDecoder.debugFastCode;
 import static org.jpedal.io.ObjectDecoder.padding;
 import org.jpedal.io.PdfFileReader;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
 
 /**
@@ -95,7 +94,6 @@ public class FloatValue {
             }
             
             if(raw[i]!=82){ //we are expecting R to end ref
-                //
                 throw new RuntimeException("3. Unexpected value in file - please send to IDRsolutions for analysis");
             }
             
@@ -108,10 +106,6 @@ public class FloatValue {
                 
                 if(debugFastCode) {
                     System.out.println(padding + "Data not yet loaded");
-                }
-                
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (3)");
                 }
                 
                 i=length;

@@ -50,7 +50,7 @@ public class BlendMode implements Composite{
         this.blendMode=blendMode;
         this.alpha=alpha;
     }
-     
+    
     @Override
     public CompositeContext createContext(final ColorModel srcColorModel, final ColorModel dstColorModel, final RenderingHints hints) {
         

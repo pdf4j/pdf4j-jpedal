@@ -64,7 +64,7 @@ public interface PdfDecoderInt {
     /**
      * build number of this version
      */
-    String version = "6.6b16";
+    String version = "6.7.25";
     /**
      * flag to show extraction mode should include any text
      */
@@ -195,8 +195,8 @@ public interface PdfDecoderInt {
      */
     PdfGroupingAlgorithms getBackgroundGroupingObject();
 
-    //
-
+    Document getMarkedContent();
+    
     boolean isOpen();
 
     int getDisplayRotation();
@@ -290,7 +290,7 @@ public interface PdfDecoderInt {
 
     void setExtractionMode(int mode, float scaling);
     
-    //
+    void setHardwareAccelerationforScreen(boolean useAcceleration);
     
     DPIFactory getDPIFactory();
 

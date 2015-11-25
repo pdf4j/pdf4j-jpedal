@@ -168,11 +168,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
                     but.setBackground(new Color(0, 0, 0, 0));
                     but.setIcon(new FixImageIcon(form, icon, 0));
                 } catch (final Exception e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -234,11 +230,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
                     but.setBackground(new Color(0, 0, 0, 0));
                     but.setIcon(new FixImageIcon(form, icon, 0));
                 } catch (final Exception e) {
-                    //tell user and log
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -318,9 +310,6 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
                     return createAnnotationInk(form);
                 case PdfDictionary.StrickOut :
                     return createAnnotationStrikeOut(form);
-                default:
-                    //
-                    break;
             }
         }
         
@@ -752,7 +741,10 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
             comboBox.setEnabled(false);
         }
         
-        // <start-demo><end-demo>
+        if(org.jpedal.DevFlags.GUITESTINGINPROGRESS){
+            final javax.swing.text.Caret c = ((JTextField)comboBox.getEditor().getEditorComponent()).getCaret();
+            c.setBlinkRate(0);
+        }
         
         //listener to keep synced
         comboBox.addItemListener(new ComboListener(comboBox,form));
@@ -1171,8 +1163,10 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
             textcomp.setHorizontalAlignment(form.getAlignment());
         }
         
-        // <start-demo><end-demo>
-        
+        if(org.jpedal.DevFlags.GUITESTINGINPROGRESS){
+            final javax.swing.text.Caret c = textcomp.getCaret();
+            c.setBlinkRate(0);
+        }
         
         /**
          * ensure we sync back to FormObject if altered
@@ -1498,7 +1492,10 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         
         setupMouseListener(comp, form);
         
-        // <start-demo><end-demo>
+        if(org.jpedal.DevFlags.GUITESTINGINPROGRESS && comp instanceof javax.swing.text.JTextComponent){
+            final javax.swing.text.Caret c = ((javax.swing.text.JTextComponent) comp).getCaret();
+            c.setBlinkRate(0);
+        }
     }
     
     /**

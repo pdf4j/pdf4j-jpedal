@@ -79,23 +79,14 @@ public class Javascript {
 				else {
                     final GenericParser genericParser = new GenericParser(this);
 					jsParser = genericParser;
-                    // <end-demo>
+                    //genericParser.setGUIFactory((org.jpedal.gui.GUIFactory) swingGUI);
                     genericParser.setupPDFObjects(this);
 				}
 
             }catch(final Error err){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Error: " + err.getMessage());
-                }
-                //
+                LogWriter.writeLog("Error: " + err.getMessage());
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
-
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
 

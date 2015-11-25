@@ -33,11 +33,14 @@
 
 package org.jpedal.examples.viewer.commands.javafx;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.io.File;
 import java.io.IOException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -54,6 +57,7 @@ import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXDialog;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.Messages;
 
 /**
  * This class is a JavaFX specific class to hold the JavaFX code for
@@ -69,26 +73,93 @@ public class JavaFXExtractSelectionAsImage extends GUIExtractSelectionAsImage {
         
         final VBox pane = new VBox();
         final FXDialog dialog = new FXDialog((Stage)currentGUI.getFrame(), Modality.APPLICATION_MODAL, pane);
+        dialog.setTitle(Messages.getMessage("PdfViewerMessage.SaveImage"));
         dialog.setResizeable(false);
+        String style = null;
+        
         //wrap image so we can display
-        if( snapShot != null ){
+        if (snapShot != null) {
+
+            final HBox imgBox = new HBox();
+            imgBox.setAlignment(Pos.CENTER);
+
+            String propValue = currentGUI.getProperties().getValue("replacePdfDisplayBackground");
+            if (!propValue.isEmpty()
+                    && propValue.equalsIgnoreCase("true")) {
+                //decode_pdf.useNewGraphicsMode = false;
+                propValue = currentGUI.getProperties().getValue("pdfDisplayBackground");
+
+                int col = Integer.parseInt(propValue);
+                final int r = ((col >> 16) & 255);
+                final int g = ((col >> 8) & 255);
+                final int b = ((col) & 255);
+                style = "-fx-background-color:rgb(" + r + ',' + g + ',' + b + ");";
+
+            } else {
+
+                if (decode_pdf.getDecoderOptions().getDisplayBackgroundColor() != null) {
+                    int col = decode_pdf.getDecoderOptions().getDisplayBackgroundColor().getRGB();
+                    final int r = ((col >> 16) & 255);
+                    final int g = ((col >> 8) & 255);
+                    final int b = ((col) & 255);
+                    style = "-fx-background-color:rgb(" + r + ',' + g + ',' + b + ");";
+                } else if (decode_pdf.useNewGraphicsMode()) {
+                    style = "-fx-background-color:#555565;";
+                } else {
+                    style = "-fx-background-color:#190190190;";
+                }
+            }
+
             //IconiseImage icon_image = new IconiseImage( snapShot );
             final ImageView imv1 = new ImageView();
             imv1.setImage(SwingFXUtils.toFXImage(snapShot, null));
             dialog.setWidth(imv1.getImage().getWidth());
-            dialog.setHeight(imv1.getImage().getHeight()+50);
+            dialog.setHeight(imv1.getImage().getHeight() + 50);
             //add image to pane if there is one
-            pane.getChildren().add(imv1);
-        }else{
+            imgBox.getChildren().add(imv1);
+            imgBox.setPadding(new Insets(5));
+            imgBox.setStyle(style);
+            pane.getChildren().add(imgBox);
+        } else {
             return;
         }
         
         final HBox btnBox = new HBox();
-        final Button saveBtn = new Button("Save");
-        final Button cancelBtn = new Button("Cancel");
-        btnBox.getChildren().addAll(saveBtn, cancelBtn);
-        btnBox.setAlignment(Pos.BOTTOM_RIGHT);
+        final Button copyBtn = new Button(Messages.getMessage("PdfSnapshotPreview.Copy"));
+        final Button saveBtn = new Button(Messages.getMessage("PdfSnapshotPreview.Save"));
+        final Button cancelBtn = new Button(Messages.getMessage("PdfSnapshotPreview.Cancel"));
+        btnBox.getChildren().addAll(copyBtn, saveBtn, cancelBtn);
+        btnBox.setAlignment(Pos.BOTTOM_CENTER);
+        btnBox.setSpacing(5);
+        btnBox.setPadding(new Insets(5));
+        
+        //Set colors for display
+        if(style!=null){
+            btnBox.setStyle(style);
+        }
+        
+        //Prevent button resize from hiding text
+        copyBtn.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+        saveBtn.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+        cancelBtn.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+        
         pane.getChildren().add(btnBox);
+        
+        //Ensure window is never so small as to hide buttons
+        dialog.getDialog().sizeToScene();
+        
+        copyBtn.setPrefWidth(BUTTONWIDTH);
+        copyBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override 
+            public void handle(final ActionEvent t) {
+                
+            dialog.getDialog().hide();
+
+            ClipboardImage clipboardImage = new ClipboardImage(snapShot);
+            Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            c.setContents(clipboardImage, null);
+            }
+        });
         
         saveBtn.setPrefWidth(BUTTONWIDTH);
         saveBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -126,9 +197,7 @@ public class JavaFXExtractSelectionAsImage extends GUIExtractSelectionAsImage {
                             try {
                                 DefaultImageHelper.write(snapShot, format, outName.toString());
                             } catch (IOException ex) {
-                                if (LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception in writing image " + ex);
-                                }
+                                LogWriter.writeLog("Exception in writing image " + ex);
                             }
                         }
                     }

@@ -56,15 +56,6 @@ public class Help {
         if (args == null) {
             getHelpBox(currentGUI);
         }
-
-//        if(args==null){
-//            try {
-//                BrowserLauncher.openURL("https://idrsolutions.fogbugz.com/default.asp?support");
-//            } catch (IOException e1) {
-//                currentGUI.showMessageDialog("Please visit https://idrsolutions.fogbugz.com/default.asp?support");
-//                //
-//            }
-//        }
     }
 
     private static void getHelpBox(final GUIFactory currentGUI) {
@@ -138,11 +129,9 @@ public class Help {
 //                errorPanel.add(textArea);
 //
 //                showMessageDialog(errorPanel,"Error loading web browser",JOptionPane.PLAIN_MESSAGE);
-                    //
-                    
-                     if(LogWriter.isOutput()) { 
-                         LogWriter.writeLog("Exception attempting launch browser: " + e1); 
-                     } 
+                  
+                LogWriter.writeLog("Exception attempting launch browser: " + e1); 
+                
                 }
             }
 

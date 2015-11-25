@@ -32,13 +32,12 @@
  */
 package org.jpedal.io;
 
+import org.jpedal.jbig2.io.JBIG2;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-//
 import org.jpedal.io.filter.*;
-import org.jpedal.jbig2.*;
 
 import org.jpedal.objects.raw.*;
 import org.jpedal.utils.LogWriter;
@@ -211,19 +210,14 @@ public class PdfFilteredReader {
     						data=new byte[ptr];    						
     						System.arraycopy(tmp, 0, data, 0, ptr);
     					}
-//    					//
-                        data=JBIG2.JBIGDecode(data, globalData);
-                        
-                        /**/
-    					
+
+                        data=JBIG2.JBIGDecode(data, globalData,ObjectStore.temp_dir);
+                       
     					streamCache.write(data);
     					data=null;
     					
-    				}else{
-    					//
-    			        data=JBIG2.JBIGDecode(data, globalData);
-    			        
-    			        /**/    					
+    				}else{    					
+    			        data=JBIG2.JBIGDecode(data, globalData,ObjectStore.temp_dir);   			        					
     				}
 
                     filter = null;
@@ -251,11 +245,7 @@ public class PdfFilteredReader {
 
                     }catch(final Exception ee){
 
-                    	if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception " + ee + " in " + getFilterName(filterType) + " decompression");
-                        }
-                        
-                        ee.printStackTrace();
+                    	LogWriter.writeLog("Exception " + ee + " in " + getFilterName(filterType) + " decompression");
                         
                         if(resetDataToNull) {
                             data = null;

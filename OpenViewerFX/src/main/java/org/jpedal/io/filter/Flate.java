@@ -128,10 +128,8 @@ public class Flate extends BaseFilter implements PdfFilter{
                     failed=false;
                 }catch(final Exception ee){
                 	
-                	if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception in Flate "+ee);
-                    }
-
+                	LogWriter.writeLog("Exception in Flate "+ee);
+                    
                     failed=true;
 
                     hasError=true;
@@ -148,7 +146,6 @@ public class Flate extends BaseFilter implements PdfFilter{
                     }
                 }
             }
-
 
             data = bos.toByteArray();
 
@@ -204,11 +201,7 @@ public class Flate extends BaseFilter implements PdfFilter{
                 }
 
             } catch (final Exception e) {
-                e.printStackTrace();
-                
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " accessing Flate filter ");
-                }
+                LogWriter.writeLog("Exception " + e + " accessing Flate filter ");
             }finally {
                 if(inf!=null){
                     inf.close();

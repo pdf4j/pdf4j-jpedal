@@ -299,7 +299,82 @@ public class TTGraphicsState implements Cloneable, Serializable {
         controlValueTableCutIn=68;
     }
 
+    private static String getVectorAsString(final int vector) {
+        final int[] v = getVectorComponents(vector);
+        return TTVM.getDoubleFromF2Dot14(v[0])+", "+TTVM.getDoubleFromF2Dot14(v[1]);
+    }
 
-    //
+    public String getRoundStateAsString() {
+        switch(roundState) {
+            case g:     return "Grid";
+            case hg:    return "HalfGrid";
+            case dg:    return "DoubleGrid";
+            case dtg:   return "DownToGrid";
+            case utg:   return "UpToGrid";
+            case off:   return "Off";
+        }
 
+        //Get period
+        int p = (roundState >> 6) & 3;
+        final String period;
+        if (p==0) {
+            period = "Period:HalfPixel";
+        } else if (p==1) {
+            period = "Period:OnePixel";
+        } else {
+            period = "Period:TwoPixels";
+        }
+
+        //Get phase
+        p = (roundState >> 4) & 3;
+        final String phase;
+        if (p==0) {
+            phase = "Phase:0";
+        } else if (p==1) {
+            phase = "Phase:Period/4";
+        } else if (p==2) {
+            phase = "Phase:Period/2";
+        } else {
+            phase = "Phase:Period*(3/4)";
+        }
+
+        //Get threshold
+        p = roundState & 15;
+        final String threshold;
+        if (p==0) {
+            threshold = "Threshold:Period-1";
+        } else {
+            threshold = "(" + (p-4) + "/8)" + "*Period";
+        }
+
+        return '(' + period + ',' + phase + ',' + threshold + ')';
+    }
+
+    /**
+     * Returns a string containing details of the graphics state.
+     * @return TTGraphicsState details
+     */
+    @Override
+    public String toString() {
+        return "org.jpedal.fonts.tt.hinting.TTGraphicsState[" +
+                "zp0=" + (zp0==TTVM.GLYPH_ZONE ? "GLYPH" : "TWILIGHT") +
+                ",zp1=" + (zp1==TTVM.GLYPH_ZONE ? "GLYPH" : "TWILIGHT") +
+                ",zp2=" + (zp2==TTVM.GLYPH_ZONE ? "GLYPH" : "TWILIGHT") +
+                ",rp0=" + rp0 +
+                ",rp1=" + rp1 +
+                ",rp2=" + rp2 +
+                ",freedomVector=(" + getVectorAsString(freedomVector) + ')' +
+                ",projectionVector=(" + getVectorAsString(projectionVector) + ')' +
+                ",dualProjectionVector=(" + getVectorAsString(dualProjectionVector) + ')' +
+                ",instructControl=" + instructControl +
+                ",autoFlip=" + autoFlip +
+                ",deltaBase=" + deltaBase +
+                ",deltaShift=" + deltaShift +
+                ",loop=" + loop +
+                ",roundState=" + getRoundStateAsString() +
+                ",minimumDistance=" + minimumDistance +
+                ",controlValueTableCutIn=" + controlValueTableCutIn +
+                ",singleWidthCutIn=" + singleWidthCutIn +
+                ",singleWidthValue=" + singleWidthValue + ']';
+    }
 }

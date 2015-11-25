@@ -107,11 +107,8 @@ public class ImageInputStreamFileBuffer implements RandomAccessBuffer {
   		pdfByteArray = os.toByteArray();
   		
   	} catch (final IOException e) {
-  		e.printStackTrace();
-  		if(LogWriter.isOutput()) {
-              LogWriter.writeLog("[PDF] Exception " + e + " getting byte[] for " + fileName);
-          }
-  	}
+  		LogWriter.writeLog("[PDF] Exception " + e + " getting byte[] for " + fileName);
+    }
   	
   	return pdfByteArray;
   }

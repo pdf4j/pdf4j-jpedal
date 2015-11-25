@@ -10,21 +10,7 @@
  *
  * This file is part of JPedal/JPDF2HTML5
  *
-     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+ @LICENSE@
  *
  * ---------------
  * CMYKtoRGB.java
@@ -50,11 +36,11 @@ public class CMYKtoRGB {
         return decode(cmyk, w, h);
     }
 
-    public static BufferedImage decode(final byte[] rasData, final int w, final int h) {
+    private static BufferedImage decode(final byte[] rasData, final int w, final int h) {
+        
         final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         int[] imageData = ((java.awt.image.DataBufferInt) image.getRaster().getDataBuffer()).getData();
         
-        //
         
         final java.awt.color.ColorSpace CMYK = DeviceCMYKColorSpace.getColorSpaceInstance();
         int dim = w * h;
@@ -73,8 +59,6 @@ public class CMYKtoRGB {
             imageData[i] = (r << 16) | (g << 8) | b;
         }
         return image;
-        /**/
         
     }
-
 }

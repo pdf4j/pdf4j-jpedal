@@ -44,6 +44,8 @@ import org.jpedal.utils.repositories.*;
 
 public abstract class BaseTTGlyph {
 
+    boolean hasHintingApplied=false;
+        
     /**paths for the letter, marked as transient so it wont be serialized */
     transient Vector_Path paths=new Vector_Path(10);
 
@@ -271,9 +273,7 @@ public abstract class BaseTTGlyph {
 
                     ttHintingRequired = true;
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("TrueType hinting probably required for font " + baseFontName);
-                    }
+                    LogWriter.writeLog("TrueType hinting probably required for font " + baseFontName);
                 }
             }
 
@@ -378,9 +378,12 @@ public abstract class BaseTTGlyph {
             final boolean WE_HAVE_A_TWO_BY_TWO=(flag & 128) ==128;
             WE_HAVE_INSTRUCTIONS = WE_HAVE_INSTRUCTIONS || (flag & 256) == 256;
 
-            //<start-demo><end-demo>
-
-
+            if (LogWriter.isRunningFromIDE && (flag & 0x800)==0x800) {
+                System.out.println("{internal only} This file contains an OpenType font with a flag specifying mac style");
+                System.out.println("composite scaling should be used. Look in TTGlyph.readComplexGlyph() - details are");
+                System.out.println("on FontForge's website. (Search for TrueType Composites differences.)");
+            }
+            
             if (ARG_1AND_2_ARE_WORDS && ARGS_ARE_XY_VALUES){
                 //1st short contains the value of e
                 //2nd short contains the value of f
@@ -738,9 +741,7 @@ public abstract class BaseTTGlyph {
         catch(final Exception e){
             //System.err.println("error occured while reading TTGlyph bytes");
             //there are many files in which the glyph length is not matched with specification
-            if (LogWriter.isOutput()) {
-                LogWriter.writeLog("Caught an Exception while reading TTGlyph bytes" + e);
-            }
+            LogWriter.writeLog("Caught an Exception while reading TTGlyph bytes" + e);
         }
     }
 
@@ -974,6 +975,8 @@ public abstract class BaseTTGlyph {
         vm.setScaleVars(scaler, pixelSize, (pixelSize*72)/96);
         vm.processGlyph(instructions, allX, allY, allOnCurve, allEndOfContour);
 
+        hasHintingApplied=true;
+        
         //Split back into individual glyphs and create paths
         clearPaths();
 
@@ -994,12 +997,6 @@ public abstract class BaseTTGlyph {
             createPaths(thisX,thisY,onCurve,endOfContour,endIndex);
             offset += componentLengths[i];
         }
-
+        
     }
-
-
-
-
-
-
 }

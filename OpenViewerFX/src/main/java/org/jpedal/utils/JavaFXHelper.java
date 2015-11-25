@@ -57,9 +57,7 @@ public class JavaFXHelper {
                 if (tryToLoadFX()) {
                     javaFXAvailable = true;
                 } else {
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("JavaFX Unavailable. Exception "+e);
-                    }
+                    LogWriter.writeLog("JavaFX Unavailable. Exception "+e);
                     
                     javaFXAvailable = false;
                 }
@@ -69,9 +67,7 @@ public class JavaFXHelper {
                 if (tryToLoadFX()) {
                     javaFXAvailable = true;
                 } else {
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("JavaFX Unavailable. Exception "+e);
-                    }
+                    LogWriter.writeLog("JavaFX Unavailable. Exception "+e);
                     
                     javaFXAvailable = false;
                 }
@@ -101,9 +97,8 @@ public class JavaFXHelper {
             return true;
         } catch (final Exception e) {
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in handling JavaFX "+e);
-            }
+            LogWriter.writeLog("Exception in handling JavaFX "+e);
+            
             return false;
         }
     }

@@ -119,15 +119,11 @@ public class JavaFXExit {
 
             properties.writeDoc();
         } catch (final Exception e1) {
-            //<start-demo><end-demo>
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception attempting to Write proterties: " + e1);
-            } 
+            LogWriter.writeLog("Exception attempting to Write proterties: " + e1);
         }
 
         //formClickTest needs this so that it does not exit after first test.
-        // <start-demo><end-demo>
-             if(!Viewer.exitOnClose){/**/
+        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !Viewer.exitOnClose) {
             currentGUI.dispose();
           
         } else {

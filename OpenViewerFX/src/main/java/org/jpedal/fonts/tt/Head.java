@@ -56,10 +56,8 @@ public class Head extends Table {
 		
 		//read 'head' table
 		if(startPointer==0){
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No head table found");
-            }
-		}else{
+			LogWriter.writeLog("No head table found");
+        }else{
 			
 			currentFontFile.getNextUint32(); //id
 			

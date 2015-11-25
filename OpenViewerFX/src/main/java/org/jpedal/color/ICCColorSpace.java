@@ -110,17 +110,15 @@ extends GenericColorSpace {
         
         if (icc_data == null){
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Error in ICC data");
-            }
+            LogWriter.writeLog("Error in ICC data");
+            
         }else {
             try{
                 cs = new ICC_ColorSpace(ICC_Profile.getInstance(icc_data));
                 type=cs.getType();
             }catch(final Exception e){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] Problem "+e.getMessage()+" with ICC data ");
-                }
+                LogWriter.writeLog("[PDF] Problem "+e.getMessage()+" with ICC data ");
+                
                 failed=true;
             }
         }
@@ -237,9 +235,8 @@ extends GenericColorSpace {
                 //file with invalid values appears to work if we just replace
                 values=new float[]{values[0],values[0],values[0]};
 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Invalid ICC values "+ee);
-                }
+                LogWriter.writeLog("Invalid ICC values "+ee);
+                
             }
             currentColor=new PdfColor(values[0],values[1],values[2]);
             
@@ -419,12 +416,8 @@ extends GenericColorSpace {
             
         }catch(final Exception e){
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem with color conversion "+e);
-            }
-            
-            //
-            
+            LogWriter.writeLog("Problem with color conversion "+e);
+           
         }finally{
             
             try {
@@ -433,9 +426,7 @@ extends GenericColorSpace {
                 iin.close();
             } catch (final Exception ee) {
                 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Problem closing  " + ee);
-                }
+                LogWriter.writeLog("Problem closing  " + ee);
             }
         }
         return image;

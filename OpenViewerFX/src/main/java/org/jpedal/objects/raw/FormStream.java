@@ -307,13 +307,8 @@ public class FormStream {
                 }
 
     		}catch(final Exception e){
-    			System.out.println("Exception "+e+" reading resources in XForm");
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
-    		}
+    			LogWriter.writeLog("Exception: " + e.getMessage());
+            }
 
             /**decode the stream*/
     		final byte[] commands=XObject.getDecodedStream();
@@ -567,19 +562,12 @@ public class FormStream {
             return aa;
 
     	}catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
+        
     		return null;
     	}catch(final Error e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Error: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Error: " + e.getMessage());
+            
             if (ExternalHandlers.throwMissingCIDError && e.getMessage()!=null && e.getMessage().contains("kochi")) {
                 throw e;
             }
@@ -618,12 +606,8 @@ public class FormStream {
                 }
 	
 			}catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
-			}
+                LogWriter.writeLog("Exception: " + e.getMessage());
+            }
 	
 	        /**decode the stream*/
 			final byte[] commands=Xobject.getDecodedStream();
@@ -640,20 +624,12 @@ public class FormStream {
 			
 			return textString;
     	}catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
+            
     		return null;
     	}catch(final Error e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Error: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Error: " + e.getMessage());
+            
             if (ExternalHandlers.throwMissingCIDError && e.getMessage()!=null && e.getMessage().contains("kochi")) {
                 throw e;
             }
@@ -946,8 +922,6 @@ public class FormStream {
                 if(!showFontMessage){
                     showFontMessage=true;
                     LogWriter.writeFormLog("{stream} Unknown FONT command "+tokenValues[i]+ ' ' +i+" string="+fontStream,debugUnimplemented);
-
-                    //<start-demo><end-demo>
                 }
             }
         }

@@ -90,7 +90,8 @@ public class JavaFXExtractText extends GUIExtractText {
          * ensure co-ords in right order
          */
         if (highlights == null) {
-            //
+            currentGUI.showMessageDialog("There is no text selected.\nPlease highlight the text you wish to extract.", "No Text selected", FXMessageDialog.ERROR_MESSAGE);
+           
             return;
         }
 

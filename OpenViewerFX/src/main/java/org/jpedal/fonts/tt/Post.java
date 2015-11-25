@@ -95,9 +95,7 @@ public class Post extends Table {
 		//System.out.println(startPointer);
 		//read 'head' table
 		if(startPointer==0){
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No Post table found");
-            }
+			LogWriter.writeLog("No Post table found");
 		}else{
 			
 			//read format (actually 1,2,2.5 but multiplied so switch works

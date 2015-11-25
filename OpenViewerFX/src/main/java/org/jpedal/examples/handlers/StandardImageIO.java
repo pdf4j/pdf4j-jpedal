@@ -86,18 +86,11 @@ public class StandardImageIO implements ImageHelper {
             //image = ImageIO.read(in);
             //in.close();
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         } catch (final Error err) {
             
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Error: " + err.getMessage());
-            }
-            //
+            LogWriter.writeLog("Error: " + err.getMessage());
+            
             throw new RuntimeException("Error " + err + " loading "+file_name+" with ImageIO");
             
         }
@@ -159,10 +152,7 @@ public class StandardImageIO implements ImageHelper {
 
         }catch(final Exception e){
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to find jars on classpath "+e);
-            }
-
+            LogWriter.writeLog("Unable to find jars on classpath "+e);
         }finally{
             if(in!=null) {
                 in.close();

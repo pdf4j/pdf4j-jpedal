@@ -84,9 +84,8 @@ final float t0;
             inversed = xform.createInverse();
         } catch (NoninvertibleTransformException ex) {
             
-            if(LogWriter.isOutput()){
-                LogWriter.writeLog("Exception "+ex+ ' ');
-            }
+            LogWriter.writeLog("Exception "+ex+ ' ');
+            
             if(inversed==null){
                 inversed = new AffineTransform();
             }

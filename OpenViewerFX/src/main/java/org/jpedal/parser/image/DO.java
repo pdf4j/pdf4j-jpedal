@@ -70,28 +70,22 @@ public class DO extends ImageDecoder {
         }
 
         try {
-            //
-            {
+            
+            // Internal tests can disable images to speed up conversion
+            if (System.getProperty("testsDisableImages") == null) {
                 processXImage(name, name, key, XObject);
             }
 
         } catch (final Error e) {
 
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Error: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Error: " + e.getMessage());
+            
             parserOptions.imagesProcessedFully=false;
             errorTracker.addPageFailureMessage("Error " + e + " in DO");
         } catch (final Exception e) {
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e);
-            }
-
-            //<start-demo><end-demo>
+            LogWriter.writeLog("Exception " + e);
+            
             parserOptions.imagesProcessedFully=false;
             errorTracker.addPageFailureMessage("Error " + e + " in DO");
         }
@@ -182,10 +176,7 @@ public class DO extends ImageDecoder {
                             try {
                                 generateTransformedImageSingle(image, name);
                             } catch (final Exception e) {
-
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception " + e + " on transforming image in file");
-                                }
+                                LogWriter.writeLog("Exception " + e + " on transforming image in file");
                             }
                         }
                     }

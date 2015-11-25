@@ -64,6 +64,8 @@ public class ExternalHandlers {
     
     private static final boolean isXFAPresent;
     
+    private static boolean ULCSupport=false;
+    
     static {
         
         loader = ExternalHandlers.class.getClassLoader();
@@ -79,11 +81,14 @@ public class ExternalHandlers {
                 
                 javaFXSupport=null;
                 
-                if(LogWriter.isOutput()){
-                    LogWriter.writeLog("[PDF] Unable to instance FX "+ex);
-                } 
+                LogWriter.writeLog("[PDF] Unable to instance FX "+ex);
             }
         }
+        
+        /**
+         * ulc
+         */
+        ULCSupport = loader.getResourceAsStream("com/ulcjava/base/application/ULCTextComponent.class")!=null;
         
         /**
          * xfa
@@ -99,6 +104,10 @@ public class ExternalHandlers {
     
     public static JavaFXSupport getFXHandler() {
         return javaFXSupport;
+    }
+
+    public static boolean isULCPresent() {
+        return ULCSupport;
     }
     
     FormFactory userFormFactory;
@@ -449,18 +458,69 @@ public class ExternalHandlers {
     }
     
     public void dispose() {
-        
-        if(javascript!=null) {
+
+        //AdditionalHandler
+        additionalHandler = null;
+
+        //PluginHandler
+        customPluginHandle = null;
+
+        //MultiPageUpdate
+        customSwingHandle = null;
+
+        //ErrorTracker
+        customErrorTracker = null;
+
+        //ExpressionEngine
+        userExpressionEngine = null;
+
+        //FormFactory
+        userFormFactory = null;
+
+        //GUIContainer
+        swingGUI = null;
+
+        //ImageHandler:
+        customImageHandler = null;
+
+        //ColorHandler:
+        customColorHandler = null;
+
+        //GlyphTracker:
+        customGlyphTracker = null;
+
+        //ShapeTracker:
+        customShapeTracker = null;
+
+        //CustomFormPrint:
+        customFormPrint = null;
+
+        //JPedalActionHandler:
+        jpedalActionHandlers = null;
+
+        //CustomMessageOutput:
+        customMessageHandler = null;
+
+        //RenderChangeListener:
+        customRenderChangeListener = null;
+
+        //CustomPrintHintingHandler:
+        customPrintHintingHandler = null;
+
+        //CustomOutput:
+        customDVR = null;
+
+        if (javascript != null) {
             javascript.dispose();
         }
-        javascript=null;
-        
+        javascript = null;
+
         //dispose the javascript object before the formRenderer object as JS accesses the renderer object
-        if(formRenderer!=null) {
+        if (formRenderer != null) {
             formRenderer.dispose();
         }
-        formRenderer=null;
-        
+        formRenderer = null;
+
     }
     
     /**
@@ -501,11 +561,7 @@ public class ExternalHandlers {
                 return formRenderer.decode(pdfObject, currentPdfFile, XObject, subtype, width, height, offsetImage, pageScaling);
             
             } catch (Exception ex) {
-                ex.printStackTrace();
-                if(LogWriter.isOutput()){
-                    LogWriter.writeLog("[PDF] Unable to instance XFA "+ex);
-                }
-                
+                LogWriter.writeLog("[PDF] Unable to instance XFA "+ex);
             }
             
         }
@@ -520,10 +576,7 @@ public class ExternalHandlers {
             try {
                 formRenderer=(AcroRenderer) loader.loadClass(xfaClassName).newInstance();
             } catch (Exception ex) {
-                ex.printStackTrace();
-                if(LogWriter.isOutput()){
-                    LogWriter.writeLog("[PDF] Unable to instance XFA "+ex);
-                }
+                LogWriter.writeLog("[PDF] Unable to instance XFA "+ex);
                 
                 formRenderer = new AcroRenderer();
             }

@@ -42,7 +42,7 @@ import org.jpedal.utils.repositories.Vector_Object;
  * store data relating to page sizes set in PDF (MediaBox, CropBox, rotation)
  */
 public class PdfPageData implements Serializable{
-
+    
 	//private boolean valuesSet=false;
 
     private int lastPage=-1;
@@ -141,12 +141,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)mediaBoxH;
 	 }
@@ -161,12 +157,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)mediaBoxY;
 	 }
@@ -181,12 +173,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)mediaBoxX;
 	 }
@@ -273,12 +261,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)mediaBoxW;
 	 }
@@ -338,25 +322,21 @@ public class PdfPageData implements Serializable{
         return returnValue.toString();
 	 }
 	 
-	 /**
-	  * @return Scaled x value for cropBox
-          * @param pageNumber the page to be displayed 
-	  */
-	 public int getScaledCropBoxX(final int pageNumber) {
+	/**
+     * @return Scaled x value for cropBox
+     * @param pageNumber the page to be displayed
+     */
+    public int getScaledCropBoxX(final int pageNumber) {
 
-		 //check values correctly set
-		 try{
-			 setSizeForPage(pageNumber);
-		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+        //check values correctly set
+        try {
+            setSizeForPage(pageNumber);
+        } catch (final Exception e) {
+            LogWriter.writeLog("Exception: " + e.getMessage());
+        }
 
-         return roundFloat(cropBoxX*scalingValue);
-	 }
+        return roundFloat(cropBoxX * scalingValue);
+    }
 
 	 /**
 	  * @return Scaled cropBox width
@@ -368,12 +348,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return roundFloat(cropBoxW*scalingValue);
 	 }
@@ -384,16 +360,12 @@ public class PdfPageData implements Serializable{
 	  */
 	 public int getScaledCropBoxY(final int pageNumber) {
 
-		 //check values correctly set
-		 try{
+        //check values correctly set
+		try{
 			 setSizeForPage(pageNumber);
-		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+		}catch(final Exception e){
+			LogWriter.writeLog("Exception: " + e.getMessage());
+        }
 
          return roundFloat(cropBoxY*scalingValue);
 	 }
@@ -408,12 +380,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return roundFloat(cropBoxH*scalingValue);
 	 }
@@ -429,12 +397,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)cropBoxX;
 	 }
@@ -449,12 +413,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return cropBoxX;
 	 }
@@ -465,16 +425,13 @@ public class PdfPageData implements Serializable{
 	  */
 	 public int getCropBoxWidth(final int pageNumber) {
 
-		 //check values correctly set
-		 try{
+		//check values correctly set
+		try{
 			 setSizeForPage(pageNumber);
-		 }catch(final Exception e){
+		}catch(final Exception e){
 			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+            LogWriter.writeLog("Exception: " + e.getMessage());
+        }
 
          return (int)cropBoxW;
 	 }
@@ -489,12 +446,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return cropBoxW;
 	 }
@@ -509,12 +462,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)cropBoxY;
 	 }
@@ -529,12 +478,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return cropBoxY;
 	 }
@@ -549,12 +494,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return (int)cropBoxH;
 	 }
@@ -569,12 +510,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return cropBoxH;
 	 }
@@ -780,12 +717,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
 		 return rotation;
 	 }
@@ -800,12 +733,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return roundFloat(mediaBoxH*scalingValue);
 	 }
@@ -820,12 +749,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return roundFloat(mediaBoxW*scalingValue);
 	 }
@@ -840,12 +765,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return roundFloat(mediaBoxX*scalingValue);
 	 }
@@ -860,12 +781,8 @@ public class PdfPageData implements Serializable{
 		 try{
 			 setSizeForPage(pageNumber);
 		 }catch(final Exception e){
-			//tell user and log
-             if(LogWriter.isOutput()) {
-                 LogWriter.writeLog("Exception: " + e.getMessage());
-             }
-             //
-		 }
+			LogWriter.writeLog("Exception: " + e.getMessage());
+         }
 
          return roundFloat(mediaBoxY*scalingValue);
 	 }

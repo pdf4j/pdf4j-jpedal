@@ -181,12 +181,7 @@ public class RunLength extends BaseFilter implements PdfFilter {
             }
         } catch (final IOException e1) {
 
-        	if(LogWriter.isOutput()) {
-                LogWriter.writeLog("IO exception in RunLength "+e1);
-            }
+        	LogWriter.writeLog("IO exception in RunLength "+e1);
         }
-
     }
-
-
 }

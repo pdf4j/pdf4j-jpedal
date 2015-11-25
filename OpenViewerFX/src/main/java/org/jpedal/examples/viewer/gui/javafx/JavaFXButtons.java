@@ -647,11 +647,11 @@ public class JavaFXButtons implements GUIButtons{
                 case Commands.CONTINUOUS_FACING:
                     continuousFacingButton.setEnabled(debug);
                     break;
-                    //
-                case Commands.FACING:
-                    facingButton.setEnabled(debug);
-                    break;
-                    /**/
+                    
+                //case Commands.FACING:
+                  //  facingButton.setEnabled(debug);
+                    //break;
+                  
                     case Commands.PAGEFLOW:
                     pageFlowButton.setEnabled(debug);
                     break;

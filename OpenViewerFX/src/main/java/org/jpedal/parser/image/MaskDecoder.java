@@ -46,6 +46,7 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.image.data.ImageData;
 import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.utils.LogWriter;
 
 /**
  *
@@ -79,6 +80,10 @@ public class MaskDecoder {
         int h=imageData.getHeight();
         int d=imageData.getDepth();
         
+        if(objectData == null && d == 8){
+            objectData = new byte[w*h];
+        }
+        
         objectData = MaskDataDecoder.convertData(decodeColorData, objectData, w, h, imageData, d, 1, null);
         
         XObject.setIntNumber(PdfDictionary.BitsPerComponent, 8);
@@ -86,7 +91,7 @@ public class MaskDecoder {
         if(maskArray!=null){
             objectData=applyMaskArray(w, h, objectData,maskArray);
         }else{
-             objectData=applyMaskStream(maskDataSream,imageData,decodeColorData, newMask, XObject);
+            objectData=applyMaskStream(objectData,maskDataSream,imageData, newMask, XObject);
         }
         
         
@@ -95,7 +100,7 @@ public class MaskDecoder {
 //        try{
 //        ImageIO.write(img, "PNG", new java.io.File("/Users/markee/Desktop/mixed.png"));
 //        }catch(Exception e){}
-
+        
         
         return objectData;
     }
@@ -172,9 +177,9 @@ public class MaskDecoder {
      * @param newSMask
      * @return
      */
-    static byte[] applyMaskStream(byte[] maskData, final ImageData imageData,final GenericColorSpace decodeColorData, final PdfObject newMask, final PdfObject XObject) {
+    static byte[] applyMaskStream(byte[] objectData,byte[] maskData, final ImageData imageData,final PdfObject newMask, final PdfObject XObject) {
         
-        byte[] objectData=imageData.getObjectData();
+        //objectData=imageData.getObjectData();
         
         /*
         * Image data
@@ -192,7 +197,7 @@ public class MaskDecoder {
         
         final boolean isImageMask=newMask.getBoolean(PdfDictionary.ImageMask); //for example, see  Case 22754
         if(isImageMask){
-            maskD=1;
+           maskD=1;
         }
         
         //needs to be 'normalised to 8  bit'
@@ -320,7 +325,7 @@ public class MaskDecoder {
                         image = ColorSpaceConvertor.convertIndexedToFlat(1,w, h, data, newIndex, true,false);
                         
                     }else{
-                        //
+                        LogWriter.writeLog("Image too big "+w+ ' '+h+ ' ' +name);
                     }
                 }
             }

@@ -51,6 +51,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.util.*;
+import org.jpedal.JDeliHelper;
 
 /**
  * handle Separation ColorSpace and some DeviceN functions
@@ -398,9 +399,7 @@ public class SeparationColorSpace extends GenericColorSpace {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
-            }
+            LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
         }
         
         try {
@@ -409,9 +408,7 @@ public class SeparationColorSpace extends GenericColorSpace {
             iin.close();
         } catch (final Exception ee) {
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem closing  " + ee);
-            }
+            LogWriter.writeLog("Problem closing  " + ee);
         }
         
         return image;
@@ -427,7 +424,40 @@ public class SeparationColorSpace extends GenericColorSpace {
         
         BufferedImage image=null;
         
-        //
+        try {
+            image = JDeliHelper.JPEG2000ToRGBImage(data);
+        } catch (Exception ex) {//rethrow as Pdfexception
+            throw new PdfException(ex.getMessage());
+        }
+
+        if(image!=null){
+            try{
+
+                IndexedColorMap = null;//make index null as we already processed
+
+
+                if(IndexedColorMap==null){ //avoid on index colorspaces
+                    image=cleanupImage(image,pX,pY);
+                }
+
+                final int iw = image.getWidth();
+                final int ih = image.getHeight();
+
+                final DataBufferByte rgb = (DataBufferByte) image.getRaster().getDataBuffer();
+                final byte[] rawData=rgb.getData();
+
+                //convert the image
+                if(getID()==ColorSpaces.DeviceN){
+                    image=createImageN(iw, ih, rawData);
+                }else{
+                    image=createImage(iw, ih, rawData, false);
+                }
+            } catch (final Exception ee) {
+                image = null;
+
+                LogWriter.writeLog("Exception in JPEG2000ToRGBImage: " + ee);
+            }
+        }
         
         return image;
         
@@ -511,9 +541,7 @@ public class SeparationColorSpace extends GenericColorSpace {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't convert Separation colorspace data: " + ee);
-            }
+            LogWriter.writeLog("Couldn't convert Separation colorspace data: " + ee);
         }
         
         return image;
@@ -633,12 +661,7 @@ public class SeparationColorSpace extends GenericColorSpace {
             
         } catch (final Exception ee) {
             
-            
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception  " + ee + " converting colorspace");
-            }
-            
-            //
+            LogWriter.writeLog("Exception  " + ee + " converting colorspace");
             
         }
         
@@ -669,9 +692,8 @@ public class SeparationColorSpace extends GenericColorSpace {
             o = super.clone();
         }catch( final Exception e ){
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Unable to close "+e);
-            }
+            LogWriter.writeLog("Unable to close "+e);
+            
             throw new RuntimeException("Unable to clone object");
         }
         

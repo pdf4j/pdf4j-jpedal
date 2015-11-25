@@ -254,15 +254,9 @@ public class GroupingObject extends PdfObject {
                     }
 
                     break;
-
             }
-
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
@@ -498,7 +492,6 @@ public class GroupingObject extends PdfObject {
 
     //    }
 
-        //
 
         //convert
         switch(mode){

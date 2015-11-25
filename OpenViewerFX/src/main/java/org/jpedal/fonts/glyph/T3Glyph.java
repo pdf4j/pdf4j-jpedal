@@ -210,12 +210,8 @@ public class T3Glyph implements PdfGlyph
 			lockColours=os.readBoolean();
 			
 		} catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-		}
+            LogWriter.writeLog("Exception: " + e.getMessage());
+        }
 	}
 
 
@@ -244,5 +240,10 @@ public class T3Glyph implements PdfGlyph
     @Override
     public Object getPath() {
         throw new UnsupportedOperationException("getPath Not supported yet.");
+    }
+    
+    @Override
+    public boolean hasHintingApplied() {
+        return false;
     }
 }

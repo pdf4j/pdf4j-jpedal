@@ -122,10 +122,6 @@ public class Name {
                         System.out.println(padding + "Data not yet loaded");
                     }
                     
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (1)");
-                    }
-                    
                     i=length;
                     return i;
                 }
@@ -175,15 +171,10 @@ public class Name {
                     try {
                         newString=decryption.decrypt(newString, pdfObject.getObjectRefAsString(), false,null, false,false);
                     } catch (final PdfSecurityException e) {
-                        //tell user and log
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
-                        //
+                        LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                 }
             }
-            
             
             pdfObject.setTextStreamValue(PDFkeyInt, newString);
             
@@ -275,7 +266,6 @@ public class Name {
             }
             
             if(raw[i]!=82){ //we are expecting R to end ref
-                //
                 throw new RuntimeException(padding+"2. Unexpected value in file - please send to IDRsolutions for analysis");
             }
             
@@ -288,10 +278,6 @@ public class Name {
                 
                 if(debugFastCode) {
                     System.out.println(padding + "Data not yet loaded");
-                }
-                
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (13)");
                 }
                 
                 return raw.length;

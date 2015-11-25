@@ -80,11 +80,7 @@ public class PropertiesFile {
     
     private String[] properties = {
         
-        //<start-demo>
         "Flag to show popup information first time viewer is used","showfirsttimepopup", "false",
-        /**
-            //<end-demo>
-			"Flag to show popup information first time viewer is used","showfirsttimepopup", "true", /**/
         "The amount of days left of the trial","daysLeft","",
         "Show message about rhino and it's use","showrhinomessage", "false",
         "Set how the search functionality is displayed\n0 : External Window\n1 : Side Tab Bar\n2 : Menu bar","searchWindowType", "2",
@@ -294,7 +290,7 @@ public class PropertiesFile {
         } catch (final Exception e) {
             userDir=System.getProperty("user.dir");
             configFile=userDir+separator+".properties.xml";
-            //
+            LogWriter.writeLog("Exception "+e);
         }
     }
     
@@ -323,7 +319,7 @@ public class PropertiesFile {
                     isReadOnly= true;
                 }catch(final Exception e){
                     doc =  db.newDocument();
-                    //
+                    LogWriter.writeLog("Exception "+e);
                 }
             }else{
                 config = new File(configFile);
@@ -332,7 +328,7 @@ public class PropertiesFile {
                         doc =  db.parse(config);
                     }catch(final Exception e){
                         doc =  db.newDocument();
-                        //
+                        LogWriter.writeLog("Exception "+e);
                     }
                 }else{
                     doc =  db.newDocument();
@@ -429,7 +425,6 @@ public class PropertiesFile {
             }
         }catch(final Exception e){
             LogWriter.writeLog("Exception " + e + " generating properties file");
-            //
         }
     }
     
@@ -459,7 +454,6 @@ public class PropertiesFile {
             
             recentDocuments = (String[]) fileNames.toArray(new String[noOfRecentDocs]);
         }catch(final Exception e){
-            //
             LogWriter.writeLog("Exception " + e + " getting recent documents");
             return null;
         }
@@ -483,7 +477,6 @@ public class PropertiesFile {
             //writeDoc();
         }catch(final Exception e){
             LogWriter.writeLog("Exception " + e + " adding recent document to properties file");
-            //
         }
     }
     
@@ -500,7 +493,6 @@ public class PropertiesFile {
             
         }catch(final Exception e){
             LogWriter.writeLog("Exception " + e + " setting value in properties file");
-            //
         }
     }
     
@@ -519,7 +511,6 @@ public class PropertiesFile {
             attrs = element.getAttributes();
             
         }catch(final Exception e){
-            //
             LogWriter.writeLog("Exception " + e + " generating properties file");
             return "";
         }
@@ -739,7 +730,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.6b16")){
+                        if(properties[position+1].equals("6.7.25")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

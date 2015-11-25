@@ -332,11 +332,8 @@ public class ImageDecoder extends BaseDecoder{
         
         isMask= XObject.getBoolean(PdfDictionary.ImageMask);
         
-        //tell user and log
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("Processing XObject: " + image_name + ' ' + XObject.getObjectRefAsString() + " width=" + imageData.getWidth() + " Height=" + imageData.getHeight() +
+        LogWriter.writeLog("Processing XObject: " + image_name + ' ' + XObject.getObjectRefAsString() + " width=" + imageData.getWidth() + " Height=" + imageData.getHeight() +
                     " Depth=" + imageData.getDepth() + " colorspace=" + decodeColorData);
-        }
         
         /**
          * allow user to process image
@@ -694,12 +691,10 @@ public class ImageDecoder extends BaseDecoder{
                     }
                 }
             }
-        } else if(LogWriter.isOutput())
+        } else{ 
             //flag no image and reset clip
-        {
             LogWriter.writeLog("NO image written");
-        }
-        
+        }    
     }
     
     
@@ -826,9 +821,7 @@ public class ImageDecoder extends BaseDecoder{
                     
                 }
             }
-        } else if(LogWriter.isOutput())
-            //flag no image and reset clip
-        {
+        } else {
             LogWriter.writeLog("NO image written");
         }
     }
@@ -968,10 +961,7 @@ public class ImageDecoder extends BaseDecoder{
             // Do nothing if we've already had the image decoded for us by user code.
         }else if (Filters == null) { //handle no filters
             
-            //save out image
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Image " + name + ' ' + w + "W * " + h + "H with No Compression at BPC " + d);
-            }
+            LogWriter.writeLog("Image " + name + ' ' + w + "W * " + h + "H with No Compression at BPC " + d);
             
             image =makeImage(decodeColorData,w,h,d,data,imageData.getCompCount());
             
@@ -982,9 +972,7 @@ public class ImageDecoder extends BaseDecoder{
              */
             if(decodeColorData.getID()== ColorSpaces.DeviceCMYK && extractRawCMYK){
                 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Raw CMYK image " + name + " saved.");
-                }
+                LogWriter.writeLog("Raw CMYK image " + name + " saved.");
                 
                 if(!objectStoreStreamRef.saveRawCMYKImage(data, name)) {
                     errorTracker.addPageFailureMessage("Problem saving Raw CMYK image " + name);
@@ -999,9 +987,7 @@ public class ImageDecoder extends BaseDecoder{
             
         } else { //handle other types
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog(name + ' ' + w + "W * " + h + "H BPC=" + d + ' ' + decodeColorData);
-            }
+            LogWriter.writeLog(name + ' ' + w + "W * " + h + "H BPC=" + d + ' ' + decodeColorData);
             
             image =makeImage(decodeColorData,w,h,d,data,imageData.getCompCount());
             
@@ -1247,8 +1233,7 @@ public class ImageDecoder extends BaseDecoder{
             }
             
             //don't bother on small itemsS
-            if(!getSamplingOnly &&(w<500 || (h<600 && (w<1000 || imageData.isJPX())))){ //change??
-                
+            if(!getSamplingOnly &&(w<500 || (h<600 && w<1000) || imageData.isJPX())){ //change??
                 imageData.setpX(0);
                 imageData.setpX(0);
                 
@@ -1326,9 +1311,7 @@ public class ImageDecoder extends BaseDecoder{
             image =BinaryImage.make(w, h, data, decodeColorData, d);
             
         }else if(ID==ColorSpaces.Separation || ID==ColorSpaces.DeviceN){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Converting Separation/DeviceN colorspace to sRGB ");
-            }
+            LogWriter.writeLog("Converting Separation/DeviceN colorspace to sRGB ");
             
             image=decodeColorData.dataToRGB(data,w,h);
             

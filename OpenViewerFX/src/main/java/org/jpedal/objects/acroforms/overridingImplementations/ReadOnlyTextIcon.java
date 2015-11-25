@@ -60,7 +60,6 @@ import org.jpedal.utils.StringUtils;
 
 /** this class is used to display the text fields in the defined font, but is used for readonly fields only. */
 public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingConstants {
-    // <start-demo><end-demo>
     
     /** used to tell the paint method that we need to scale up the image for printing */
     private boolean currentlyPrinting;
@@ -127,14 +126,11 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
         paintIcon(null, g, 0, 0);
         g.dispose();
         
-        // <start-demo><end-demo>
-        
         return bufImg;
     }
     
     @Override
     public synchronized void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-        // <start-demo><end-demo>
         
         final BufferedImage image = (BufferedImage) getImage();
         
@@ -147,8 +143,6 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
         } else {
             g.setColor(Color.gray);
         }
-        
-        // <start-demo><end-demo>
         
         final Graphics2D g2 = (Graphics2D) g;
         if (iconWidth > 0 && iconHeight > 0) {
@@ -251,15 +245,11 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
                 || newWidth > (rootImage.getWidth(null))
                 || newHeight > (rootImage.getHeight(null))
                 || newWidth < (rootImage.getWidth(null)/MAXSCALEFACTOR)
-                || newHeight < (rootImage.getHeight(null)/MAXSCALEFACTOR)
-                // <start-demo><end-demo>
-                ){
+                || newHeight < (rootImage.getHeight(null)/MAXSCALEFACTOR)){
             //System.out.println(fakeObj.getObjectRefAsString()+" command="+fullCommandString);
             rootImage = FormStream.decode(form,currentpdffile, fakeObj, subtype,newWidth,newHeight,0,1);
-            // <start-demo><end-demo>
             
             finalImage = FormStream.rotate(rootImage,iconRotation);
-            // <start-demo><end-demo>
             
             //make text as redrawn
             textChanged = false;
@@ -352,26 +342,29 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             	
                 //Add 2 to simulate form padding
                 int alignmentX = 2;
-                int alignmentY = ((int) (((FormObject) form).getBoundingRectangle().height - Float.parseFloat(fontSize))) / 2;
-                if(alignmentY<2){
-                    alignmentY = 2;
-                }
+                int alignmentY = ((int) (((FormObject) form).getBoundingRectangle().height - Float.parseFloat(fontSize)))+2;
                 
-                if (((FormObject) form).getAlignment() != SwingConstants.LEFT) {
+                if (form.getParameterConstant(PdfDictionary.Subtype) != PdfDictionary.FreeText) {
+                    alignmentY = ((int) (((FormObject) form).getBoundingRectangle().height - Float.parseFloat(fontSize))) / 2;
+                    if (alignmentY < 2) {
+                        alignmentY = 2;
+                    }
 
-                    final FontMetrics fm = new Canvas().getFontMetrics(new Font(fontName, Font.PLAIN, (int) Float.parseFloat(fontSize)));
-                    final Rectangle2D r = fm.getStringBounds(text, null);
+                    if (((FormObject) form).getAlignment() != SwingConstants.LEFT) {
 
-                    switch (((FormObject) form).getAlignment()) {
-                        case SwingConstants.CENTER:
-                            alignmentX = ((int) (((FormObject) form).getBoundingRectangle().width - r.getWidth())) / 2;
-                            break;
-                        case SwingConstants.RIGHT:
-                            alignmentX = ((int) (((FormObject) form).getBoundingRectangle().width - r.getWidth())) - 2;
-                            break;
+                        final FontMetrics fm = new Canvas().getFontMetrics(new Font(fontName, Font.PLAIN, (int) Float.parseFloat(fontSize)));
+                        final Rectangle2D r = fm.getStringBounds(text, null);
+
+                        switch (((FormObject) form).getAlignment()) {
+                            case SwingConstants.CENTER:
+                                alignmentX = ((int) (((FormObject) form).getBoundingRectangle().width - r.getWidth())) / 2;
+                                break;
+                            case SwingConstants.RIGHT:
+                                alignmentX = ((int) (((FormObject) form).getBoundingRectangle().width - r.getWidth())) - 2;
+                                break;
+                        }
                     }
                 }
-                
                 //Construction alignment string
                 String textAlignment = alignmentX+" "+alignmentY+" Td ";
                 
@@ -466,12 +459,7 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             fakeObj.setDecodedStream(fullCommandString.getBytes("Cp1252"));
             
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-            
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
       
@@ -485,8 +473,6 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
         final PdfObject appObj = form.getDictionary(PdfDictionary.AP).getDictionary(PdfDictionary.N);
         if(appObj!=null){
             final byte[] bytes = appObj.getDecodedStream();
-            
-            //
             
             if(bytes!=null){
                 int startTf=-1;

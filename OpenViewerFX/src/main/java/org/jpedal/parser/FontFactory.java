@@ -59,8 +59,6 @@ public class FontFactory {
 
             default:
 
-                //
-
                 //LogWriter.writeLog("Font type " + subtype + " not supported");
                 return new PdfFont(currentPdfFile);
         }

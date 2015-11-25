@@ -133,10 +133,7 @@ public class JavaFXSaveFile {
                     fis.close();
                     fos.close();
                 } catch (final Exception e2) {
-                    //e2.printStackTrace();
-                     if(LogWriter.isOutput()) { 
-                         LogWriter.writeLog("Exception attempting to Read File: " + e2); 
-                     } 
+                    LogWriter.writeLog("Exception attempting to Read File: " + e2); 
                 }
             }
             finished = true;

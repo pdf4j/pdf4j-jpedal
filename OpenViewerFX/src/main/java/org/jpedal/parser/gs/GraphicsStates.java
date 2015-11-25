@@ -110,14 +110,10 @@ public class GraphicsStates {
      */
     public GraphicsState restoreGraphicsState(GraphicsState gs, final DynamicVectorRenderer current) {
 
-        //boolean hasClipChanged=false;
-
         if(!isStackInitialised){
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No GraphicsState saved to retrieve");
-            }
-
+            LogWriter.writeLog("No GraphicsState saved to retrieve");
+            
             //reset to defaults
             gs=new GraphicsState();
             gs.setTextState(new TextState());
@@ -126,62 +122,29 @@ public class GraphicsStates {
 
             depth--;
 
-            //see if clip changed
-            //hasClipChanged=gs.hasClipChanged();
-
             gs = (GraphicsState) graphicsStateStack.pull();
             gs.setTextState((TextState) textStateStack.pull());
 
-            //@remove all caching?
             gs.strokeColorSpace=(GenericColorSpace) strokeColorStateStack.pull();
             gs.nonstrokeColorSpace=(GenericColorSpace) nonstrokeColorStateStack.pull();
 
-            if(gs.strokeColorSpace.getID()== ColorSpaces.Separation) {
+            int id=gs.strokeColorSpace.getID();
+            if(id == ColorSpaces.Separation || id == ColorSpaces.DeviceN) {
                 gs.strokeColorSpace.restoreColorStatus();
             }
 
-            if(gs.nonstrokeColorSpace.getID()==ColorSpaces.Separation) {
+            //and the non-stroke
+            id=gs.nonstrokeColorSpace.getID();
+            if(id==ColorSpaces.Separation || id == ColorSpaces.DeviceN) {
                 gs.nonstrokeColorSpace.restoreColorStatus();
             }
         }
-        //20101122 removed by MS as not apparently needed
-        //Object currentClip=clipStack.pull();
-
-
-        /**
-         if(hasClipChanged){
-         //if(!renderDirectly && hasClipChanged){
-         if(currentClip==null){
-
-         if(gs.current_clipping_shape!=null){
-         System.out.println("1shape="+gs.current_clipping_shape);
-         throw new RuntimeException();
-         }
-         gs.setClippingShape(null);
-         }else{
-
-         if(!gs.current_clipping_shape.equals((Area)currentClip)){
-         System.out.println("2shape="+gs.current_clipping_shape);
-         //  throw new RuntimeException();
-         }
-         gs.setClippingShape((Area)currentClip);
-         }
-         }
-         /**/
-        ////////////////////////////////////
-
-//            //copy back last CM
-//            for(int i=0;i<3;i++){
-//                System.arraycopy(new float[][]{{1,0,0},{0,1,0},{0,0,1}}, 0, gs.CTM, 0, 3);
-//            }
-
+        
         //save for later
         if (parserOptions.isRenderPage()){
 
-           // if(hasClipChanged){
+            current.drawClip(gs,parserOptions.defaultClip,false) ;
 
-                current.drawClip(gs,parserOptions.defaultClip,false) ;
-          //  }
             current.resetOnColorspaceChange();
 
             current.drawFillColor(gs.getNonstrokeColor());
@@ -192,9 +155,6 @@ public class GraphicsStates {
              */
             current.setGraphicsState(GraphicsState.FILL,gs.getAlpha(GraphicsState.FILL),gs.getBMValue());
             current.setGraphicsState(GraphicsState.STROKE,gs.getAlpha(GraphicsState.STROKE),gs.getBMValue());
-
-            //current.drawTR(currentGraphicsState.getTextRenderType()); //reset TR value
-
         }
 
         return gs;

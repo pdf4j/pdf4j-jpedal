@@ -207,7 +207,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
                 }
                 ok.setDisable(true);
                 pagesOptions.setDisable(true);
-                //
+               
                 pagesOptions.setItems(FXCollections.observableArrayList("Loading..."));
                 resolutionOptions.setDisable(true);
                 resolutionOptions.setItems(FXCollections.observableArrayList("Loading..."));
@@ -262,7 +262,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
                             }
                             pagesOptions.setDisable(false);
                             ok.setDisable(false);
-                            //
+                            
                             if (debugPrinterChange) {
                                 System.out.println("Reenabled GUI");
                             }
@@ -706,7 +706,6 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
     
     private static final double mmPerSubInch = 25.4 / 72;
     
-    //
     @Override
     public void resetDefaults(final String[] printersList, final String defaultPrinter, final int pageCount, final int currentPage) {
 
@@ -745,7 +744,9 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
         
         copies.setText("1");
         
-        //
+        if(org.jpedal.DevFlags.testing){
+    		printers.getSelectionModel().select("Zan Image Printer(color)");
+    	}
     	
     }
     
@@ -1056,7 +1057,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 //
 //            g2.drawImage(img,lO+iX+centeringX,tO+iY+centeringY,pageWidth,pageHeight,null);
 //        } catch(PdfException e) {
-//            //
+//        
 //        }
 //
 //        //Draw border
@@ -1068,7 +1069,18 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 //
 //    }
 
-    //
+//    private void nameElements() {
+//		// TODO Auto-generated method stub
+//		this.okButton.setName("ok");
+//		this.cancelButton.setName("cancel");
+//		this.pageSize.setName("size");
+//		this.printerName.setName("printer");
+//		this.autoRotateCenter.setName("autoRot");
+//		this.paperSourceByPDF.setName("paperSource");
+//		this.printHandlingScaling.setName("scaling");
+//		this.tabbedPane.setName("tabPane");
+//		this.setName("printDialog");
+//	}
 
 //    private void updatePreview(){
 //        int selection = previewSlider.getValue();
@@ -1242,10 +1254,8 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
                start = Integer.parseInt(numberFrom.getText());
            } catch (final NumberFormatException e) {
 
-               if(LogWriter.isOutput()) {
-                   LogWriter.writeLog("Exception in setting page range "+e);
-               }
-
+               LogWriter.writeLog("Exception in setting page range "+e);
+               
                numberFrom.setText("1");
                start = 1;
            }
@@ -1253,10 +1263,8 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
                end = Integer.parseInt(numberTo.getText());
            } catch(final NumberFormatException e) {
 
-               if(LogWriter.isOutput()) {
-                   LogWriter.writeLog("Exception in setting page range "+e);
-               }
-
+               LogWriter.writeLog("Exception in setting page range "+e);
+               
                numberTo.setText(String.valueOf(pageCount));
                end = pageCount;
            }

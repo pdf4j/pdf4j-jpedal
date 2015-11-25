@@ -136,9 +136,7 @@ public class ArrayUtils {
                 decryptedValue = decryptor.decryptString(IDbytes, ref);
                 
             } catch (PdfSecurityException ex) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + ex.getMessage());
-                }
+                LogWriter.writeLog("Exception: " + ex.getMessage());
             }
             newValues= (decryptedValue==null) ? IDbytes:decryptedValue;
         }

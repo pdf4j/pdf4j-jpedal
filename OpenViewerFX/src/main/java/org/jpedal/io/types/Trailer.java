@@ -71,13 +71,8 @@ public class Trailer {
                 pdf_datafile.seek(pointer);
                 pdf_datafile.read(buffer); //get next chars
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
-            
             
             boolean endFound = false;
             

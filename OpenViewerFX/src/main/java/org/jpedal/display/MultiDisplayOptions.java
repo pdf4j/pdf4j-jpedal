@@ -276,11 +276,7 @@ public class MultiDisplayOptions {
             try {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
     }

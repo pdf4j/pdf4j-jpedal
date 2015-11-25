@@ -36,8 +36,9 @@ package org.jpedal.io.filter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.util.Map;
+import org.jpedal.io.ObjectStore;
 
-import org.jpedal.io.JBIG2;
+import org.jpedal.jbig2.io.JBIG2;
 import org.jpedal.jbig2.*;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
@@ -59,10 +60,8 @@ public class JBIGFilter extends BaseFilter implements PdfFilter {
     public byte[] decode(final byte[] data) throws Exception {
       byte [] dataBytes;
       
-      //
-      dataBytes=JBIG2.JBIGDecode(data, globalData);      
-      /**/   
-      
+      dataBytes=JBIG2.JBIGDecode(data, globalData, ObjectStore.temp_dir);
+
       return dataBytes;  
     }
 

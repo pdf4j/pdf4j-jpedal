@@ -59,6 +59,7 @@ import org.jpedal.utils.LogWriter;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import javax.imageio.metadata.IIOMetadataNode;
+import org.jpedal.JDeliHelper;
 
 import org.w3c.dom.NodeList;
 
@@ -183,9 +184,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
             /**define the conversion. PdfColor.hints can be replaced with null or some hints*/
             CSToRGB = new ColorConvertOp(cmykCS, rgbCS, ColorSpaces.hints);
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e.getMessage() + " initialising color components");
-            }
+            LogWriter.writeLog("Exception " + e.getMessage() + " initialising color components");
             
             throw new PdfException("[PDF] Unable to create CMYK colorspace. Check cmyk.icm in jar file");
             
@@ -222,10 +221,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 ICCProfileForRGB = ICC_Profile.getInstance(new FileInputStream(profile));
                 
             }catch(final Exception e){
-                e.printStackTrace();
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] Problem " + e.getMessage() + " with ICC data ");
-                }
+                LogWriter.writeLog("[PDF] Problem " + e.getMessage() + " with ICC data ");
                 
                 if(ICCProfileForRGB==null) {
                     throw new RuntimeException("Problem wth RGB profile "+profile+ ' ' +e.getMessage());
@@ -365,9 +361,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 }
                 
             }catch(final Exception e){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Unable to find jars on classpath "+e);
-                }
+                LogWriter.writeLog("Unable to find jars on classpath "+e);
                 
                 return null;
             }
@@ -405,7 +399,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                     // }else if(decodeArray.indexOf("0 1 0 1 0 1 0 1")!=-1){//identity
                     // }else if(decodeArray.indexOf("0.0 1.0 0.0 1.0 0.0 1.0 0.0 1.0")!=-1){//identity
                 }else if(decodeArray!=null && decodeArray.length>0){
-                    //
+                    LogWriter.writeLog("CMYK decode array "+java.util.Arrays.toString(decodeArray)+" not implemented");
                 }
             }
 
@@ -435,12 +429,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                  
                     }
                 }catch(final Exception e){
-                    e.printStackTrace();
-                    
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Problem with JPEG conversion");
-                    }
-                    //<start-demo><end-demo>
+                    LogWriter.writeLog("Problem with JPEG conversion "+e);
                 }
             }else if(cmykType!=0){
                 
@@ -483,14 +472,10 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                             isYCC=true;
                         }
                     }catch(final Exception ee){
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("[PDF] Unable to read metadata on Jpeg "+ee);
-                    }
+                        LogWriter.writeLog("[PDF] Unable to read metadata on Jpeg "+ee);
                     }
                     
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("COLOR_ID_YCbCr image");
-                    }
+                    LogWriter.writeLog("COLOR_ID_YCbCr image");
                     
                     if(isYCC){ //sample file debug2/pdf4134.pdf suggests we need this change
                         image=DefaultImageHelper.read(data);
@@ -506,16 +491,11 @@ public class GenericColorSpace  implements Cloneable, Serializable {
             
         } catch (final Exception ee) {
             image = null;
-            ee.printStackTrace();
-            
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
-            }
+            LogWriter.writeLog("Couldn't read JPEG, not even raster: " + ee);
         }catch(final Error err ){
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("JPeg error "+err);
-            }
+            LogWriter.writeLog("JPeg error "+err);
+            
             if(iir!=null) {
                 iir.dispose();
             }
@@ -523,11 +503,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 try {
                     iin.flush();
                 } catch (final IOException e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }
         }
@@ -543,10 +519,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 iin.close();
             }
         } catch (final Exception ee) {
-            
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem closing  " + ee);
-            }
+            LogWriter.writeLog("Problem closing  " + ee);
         }
         
         return image;
@@ -579,9 +552,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
             }
             
         }catch(final Error err){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[PDF] Error in cleanupImage "+err);
-        }
+            LogWriter.writeLog("[PDF] Error in cleanupImage "+err);
         }
         
         return image;
@@ -667,8 +638,8 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                         break;
                 }
                 }
-            }else{
-                //
+            }else if(LogWriter.isRunningFromIDE){
+                throw new RuntimeException("Unknown case "+layerCount+" in GenericColorspace");
             }
         }
         
@@ -769,12 +740,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 ras=Raster.createInterleavedRaster(new DataBufferByte(newData,newData.length), newW, newH, newW*comp, comp, bands, null);
                 
             }catch(final Exception e){
-                
-                e.printStackTrace();
-                
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Problem with Image");
-            }
+                LogWriter.writeLog("Problem with Image "+e);
             }
             
         }
@@ -835,8 +801,8 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                         break;
                 }
                 }
-            }else{
-                //
+            }else if(LogWriter.isRunningFromIDE){
+                throw new RuntimeException("Unknown case in GenericColorspace");
             }
         }
         
@@ -951,13 +917,8 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 //img=img.getSubimage(0,0,newW,newH); slower so replaced
                 
             }catch(final Exception e){
-                
-                e.printStackTrace();
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Problem with Image");
-            }
-            }
-            
+                LogWriter.writeLog("Problem with Image "+e);
+            }       
         }
         
         return img;
@@ -1070,7 +1031,9 @@ public class GenericColorSpace  implements Cloneable, Serializable {
      */
     public void setColor(final float[] value, final int operandCount){
         
-        //
+        if(LogWriter.isRunningFromIDE){
+            throw new RuntimeException(" called setColor(float[] in Generic for "+this);
+        }
         
     }
     
@@ -1107,11 +1070,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
         } catch (final Exception ee) {
             image = null;
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem reading JPEG: " + ee);
-            }
-            
-            //
+            LogWriter.writeLog("Problem reading JPEG: " + ee);
         }
         
         //if all else has failed try this
@@ -1140,10 +1099,72 @@ public class GenericColorSpace  implements Cloneable, Serializable {
      */
     public BufferedImage JPEG2000ToRGBImage(byte[] data, final int w, final int h, final float[] decodeArray, final int pX, final int pY, final int d) throws PdfException {
 
-        BufferedImage image = null;
+        BufferedImage image;
+        try {
+            image = JDeliHelper.JPEG2000ToRGBImage(data);
+        } catch (Exception ex) {//rethrow as Pdfexception
+            throw new PdfException(ex.getMessage());
+        }
 
-        //
+        if (image != null) {
 
+            IndexedColorMap = null;//make index null as we already processed
+        
+            //does not work correctly if indexed so we manipulate the data
+            //if you need to alter check  the images on page 42, 53, 71, 80, 89, 98, 107 and 114 are displayed in black
+            //infinite/Plumbing_Fixtures_2_V1_replaced.pdf
+            byte[] index = getIndexedMap();
+            if (index != null) {
+
+                if (value != ColorSpaces.DeviceRGB) {
+                    index = convertIndexToRGB(index);
+                    final int count = index.length;
+                    for (byte i = 0; i < count; i++) {
+                        index[i] = (byte) (index[i] ^ 255);
+                    }
+                }
+
+                data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                image = ColorSpaceConvertor.convertIndexedToFlat(d, w, h, data, index, false, false);
+
+            }
+
+            image = cleanupImage(image, pX, pY);
+
+            //ensure white background
+            if (image.getType() == BufferedImage.TYPE_BYTE_INDEXED) {
+                final BufferedImage oldImage = image;
+                final int newW = image.getWidth();
+                final int newH = image.getHeight();
+                image = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
+                final Graphics2D g2 = (Graphics2D) image.getGraphics();
+                g2.setPaint(Color.WHITE);
+                g2.fillRect(0, 0, newW, newH);
+                g2.drawImage(oldImage, 0, 0, null);
+
+            }
+
+            ColorSpace cSpace = image.getColorModel().getColorSpace();
+            int csType = cSpace.getType();
+            int trnsType = image.getColorModel().getTransferType();
+            if (image.getType() == BufferedImage.TYPE_CUSTOM
+                    && (csType == ColorSpace.CS_sRGB || csType == ColorSpace.TYPE_RGB)
+                    && trnsType == DataBuffer.TYPE_BYTE) {
+                BufferedImage temp = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+                int[] tempData = ((DataBufferInt) temp.getRaster().getDataBuffer()).getData();
+                byte[] imgData = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                int p = 0;
+                for (int i = 0; i < tempData.length; i++) {
+                    int rgb = ((imgData[p] & 0xFF) << 16) | ((imgData[p + 1] & 0xFF) << 8) | ((imgData[p + 2] & 0xFF));
+                    tempData[i] = rgb;
+                    p += 3;
+                }
+                image = temp;
+            } else {
+                image = ColorSpaceConvertor.convertToRGB(image);
+            }
+        }
+        
         return image;
     }
     
@@ -1257,9 +1278,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
             }
 
         } catch (final Exception ee) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception  " + ee + " converting colorspace");
-            }
+            LogWriter.writeLog("Exception  " + ee + " converting colorspace");
         }
 
         return data;
@@ -1386,11 +1405,8 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                 
                 System.out.println("use "+profile);
             }catch(final Exception e){
-                e.printStackTrace();
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[PDF] Problem " + e.getMessage() + " with ICC data ");
+                LogWriter.writeLog("[PDF] Problem " + e.getMessage() + " with ICC data ");
             }
-        }
         }
         
         return rgbCS;
@@ -1425,8 +1441,19 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     public BufferedImage JPEG2000ToImage(final byte[] data, final int pX, final int pY, final float[] decodeArray) throws PdfException {
            
         BufferedImage image=null;
-        //
         
+        try {
+            image = JDeliHelper.JPEG2000ToRGBImage(data);
+        
+            if(image!=null){
+                image = cleanupImage(image, pX, pY);
+            }
+            
+           
+        } catch (Exception ex) {//rethrow as Pdfexception
+            throw new PdfException(ex.getMessage());
+        }
+
         return image;
         
     }

@@ -59,9 +59,8 @@ public class JPeg2000ImageDecoder {
         
 //needs imageio library
         
-        if(LogWriter.isOutput()) {
-            LogWriter.writeLog("JPeg 2000 Image " + name + ' ' + w + "W * " + h + 'H');
-        }
+        LogWriter.writeLog("JPeg 2000 Image " + name + ' ' + w + "W * " + h + 'H');
+        
         /**
          * try {
          * java.io.FileOutputStream a =new java.io.FileOutputStream("/Users/markee/Desktop/"+ name + ".jpg");
@@ -129,10 +128,7 @@ public class JPeg2000ImageDecoder {
             iin.close();
             
         }catch(final Exception ee){
-            
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Problem closing  " + ee);
-            }
+            LogWriter.writeLog("Problem closing  " + ee);
         }
         
         return ras;

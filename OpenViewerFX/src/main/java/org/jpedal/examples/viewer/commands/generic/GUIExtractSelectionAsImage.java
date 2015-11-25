@@ -34,7 +34,12 @@
 
 package org.jpedal.examples.viewer.commands.generic;
 
+import java.awt.Image;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.gui.GUIFactory;
@@ -79,5 +84,41 @@ public class GUIExtractSelectionAsImage {
         }
         
         snapShot=decode_pdf.getSelectedRectangleOnscreen(t_x1,t_y1,t_x2,t_y2,scaling);
+    }
+    
+    
+    protected static class ClipboardImage implements Transferable {
+
+        Image image;
+
+        public ClipboardImage(Image i) {
+            this.image = i;
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws IOException, UnsupportedFlavorException {
+            if (image != null && flavor.equals(DataFlavor.imageFlavor)) {
+                return image;
+            } else {
+                throw new UnsupportedFlavorException(flavor);
+            }
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{DataFlavor.imageFlavor};
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            DataFlavor[] flavors = getTransferDataFlavors();
+            for (int i=0; i<flavors.length; i++) {
+                if (flavor.equals(flavors[i])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

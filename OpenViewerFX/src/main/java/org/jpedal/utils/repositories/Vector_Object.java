@@ -330,8 +330,6 @@ public class Vector_Object implements Serializable
         //size of array as first item
         os.writeObject(max_size);
         
-        //int basicStrokes=0,bufferedImages=0,paints=0,generalPaths=0,t3glyphs=0,t1glyphs=0,ttglyphs=0,generics=0,nullGenerics=0;
-        //int totalGeneric=0;
         /**
          * iterate through each item in the collection, and if its an object that
          * wont serialize automaticaly, then perform a custom serialization, otherwise
@@ -463,12 +461,7 @@ public class Vector_Object implements Serializable
                 PathSerializer.serializePath(os,pathIterator);
                 
             }else{
-                
-//				if(nextObj==null)
-//					nullGenerics++;
-//				else{
-//					generics++;
-//				}
+          
                 /**
                  * if the object is not on our list to custom serialize, then let the
                  * default serialization handle it
@@ -476,22 +469,14 @@ public class Vector_Object implements Serializable
                 
                 try{
                     
-                    //int start = bos.size();
-                    
                     /** write out a flag to indicate this is a generic object */
                     os.writeObject(GENERIC);
                     
                     /** serialize the object to the stream */
                     os.writeObject(nextObj);
                     
-                    //int end = bos.size();
-                    //totalGeneric+=(end-start);
                 }catch(final Exception e){
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }
         }

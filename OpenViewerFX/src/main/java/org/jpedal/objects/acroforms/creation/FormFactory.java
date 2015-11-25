@@ -182,5 +182,7 @@ public interface FormFactory {
     
     void setDVR(DynamicVectorRenderer htmLoutput, Javascript javaScript);
 
+    Object generateBorderfromForm(final FormObject form, final float scaling);
+    
 }
 

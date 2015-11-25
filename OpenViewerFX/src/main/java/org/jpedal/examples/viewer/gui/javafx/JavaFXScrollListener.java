@@ -141,10 +141,7 @@ public class JavaFXScrollListener implements ChangeListener<Number>, EventHandle
                 gui.getPdfDecoder().repaintPane(nextPage);
 
             } catch (final Exception ee) {
-                //
-                if (LogWriter.isOutput()) {
-                    LogWriter.writeLog("Caught an Exception " + ee);
-                }
+                LogWriter.writeLog("Caught an Exception " + ee);
             }
         }
     }

@@ -577,7 +577,7 @@ final JPanel viewBGColor = new JPanel();
                             try {
                                 Thread.sleep(300);
                             } catch (final InterruptedException e) {
-                                //<start-demo><end-demo>
+                                LogWriter.writeLog("Exception "+e);
                             }
                         }
                         return null;
@@ -616,10 +616,7 @@ final JPanel viewBGColor = new JPanel();
             	try {
             		properties.writeDoc();
             	} catch (final Exception e) {
-            		//<start-demo><end-demo>
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to write properties " + e);
-                    }
+            		LogWriter.writeLog("Attempting to write properties " + e);
                 }
                 if(GUI.showMessages) {
                     JOptionPane.showMessageDialog(null, Messages.getMessage("PdfPreferences.savedTo") + propertiesLocation + '\n' + Messages.getMessage("PdfPreferences.restart"), "Restart Jpedal", JOptionPane.INFORMATION_MESSAGE);
@@ -683,11 +680,8 @@ final JPanel viewBGColor = new JPanel();
                     try {
                 		properties.writeDoc();
                 	} catch (final Exception e1) {
-                		//<start-demo><end-demo>
-                        if (LogWriter.isOutput()) {
-                            LogWriter.writeLog("Attempting to write properties " + e);
-                        }
-                	}
+                		LogWriter.writeLog("Attempting to write properties " + e);
+                    }
                    
                 }
                 //Reset to the properties file used when jpedal opened
@@ -712,10 +706,7 @@ final JPanel viewBGColor = new JPanel();
                     try {
                     	properties.writeDoc();
                     } catch (final Exception e2) {
-                    	//<start-demo><end-demo>
-                        if (LogWriter.isOutput()) {
-                            LogWriter.writeLog("Attempting to write properties " + e);
-                        }
+                    	LogWriter.writeLog("Attempting to write properties " + e);
                     }
                     if(GUI.showMessages) {
                         JOptionPane.showMessageDialog(propertiesDialog, Messages.getMessage("PdfPreferences.restart"));
@@ -1409,10 +1400,7 @@ final JPanel viewBGColor = new JPanel();
                     propValue = propValue.replaceAll("[^0-9]", "");
                     defaultDPI.setText(Integer.parseInt(propValue)+"dpi");
                 } catch (final Exception e) {
-                    //
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Attempting to get Properties values " + e);
-                    }
+                    LogWriter.writeLog("Attempting to get Properties values " + e);
                 }
             }
             
@@ -2139,7 +2127,6 @@ final JPanel viewBGColor = new JPanel();
                         BrowserLauncher.openURL(url);
                     } catch(final Exception ex){
                         JOptionPane.showMessageDialog(pane, Messages.getMessage("PdfViewer.ErrorWebsite"));
-                        //
                     }
                 }
             }

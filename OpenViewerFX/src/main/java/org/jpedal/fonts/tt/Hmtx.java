@@ -63,13 +63,9 @@ public class Hmtx extends Table {
 		
 		//read 'head' table
 		if(startPointer==0){
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No Htmx table found");
-            }
-		}else if(lsbCount<0){
-			if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Invalid Htmx table found");
-            }
+			LogWriter.writeLog("No Htmx table found");
+        }else if(lsbCount<0){
+			LogWriter.writeLog("Invalid Htmx table found");
         }else{
 			int i ;
 			for (i = 0; i < metricsCount; i++){
@@ -86,20 +82,17 @@ public class Hmtx extends Table {
 
             //catch needed for 48789.pdf
             try{
-			//read additional lsb entries
-			for(int j=i;j<lsbCount;j++){
+                //read additional lsb entries
+                for(int j=i;j<lsbCount;j++){
 
-				hMetrics[j] =currentMetric;
-				leftSideBearing[j] = currentFontFile.getFWord();
-				//System.out.println((j)+" "+leftSideBearing[j]);
-			}
-            }catch(final Exception ee){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in reading Hmtx " + ee);
+                    hMetrics[j] =currentMetric;
+                    leftSideBearing[j] = currentFontFile.getFWord();
+                    //System.out.println((j)+" "+leftSideBearing[j]);
                 }
+            }catch(final Exception ee){
+                LogWriter.writeLog("Exception in reading Hmtx " + ee);
             }
-		}
-		
+		}	
 	}
 
     public Hmtx() {

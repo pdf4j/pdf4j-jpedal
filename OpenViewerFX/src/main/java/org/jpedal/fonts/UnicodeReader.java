@@ -110,11 +110,7 @@ class UnicodeReader {
             }
             
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception setting up text object " + e);
-            }
-            
-            //
+            LogWriter.writeLog("Exception setting up text object " + e);
         }
         
         return unicodeMappings;

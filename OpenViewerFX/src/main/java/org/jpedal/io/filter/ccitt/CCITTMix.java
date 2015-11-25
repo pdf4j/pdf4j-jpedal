@@ -91,11 +91,7 @@ public class CCITTMix extends CCITT2D implements CCITTDecoder {
                 }
             }
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //put it all together

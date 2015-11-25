@@ -502,10 +502,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 Thread.sleep(50);
             } catch (final InterruptedException e) {
                 //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
             
             if(currentThreadID!=paintThreadID){
@@ -1668,11 +1665,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             img=(BufferedImage)currentObject;
             
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         return img;
     }
@@ -1848,8 +1841,13 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
         //System.out.println(y+" "+h+" "+nextAf[3]);
         this.drawAffine(nextAf);
-            
-        if(useHiResImageForDisplay){
+         
+        if(!useHiResImageForDisplay) {
+
+            if(CTM[1][1]>0 && image.getHeight()>1){//needed to manually turn in low res (used in ULC)
+                image = RenderUtils.invertImage(image);
+            }
+        }else{
             
             final int w;
             final int h;
@@ -1912,16 +1910,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         objectType.addElement(DynamicVectorRenderer.IMAGE);
         float WidthModifier = 1;
         float HeightModifier = 1;
-        
-        if(useHiResImageForDisplay){
-            if(!alreadyCached){
-                WidthModifier = image.getWidth();
-                HeightModifier = image.getHeight();
-            }else{
-                WidthModifier= (Integer) cachedWidths.get(key);
-                HeightModifier= (Integer) cachedHeights.get(key);
-            }
-        }
         
         //ignore in this case /PDFdata/baseline_screens/customers3/1773_A2.pdf
         if(CTM[0][0]>0 && CTM[0][0]<0.05 && CTM[0][1]!=0 && CTM[1][0]!=0 && CTM[1][1]!=0){
@@ -2140,7 +2128,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             //Adjust line width to 1 if less than 1 
             //ignore if using T3Display (such as ap image generation in html / svg conversion
             if(((BasicStroke)newStroke).getLineWidth()<1 && !(this instanceof T3Display)){
-                newStroke = new BasicStroke(1);
+                newStroke = new BasicStroke(1,((BasicStroke)newStroke).getEndCap(), ((BasicStroke)newStroke).getLineJoin(), ((BasicStroke)newStroke).getMiterLimit(), ((BasicStroke)newStroke).getDashArray(), ((BasicStroke)newStroke).getDashPhase());
             }
             lastStroke=newStroke;
             drawStroke((newStroke));
@@ -2942,11 +2930,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             bis.close();
             
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         //used in loop to draw so needs to be set

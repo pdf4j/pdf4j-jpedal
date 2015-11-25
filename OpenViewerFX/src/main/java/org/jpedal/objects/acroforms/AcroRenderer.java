@@ -412,7 +412,7 @@ public class AcroRenderer{
      */
     public void createDisplayComponentsForPage(final int page, final PdfStreamDecoder current) {
 
-       // System.out.println("createDisplayComponents "+page);
+        //System.out.println("createDisplayComponents "+page);
         
         final Map<String, String> formsCreated=new HashMap<String, String>();
         
@@ -520,8 +520,14 @@ public class AcroRenderer{
                             continue;
                         }
                         
-                        formObject=convertRefToFormObject(objRef,page);
-
+                        try{
+                            formObject=convertRefToFormObject(objRef,page);
+                        }catch(Exception e){
+                            LogWriter.writeLog("Exception "+e+" with "+objRef);
+                            formObject=null;
+                            continue;
+                        }
+                        
                         /**
                          * Only allows Annotations if in Annots page stream
                          */
@@ -700,11 +706,7 @@ public class AcroRenderer{
                                 getFormFlattener().drawFlattenedForm(current, formObject, type == FormFactory.HTML || type == FormFactory.SVG, (PdfObject) this.getFormResources()[0]);
                             
                             }catch( final PdfException e ){
-                                //tell user and log
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception: " + e.getMessage());
-                                }
-                                //
+                                LogWriter.writeLog("Exception: " + e.getMessage());
                             }
                             
                         }else {
@@ -764,11 +766,7 @@ public class AcroRenderer{
                     }
                     
                 }catch(final Exception e){
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -1012,7 +1010,8 @@ public class AcroRenderer{
         
         compData.displayComponents(startPage, endPage);
         
-        // <start-demo><end-demo>
+        //used in tests
+        org.jpedal.DevFlags.formsLoaded = true;
     }
     
     private void initJSonFields(final Map<String, String> formsCreated) {
@@ -1041,10 +1040,16 @@ public class AcroRenderer{
      */
     private void createField(final FormObject formObject) {
 
-        //
-        
-        /**/
-        
+        // avoid creation of Swing widgets if we have 2 copies in play on ULC
+        //noinspection PointlessBooleanExpression
+        if(ExternalHandlers.isULCPresent() &&
+                formFactory.getType()==FormFactory.SWING){
+        //if(org.jpedal.examples.canoo.server.ULCViewer.formOption == org.jpedal.constants.SpecialOptions.ULC_WIDGETS_ON_SERVER &&
+          //      formFactory.getType()==FormFactory.SWING){
+            
+            return;
+        }
+       
         final Integer widgetType; //no value set
         
         final Object retComponent=null;

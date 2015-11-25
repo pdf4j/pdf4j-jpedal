@@ -36,6 +36,7 @@ import java.util.BitSet;
 
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 
 /**
  * implement 1D CCITT decoding
@@ -570,7 +571,8 @@ public class CCITT1D implements CCITTDecoder{
 
         if(pixelCount ==-1){
             if(line != 0){
-                //<start-demo><end-demo>
+                LogWriter.writeLog("EOF marker encountered but not EOL yet!");
+               
 //                pixelCount = width - line;
             }
 

@@ -41,9 +41,7 @@ public class AlwaysShowMouse {
 
     public static void execute(final Object[] args) {
         if (args == null) {
-            //<start-demo>
-        } else {
-
+            GUI.alwaysShowMouse = !GUI.alwaysShowMouse;
         }
     }
 }

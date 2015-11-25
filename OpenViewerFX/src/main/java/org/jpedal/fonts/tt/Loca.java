@@ -74,7 +74,7 @@ public class Loca extends Table {
 	    glyphIndexStart[0]=0;
 	    //long version
 	    if(format==1 || format==256){ //some tools get the byte order wrong
-		if(LogWriter.isOutput() && (locaLength/4)!=(glyphCount+1)) {
+		if((locaLength/4)!=(glyphCount+1)) {
             LogWriter.writeLog("Incorrect length");
         }
 		

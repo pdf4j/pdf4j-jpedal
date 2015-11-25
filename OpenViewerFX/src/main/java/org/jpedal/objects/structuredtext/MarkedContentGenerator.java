@@ -84,9 +84,6 @@ public class MarkedContentGenerator {
     
     static boolean debug;
     
-    // Stops "No structured content in file" message being output multiple times
-    static boolean displayNoStructMsg = true;
-    
     //used to indent debug output
     static String indent="";
     
@@ -140,11 +137,7 @@ public class MarkedContentGenerator {
                 try {
                     decodePageForMarkedContent(1, null, doc);
                 } catch (final Exception e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         }
@@ -162,11 +155,7 @@ public class MarkedContentGenerator {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             db = dbf.newDocumentBuilder();
         } catch (final ParserConfigurationException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         doc =  db.newDocument();
@@ -293,11 +282,7 @@ public class MarkedContentGenerator {
                     //  pageStreams.put(Pg,pageStream);
                     
                 } catch (final Exception e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
             }
         
@@ -451,9 +436,7 @@ public class MarkedContentGenerator {
        
         if (isDecoding) {
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[PDF]WARNING - this file is being decoded already");
-            }
+            LogWriter.writeLog("[PDF]WARNING - this file is being decoded already");
             
         } else {
             
@@ -496,15 +479,9 @@ public class MarkedContentGenerator {
                 current.decodePageContent(pdfObject);
 
                 objectStoreRef.flush();
-
-                //
                
             }catch(final Exception e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }finally {
                 isDecoding=false;
             }

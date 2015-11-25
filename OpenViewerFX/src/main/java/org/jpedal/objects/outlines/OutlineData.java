@@ -190,11 +190,6 @@ public class OutlineData {
 
 			String ref=null;
 
-
-			//get coord & page from data
-            //if(type==PdfDictionary.GoToR){
-                //
-         //   }else
         if (DestObj != null && DestObj.getTokenCount()>0){// && type==PdfDictionary.Goto) {
 
 				int count=DestObj.getTokenCount();

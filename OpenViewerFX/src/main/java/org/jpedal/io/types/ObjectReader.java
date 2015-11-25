@@ -273,9 +273,7 @@ public class ObjectReader {
         try{
             old_pointer = pdf_datafile.getFilePointer();
         }catch( final Exception e ){
-        	if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " getting pointer in file");
-            }
+        	LogWriter.writeLog("Exception " + e + " getting pointer in file");
         }
         return old_pointer;
     }

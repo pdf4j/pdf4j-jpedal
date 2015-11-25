@@ -46,7 +46,8 @@ import org.jpedal.gui.GUIFactory;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
-// <start-demo><end-demo>
+import org.jpedal.display.Display;
+
 /**
  * Clean up and exit programo
  */
@@ -71,11 +72,26 @@ public class Exit {
          */
         SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);
 
-        //MARK - idea would it be good to link the cross for closing the window to this command, so user can also cancel if accidental.
         /**
          * create the dialog
          */
-        // <start-demo><end-demo>
+        if(LogWriter.isRunningFromIDE){
+            final int choice;
+            if (!org.jpedal.DevFlags.GUITESTINGINPROGRESS && currentGUI.confirmClose()) {
+                choice = javax.swing.JOptionPane.showConfirmDialog(null, new javax.swing.JLabel(Messages.getMessage("PdfViewerExiting")),
+                        Messages.getMessage("PdfViewerprogramExit"), javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+            } else {
+                choice = javax.swing.JOptionPane.OK_OPTION;
+            }
+
+            if (choice == javax.swing.JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+
+            if(decode_pdf.getDisplayView()==Display.PAGEFLOW){
+                decode_pdf.getPages().stopGeneratingPage();
+            }
+        }
 
         
         /**
@@ -118,16 +134,12 @@ public class Exit {
 
             properties.writeDoc();
         } catch (final Exception e1) {
-            //<start-demo><end-demo>
-            
-             if(LogWriter.isOutput()) { 
-                 LogWriter.writeLog("Exception attempting to Write proterties: " + e1);
-             } 
+            LogWriter.writeLog("Exception attempting to Write proterties: " + e1);
         }
 
         //formClickTest needs this so that it does not exit after first test.
-        // <start-demo><end-demo>
-             if(!Viewer.exitOnClose){/**/
+        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !Viewer.exitOnClose) {
+            
             ((Container)currentGUI.getFrame()).setVisible(false);
             if (currentGUI.getFrame() instanceof JFrame) {
                 ((JFrame) currentGUI.getFrame()).dispose();

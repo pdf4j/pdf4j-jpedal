@@ -133,17 +133,9 @@ public class ColorSpaces {
                 }
                 //}
             }catch(final IllegalAccessException e){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: "+e.getMessage());
             }catch(IllegalArgumentException ee){
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: "+ee.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: "+ee.getMessage());
             }
         }
         

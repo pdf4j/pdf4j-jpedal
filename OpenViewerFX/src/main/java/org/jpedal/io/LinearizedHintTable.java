@@ -327,7 +327,10 @@ public class LinearizedHintTable {
         //assume less than 32 as we will need to recode otherwise
         if(bytesNeeded>4){
 
-            //
+            if(LogWriter.isRunningFromIDE){
+                throw new RuntimeException("Example of bits over 32 in Linearized table");
+            }
+            
             return 0;
         }else{
             //System.out.println("bytesNeeded="+bytesNeeded+" startByte="+startByte+" "+" startOffset="+startOffset);
@@ -495,12 +498,8 @@ public class LinearizedHintTable {
                 size = fos.size() - 200;
             }
         } catch (final Exception e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
+            
             size=0;
         }
 
@@ -520,12 +519,8 @@ public class LinearizedHintTable {
                 buf.get(data, 0, data.length);
             }
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
-
+            LogWriter.writeLog("Exception: " + e.getMessage());
+            
             data=null;
         }
 

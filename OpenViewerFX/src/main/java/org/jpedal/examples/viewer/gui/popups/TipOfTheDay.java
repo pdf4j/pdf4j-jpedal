@@ -56,6 +56,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.utils.BrowserLauncher;
+import org.jpedal.utils.LogWriter;
 
 public class TipOfTheDay extends JDialog {
 	
@@ -78,7 +79,7 @@ public class TipOfTheDay extends JDialog {
 			populateTipsList(tipsRoot, tipPaths);
 		} catch (final IOException e) {
 			tipLoadingFailed = true;
-			//
+			LogWriter.writeLog("Exception "+e.getMessage());
 		}
 		
 		final Random r = new Random();
@@ -230,7 +231,7 @@ public class TipOfTheDay extends JDialog {
 				tipPane.setPage(getClass().getResource((String) tipPaths.get(currentTip)));
 			} catch (final IOException e) {
 				tipLoadingFailed = true;
-				//
+				LogWriter.writeLog("Exception "+e.getMessage());
 			}
 		}
 		
@@ -275,7 +276,7 @@ public class TipOfTheDay extends JDialog {
 				in.close();
 			}
 		} catch (final IOException e) {
-			//
+			LogWriter.writeLog("Exception "+e.getMessage());
 			throw e;
 		}
 	}

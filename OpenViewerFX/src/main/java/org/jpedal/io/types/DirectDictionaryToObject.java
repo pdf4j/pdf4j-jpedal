@@ -103,8 +103,6 @@ public class DirectDictionaryToObject {
             }
         }
         
-        //
-        
         if(debugFastCode) {
             System.out.println(padding + "Reading [<<data>>] to " + valueObj + " into " + pdfObject + " i=" + i);
         }

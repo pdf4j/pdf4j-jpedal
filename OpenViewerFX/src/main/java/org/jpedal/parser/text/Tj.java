@@ -948,14 +948,9 @@ public class Tj extends BaseDecoder {
             }
         } catch (final Exception e) {
             
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
+            LogWriter.writeLog("Exception: " + e.getMessage());
             
             errorTracker.addPageFailureMessage("Exception " + e + " on embedded font renderer");
-            
-            //
         }
     }
     
@@ -963,18 +958,7 @@ public class Tj extends BaseDecoder {
         
         final String newValue=currentFontData.getGlyphValue(glyphData.getRawInt());
         glyphData.setDisplayValue(newValue);
-        
-        /**
-         * remap chars for HTML,etc - not needed and breaks other code
-         * needed to fix glyph mapping issue in odd file for PDF2HTML5
-         * /sample_pdfs_html/thoughtcorp/Simple Relational Contracts.pdf
-         */
-        boolean alreadyRemaped=false;
-        
-        if((newValue.isEmpty() || (!newValue.isEmpty() && newValue.charAt(0)<32)) && current.isHTMLorSVG() && !currentFontData.isCIDFont()){
-            alreadyRemaped=HTMLTextUtils.remapGlyph(currentFontData, glyphData);
-        }
-        
+       
         final int rawInt=glyphData.getRawInt();
         
         //if space is actually mapped onto something else we need to reset
@@ -984,9 +968,7 @@ public class Tj extends BaseDecoder {
             //rawChar='Z';
         }
         
-        if(!alreadyRemaped && parserOptions.isTextExtracted()) {
-           glyphData.setUnicodeValue(currentFontData.getUnicodeValue(glyphData.getDisplayValue(),rawInt));
-        }
+        glyphData.setUnicodeValue(currentFontData.getUnicodeValue(glyphData.getDisplayValue(),rawInt));
         
         //fix for character wrong in some T1 fonts
         if(currentFontData.getFontType()==StandardFonts.TYPE1 && current.isHTMLorSVG()){

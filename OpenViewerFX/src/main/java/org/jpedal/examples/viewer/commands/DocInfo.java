@@ -61,7 +61,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.gui.GUIFactory;
@@ -70,6 +69,7 @@ import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.ReturnValues;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 
 /**
@@ -105,7 +105,9 @@ public class DocInfo {
         final JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setBackground(Color.WHITE);
 
-        //
+        if(LogWriter.isRunningFromIDE){
+            tabbedPane.setName("docProp");
+        }
 
         int ptr = selectedFile.lastIndexOf('\\');
         if (ptr == -1) {
@@ -113,8 +115,6 @@ public class DocInfo {
         }
 
         final String file = selectedFile.substring(ptr + 1, selectedFile.length());
-
-        //
 
         final String path = selectedFile.substring(0, ptr + 1);
 

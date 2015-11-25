@@ -110,7 +110,6 @@ public class NumberValue {
             }
             
             if(raw[i]!=82){ //we are expecting R to end ref
-                //
                 throw new RuntimeException("3. Unexpected value in file - please send to IDRsolutions for analysis");
             }
             
@@ -125,9 +124,7 @@ public class NumberValue {
                     System.out.println(padding + "Data not yet loaded");
                 }
                 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (8)");
-                }
+                LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (8)");
                 
                 return rawLength;
             }

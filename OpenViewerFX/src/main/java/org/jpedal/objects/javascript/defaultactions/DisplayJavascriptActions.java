@@ -86,8 +86,6 @@ public static final int notHidden = 4;
 	public static final float[] gray = {0.5f};
 	public static final float[] ltGray = {0.75f};
 	
-	// <start-demo><end-demo>
-	
 	public static float[] convertToColorFloatArray(final String newColor) {
 		
 		final StringTokenizer tok = new StringTokenizer(newColor,"[,]\"");

@@ -133,11 +133,7 @@ public class PdfFileReader
         try{
             eof=pdf_datafile.length();
         }catch(final IOException e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         objectReader=new ObjectReader(pdf_datafile,eof,this);
@@ -193,10 +189,8 @@ public class PdfFileReader
 
 
                     }else if(id>ObjLengthTable.length || ObjLengthTable[id]==0){
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog(objectRef + " cannot have offset 0");
-                        }
-
+                        LogWriter.writeLog(objectRef + " cannot have offset 0");
+                        
                         raw=new byte[0];
                     }else {
                         raw = objectReader.readObjectData(ObjLengthTable[id], pdfObject);
@@ -338,12 +332,9 @@ public class PdfFileReader
 
                         decryption.decrypt(null,pdfObject.getObjectRefAsString(), false,cacheName, false,false);
                     }
-                }catch(final Exception e){
-                    e.printStackTrace();
+                }catch(final Exception e){                  
                     stream=null;
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception " + e);
-                    }
+                    LogWriter.writeLog("Exception " + e);
                 }
             }
 
@@ -363,12 +354,9 @@ public class PdfFileReader
                     }
                 }catch(final PdfSecurityException e){
 
-                    //
                     stream=null;
 
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception " + e + " with " + pdfObject.getObjectRefAsString());
-                    }
+                    LogWriter.writeLog("Exception " + e + " with " + pdfObject.getObjectRefAsString());
                 }
             }
 
@@ -431,11 +419,8 @@ public class PdfFileReader
 
                     }catch(final Exception e){
 
-                        //
-                        if(LogWriter.isOutput()) {
-                            LogWriter.writeLog("[PDF] Problem " + e + " decompressing stream ");
-                        }
-
+                        LogWriter.writeLog("[PDF] Problem " + e + " decompressing stream ");
+                        
                         stream=null;
                         isCachedOnDisk=false; //make sure we return null, and not some bum values
                     }
@@ -470,11 +455,7 @@ public class PdfFileReader
                 try {
                     new BufferedInputStream(new FileInputStream(cacheName)).read(bytes);
                 } catch (final Exception e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
 
                 /**resize if length supplied*/
@@ -636,17 +617,10 @@ public class PdfFileReader
 
                         readData=tmpArray;
                     }
-               // }
-
-
             }
 
         } catch (final Exception e) {
-            e.printStackTrace();
-
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading object");
-            }
+            LogWriter.writeLog("Exception " + e + " reading object");
         }
 
         if(array!=null){
@@ -654,8 +628,6 @@ public class PdfFileReader
             array.close();
         }
     }
-
-
 
     public void spoolStreamDataToDisk(final File tmpFile,long start) throws Exception{
 
@@ -867,11 +839,7 @@ public class PdfFileReader
             }
 
         } catch (final Exception e) {
-            e.printStackTrace();
-
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading object");
-            }
+            LogWriter.writeLog("Exception " + e + " reading object");
         }
 
         if(array!=null){
@@ -899,11 +867,7 @@ public class PdfFileReader
         try {
             pdf_datafile.read(buffer); //get next chars
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         return buffer;
@@ -943,11 +907,7 @@ public class PdfFileReader
                 pdf_datafile.close();
             }
         } catch (final IOException e) {
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         pdf_datafile=null;
@@ -977,9 +937,7 @@ public class PdfFileReader
             }
 
         }catch( final Exception e ){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " in reading type");
-            }
+            LogWriter.writeLog("Exception " + e + " in reading type");
         }
         return pdf_type;
     }
@@ -997,18 +955,12 @@ public class PdfFileReader
         {
             //make sure inside file
             if( pointer > pdf_datafile.length() ){
-
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Attempting to access ref outside file");
-                }
-                //throw new PdfException("Exception moving file pointer - ref outside file");
+                LogWriter.writeLog("Attempting to access ref outside file");
             }else{
                 pdf_datafile.seek( pointer );
             }
         }catch( final Exception e ){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " moving pointer to  " + pointer + " in file.");
-            }
+            LogWriter.writeLog("Exception " + e + " moving pointer to  " + pointer + " in file.");
         }
     }
 
@@ -1022,9 +974,7 @@ public class PdfFileReader
         try{
             old_pointer = pdf_datafile.getFilePointer();
         }catch( final Exception e ){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " getting pointer in file");
-            }
+            LogWriter.writeLog("Exception " + e + " getting pointer in file");
         }
         return old_pointer;
     }
@@ -1072,17 +1022,11 @@ public class PdfFileReader
             if(data==null){
                 pdfObject.setFullyResolved(false);
 
-                //if(debugFastCode)
-                //    System.out.println(paddingString+"Data not yet loaded");
-
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (15)");
-                }
-
+                LogWriter.writeLog("[Linearized] " + pdfObject.getObjectRefAsString() + " not yet available (15)");
+                
                 return data;
             }
         }
-
 
         final boolean debug=false;
 
@@ -1115,12 +1059,9 @@ public class PdfFileReader
                         raw = objectReader.readObjectData(-1, pdfObject);
                     }
 
-
                 }else if(id>ObjLengthTable.length || ObjLengthTable[id]==0){
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog(objectRef + " cannot have offset 0");
-                    }
-
+                    LogWriter.writeLog(objectRef + " cannot have offset 0");
+                    
                     raw=new byte[0];
                 }else {
                     raw = objectReader.readObjectData(ObjLengthTable[id], pdfObject);
@@ -1312,9 +1253,7 @@ public class PdfFileReader
             try {
                 pdf_datafile.seek( offset.elementAt(compressedID) );
             } catch (final IOException e) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e + " moving pointer in file.");
-                }
+                LogWriter.writeLog("Exception " + e + " moving pointer in file.");
             }
             lastCompressedID=compressedID;
 
@@ -1513,9 +1452,8 @@ public class PdfFileReader
 
         }catch(final Error err){
 
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No Bouncy castle on classpath "+err);
-            }
+            LogWriter.writeLog("No Bouncy castle on classpath "+err);
+            
             throw new RuntimeException("This PDF file is encrypted and JPedal needs an additional library to \n" +
                     "decode on the classpath (we recommend bouncycastle library).\n" +
                     "There is additional explanation at http://www.idrsolutions.com/additional-jars"+ '\n');

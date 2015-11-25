@@ -70,6 +70,9 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
     final JavaFXMousePanMode panningFunctions;
     final JavaFXMousePageTurn pageTurnFunctions;
 
+    //Track dragging as FX uses click after drag when it should not
+    private boolean dragging = false;
+    
     //Custom mouse function
     private static JavaFXMouseFunctionality customMouseFunctions;
 
@@ -115,6 +118,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         decode_pdf.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent e) {
+                dragging = true;
                 mouseDragged(e);
             }
         });
@@ -132,7 +136,12 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         decode_pdf.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent e) {
-                mouseClicked(e);
+                //FX calls clicked even if dragged. This should not happen.
+                if(dragging){
+                    dragging = false;
+                }else{
+                    mouseClicked(e);
+                }
             }
         });
 
@@ -153,6 +162,8 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         decode_pdf.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent e) {
+                //Ensure reset on each press
+                dragging = false;
                 mousePressed(e);
             }
         });
@@ -555,5 +566,10 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
                     break;
             }
         }
+    }
+
+    @Override
+    public void dispose() {
+        //Do nothing as of yet.
     }
 }

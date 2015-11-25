@@ -205,11 +205,7 @@ public class JavaFXOpenFile {
 
                         processPage(commonValues, decode_pdf, currentGUI, thumbnails);
                     } catch (final PdfException e) {
-                        // 
-                       
-                         if(LogWriter.isOutput()) { 
-                             LogWriter.writeLog("Exception attempting to open file: " + e);
-                         }
+                        LogWriter.writeLog("Exception attempting to open file: " + e);
                     }
                 }
 
@@ -263,11 +259,7 @@ public class JavaFXOpenFile {
 
                                 }
                             } catch (final InterruptedException e) {
-                                // 
-                                
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception attempting to open file: " + e);
-                                }
+                                LogWriter.writeLog("Exception attempting to open file: " + e);
                             }
                         }
 
@@ -290,9 +282,8 @@ public class JavaFXOpenFile {
                                 file = file.getCanonicalFile();
                             } catch (final Exception e) {
 
-                                if(LogWriter.isOutput()) {
-                                    LogWriter.writeLog("Exception in opening file "+e);
-                                }
+                                LogWriter.writeLog("Exception in opening file "+e);
+                                
                                 file = new File(parent, filename);
                             }
                         }
@@ -345,12 +336,7 @@ public class JavaFXOpenFile {
                                 }
                             }
                         } catch (final IOException e1) {
-                            // 
-                            
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception attempting to open file: " + e1);
-                            }
-                            
+                            LogWriter.writeLog("Exception attempting to open file: " + e1);
                         }
                     } else { // no file selected so redisplay old
                         currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
@@ -398,7 +384,7 @@ public class JavaFXOpenFile {
                     }
                 } catch (final Exception e) {
                     failed = true;
-                    //
+                    LogWriter.writeLog("Unable to open as URL " + newFile+ ' ' +e);
                 }
 
                 if (failed) {
@@ -441,16 +427,14 @@ public class JavaFXOpenFile {
 
                             }
                         } catch (final InterruptedException e) {
-                            // 
-                            
-                            if(LogWriter.isOutput()) {
-                                LogWriter.writeLog("Exception attempting to open file: " + e);
-                            }
+                            LogWriter.writeLog("Exception attempting to open file: " + e);
                         }
                     }
 
                 } else { // no file selected so redisplay old
-                    //
+                    
+                    //((PdfDecoder)decode_pdf).repaint();
+                    
                     // currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
                 }
             }
@@ -530,10 +514,7 @@ public class JavaFXOpenFile {
                 commonValues.setCurrentPage(1);
             }
         } catch (final Exception e) {
-            e.printStackTrace();
-            System.err.println(Messages.getMessage("PdfViewerError.Exception") + ' ' + e + ' ' + Messages.getMessage("PdfViewerError.DecodeFile"));
-
-            //<start-demo><end-demo>
+            LogWriter.writeLog(Messages.getMessage("PdfViewerError.Exception") + ' ' + e + ' ' + Messages.getMessage("PdfViewerError.DecodeFile"));
         }
         //}
 
@@ -564,7 +545,6 @@ public class JavaFXOpenFile {
 
         } catch (final Exception e) {
             LogWriter.writeLog("Exception " + e + " getting paths");
-            //
         }
 
         /**
@@ -765,11 +745,7 @@ public class JavaFXOpenFile {
                                             try {
                                                 Thread.sleep(500);
                                             } catch (final Exception e) {
-                                                //<start-demo><end-demo>
-                                                
-                                                if(LogWriter.isOutput()) {
-                                                    LogWriter.writeLog("Exception attempting to open file: " + e);
-                                                }
+                                                LogWriter.writeLog("Exception attempting to open file: " + e);
                                             }
                                         }
                                     }
@@ -844,7 +820,7 @@ public class JavaFXOpenFile {
                         }
                     } catch (final Exception e) {
                         currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.UrlError") + " file=" + selectedFile + '\n' + e.getMessage());
-                        //<start-demo><end-demo>
+                        
                         decode_pdf.closePdfFile();
                         fileCanBeOpened = false;
                     }
@@ -853,8 +829,6 @@ public class JavaFXOpenFile {
                     try {
                         decode_pdf.openPdfFile(commonValues.getSelectedFile());
                     } catch (final RuntimeException e) {
-
-                        //
 
                         //customise message for missing bouncycastle error
                         final String message;
@@ -981,9 +955,8 @@ public class JavaFXOpenFile {
             }
 
         } catch (final PdfException e) {
-            System.err.println(("Exception " + e + " opening file"));
-            //<start-demo><end-demo>
-
+            LogWriter.writeLog(("Exception " + e + " opening file"));
+            
             if (currentGUI.isSingle()) {
 
                 if (GUI.showMessages) {
@@ -1105,10 +1078,7 @@ public class JavaFXOpenFile {
             }
             
         } catch (final IOException e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("[PDF] Exception " + e + " scanning URL " + pdfUrl);
-            }
-            e.printStackTrace();
+            LogWriter.writeLog("[PDF] Exception " + e + " scanning URL " + pdfUrl);
         }
         
         return isLinear;
@@ -1159,9 +1129,7 @@ public class JavaFXOpenFile {
             } catch (final Exception e) {
                 failed=true;
 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in handling URL "+e);
-                }
+                LogWriter.writeLog("Exception in handling URL "+e);
             }
 
             if(failed){

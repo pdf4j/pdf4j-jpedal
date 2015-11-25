@@ -82,11 +82,7 @@ public abstract class SwingWorker {
                 try {
                     Thread.sleep(20);
                 } catch (final InterruptedException e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: "+e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: "+e.getMessage());
                 }
             }
         }
@@ -111,9 +107,8 @@ public abstract class SwingWorker {
             }
             catch (final InterruptedException e) {
 
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in handling thread "+e);
-                }
+                LogWriter.writeLog("Exception in handling thread "+e);
+               
                 Thread.currentThread().interrupt(); // propagate
                 return null;
             }
@@ -134,10 +129,7 @@ public abstract class SwingWorker {
                     setValue(construct());
                     
                 }catch(final Exception e){
-                    //
-                    if (LogWriter.isOutput()) {
-                        LogWriter.writeLog("Caught a Exception " + e);
-                    }
+                    LogWriter.writeLog("Caught a Exception " + e);
                 }
                 finally {
                     threadVar.clear();

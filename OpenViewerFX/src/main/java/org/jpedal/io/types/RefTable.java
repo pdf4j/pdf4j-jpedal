@@ -163,9 +163,7 @@ public class RefTable {
             lastBytes=getBytes(count, lastBytes.length);
             
         } catch (final Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " reading last 1024 bytes");
-            }
+            LogWriter.writeLog("Exception " + e + " reading last 1024 bytes");
             
             throw new PdfException( e + " reading last 1024 bytes");
         }
@@ -202,9 +200,7 @@ public class RefTable {
             try {
                 closeFile();
             } catch (final IOException e1) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e1 + " closing file");
-                }
+                LogWriter.writeLog("Exception " + e1 + " closing file");
             }
             throw new PdfException( "No Startxref found in last 1024 bytes ");
         }
@@ -231,15 +227,12 @@ public class RefTable {
         }
         
         if (pointer == -1){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("No Startref found in last 1024 bytes ");
-            }
+            LogWriter.writeLog("No Startref found in last 1024 bytes ");
+            
             try {
                 closeFile();
             } catch (final IOException e1) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + e1 + " closing file");
-                }
+                LogWriter.writeLog("Exception " + e1 + " closing file");
             }
             throw new PdfException( "No Startref found in last 1024 bytes ");
         }
@@ -299,9 +292,7 @@ public class RefTable {
         
         if (pointer >= eof || pointer==0) {
             
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Pointer not if file - trying to manually find startref");
-            }
+            LogWriter.writeLog("Pointer not if file - trying to manually find startref");
             
             offset.setRefTableInvalid(true);
             
@@ -348,9 +339,7 @@ public class RefTable {
                 try {
                     closeFile();
                 } catch (final IOException e1) {
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception " + e + " closing file "+e1);
-                    }
+                    LogWriter.writeLog("Exception " + e + " closing file "+e1);
                 }
                 throw new PdfException("Exception " + e + " reading trailer");
             }
@@ -487,9 +476,7 @@ public class RefTable {
             }
             
             if (pointer == -1){
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("No startRef");
-                }
+                LogWriter.writeLog("No startRef");
                 
                 /**now read the objects for the trailers*/
             } else if (Bytes[i] == 120 && Bytes[i+1] == 114 && Bytes[i+2] == 101 && Bytes[i+3] == 102) { //make sure starts xref
@@ -573,9 +560,8 @@ public class RefTable {
                 
                 rootObj.setStatus(status);
                 rootObj.setUnresolvedData(data, status);
-                if(LogWriter.isOutput()){
-                    LogWriter.writeLog("[PDF] Exception reading type on root object "+e);
-                }
+                LogWriter.writeLog("[PDF] Exception reading type on root object "+e);
+               
             }
            
             //something gone wrong so manually index
@@ -734,11 +720,7 @@ public class RefTable {
                 pdf_datafile.seek(start);
                 pdf_datafile.read(buffer); //get next chars
             } catch (final IOException e) {
-                //tell user and log
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-                //
+                LogWriter.writeLog("Exception: " + e.getMessage());
             }
         }
         
@@ -849,9 +831,7 @@ public class RefTable {
             try {
                 closeFile();
             } catch (final IOException e1) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception " + 1 + " closing file "+e1);
-                }
+                LogWriter.writeLog("Exception " + 1 + " closing file "+e1);
             }
             throw new PdfException("Exception unable to find ref or obj in trailer");
         }
@@ -877,22 +857,16 @@ public class RefTable {
      */
     public void movePointer(final long pointer)
     {
-        try
-        {
+        try {
             //make sure inside file
             if( pointer > pdf_datafile.length() ){
             	
-            	if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Attempting to access ref outside file");
-                }
-                //throw new PdfException("Exception moving file pointer - ref outside file");
+            	LogWriter.writeLog("Attempting to access ref outside file");
             }else{
                 pdf_datafile.seek( pointer );
             }
         }catch( final Exception e ){
-        	if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " moving pointer to  " + pointer + " in file.");
-            }
+        	LogWriter.writeLog("Exception " + e + " moving pointer to  " + pointer + " in file.");
         }
     }
 }

@@ -312,11 +312,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
                 try {
                     glyph.render(GraphicsState.STROKE, g2, strokeOnlyLine, false);
                 } catch (final Exception e) {
-                    //tell user and log
-                    if(LogWriter.isOutput()) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    }
-                    //
+                    LogWriter.writeLog("Exception: " + e.getMessage());
                 }
 
                 //reset opacity
@@ -383,10 +379,8 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             }
 
         }catch(final Exception e){
-	    	if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception " + e + " filling shape");
-            }
-	    }
+	    	LogWriter.writeLog("Exception " + e + " filling shape");
+        }
 	    
 	    g2.setComposite(comp);
 	}
@@ -987,11 +981,8 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             try {
                 DefaultImageHelper.write(image, type, des);
             } catch (IOException ex) {
-                if(LogWriter.isOutput()) {
-                    LogWriter.writeLog("Exception in writing image "+ex);
-                }
-            }
-            
+                LogWriter.writeLog("Exception in writing image "+ex);
+            }           
         }
     }
     

@@ -248,11 +248,7 @@ public class MaskObject extends XObject {
             }
 
         }catch(final Exception e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
         //System.out.println(pdfKeyType+"="+PDFvalue);
@@ -497,7 +493,6 @@ public class MaskObject extends XObject {
 
       //  }
 
-        //
 
         //convert
         switch(mode){

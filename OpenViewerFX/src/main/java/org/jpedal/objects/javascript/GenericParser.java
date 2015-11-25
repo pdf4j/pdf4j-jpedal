@@ -63,8 +63,7 @@ public class GenericParser implements ExpressionEngine {
     private final ScriptContext context;
     private JSDoc docObject;
     private final Javascript jsObject;
-    // <end-demo>
-
+   
     private static final boolean debugEngine = false;
     private static ArrayList<String> erroredCode;
 
@@ -89,8 +88,6 @@ public class GenericParser implements ExpressionEngine {
         }
     }
 
-    // <end-demo>
-
     public void setupPDFObjects(final Javascript jsObject) {
         // Insert code for setting up PDF objects here
         try {
@@ -104,7 +101,9 @@ public class GenericParser implements ExpressionEngine {
 //			context.setAttribute("event", new JSEvent(), ScriptContext.ENGINE_SCOPE);
             final JSConsole console = new JSConsole();
             context.setAttribute("console", console, ScriptContext.ENGINE_SCOPE);
-            // <end-demo>
+            
+            //console.setGUIFactory(this.guiFactory);
+            
             if (debugEngine) {
                 System.out.println("Parsing aform.js");
             }
@@ -515,10 +514,7 @@ public class GenericParser implements ExpressionEngine {
             out.close();
             erroredCode.add(log);
         } catch (final IOException e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
 

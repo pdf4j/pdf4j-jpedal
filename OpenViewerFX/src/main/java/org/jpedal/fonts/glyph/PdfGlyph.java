@@ -85,4 +85,6 @@ public interface PdfGlyph {
     boolean containsBrokenData();
 
     Object getPath();
+
+    public boolean hasHintingApplied();
 }

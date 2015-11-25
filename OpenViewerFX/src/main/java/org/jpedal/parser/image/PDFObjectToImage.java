@@ -91,11 +91,7 @@ public class PDFObjectToImage {
             }
             
         }catch(final PdfException e){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + e.getMessage());
-            }
-            //
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
         int w=fw-fx;
@@ -146,10 +142,7 @@ public class PDFObjectToImage {
             }
             
         }catch(final Error err){
-            //tell user and log
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception: " + err.getMessage());
-            }
+            LogWriter.writeLog("Exception: " + err.getMessage());
             
             smaskImage=null;
         }

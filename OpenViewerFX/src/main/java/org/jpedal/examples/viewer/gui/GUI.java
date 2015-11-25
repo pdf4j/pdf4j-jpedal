@@ -80,12 +80,16 @@ import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.DecodeStatus;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.render.*;
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 import org.jpedal.utils.StringUtils;
 
 /**any shared GUI code - generic and AWT*/
 public abstract class GUI implements GUIFactory {
 
+    public static boolean deletePropertiesOnExit=GUIFactory.deletePropertiesOnExit;
+    public static boolean alwaysShowMouse=GUIFactory.alwaysShowMouse;
+    
     protected static int expandedSize=190;
     protected static int collapsedSize=30;
     
@@ -252,8 +256,8 @@ public abstract class GUI implements GUIFactory {
     /** minimum screen width to ensure menu buttons are visible */
     protected static final int minimumScreenWidth=700;
 
-    //<start-demo><end-demo>
-
+    private long start=System.currentTimeMillis();
+    
     /**XML structure of bookmarks*/
     protected GUIOutline tree;
 
@@ -1057,7 +1061,20 @@ public abstract class GUI implements GUIFactory {
 
             OpenFile.setPageProperties(getSelectedComboItem(Commands.ROTATION), getSelectedComboItem(Commands.SCALING));
 
-            //<end-demo>
+            if(LogWriter.isRunningFromIDE){
+                /**
+                 * show time and memory usage
+                 */
+                System.out
+                        .println(((Runtime.getRuntime().totalMemory() - Runtime
+                                .getRuntime().freeMemory()) / 1000)
+                                + "K");
+                System.out.println((((float) Math.abs(((System
+                        .currentTimeMillis() - start) / 100))) / 10)
+                        + "s");
+
+            }
+            
             if (decode_pdf.getPageCount()>0 && thumbnails.isShownOnscreen() && decode_pdf.getDisplayView()==Display.SINGLE_PAGE) {
                 thumbnails.generateOtherVisibleThumbnails(commonValues.getCurrentPage());
             }
@@ -1083,11 +1100,7 @@ public abstract class GUI implements GUIFactory {
 //                    t.setRepeats(false);
 //                    t.start();
 
-//        try{
-//            Thread.sleep(800);
-//        }catch(final Exception e){
-//            //
-//        }
+
         currentGUI.setMultibox(new int[]{});
 
         //reanable user changing scaling
@@ -1213,10 +1226,7 @@ public abstract class GUI implements GUIFactory {
                 try {
                     fxDisplay.drawAdditionalObjectsOverPage(additionaValuesforPage.getType(), null,additionaValuesforPage.getObj());
                 } catch (PdfException ex) {
-                    //
-                    if (org.jpedal.utils.LogWriter.isOutput()) {
-                        org.jpedal.utils.LogWriter.writeLog("Exception attempting to draw additional objects " + ex);
-                    }
+                    org.jpedal.utils.LogWriter.writeLog("Exception attempting to draw additional objects " + ex);
                 }
                 
             }

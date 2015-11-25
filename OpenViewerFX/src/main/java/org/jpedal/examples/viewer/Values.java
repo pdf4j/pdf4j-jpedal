@@ -109,9 +109,7 @@ public class Values {
     private int maxNoOfMultiViewers;
     
     /**boolean lock to stop multiple access*/
-    //
-     public static boolean isProcessing = false;
-      /**/
+    public static boolean isProcessing = false;
     
     public Values(){
         
@@ -124,14 +122,12 @@ public class Values {
             
             isEncryptOnClasspath = getClass().getResource(altSP) != null;
         }catch(final Exception e){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in encryption "+e);
-            }
+            LogWriter.writeLog("Exception in encryption "+e);
+            
             isEncryptOnClasspath=false;
         }catch(final Error e){
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception in encryption "+e);
-            }
+            LogWriter.writeLog("Exception in encryption "+e);
+            
             isEncryptOnClasspath=false;
         }
     }

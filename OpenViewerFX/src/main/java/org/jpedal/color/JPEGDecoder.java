@@ -304,7 +304,7 @@ public class JPEGDecoder {
             
         } catch (Exception e) {
             if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception with JPeg Image ");
+                LogWriter.writeLog("Exception "+e+" with JPeg Image ");
             }
         }
         

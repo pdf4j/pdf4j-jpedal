@@ -61,8 +61,8 @@ public class XForm {
             return null;
         }
 
-        if(gs.SMask!=null && BBox!=null && BBox[0]>=0 && BBox[2]>0 ){ //see if SMask to cache to image & stop negative cases such as Milkshake StckBook Activity disX.pdf
-            
+        if(gs.SMask!=null && BBox!=null){ //see if SMask to cache to image & stop negative cases such as Milkshake StckBook Activity disX.pdf
+           
             //if(gs.SMask.getParameterConstant(PdfDictionary.Type)!=PdfDictionary.Mask || gs.SMask.getFloatArray(PdfDictionary.BC)!=null){ //fix for waves file
                 newSMask= gs.SMask.getDictionary(PdfDictionary.G);
                 currentPdfFile.checkResolved(newSMask);

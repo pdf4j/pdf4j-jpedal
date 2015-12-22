@@ -68,54 +68,34 @@ public class MaskUtils {
                                       final DynamicVectorRenderer current, final PdfObjectReader currentPdfFile,
                                       final ParserOptions parserOptions, final int formLevel, final float multiplyer, final boolean useTransparancy) {
 
-        final float[] BBox;//size
-        BBox= XObject.getFloatArray(PdfDictionary.BBox);
+        final float[] BBox= XObject.getFloatArray(PdfDictionary.BBox);
 
+        //System.out.println("x,y="+gs.CTM[2][0]+" "+gs.CTM[2][1]+" "+BBox[0]+" "+BBox[1]+" "+BBox[2]+" "+BBox[3]+" "+newSMask);
+        
         /**get form as an image*/
         final int fx=(int)BBox[0];
-        final int fy=(int)BBox[1];
         final int fw=(int)BBox[2];
-        final int fh=(int)(BBox[3]);
-//        int bmValue = PdfDictionary.Normal;
-//        float transparency = 1f;
+        final int fy=(int)BBox[1];
+        final int fh=(int)BBox[3];
+        
+        final int iw,ih;
+        final float scaling=4f;
 
-        final int iw;
-        final int ih;
+        BufferedImage image = PDFObjectToImage.getImageFromPdfObject(XObject, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,(newSMask==null && useTransparancy),scaling); 
 
-        //get the form
-        BufferedImage image;
-//        PDFObjectToImageNonStatic pdfObjectToImage = new PDFObjectToImageNonStatic();
+        if(newSMask!=null){ //apply SMask to image
+            
+            final BufferedImage smaskImage = PDFObjectToImage.getImageFromPdfObject(newSMask, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,false,scaling);
 
-        if(newSMask!=null){
-            image = PDFObjectToImage.getImageFromPdfObject(XObject, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,false,4f);
-
-            // @blendissues
-//            image = pdfObjectToImage.getImageFromPdfObject(XObject, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,false,1f);
-//            bmValue = pdfObjectToImage.getBlendMode();
-//            transparency = pdfObjectToImage.getTransparency();
-            final BufferedImage smaskImage = PDFObjectToImage.getImageFromPdfObject(newSMask, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,false,4f);
-
-            //apply SMask to image
             image= SMask.applySmask(image, smaskImage,true);
 
             if(smaskImage!=null){
                 smaskImage.flush();
             }
-
-            iw=image.getWidth()/4;
-            ih=image.getHeight()/4;
-
-        }else{
-
-            image = PDFObjectToImage.getImageFromPdfObject(XObject, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,useTransparancy,4f);
-            //image = PDFObjectToImage.getImageFromPdfObject(XObject, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,true,4f);
-
-            //image = pdfObjectToImage.getImageFromPdfObject(XObject, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,true,4f);
-
-            //hard-coded upscale to give better image quality
-            iw=image.getWidth()/4;
-            ih=image.getHeight()/4;
         }
+        
+        iw=image.getWidth()/4;
+        ih=image.getHeight()/4;
 
         final GraphicsState gs1; //add in gs
 
@@ -147,57 +127,28 @@ public class MaskUtils {
             gs1.y= parserOptions.getflattenY();
         }else{
 
-            if(fx<fw) {
-                gs1.x = fx;
-            } else {
-                gs1.x = fx - iw;
-            }
-
+            gs1.x = fx;
+            
             if(fy<fh) {
                 gs1.y = fy;
             } else {
                 gs1.y = fy - ih;
             }
         }
-
-//        float tempX = gs1.x;
-//        float tempY = gs1.y;
-
-//        if(gs.CTM[2][0]<0) {
-//           gs1.x = tempX*gs.CTM[0][0] + tempY*gs.CTM[1][0] + gs.CTM[2][0];
-//        }
-
-//        if(gs.CTM[2][1]<0) {
-//            gs1.y = tempY*gs.CTM[1][1] + tempY*gs.CTM[0][1] + gs.CTM[2][1];
-//        }
-
+        
         //see case 20638 for this quick fix we can use affine transform in future
-        gs1.x += gs.CTM[2][0];
-        gs1.y += gs.CTM[2][1];
-
-        //draw as image
-        gs1.CTM[2][0]= gs1.x;
-        gs1.CTM[2][1]= gs1.y;
-
-//        // @blendissues
-//        if(PdfDictionary.Normal != bmValue){
-//            current.setGraphicsState(GraphicsState.FILL, transparency, bmValue);
-//            current.setGraphicsState(GraphicsState.STROKE, transparency, bmValue);
-//            System.out.println(PdfDictionary.showAsConstant(bmValue));
-//        }
-
+        gs1.CTM[2][0]= (gs1.x*gs.CTM[0][0])+gs.CTM[2][0];
+        gs1.CTM[2][1]= (gs1.y*gs.CTM[1][1])+gs.CTM[2][1];
+        
         gs1.CTM[1][1]=-gs1.CTM[1][1];
-        gs1.CTM[2][1] -= gs1.CTM[1][1];
+        gs1.CTM[2][1]-=gs1.CTM[1][1];
             
         //separate call needed to paint image on thumbnail or background image in HTML/SVG
-        if(current.isHTMLorSVG()){
-            
+        if(current.isHTMLorSVG()){            
             current.drawImage(parserOptions.getPageNumber(),image,gs1,false,name, -3);
-
             current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -2);
-
         }else{
-            
+            gs1.x = gs1.CTM[2][0];
             gs1.y = gs1.CTM[2][1];
             
             current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -1);
@@ -206,7 +157,6 @@ public class MaskUtils {
         if(isChanged){
             current.setGraphicsState(GraphicsState.STROKE, gs.getAlpha(GraphicsState.STROKE),gs.getBMValue());
             current.setGraphicsState(GraphicsState.FILL, gs.getAlpha(GraphicsState.FILL), gs.getBMValue());
-
         }
     }
 

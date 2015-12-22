@@ -32,7 +32,6 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Point;
 import javax.swing.JOptionPane;
 import org.jpedal.*;
 import org.jpedal.display.Display;
@@ -242,9 +241,7 @@ public class PageNavigator {
         //new page number
         return currentPage + changeCount;
     }
-    
-    //
-    
+
     private static void changePage(PdfDecoderInt decode_pdf, GUIFactory currentGUI, Values commonValues, int updatedTotal) {
         commonValues.setCurrentPage(updatedTotal);
         //currentGUI.setPageNumber();
@@ -332,8 +329,18 @@ public class PageNavigator {
                         }
                     }
 
-                    //
-                    {
+                    /**
+                     * animate if using drag in facing
+                     */
+                    if (count == 1 && decode_pdf.getDisplayView() == Display.FACING
+                            && decode_pdf.getPages().getBoolean(Display.BoolValue.TURNOVER_ON)
+                            && decode_pdf.getPageCount() != 2
+                            && currentGUI.getPageTurnScalingAppropriate()
+                            && updatedTotal / 2 != commonValues.getCurrentPage() / 2
+                            && !decode_pdf.getPdfPageData().hasMultipleSizes()
+                            && !pageTurnAnimating) {
+                        currentGUI.triggerPageTurnAnimation(null, commonValues, updatedTotal, false);
+                    } else {
                         changePage(decode_pdf, currentGUI, commonValues, updatedTotal);
                     }
                 }
@@ -398,8 +405,18 @@ public class PageNavigator {
                         }
                     }
 
-                    //
-                    {
+                    /**
+                     * animate if using drag in facing
+                     */
+                    if (count == -1 && decode_pdf.getDisplayView() == Display.FACING
+                            && decode_pdf.getPages().getBoolean(Display.BoolValue.TURNOVER_ON)
+                            && currentGUI.getPageTurnScalingAppropriate()
+                            && decode_pdf.getPageCount() != 2
+                            && (updatedTotal != commonValues.getCurrentPage() - 1 || updatedTotal == 1)
+                            && !decode_pdf.getPdfPageData().hasMultipleSizes()
+                            && !pageTurnAnimating) {
+                        currentGUI.triggerPageTurnAnimation(null, commonValues, updatedTotal, true);
+                    } else {
                         changePage(decode_pdf, currentGUI, commonValues, updatedTotal);
                     }
                 }
@@ -453,12 +470,26 @@ public class PageNavigator {
         currentGUI.setPageNumber();
 
 							//Display new page
-        //
+
+        decode_pdf.repaint();
+
 
     }
     public static void drawMultiPageTiff(final Values commonValues, final PdfDecoderInt decode_pdf) {
 
-        //
+        if (tiffHelper != null) {
+            commonValues.setBufferedImg(tiffHelper.getImage(commonValues.getTiffImageToLoad()));
+
+            if (commonValues.getBufferedImg() != null) {
+                /**
+                 * flush any previous pages
+                 */
+                decode_pdf.getDynamicRenderer().flush();
+                decode_pdf.getPages().refreshDisplay();
+
+                Images.addImage(decode_pdf, commonValues);
+            }
+        }
     }
 
     public static void setPageTurnAnimating(final boolean a, final GUIFactory currentGUI) {

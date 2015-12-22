@@ -168,7 +168,7 @@ public class PropertiesFile {
       "Shows the tip of the day menuitem on the help menu","Tipoftheday", "true",
       "Shows the check for updates menuitem on the help menu","Checkupdates", "true",
       "Shows the about menuitem on the help menu","About", "true",
-        //
+      "Shows the help forum menuitem on the help menu","Helpforum", "true",
         "ENDCHILDREN",
         "ENDCHILDREN",
       "Show the content of the Button bar, button bar remain but empty if false","ButtonsMenu", "true",
@@ -178,7 +178,8 @@ public class PropertiesFile {
       "Show the document properties button on the button bar","Propertiesbutton", "false",
       "Show the about button on the button bar","Aboutbutton", "false",
       "Show the snapshot button on the button bar","Snapshotbutton", "true",
-        //
+      "Show the help button on the button bar","Helpbutton", "true",
+      "Show the rss feed button on the button bar","RSSbutton", "true",
       "Show the cursor button on the button bar","CursorButton", "true",
       "Show the mouse mode button on the button bar","MouseModeButton", "true",
         "ENDCHILDREN",
@@ -730,7 +731,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.7.25")){
+                        if(properties[position+1].equals("6.8.22")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

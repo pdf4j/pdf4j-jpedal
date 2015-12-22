@@ -27,38 +27,21 @@
 
  *
  * ---------------
- * Bookmark.java
+ * FileAccessHelper.java
  * ---------------
  */
-package org.jpedal.examples.viewer.commands;
-
-import org.jpedal.*;
-import org.jpedal.gui.GUIFactory;
+package org.jpedal;
 
 /**
- * Bookmark the current page in the Viewer
+ *
+ * @author markee
  */
-public class Bookmark {
+public class FileAccessHelper {
 
-    public static void execute(final Object[] args, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf) {
-        //Only works if a bookmark is specified and the currentGUI is not null
-        if (args.length >= 1 && currentGUI != null) {
-            final String bookmark = (String) args[0];
-
-            currentGUI.setBookmarks(true);
-
-            final String page = currentGUI.getBookmark(bookmark);
-
-            if (page != null) {
-                final int p = Integer.parseInt(page);
-
-                try {
-                    decode_pdf.decodePage(p);
-                    //
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public static final int mode=1;
+    
+    static void init() {
+     //   throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+   
 }

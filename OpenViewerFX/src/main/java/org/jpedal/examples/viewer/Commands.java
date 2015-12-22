@@ -32,14 +32,11 @@
  */
 package org.jpedal.examples.viewer;
 
-import org.jpedal.examples.viewer.commands.generic.Snapshot;
-import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 import org.jpedal.*;
 import org.jpedal.examples.viewer.commands.*;
-import org.jpedal.examples.viewer.gui.GUI.PageCounter;
 import org.jpedal.examples.viewer.gui.generic.GUISearchList;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.display.GUIThumbnailPanel;
@@ -141,7 +138,8 @@ public class Commands {
     public static final int OPENMENU = 316;
     public static final int FILEMENU = 317;
     
-    //
+    public static final int HELPFORUM = 318;
+    
     //300-499 not handled here
     
     //<link><a name="constants" />
@@ -241,296 +239,7 @@ public class Commands {
         this.searchFrame=searchFrame;
         
     }
-            
-    private Object executeMenuBarCommands(final int ID, Object[] args){
-        Object status =null;
-        
-        switch (ID) {
-            case ABOUT:
-                Info.execute(args, currentGUI); //Gets the info box
-                break;
-            //
-            case SAVE:
-                SaveFile.execute(args, currentGUI, commonValues);
-                break;
-            //
-            case EXIT:
-                Exit.execute(args, thumbnails, currentGUI, commonValues, decode_pdf, properties);
-                break;
-            case AUTOSCROLL:
-                AutoScroll.execute(args, currentGUI);
-                break;
-            case DOCINFO:
-                DocInfo.execute(args, currentGUI, commonValues, decode_pdf);
-                break;
-            case OPENFILE:
-                OpenFile.executeOpenFile(args, commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
-                break;
-            case BOOKMARK:
-                Bookmark.execute(args, currentGUI, decode_pdf);
-                break;
-            case FIND:
-                Find.execute(args, commonValues, currentGUI, decode_pdf, searchFrame);
-                break;
-            //
-            case OPENURL:
-                OpenFile.executeOpenURL(args, commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
-                break;
-            case VISITWEBSITE:
-                VisitWebsite.execute(args, currentGUI);
-                break;
-            case PREVIOUSDOCUMENT:
-                NavigateDocuments.executePrevDoc(args, currentGUI, commonValues, searchFrame, decode_pdf, properties, thumbnails);
-                break;
-            case NEXTDOCUMENT:
-                NavigateDocuments.executeNextDoc(args, currentGUI, commonValues, searchFrame, decode_pdf, properties, thumbnails);
-                break;
-            case PREVIOUSRESULT:
-                status = PreviousResult.execute(args, commonValues, currentGUI, decode_pdf, searchFrame);
-                break;
-            case NEXTRESULT:
-                status = NextResults.execute(args, commonValues, searchFrame, currentGUI, decode_pdf);
-                break;
-            case TIP:
-                Tip.execute(args, currentGUI, properties);
-                break;
-            case CASCADE:
-                Cascade.execute(args, currentGUI);
-                break;
-            case TILE:
-                Tile.execute(args, currentGUI);
-                break;
-            //case UPDATE: break;
-            case PREFERENCES:
-                Preferences.execute(args, currentGUI);
-                break;
-            case COPY:
-                Copy.execute(currentGUI, decode_pdf, commonValues);
-                break;
-            case SELECTALL:
-                SelectAll.execute(currentGUI, decode_pdf, commonValues);
-                break;
-            case DESELECTALL:
-                DeSelectAll.execute(currentGUI, decode_pdf);
-                break;
-            case UPDATEGUILAYOUT:
-                UpdateGUILayout.execute(args, currentGUI);
-                break;
-            case MOUSEMODE:
-                MouseModeCommand.execute(args, currentGUI, mouseMode, decode_pdf);
-                break;
-            case PANMODE:
-                PanMode.execute(args, currentGUI, mouseMode, decode_pdf);
-                break;
-            case TEXTSELECT:
-                TextSelect.execute(args, currentGUI, mouseMode);
-                break;
-            //
-            case EXTRACTASIMAGE:
-                ExtractSelectionAsImage.execute(commonValues, currentGUI, decode_pdf);
-                break;
-        }
-        return status;
-    }
-    
-    private void executeDisplayCommands(final int ID, Object[] args) {
-        
-        switch (ID) {
-            case FIRSTPAGE:
-                PageNavigator.goFirstPage(args, commonValues, decode_pdf, currentGUI);
-                break;
-
-            case FBACKPAGE:
-                PageNavigator.goFBackPage(args, commonValues, decode_pdf, currentGUI);
-                break;
-
-            case BACKPAGE:
-                PageNavigator.goBackPage(args, commonValues, decode_pdf, currentGUI);
-                break;
-
-            case FORWARDPAGE:
-                PageNavigator.goForwardPage(args, commonValues, decode_pdf, currentGUI);
-                break;
-
-            case FFORWARDPAGE:
-                PageNavigator.goFForwardPage(args, commonValues, decode_pdf, currentGUI);
-                break;
-
-            case LASTPAGE:
-                PageNavigator.goLastPage(args, commonValues, decode_pdf, currentGUI);
-                break;
-
-            case GOTO:
-                PageNavigator.goPage(args, currentGUI, commonValues, decode_pdf);
-                break;
-
-            //
-
-            case FULLSCREEN:
-                FullScreen.execute(args, currentGUI, thumbnails, commonValues, decode_pdf, properties);
-                break;
-
-        }
-    }
-    
-    private void executeDemoVersionCommands(final int ID, Object[] args) {
-        
-        switch (ID) {
-            case HELP:
-                Help.execute(args, currentGUI); //gets the help box            
-                break;
-            case BUY:
-                Buy.execute(args, currentGUI); //takes user to pricing page
-                break;
-            case RSS:
-                RSSyndication.execute(args, currentGUI); //gets the RSSs box
-                break;
-        }
-    }
-    
-    private void executeComboCommands(final int ID, Object[] args) {
-        
-        switch (ID) {
-            case QUALITY:
-                Quality.execute(args, currentGUI, commonValues, decode_pdf);
-                break;
-
-            case SCALING:
-                Scaling.execute(args, commonValues, decode_pdf, currentGUI, viewStack);
-                break;
-
-            case ROTATION:
-                Rotation.execute(args, currentGUI, commonValues);
-                break;
-        }
-    }
-    
-    private void executeExternalCommands(final int ID, Object[] args) {
-        
-        switch (ID) {
-            case SAVEFORM:
-                SaveForm.execute(args, currentGUI, decode_pdf, commonValues);
-                break;
-            case PDF:
-                Pdf.execute(args, commonValues, currentGUI, decode_pdf);
-                break;
-            case ROTATE:
-                Rotate.execute(args, commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
-                break;
-            //
-        }
-    }
-    
-    private void executePageCommands(final int ID, Object[] args) {
-        switch (ID) {
-            case HIGHLIGHT:
-                Highlight.execute(args, decode_pdf);
-                break;
-            case SCROLL:
-                Scroll.execute(args, commonValues, decode_pdf);
-                break;
-        }
-    }
-    
-    private Object executeViewerFunctionalityCommands(final int ID, Object[] args) {
-        Object status = null;
-        switch (ID) {
-            case ADDVIEW:
-                viewStack.add((Integer) args[0], (Rectangle) args[1], (Integer) args[2]);
-                break;
-            case FORWARD:
-                //go forward to next viewed location
-                if (viewStack.forward() != null) {
-                    decode_pdf.getFormRenderer().getActionHandler().changeTo(null, viewStack.forward().getPage(), viewStack.forward().getLocation(), viewStack.forward().getType(), false);
-                }
-                break;
-            case BACK:
-                //go back to last viewed location
-                if (viewStack.back() != null) {
-                    decode_pdf.getFormRenderer().getActionHandler().changeTo(null, viewStack.back().getPage(), viewStack.back().getLocation(), viewStack.back().getType(), false);
-                }
-                break;
-            case PAGECOUNT:
-                status = PageCount.execute(decode_pdf);
-                break;
-            case CURRENTPAGE:
-                status = CurrentPage.execute(decode_pdf, currentGUI);
-                break;
-            case GETOUTLINEPANEL:
-                //ensure setup
-                currentGUI.setBookmarks(true);
-                status = currentGUI.getOutlinePanel();
-                break;
-            case GETTHUMBNAILPANEL:
-                //ensure setup
-                currentGUI.setBookmarks(true);
-                status = currentGUI.getThumbnailPanel();
-                break;
-            case GETPAGECOUNTER:
-                status = currentGUI.getPageCounter(PageCounter.PAGECOUNTER2);
-                break;
-            case PAGEGROUPING:
-                status = PageGrouping.execute(args, decode_pdf); //Group Pages 
-                break;
-
-            case SETPAGECOLOR:
-                SetPageColor.execute(args, decode_pdf);
-                break;
-
-            case SETUNDRAWNPAGECOLOR:
-                SetUndrawnPageColor.execute(args, decode_pdf);
-                break;
-
-            case REPLACETEXTCOLOR:
-                ReplaceTextColor.execute(args, decode_pdf);
-                break;
-
-            case SETTEXTCOLOR:
-                SetTextColor.execute(args, decode_pdf);
-                break;
-
-            case CHANGELINEART:
-                ChangeLineArt.execute(args, decode_pdf);
-                break;
-            case SETDISPLAYBACKGROUND:
-                SetDisplayBackground.execute(args, decode_pdf);
-                break;
-            case SETREPLACEMENTCOLORTHRESHOLD:
-                SetReplacementThreshold.execute(args, decode_pdf);
-                break;
-            case GETPDFNAME: //Used for JavaFX Netbeans PDF Viewer Plugin.
-                status = decode_pdf.getFileName(); //cast to string when using.
-                break;
-        }
-        
-        return status;
-    }
-    
-    private void executeDebugCommands(final int ID, Object[] args){
-        
-        switch (ID) {
-            case TOGGLE:
-                Toggle.execute(args, decode_pdf);
-                break;
-            case SET:
-                SetCommand.execute(args, currentGUI, decode_pdf, commonValues);
-                break;
-            case RESET:
-                Reset.execute(args, commonValues, decode_pdf);
-                break;
-            //
-            case SHOWFORMNAMES:
-                ShowFormNames.execute(args, decode_pdf);
-                break;
-            case DELETEPROPERTIESONEXIT:
-                DeletePropertiesOnExit.execute(args);
-                break;
-            case ALWAYSSHOWMOUSE:
-                AlwaysShowMouse.execute(args);
-                break;
-        }
-    }
-    
+      
     //<link><a name="commands" />
     /**
      * main routine which executes code for current command
@@ -563,27 +272,10 @@ public class Commands {
             }
         }
         
-        if(!Viewer.isFX()){
+        if(!SharedViewer.isFX()){
          
-            if(ID < FIRSTPAGE){
-                status = executeMenuBarCommands(ID, args);
-            }else if(ID < QUALITY){
-                executeDisplayCommands(ID, args);
-            }else if(ID < CURRENTMENU){
-                executeComboCommands(ID, args);
-            }else if(ID < SAVEFORM){
-                //These options do nothing at the moment
-            }else if(ID < HIGHLIGHT){
-                executeExternalCommands(ID, args);
-            }else if(ID < ADDVIEW){
-                executePageCommands(ID, args);
-            }else if(ID < RSS){
-                status = executeViewerFunctionalityCommands(ID, args);
-            }else if(ID < 1000){ //Use hard coded value for a debug value remvoed during build
-                executeDemoVersionCommands(ID, args);
-            } else {
-                executeDebugCommands(ID, args);
-            }
+            status=executeSwingCommand(ID, args,status);
+           
         }
         
         //Mark as executed is not running in thread
@@ -593,20 +285,6 @@ public class Commands {
         
         return status;
         
-    }
-    
-    protected void openTransferedFile() throws PdfException {
-        if (currentGUI.isSingle()) {
-            decode_pdf.flushObjectValues(true);
-        } else {
-            //
-        }
-
-        //reset the viewableArea before opening a new file
-        decode_pdf.resetViewableArea();
-
-        OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
-
     }
 
     public void handleTransferedFile(final String file) throws PdfException {
@@ -650,7 +328,11 @@ public class Commands {
             }
         }
     }
- 
+
+    protected void openTransferedFile() throws PdfException {
+        throw new RuntimeException("openTransferedFile in Commands should never be called");
+    }
+
     public void recentDocumentsOption() {
 
         currentGUI.setRecentDocument();
@@ -744,4 +426,8 @@ public class Commands {
         
         return isLinear;
     }
+
+     Object executeSwingCommand(int ID, Object[] args, Object status) {
+         throw new UnsupportedOperationException("executeSwingCommand should not be called");
+     }
 }

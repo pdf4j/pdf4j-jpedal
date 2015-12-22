@@ -33,11 +33,7 @@
 package org.jpedal.examples.viewer.commands;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,10 +42,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.jpedal.*;
 import org.jpedal.display.Display;
@@ -85,10 +78,6 @@ public class OpenFile {
     public static boolean isPDf;
     
     private static InputStream inputStream;
-
-    private static int startX, startY;
-
-    //
 
     public static void executeOpenURL(final Object[] args, final Values commonValues, final GUISearchWindow searchFrame,
             final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final PropertiesFile properties,
@@ -160,7 +149,9 @@ public class OpenFile {
 
                         currentGUI.stopThumbnails();
 
-                        //
+                        if (!currentGUI.isSingle()) {
+                            currentGUI.openNewMultiplePage(commonValues.getSelectedFile(), commonValues);
+                        }
 
                         try {
                             //Set to true to show our default download window
@@ -176,7 +167,8 @@ public class OpenFile {
                     }
 
                 } else { // no file selected so redisplay old
-                    //
+
+                    decode_pdf.repaint();
                     // currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
                 }
             }
@@ -197,8 +189,9 @@ public class OpenFile {
              */
             SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);
 
-            //
-            if (Values.isProcessing()) {
+            if (org.jpedal.examples.viewer.utils.Printer.isPrinting()) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewerPrintWait.message"));
+            } else if (Values.isProcessing()) {
                 currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
             } else {
 
@@ -371,7 +364,8 @@ public class OpenFile {
                         }
 
                     } else { // no file selected so redisplay old
-                        //
+                        decode_pdf.repaint();
+
                         // currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
                     }
 
@@ -445,7 +439,8 @@ public class OpenFile {
                             LogWriter.writeLog("Exception attempting to open file: " + e1);
                         }
                     } else { // no file selected so redisplay old
-                        //
+                        decode_pdf.repaint();
+
                         currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
                     }
                 }
@@ -453,8 +448,6 @@ public class OpenFile {
         }
 
     }
-
-    //
 
     public static void open(final String file, final Values commonValues, final GUISearchWindow searchFrame,
             final GUIFactory currentGUI, PdfDecoderInt decode_pdf, final PropertiesFile properties,
@@ -498,7 +491,7 @@ public class OpenFile {
             if (currentGUI.isSingle()) {
                 decode_pdf.flushObjectValues(true);
             } else {
-                //
+                decode_pdf = currentGUI.openNewMultiplePage(commonValues.getSelectedFile(), commonValues);
             }
 
             //reset the viewableArea before opening a new file
@@ -982,12 +975,14 @@ public class OpenFile {
                     e1.printStackTrace();
                 }
             } else {
-                //
+                decode_pdf.repaint();
+
                 currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.NotValidPdfWarning"));
             }
 
         } else { //no file selected so redisplay old
-            //
+            decode_pdf.repaint();
+
             currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
         }
     }
@@ -1081,7 +1076,17 @@ public class OpenFile {
         if (commonValues.isPDF()) {
             currentGUI.decodePage();
         } else {
-            //
+
+            //resize (ensure at least certain size)
+            currentGUI.scaleAndRotate();
+
+            //add a border
+            decode_pdf.setPDFBorder(BorderFactory.createLineBorder(Color.black, 1));
+
+            Images.decodeImage(DecoderOptions.hires, decode_pdf, currentGUI, thumbnails, commonValues);
+
+            Values.setProcessing(false);
+
         }
     }
     
@@ -1180,22 +1185,23 @@ public class OpenFile {
                 
                 currentGUI.stopThumbnails();
 
-                //
+                if(!currentGUI.isSingle()) {
+                    currentGUI.openNewMultiplePage(commonValues.getSelectedFile(), commonValues);
+                }
 
                 OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
             }
             
         } else { //no file selected so redisplay old
-            //
+
+            decode_pdf.repaint();
+
             currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
         }
         
         return selectedFile;
     }
     
-    public static void setPageProperties(final Object rotation, final Object scaling) {
-        //
-        
-    }
+
 }

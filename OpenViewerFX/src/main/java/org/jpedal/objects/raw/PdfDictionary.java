@@ -292,6 +292,8 @@ public class PdfDictionary {
 
     public static final int DW=5159;
 
+    public static final int DW2=1320706;
+
     public static final int E=21;
 
     public static final int EarlyChange=1838971823;
@@ -1528,6 +1530,9 @@ public class PdfDictionary {
 
             case DW:
                 return VALUE_IS_INT;
+
+            case DW2:
+                return VALUE_IS_INT_ARRAY;
 
             case E:
 

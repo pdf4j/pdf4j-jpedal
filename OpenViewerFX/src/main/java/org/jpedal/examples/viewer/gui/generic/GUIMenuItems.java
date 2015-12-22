@@ -52,6 +52,12 @@ public abstract class GUIMenuItems {
         this.properties=properties;
     }
     
+    public static boolean includeExtraMenus;
+    
+    static{
+        includeExtraMenus=org.jpedal.FileAccessHelper.mode==2;
+    }
+    
     public abstract void addToMenu(Object menuItem, int parentMenuID);
     
     public abstract void ensureNoSeperators();

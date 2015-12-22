@@ -524,7 +524,6 @@ public class AcroRenderer{
                             formObject=convertRefToFormObject(objRef,page);
                         }catch(Exception e){
                             LogWriter.writeLog("Exception "+e+" with "+objRef);
-                            formObject=null;
                             continue;
                         }
                         
@@ -1485,9 +1484,7 @@ public class AcroRenderer{
     }
 
     public PrintStreamDecoder getStreamDecoderForPrinting(PdfObjectReader currentPdfFile, boolean isHires, PdfLayerList pdfLayerList) {
-        //
-         return null;
-        /**/
+        return new PdfStreamDecoderForPrinting(currentPdfFile, isHires, pdfLayerList);
     }
 
     public BufferedImage decode(PdfObject pdfObject, PdfObjectReader currentPdfFile, PdfObject XObject, int subtype, int width, int height, int offsetImage, float pageScaling) {

@@ -100,7 +100,7 @@ public class JavaFXCommands extends Commands {
             }
         }
 
-        if (Viewer.isFX()) {
+        if (SharedViewer.isFX()) {
 
             // Temp patch to get page nav working
             if (ID >= FIRSTPAGE && ID <= GOTO) {
@@ -120,7 +120,27 @@ public class JavaFXCommands extends Commands {
                     JavaFXTextSelect.execute(args, currentGUI, mouseMode, decode_pdf);
                     break;
                   
-                    //
+                case CONTINUOUS:
+                    ((FileAccess)decode_pdf.getExternalHandler(Options.FileAccess)).setLastPageDecoded(-1);
+                    Continuous.execute(decode_pdf, currentGUI, args);
+                    //PanModeFX.execute(args, currentGUI, mouseMode, decode_pdf); //Enables Panning of document
+                    break;
+                  
+                    case PAGEFLOW:
+                    PageFlow.execute(args, currentGUI, commonValues, decode_pdf, properties, searchFrame);
+                    break;
+                 
+                case CONTINUOUS_FACING:
+                    ((FileAccess)decode_pdf.getExternalHandler(Options.FileAccess)).setLastPageDecoded(-1);
+                    ContinuousFacing.execute(args, decode_pdf, currentGUI, commonValues);
+                    //PanModeFX.execute(args, currentGUI, mouseMode, decode_pdf); //Enables Panning of document
+                    break;
+                    
+                   
+                //case FACING:
+                  //  Facing.execute(args, decode_pdf, currentGUI, commonValues);
+                    //PanMode.execute(args, currentGUI, mouseMode, decode_pdf); //Enables Panning of document
+                    //break;
                     
                 case SNAPSHOT:
                     extractingAsImage = Snapshot.execute(args, currentGUI, decode_pdf, extractingAsImage); // Snapshot selected area
@@ -233,7 +253,9 @@ public class JavaFXCommands extends Commands {
                 case EXIT:
                     JavaFXExit.execute(args, thumbnails, currentGUI, commonValues, decode_pdf, properties);
                     break;
-                //
+                case PRINT:
+                    JavaFXPrint.execute(args, currentGUI, commonValues, properties, currentPrinter, decode_pdf);
+                    break;
                 case SETPAGECOLOR:
                     SetPageColor.execute(args, decode_pdf);
                     break;
@@ -271,7 +293,7 @@ public class JavaFXCommands extends Commands {
         if (currentGUI.isSingle()) {
             decode_pdf.flushObjectValues(true);
         } else {
-            //
+            decode_pdf = MultiPages.openNewMultiplePage(commonValues.getSelectedFile(), currentGUI, commonValues);
         }
 
         JavaFXOpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);

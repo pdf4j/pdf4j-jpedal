@@ -27,7 +27,7 @@
 
  *
  * ---------------
- * Viewer.java
+ * SharedViewer.java
  * ---------------
  */
 
@@ -44,18 +44,14 @@ import javax.swing.SwingUtilities;
 
 import org.jpedal.*;
 import org.jpedal.examples.viewer.commands.OpenFile;
-import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.display.GUIThumbnailPanel;
-//
 import org.jpedal.examples.viewer.utils.*;
-import org.jpedal.examples.viewer.objects.ClientExternalHandler;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.Options;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
-import org.jpedal.objects.acroforms.actions.DefaultActionHandler;
 import org.jpedal.objects.raw.OutlineObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
@@ -64,46 +60,7 @@ import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 import org.w3c.dom.Node;
 
-
-/** <h2><b>PDF Viewer</b></h2>
- *
- * <p>If you are compiling, you will need to download all the examples source files from :
- * <a href="http://www.idrsolutions.com/how-to-view-pdf-files-in-java/">How to View PDF File in Java.</a></p>
- *
- * <p><b>Run directly from jar with java -cp jpedal.jar org/jpedal/examples/viewer/Viewer
- * or java -jar jpedal.jar</b></p>
- *
- * <p>There are plenty of tutorials on how to configure the Viewer on our website <a href="http://www.idrsolutions.com/java-pdf-library-support/">Support Section.</a></p>
- * 
- * <p><a href="http://javadoc.idrsolutions.com/org/jpedal/constants/JPedalSettings.html">See Here for Settings to Customise the PDF Viewer</a></p>
- * 
- * <p>We also have our JavaFX Viewer documented at :</p>
- * <a href="http://files.idrsolutions.com/samplecode/org/jpedal/examples/viewer/OpenViewerFX.java.html">JavaFX Viewer Documentation.</a>
- *
- * <p>If you want to implement your own there is
- * a very simple example at : 
- * <a href="http://files.idrsolutions.com/samplecode/org/jpedal/examples/jpaneldemo/JPanelDemo.java.html">JPanel Demo.</a></p>
- * <p>We recommend you look at the full viewer as it is totally configurable and does everything for you.</p>
- *
- *
- * <p>Fully featured GUI viewer and demonstration of JPedal's capabilities.</p>
- *
- * <p>This class provides the framework for the Viewer and calls other classes which provide the following
- * functions:-</p>
- *<ul>
- * <li>Values commonValues - repository for general settings.</li>
- * <li>Printer currentPrinter - All printing functions and access methods to see if printing active.</li>
- * <li>PdfDecoder decode_pdf - PDF library and panel.</li>
- * <li>ThumbnailPanel thumbnails - provides a thumbnail pane down the left side of page - thumbnails can be clicked on to goto page.</li>
- * <li>PropertiesFile properties - saved values stored between sessions.</li>
- * <li>SwingGUI currentGUI - all Swing GUI functions.</li>
- * <li>SearchWindow searchFrame (not GPL) - search Window to search pages and goto references on any page.</li>
- * <li>Commands currentCommands - parses and executes all options.</li>
- * <li>SwingMouseHandler mouseHandler - handles all mouse and related activity.</li>
- * </ul>
- * 
- */
-public class Viewer implements ViewerInt{
+public abstract class SharedViewer implements ViewerInt{
 	
     /**Location of Preferences Files*/
     public static final String PREFERENCES_DEFAULT = "jar:/org/jpedal/examples/viewer/res/preferences/Default.xml";
@@ -146,7 +103,13 @@ public class Viewer implements ViewerInt{
     /**Throw runtime exception when user tries to open document after close() has been called*/
     public static boolean closeCalled;
 
-    //
+    /**
+     * open the file passed in by user on startup (do not call directly)
+     * USED by our tests
+     */
+    public GUIFactory getSwingGUI(){
+        return currentGUI;
+    }
 
 
     /**
@@ -290,111 +253,8 @@ public class Viewer implements ViewerInt{
         return decode_pdf;
     }
 
-    void init(){
-
-        //
-        
-    }
-    
-    /**
-	 * setup and run client
-	 */
-	public Viewer() {
-        // args and stage in FX not set up yet 
-        // so running init stuff causes the viewer to crash
-        if(isFX){
-            return;
-        }
-        init();
-        
-		//enable error messages which are OFF by default
-		DecoderOptions.showErrorMessages=true;
-		
-		//
-		
-		
-		final String prefFile = System.getProperty("org.jpedal.Viewer.Prefs");
-		if(prefFile != null){
-			properties.loadProperties(prefFile);
-		}else{
-			properties.loadProperties();
-		}
-    }
-
-	/**
-     * setup and run client passing in paramter to show if
-     * running as applet, webstart or JSP (only applet has any effect
-     * at present)
-     * @param modeOfOperation The new modeOfOperation(RUNNING_NORMAL,RUNNING_APPLET,RUNNING_WEBSTART,RUNNING_JSP)
-     */
-    public Viewer(final int modeOfOperation) {
-
-        init();
-        
-        //enable error messages which are OFF by default
-        DecoderOptions.showErrorMessages=true;
-
-        final String prefFile = System.getProperty("org.jpedal.Viewer.Prefs");
-        if(prefFile != null){
-            properties.loadProperties(prefFile);
-        }else{
-            properties.loadProperties();
-        }
-
-        commonValues.setModeOfOperation(modeOfOperation);
-
-    }
-
-    /**
-     * setup and run client passing in paramter that points to the preferences file we should use.
-     * @param prefs Full path to xml file containing preferences
-     */
-    public Viewer(final String prefs) {
-        
-        init();
-
-        //enable error messages which are OFF by default
-        DecoderOptions.showErrorMessages=true;
-
-        try{
-            properties.loadProperties(prefs);
-        }catch(final Exception e){
-            System.err.println("Specified Preferrences file not found at "+prefs+". If this file is within a jar ensure filename has jar: at the begining.\n\nLoading default properties. "+e);
-
-            properties.loadProperties();
-        }
-
-
-    }
-
-    /**
-     * setup and run client passing in parameter that points to the preferences file we should use.
-     * preferences file
-     * @param rootContainer Is a swing component that the viewer is displayed inside
-     * @param preferencesPath The path of the preferences file
-     */
-    public Viewer(final Object rootContainer, final String preferencesPath) {
-
-        init();
-        
-        //enable error messages which are OFF by default
-        DecoderOptions.showErrorMessages=true;
-
-        if(preferencesPath!=null && !preferencesPath.isEmpty()){
-            try{
-                properties.loadProperties(preferencesPath);
-            }catch(final Exception e){
-                System.err.println("Specified Preferrences file not found at "+preferencesPath+". If this file is within a jar ensure filename has jar: at the begining.\n\nLoading default properties. "+e);
-
-                properties.loadProperties();
-            }
-        }else{
-            properties.loadProperties();
-        }
-        setRootContainer(rootContainer);
-
-    }
-    
+    public SharedViewer() {}
+       
     @Override
     public void setRootContainer(final Object rootContainer){
         currentGUI.setRootContainer(rootContainer);
@@ -505,8 +365,8 @@ public class Viewer implements ViewerInt{
 
             }catch(final IOException ee){
 
-                //
-
+                ee.printStackTrace();
+                
                 java.util.Locale.setDefault(new java.util.Locale("en", "EN"));
                 currentGUI.showMessageDialog("No locale file "+fileName+" has been defined for this Locale - using English as Default"+
                         "\n Format is path, using '.' as break ie org.jpedal.international.messages");
@@ -531,7 +391,7 @@ public class Viewer implements ViewerInt{
         /**
          * setup window for warning if renderer has problem
          */
-        if(!Viewer.isFX){
+        if(!SharedViewer.isFX){
             decode_pdf.getDynamicRenderer().setMessageFrame((Container)currentGUI.getFrame());
         }
         String propValue = properties.getValue("showfirsttimepopup");
@@ -571,7 +431,9 @@ public class Viewer implements ViewerInt{
             try{
                 Messages.setBundle(ResourceBundle.getBundle("org.jpedal.international.messages"));
             }catch(final Exception e){
-                //
+                
+                e.printStackTrace();
+                
                 LogWriter.writeLog("Exception "+e+" loading resource bundle.\n" +
                         "Also check you have a file in org.jpedal.international.messages to support Locale="+java.util.Locale.getDefault());
             }
@@ -809,21 +671,7 @@ public class Viewer implements ViewerInt{
     
     static boolean isFX;
 
-    /** main method to run the software as standalone application
-     * @param args Program arguments passed into the Viewer.
-     */
-    public static void main(final String[] args) {
-
-        //make sure JavaFX run correctly
-        if(isFX){
-            System.out.println("Please run ViewerFx using java -cp jpedal.jar org.jpedal.examples.viewer.FXStartup");
-            System.exit(1);
-        }
-        
-        final Viewer current = new Viewer();
-        current.setupViewer();
-        current.handleArguments(args);
-    }
+    
 
     /**
      * Have the viewer handle program arguments
@@ -938,8 +786,8 @@ public class Viewer implements ViewerInt{
         }catch(final Exception e){
             System.err.println("Exception " + e + " processing file");
 
-            //<start-demo><end-demo>
-
+            e.printStackTrace();
+            
             Values.setProcessing(false);
         }
     }
@@ -963,8 +811,8 @@ public class Viewer implements ViewerInt{
         }catch(final Exception e){
             System.err.println("Exception " + e + " processing file");
 
-            //<start-demo><end-demo>
-
+            e.printStackTrace();
+            
             Values.setProcessing(false);
         }
     }
@@ -997,8 +845,6 @@ public class Viewer implements ViewerInt{
         return currentCommands.executeCommand(commandID, args);
 
     }
-
-    //
 
     public static boolean isProcessing(){
         return Values.isProcessing();

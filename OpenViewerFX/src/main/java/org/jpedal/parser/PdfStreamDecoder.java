@@ -70,7 +70,7 @@ public class PdfStreamDecoder extends BaseDecoder{
     
     private static boolean showFXShadingMessage;
     
-    //
+    protected org.jpedal.objects.structuredtext.StructuredContentHandler contentHandler;
     
     int formLevel;
     
@@ -378,7 +378,23 @@ public class PdfStreamDecoder extends BaseDecoder{
                 this.layers=(PdfLayerList) obj;
                 break;
                 
-                //
+                /**
+                 * used internally for structured content extraction.
+                 */
+            case ValueTypes.MarkedContent:
+                
+                if(isHTML){
+                    contentHandler=new org.jpedal.objects.structuredtext.HTMLStructuredContentHandler(obj,current);
+                }else{
+                    contentHandler=new org.jpedal.objects.structuredtext.StructuredContentHandler(obj);
+                }
+                
+                parserOptions.setContentHandler(contentHandler);
+                break;
+                
+            case Options.GlyphTracker:
+                parserOptions.setCustomGlyphTracker((GlyphTracker) obj);
+                break;
                 
             case ValueTypes.ImageHandler:
                 this.customImageHandler = (ImageHandler)obj;
@@ -1149,8 +1165,14 @@ public class PdfStreamDecoder extends BaseDecoder{
             
             case ValueTypes.EmbeddedFonts:
                 return pdfFontFactory.hasEmbeddedFonts();
+            
+            case ValueTypes.StructuredContent:
                 
-                //
+                if(contentHandler==null) {
+                    return false;
+                } else {
+                    return contentHandler.hasContent();
+                }
             
             case DecodeStatus.PageDecodingSuccessful:
                 return errorTracker.ispageSuccessful();
@@ -1290,7 +1312,10 @@ public class PdfStreamDecoder extends BaseDecoder{
                     parserOptions.getLayerVisibility().add(parserOptions.getLayerLevel());
                 }
                 
-                //
+                if(contentHandler!=null) {
+                    contentHandler.BMC(parser.generateOpAsString(0, false));
+                }
+                
                 break;
                 
             case Cmd.BDC :
@@ -1308,7 +1333,10 @@ public class PdfStreamDecoder extends BaseDecoder{
                 //track setting and use in preference for text extraction
                 textDecoder.setActualText(BDCobj.getTextStreamValue(PdfDictionary.ActualText));
                 
-                //
+                if(contentHandler!=null) {
+                    contentHandler.BDC(BDCobj);
+                }
+                
                 break;
                 
             case Cmd.BT :
@@ -1317,7 +1345,9 @@ public class PdfStreamDecoder extends BaseDecoder{
                 
             case Cmd.EMC :
                 textDecoder.setActualText(null);
-                //
+                if(contentHandler!=null) {
+                    contentHandler.EMC();
+                }
                 
                 //balance stack inside tagged commands
                 if(parserOptions.getLayerLevel()==1 && BDCDepth!=-1 && BDCDepth!=graphicsStates.getDepth()){
@@ -1338,7 +1368,13 @@ public class PdfStreamDecoder extends BaseDecoder{
                 break;
                 
             case Cmd.DP :
-                //
+                if(contentHandler!=null){
+                    
+                    final MCObject obj=new MCObject(parser.generateOpAsString(0, false));
+                    currentPdfFile.readObject(obj);
+                    
+                    contentHandler.DP(obj);
+                }
                 break;
 
             case Cmd.Tf :

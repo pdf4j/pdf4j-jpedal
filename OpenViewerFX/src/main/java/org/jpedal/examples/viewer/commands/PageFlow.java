@@ -45,9 +45,7 @@ import javax.swing.SwingUtilities;
 import org.jpedal.*;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -146,7 +144,7 @@ public class PageFlow {
                 
                 currentGUI.getButtons().alignLayoutMenuOption(Display.PAGEFLOW);
                 
-                if (Viewer.isFX()) {
+                if (SharedViewer.isFX()) {
                     ModeChange.changeModeInJavaFX(Display.PAGEFLOW, decode_pdf, currentGUI, commonValues,  properties, searchFrame);
                 } else {
                     ModeChange.changeModeInSwing(Display.PAGEFLOW, decode_pdf, currentGUI, commonValues,  properties, searchFrame);

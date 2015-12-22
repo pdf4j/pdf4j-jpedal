@@ -35,8 +35,7 @@ package org.jpedal.examples.viewer.gui.javafx;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.examples.viewer.gui.CommandListenerImpl;
 import org.jpedal.examples.viewer.gui.generic.GUIButton;
 
@@ -66,7 +65,7 @@ public class JavaFXCommandListener extends CommandListenerImpl implements EventH
         } else {
             ID = ((JavaFXID) source).getID();
         }
-           if (!Viewer.closeCalled) {
+           if (!SharedViewer.closeCalled) {
             currentCommands.executeCommand(ID, null);
         } else {
             throw new RuntimeException("No resource to open document, call to close() disposes viewer resources");

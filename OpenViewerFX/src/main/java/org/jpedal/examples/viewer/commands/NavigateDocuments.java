@@ -50,8 +50,9 @@ public class NavigateDocuments {
             final GUISearchWindow searchFrame, final PdfDecoderInt decode_pdf,
             final PropertiesFile properties, final GUIThumbnailPanel thumbnails) {
         if (args == null) {
-            //
-            if (Values.isProcessing()) {
+            if (org.jpedal.examples.viewer.utils.Printer.isPrinting()) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewerPrintWait.message"));
+            } else if (Values.isProcessing()) {
                 currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
             } else {
                 final String fileToOpen = currentGUI.getRecentDocument().getPreviousDocument();
@@ -65,8 +66,9 @@ public class NavigateDocuments {
             final PropertiesFile properties, final GUIThumbnailPanel thumbnails) {
         if (args == null) {
 
-            //
-            if (Values.isProcessing()) {
+            if (org.jpedal.examples.viewer.utils.Printer.isPrinting()) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewerPrintWait.message"));
+            } else if (Values.isProcessing()) {
                 currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
             } else {
                 final String fileToOpen = currentGUI.getRecentDocument().getNextDocument();

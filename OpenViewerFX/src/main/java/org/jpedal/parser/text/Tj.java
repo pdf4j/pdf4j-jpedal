@@ -289,13 +289,18 @@ public class Tj extends BaseDecoder {
      */
     private StringBuffer processTextArray(final byte[] stream, int startCommand, final int dataPointer, final float multiplyer, final boolean multipleTJs){
         
+        //can be left unset by 2 byte CID glyphs in <> so always ensure off
+        glyphData.setText(false);
+        
         isHTML=current.isHTMLorSVG();
         
         /**
          * global and local values
          */
         resetValues(glyphData);
-        
+
+        final boolean widthIsVertical=currentFontData.isWidthVertical();
+
         final int Tmode=gs.getTextRenderType();
         boolean hasContent=false,isMultiple=false; //flag text found as opposed to just spacing
         char lastTextChar = 'x';
@@ -682,7 +687,7 @@ public class Tj extends BaseDecoder {
             }
         }
         
-        Trm=updateMatrixPosition( Trm, glyphData.getLeading(), currentWidth, currentTextState);
+        Trm=updateMatrixPosition(widthIsVertical, Trm, glyphData.getLeading(), currentWidth, currentTextState);
         
         /** now workout the rectangular shape this text occupies
          * by creating a box of the correct width/height and transforming it
@@ -697,7 +702,7 @@ public class Tj extends BaseDecoder {
         }       
     }
     
-    static float[][] updateMatrixPosition(float[][] Trm, float leading, float currentWidth, TextState currentTextState) {
+    static float[][] updateMatrixPosition(boolean widthIsVertical, float[][] Trm, float leading, float currentWidth, TextState currentTextState) {
         /**all text is now drawn (if required) and text has been decoded*/
         
         //final move to get end of shape
@@ -708,7 +713,7 @@ public class Tj extends BaseDecoder {
         temp[1][0] = 0;
         temp[1][1] = 1;
         temp[1][2] = 0;
-        
+
         //if leading moves it back into text, leave off
         if(leading<0) {
             temp[2][0] = (currentWidth);
@@ -717,6 +722,13 @@ public class Tj extends BaseDecoder {
         }
         
         temp[2][1] = 0; //ty;
+
+        if(widthIsVertical){  //switch x and y
+            float tmp=temp[2][0];
+            temp[2][0]=temp[2][1];
+            temp[2][1]=tmp;
+        }
+
         temp[2][2] = 1;
         Trm = Matrix.multiply(temp, Trm); //multiply to get new Tm
         

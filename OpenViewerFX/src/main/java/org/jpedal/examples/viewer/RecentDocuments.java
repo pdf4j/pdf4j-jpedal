@@ -219,8 +219,9 @@ public class RecentDocuments implements RecentDocumentsFactory {
             @Override
             public void actionPerformed(final ActionEvent e) {
 
-                //
-                if (Values.isProcessing()) {
+                if (Printer.isPrinting()) {
+                    currentGUI.showMessageDialog(Messages.getMessage("PdfViewerPrintWait.message"));
+                } else if (Values.isProcessing()) {
                     currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
                 } else {
                     /**

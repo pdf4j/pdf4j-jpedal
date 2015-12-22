@@ -87,6 +87,7 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
+import org.jpedal.examples.viewer.OpenViewerFX;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.JavaFxGUI;
 import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions;
@@ -121,7 +122,6 @@ public class JavaFXPreferences {
     private static final Text title = new Text(Messages.getMessage("PdfPreferences.GeneralSection"));
     private static ScrollPane contentScrollPane;
     private static PropertiesFile properties;
-
 
     private static final int GENERAL = 0;
     private static final int PAGEDISPLAY = 1;
@@ -295,7 +295,23 @@ public class JavaFXPreferences {
          */
         hiResPrintingCB = new CheckBox(Messages.getMessage("Printing.HiRes"));
 
-        //
+        
+        if(!OpenViewerFX.isOpenFX){
+            final List<String> availablePrinters = new ArrayList<String>(Arrays.asList(org.jpedal.examples.viewer.utils.Printer.getAvailablePrinters(properties.getValue("printerBlacklist"))));
+            final PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+            if (defaultPrintService != null) {
+                availablePrinters.add(Messages.getMessage("PdfPreferences.systemDefault.text") + " (" + defaultPrintService.getName() + ')');
+            } else {
+                availablePrinters.add(Messages.getMessage("PdfPreferences.systemDefault.text"));
+            }
+            final ObservableList<String> printerOptions = FXCollections.observableList(availablePrinters);
+            printerCombo = new ComboBox(printerOptions);
+
+            final ObservableList<String> pageSizeOptions = FXCollections.observableList(Arrays.asList(currentGUI.getPaperSizes().getPaperSizes()));
+            paperSizesCombo = new ComboBox(pageSizeOptions);
+            paperSizesCombo.setValue(pageSizeOptions.get(currentGUI.getPaperSizes().getDefaultPageIndex()));
+
+        }
 
         defaultDPITF = new TextField();
         blackListTF = new TextField();
@@ -888,9 +904,7 @@ public class JavaFXPreferences {
             if (i < nodes.getLength()) {
                 final String name = nodes.item(i).getNodeName();
 
-                if (removeOption(name)) {
-                    //Ignore this item
-                } else if (!name.startsWith("#")) {
+                if (!name.startsWith("#")) {
                     //Node to add
                     final CheckBoxTreeItem<String> newLeaf = new CheckBoxTreeItem<String>(Messages.getMessage("PdfCustomGui." + name));
 
@@ -935,30 +949,6 @@ public class JavaFXPreferences {
                 }
             }
         }
-    }
-
-    private static boolean removeOption(final String name) {
-
-        //
-        //Remove help button as it is not in use in gpl version
-        if(name.equals("Helpbutton")){
-            return true;
-        }
-
-        //Remove rss button as it is not in use in gpl version
-        if(name.equals("RSSbutton")){
-            return true;
-        }
-        /**/
-
-        //
-        //Remove help menu item as it is not in use in gpl or full version
-        if(name.equals("Helpforum")){
-            return true;
-        }
-        /**/
-
-        return false;
     }
 
     /**

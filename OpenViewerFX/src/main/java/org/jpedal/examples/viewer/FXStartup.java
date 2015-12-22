@@ -155,8 +155,8 @@ public class FXStartup extends Application {
     
     //starting the FXViewer Stage
      public void startNew(final Stage stage){
-        
-        final List<String> args = this.getParameters().getUnnamed();
+
+            final List<String> args = this.getParameters().getUnnamed();
         viewer = new OpenViewerFX(stage,args.toArray(new String[args.size()]));
         viewer.setupViewer();
     }

@@ -41,7 +41,6 @@ import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.MouseMode;
-import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXMessageDialog;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;
@@ -88,9 +87,9 @@ public class JavaFXMouseModeCommand {
                     if (url != null) {
                         currentGUI.getButtons().getButton(Commands.MOUSEMODE).setIcon(url);
                     }
-                    if(GUI.debugFX){
-                        currentGUI.getButtons().getButton(Commands.SNAPSHOT).setEnabled(true);
-                    }
+                    
+                    currentGUI.getButtons().getButton(Commands.SNAPSHOT).setEnabled(true);
+                    
                     //Update Cursor
                     ((PdfDecoderFX) decode_pdf).setDefaultCursor(Cursor.TEXT);
                 }

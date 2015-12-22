@@ -37,7 +37,6 @@ import org.jpedal.display.GUIThumbnailPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -57,11 +56,7 @@ import javax.swing.tree.TreeNode;
 import org.jpedal.*;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.RecentDocumentsFactory;
-import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.Viewer;
-import org.jpedal.examples.viewer.commands.OpenFile;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.examples.viewer.gui.generic.*;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.*;
@@ -94,6 +89,12 @@ public abstract class GUI implements GUIFactory {
     protected static int collapsedSize=30;
     
     boolean isJavaFX;
+    
+    static boolean includeExtraMenus;
+    
+    static{
+        includeExtraMenus=org.jpedal.FileAccessHelper.mode==2;
+    }
 
     /**
      * Generic ENUMS for setting similar JavaFX and Swing values.
@@ -177,13 +178,6 @@ public abstract class GUI implements GUIFactory {
         this.commonValues = commonValues;
         this.thumbnails = thumbnails;
         this.properties = properties;
-
-        //<start-demo>
-        /**
-         //<end-demo>
-
-         //
-         /**/
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -231,7 +225,7 @@ public abstract class GUI implements GUIFactory {
         decode_pdf.setPageMode(pageMode);
         properties.setValue("startView", String.valueOf(pageMode));
 
-        //
+        decode_pdf.repaint();
 
         //Set the search window
         final String propValue = properties.getValue("searchWindowType");
@@ -463,11 +457,6 @@ public abstract class GUI implements GUIFactory {
      */
     public void init(final Commands currentCommands) {
 
-        /**
-         * single listener to execute all commands
-         */
-        currentCommandListener = new CommandListener(currentCommands);
-
         //setup custom message and switch off error messages if used
         customMessageHandler = (CustomMessageHandler) (decode_pdf.getExternalHandler(Options.CustomMessageOutput));
         if (customMessageHandler != null) {
@@ -495,9 +484,7 @@ public abstract class GUI implements GUIFactory {
             if (!propValue.isEmpty()) {
                 windowTitle = propValue;
             } else {
-                //
-                windowTitle ="LGPL PDF JavaFX Viewer " + PdfDecoderInt.version;
-                /**/
+                windowTitle=getTitle();
             }
 
             propValue = properties.getValue("vbgColor");
@@ -634,6 +621,10 @@ public abstract class GUI implements GUIFactory {
 
     }
 
+    protected String getTitle(){
+        return Messages.getMessage("PdfViewer.titlebar") + ' ' + PdfDecoderInt.version;
+    }
+
     @Override
     @SuppressWarnings("UnusedDeclaration")
     public boolean isCommandInThread(){
@@ -703,8 +694,8 @@ public abstract class GUI implements GUIFactory {
 
         if(getSelectedComboIndex(Commands.ROTATION)!=(rotation/90)){
             setSelectedComboIndex(Commands.ROTATION, (rotation/90));
-        }else if(!Values.isProcessing() && !Viewer.isFX()){
-            //
+        }else if(!Values.isProcessing() && !SharedViewer.isFX()){
+            decode_pdf.repaint();
         }
     }
 
@@ -864,7 +855,7 @@ public abstract class GUI implements GUIFactory {
 
             currentGUI.scrollToPage(commonValues.getCurrentPage());
 
-                if(!Viewer.isFX()){
+                if(!SharedViewer.isFX()){
                 return ;
             }
         }else if(decode_pdf.getDisplayView() == Display.PAGEFLOW) {
@@ -879,12 +870,15 @@ public abstract class GUI implements GUIFactory {
 
         //SwingWorker worker = new SwingWorker() {
 
-        //
+        setCursor(2);
 
-        //<start-demo><end-demo>
+
+        if(LogWriter.isRunningFromIDE){
+            start=System.currentTimeMillis();
+        }
 
         try {
-            if(!Viewer.isFX()){
+            if(!SharedViewer.isFX()){
                 ((StatusBar)currentGUI.getStatusBar()).updateStatus("Decoding Page",0);
             }
             /**
@@ -1024,7 +1018,7 @@ public abstract class GUI implements GUIFactory {
 
 
                 }
-            if(!Viewer.isFX()){
+            if(!SharedViewer.isFX()){
                 ((StatusBar)currentGUI.getStatusBar()).updateStatus("Displaying Page",0);
             }
 
@@ -1059,7 +1053,6 @@ public abstract class GUI implements GUIFactory {
 
             currentGUI.setViewerTitle(null); //restore title
 
-            OpenFile.setPageProperties(getSelectedComboItem(Commands.ROTATION), getSelectedComboItem(Commands.SCALING));
 
             if(LogWriter.isRunningFromIDE){
                 /**
@@ -1088,7 +1081,7 @@ public abstract class GUI implements GUIFactory {
         currentGUI.selectBookmark();
 
         //Update multibox
-        if(!Viewer.isFX()){
+        if(!SharedViewer.isFX()){
             ((StatusBar)currentGUI.getStatusBar()).setProgress(100);
         }
 //                    ActionListener listener = new ActionListener(){
@@ -1241,10 +1234,14 @@ public abstract class GUI implements GUIFactory {
         //Ensure page is at the correct scaling and rotation for display
         currentGUI.scaleAndRotate();
 
-        //
+        setCursor(1);
+
+
     }
 
-    //
+    void setCursor(int type) {
+        //only used in Swing implementation
+    }
 
     /*
      * Set title to display on top of Swing of FX viewer (include days left on trial version)
@@ -1254,14 +1251,10 @@ public abstract class GUI implements GUIFactory {
     @Override
     public void setViewerTitle(String title) {
 
-        if(title!=null){
+        if(title!=null && FileAccess.bb>0){
 
-            //<start-demo>
-            /**
-             //<end-demo>
-             title="("+dx+" days left) "+title;
-             /**/
-
+             title="("+FileAccess.bb+" days left) "+title;
+           
         }else{
 
             //set null title value to empty string
@@ -1277,12 +1270,6 @@ public abstract class GUI implements GUIFactory {
                     title += " (Linearized)";
                 }
             }
-
-            //<start-demo>
-            /**
-             //<end-demo>
-             finalMessage="("+dx+" days left) "+title;
-             /**/
 
             if(commonValues.isFormsChanged()) {
                 title = "* " + title;

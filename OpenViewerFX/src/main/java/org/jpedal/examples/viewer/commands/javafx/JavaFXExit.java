@@ -36,9 +36,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.examples.viewer.commands.SaveForm;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.display.GUIThumbnailPanel;
@@ -56,8 +54,9 @@ public class JavaFXExit {
 
     public static void execute(final Object[] args, final GUIThumbnailPanel thumbnails, final GUIFactory currentGUI, final Values commonValues, final PdfDecoderInt decode_pdf, final PropertiesFile properties) {
         if (args == null) {
-            //
-            {
+            if (org.jpedal.examples.viewer.utils.Printer.isPrinting()) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewerStillPrinting.text"));
+            } else {
                 exit(thumbnails, currentGUI, commonValues, decode_pdf, properties);
             }
 
@@ -123,13 +122,13 @@ public class JavaFXExit {
         }
 
         //formClickTest needs this so that it does not exit after first test.
-        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !Viewer.exitOnClose) {
+        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !SharedViewer.exitOnClose) {
             currentGUI.dispose();
           
         } else {
             
             //Added this one for now to remove a delay being experienced.
-            if(Viewer.exitOnClose){
+            if(SharedViewer.exitOnClose){
                 decode_pdf.dispose();
                 currentGUI.dispose();
 

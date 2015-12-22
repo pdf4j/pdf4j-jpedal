@@ -221,8 +221,8 @@ public class CommandParser {
 
                 //showCommands=(tokenNumber>6300);
                 //this makes rest of page disappear
-               // if(tokenNumber>70)
-               //	return streamSize;
+               // if(tokenNumber>22)
+               	//return streamSize;
 
 
                 if(PdfStreamDecoder.showCommands) {

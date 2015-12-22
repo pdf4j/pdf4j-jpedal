@@ -66,6 +66,9 @@ public class ThumbnailDecoder {
             //forms rendered as components just for thumbnail
             final AcroRenderer formRenderer=decode_pdf.getFormRenderer();
             final boolean originalRasterize = formRenderer.getCompData().formsRasterizedForDisplay();
+            
+            boolean formsAlreadyDecoded = formRenderer.getCompData().getFormList(true)[pageNumber]!=null;
+            
             formRenderer.getCompData().setRasterizeForms(true);
             
             //Produce image at 50% scaling to prevent massive memory issues at large scalings
@@ -80,6 +83,12 @@ public class ThumbnailDecoder {
             }
             
             formRenderer.getCompData().setRasterizeForms(originalRasterize);
+            
+            //If viewer had not decoded forms for that page, reset to null
+            if(!formsAlreadyDecoded){
+                formRenderer.getCompData().getFormList(true)[pageNumber]=null;
+                formRenderer.getCompData().getFormList(false)[pageNumber]=null;
+            }
             
             final int imgHeight = pageImage.getHeight();
             final double scale = height/(double)imgHeight;

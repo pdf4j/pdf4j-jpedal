@@ -50,6 +50,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.examples.viewer.OpenViewerFX;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXDialog;
 import org.jpedal.utils.BrowserLauncher;
 import org.jpedal.utils.Messages;
@@ -76,40 +77,33 @@ public class JavaFXInfo {
         final Text title = new Text ("JavaFX Viewer Information");
         title.setTextAlignment(TextAlignment.CENTER);
         title.setFont(Font.font("SansSerif", FontWeight.BOLD, 14));
+        ImageView imageView;
+        Hyperlink link;
          
         /**
          * Build Main Body Text.
          */
+        Text info ;
    
-        //
-        Text info = new Text("OpenViewerFX is a JavaFX PDF Viewer written in JavaFX and released without any warranty or support under an LGPL license.\n"
-            + "This Application is updated regularly and a supported, enhanced version is available as part of the commercial JPedal Java PDF library.");
-        info.setText(info.getText()+"\n\n\t\tVersions: " + PdfDecoderInt.version + "          " + "Java: " + System.getProperty("java.version"));
-        /**/    
-        //
+        if (OpenViewerFX.isOpenFX) {
+            info = new Text("OpenViewerFX is a JavaFX PDF Viewer written in JavaFX and released without any warranty or support under an LGPL license.\n"
+                    + "This Application is updated regularly and a supported, enhanced version is available as part of the commercial JPedal Java PDF library.");
+            info.setText(info.getText() + "\n\n\t\tVersions: " + PdfDecoderInt.version + "          " + "Java: " + System.getProperty("java.version"));
+
+            imageView = new ImageView(new Image("/org/jpedal/examples/viewer/res/logo2.png"));
+            link = new Hyperlink("Learn more about the JPedal Commercial PDF Library");
+        } else {
+            info = new Text(Messages.getMessage("PdfViewerInfo1"));
+            info.setText(info.getText() + "\n\n\t\tVersions:\n\t\tJPedal: " + PdfDecoderInt.version + "          " + "Java: " + System.getProperty("java.version"));
+
+            imageView = new ImageView(new Image("/org/jpedal/examples/viewer/res/logo.png"));
+            link = new Hyperlink("Take Me To JPedal Library");
+        }
         
         info.setWrappingWidth(350);
         info.setTextAlignment(TextAlignment.JUSTIFY);
         info.setFont(Font.font("SansSerif", FontWeight.NORMAL,12));
         
-        /**
-         * Build Main Body Logo.
-         */
-        
-        //
-        ImageView imageView = new ImageView(new Image("/org/jpedal/examples/viewer/res/logo2.png"));
-        /**/    
-        //
-        
-      
-        /**
-         * Build Main Body HyperLink.
-         */
-        
-        //    
-        Hyperlink link = new Hyperlink("Learn more about the JPedal Commercial PDF Library");
-        /**/    
-        // 
         link.setBorder(Border.EMPTY);
         
         /**
@@ -148,11 +142,11 @@ public class JavaFXInfo {
         
         final FXDialog newDialog = new FXDialog(null, Modality.APPLICATION_MODAL, vBox, 400,350);
         
-        //   
+       if(OpenViewerFX.isOpenFX){
             newDialog.setTitle("About OpenViewerFX");
-        /**/    
-        //
-        
+       }else{
+           newDialog.setTitle("About JPedal");
+       }
         newDialog.setResizeable(false);
       
         //Open default-browser window to support & docs page when link is clicked.

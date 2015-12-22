@@ -99,6 +99,7 @@ import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.JavaFXRecentDocuments;
 import org.jpedal.examples.viewer.RecentDocumentsFactory;
 import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.OpenViewerFX;
 import org.jpedal.examples.viewer.commands.OpenFile;
 import org.jpedal.examples.viewer.commands.javafx.JavaFXOpenFile;
 import org.jpedal.examples.viewer.gui.generic.GUIButtons;
@@ -262,7 +263,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
     private PrintPanelFX printPanel;
 
-    //
     private TransitionType transitionType = TransitionType.None;
     // Scrolls between pages when the pdf is not zoomed in
     private ScrollBar pageScroll;
@@ -1061,6 +1061,11 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
         mouseHandler.setupMouse();
 
+        /**
+         * single listener to execute all commands
+         */
+        currentCommandListener = new CommandListenerFX(currentCommands);
+
         super.init(currentCommands);
 
         /**
@@ -1101,7 +1106,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
          */
         setupComboBoxes();
 
-        if(LogWriter.isRunningFromIDE){
+        if(LogWriter.isRunningFromIDE || org.jpedal.DevFlags.GUITESTINGINPROGRESS){
             nameElements();
         }
 
@@ -1167,7 +1172,15 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
         fxButtons.getTopButtons().getItems().add(sep);
 
-        //
+        if(includeExtraMenus && commonValues.getModeOfOperation() != Values.RUNNING_PLUGIN) {
+            fxButtons.addButton(GUIFactory.BUTTONBAR, Messages.getMessage("PdfViewerToolbarTooltip.help"), "help.png", Commands.HELP, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+        }
+
+        //addButton(GUIFactory.BUTTONBAR,Messages.getMessage("PdfViewerToolbarTooltip.buy"),iconLocation+"buy.png",Commands.BUY);
+        if(includeExtraMenus && commonValues.getModeOfOperation() != Values.RUNNING_PLUGIN) {
+            fxButtons.addButton(GUIFactory.BUTTONBAR, "RSS", "rss.gif", Commands.RSS, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+        }
+
         /**
          * add cursor location
          */
@@ -1214,12 +1227,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         //frame.repaint();
         /////////////////////////////////////
 
-//        //<start-demo>
-        /**
-//        //<end-demo>
-         
-        // 
-        /**/
         /**
          * set display to occupy half screen size and display, add listener and
          * make sure appears in centre
@@ -1650,13 +1657,38 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 }
                 break;
 
-                 //
-                
-            /**/
+            case Display.PAGEFLOW:
+
+                if (pages instanceof PageFlowDisplayFX) {
+                    return hasChanged;
+                }
+
+                if (lastDisplayView != Display.SINGLE_PAGE) {
+                    setDisplayView(Display.SINGLE_PAGE, 0);
+                    setDisplayView(Display.PAGEFLOW, 0);
+                    return hasChanged;
+                }
+
+                pages = new PageFlowDisplayFX((GUIFactory) customFXHandle, comp);
+
+                break;
+              
             default:
 
-                //
+                if (needsReset) {
+                    pages = new MultiDisplayFX(this, pageNumber, decode_pdf.getDynamicRenderer(), displayView, comp, options, fileAccess);
+                    //displayRotation = displayRotation;
+                    pages.setPageRotation(decode_pdf.getDisplayRotation()); //force update
+                } else {
+                    pages = new MultiDisplayFX(this, pageNumber, decode_pdf.getDynamicRenderer(), displayView, comp, options, fileAccess);
+                }
 
+                //pass in value if needed
+                final RenderChangeListener customRenderChangeListener = (RenderChangeListener) externalHandlers.getExternalHandler(Options.RenderChangeListener);
+                if (customRenderChangeListener != null) {
+                    pages.setObjectValue(Options.RenderChangeListener, customRenderChangeListener);
+                }
+                
                 break;
 
         }
@@ -2622,7 +2654,15 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         if (isSingle) {
             fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.SinglePage"), "single.gif", Commands.SINGLE, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
 
-            //
+            if(!OpenViewerFX.isOpenFX){
+                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.Continuous"), "continuous.gif", Commands.CONTINUOUS, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+
+                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.ContinousFacing"), "continuous_facing.gif", Commands.CONTINUOUS_FACING, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+
+                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.Facing"), "facing.gif", Commands.FACING, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+
+                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.PageFlow"), "pageflow.gif", Commands.PAGEFLOW, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+            }
         }
 
         //on top in plugin
@@ -2709,9 +2749,9 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             scalingBox.setSelectedItem(scale + '%');
         }
 
-        if (!Values.isProcessing()) {
-            //
-        }
+        //if (!Values.isProcessing()) {
+            //((PdfDecoder) decode_pdf).repaint();
+        //}
     }
 
     /* (non-Javadoc)
@@ -4509,6 +4549,28 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
         }
     }
+
+    @Override
+    public PdfDecoderInt openNewMultiplePage(String selectedFile, Values commonValues) {
+        throw new RuntimeException("Not implemented in JavaFX");
+
+    }
+
+    @Override
+    public void triggerPageTurnAnimation(PdfDecoderInt decode_pdf, Values commonValues, int updatedTotal, boolean rightTurn) {
+
+    }
+
+    @Override
+    protected String getTitle(){
+
+        if(OpenViewerFX.isOpenFX) {
+            return "LGPL PDF JavaFX Viewer " + PdfDecoderInt.version;
+        }else{
+            return super.getTitle();
+        }
+    }
+
 
 }
 

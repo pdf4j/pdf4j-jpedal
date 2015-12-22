@@ -64,7 +64,7 @@ public interface PdfDecoderInt {
     /**
      * build number of this version
      */
-    String version = "6.7.25";
+    String version = "6.8.22";
     /**
      * flag to show extraction mode should include any text
      */
@@ -233,7 +233,17 @@ public interface PdfDecoderInt {
 
     BufferedImage getPageAsImage(int pageIndex) throws PdfException;
 
-    //
+    BufferedImage getPageAsHiRes(int pageIndex) throws PdfException;
+
+    BufferedImage getPageAsHiRes(int pageIndex, Map params) throws PdfException;
+
+    BufferedImage getPageAsHiRes(int pageIndex, Map params, boolean isTransparent) throws PdfException;
+
+    BufferedImage getPageAsHiRes(int pageIndex, boolean isTransparent)throws PdfException;
+
+    BufferedImage getPageAsTransparentImage(int pageIndex) throws PdfException;
+    
+    float getHiResUpscaleFactor();
     
     /**
      * Return amount to inset the page rectangle height by
@@ -464,4 +474,6 @@ public interface PdfDecoderInt {
     DisplayOffsets getDisplayOffsets();
 
     int getTextPrint();
+
+    void repaint();
 }

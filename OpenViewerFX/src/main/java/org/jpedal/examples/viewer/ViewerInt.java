@@ -69,9 +69,6 @@ package org.jpedal.examples.viewer;
  */
 public interface ViewerInt {
 	
-	//
-
-
     /**
      *
      * Allow user to open PDF file to display

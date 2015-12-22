@@ -56,7 +56,7 @@ public class ObjectDecoder implements Serializable {
     
     //not final in IDE but in build do our static analysis does not flag as dead debug code
     //which we  want compiler to ooptimise out
-    public static final boolean debugFastCode=false; //objRef.equals("68 0 R")
+    public static boolean debugFastCode=false; //objRef.equals("68 0 R")
     
     private int pdfKeyType, PDFkeyInt;
     
@@ -1127,7 +1127,7 @@ public class ObjectDecoder implements Serializable {
         }
         //and store if it is a ref
         if(raw[end]=='o' && raw[end+1]=='b' && raw[end+2]=='j') {
-            objectRef=new String(raw, 0, end)+"R";
+            objectRef=new String(raw, 0, end)+ 'R';
             int newArrayLen=raw.length-end-4;
             byte[] newArray=new byte[newArrayLen];
             System.arraycopy(raw, end+4, newArray, 0, newArrayLen);

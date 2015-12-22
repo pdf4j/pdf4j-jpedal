@@ -32,13 +32,13 @@
  */
 package org.jpedal.io;
 import java.awt.image.BufferedImage;
-import java.io.RandomAccessFile;
+import org.jpedal.JDeliHelper;
 
 public class TiffHelper {
 
     //private ImageDecoder dec;
 
-    private int pageCount;
+    private final int pageCount;
     private final String file;
 
     /**
@@ -46,10 +46,9 @@ public class TiffHelper {
      */
     public TiffHelper(final String file){
 
-        RandomAccessFile raf;
         this.file = file;
         
-        //
+        pageCount=JDeliHelper.getTiffPageCount(file);
         
     }
 
@@ -58,12 +57,8 @@ public class TiffHelper {
     }
 
     public BufferedImage getImage(final int tiffImageToLoad) {
-        RandomAccessFile raf;
-        BufferedImage image = null;
         
-        //
-        
-        return image;
+        return JDeliHelper.getTiffImage(tiffImageToLoad,file);
         
     }
 }

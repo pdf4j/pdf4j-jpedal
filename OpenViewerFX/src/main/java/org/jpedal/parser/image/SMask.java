@@ -189,8 +189,8 @@ public class SMask {
                        maybeFourBit=false;
                    }
                } else if (values[0] == 0 && values[1] == 0 && values[2] == 0 && values[3] == 0) {
-                   if(pix[3]!=255){
-                       imgRas.setPixels(x, y, 1, 1, transparentPixel);
+                   if(pix[3]!=255 && pix[0]==0){
+                      imgRas.setPixels(x, y, 1, 1, transparentPixel);
                    }
                    
                    //if(pix[0]==255 && pix[1]==255 && pix[2]==255 && pix[3]==255){

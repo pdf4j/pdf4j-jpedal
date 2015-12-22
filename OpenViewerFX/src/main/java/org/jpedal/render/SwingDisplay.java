@@ -92,7 +92,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     protected GlyphFactory factory;
     
-    //
+    private PdfGlyphs glyphs;
     
     private Map imageID=new HashMap(10);
     
@@ -656,7 +656,52 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 return;
             }
             
-            //
+            /**
+             * generate glyph for text
+             */
+            if(type<0){
+                
+                //lazy initialisation on factory
+                if(factory==null) {
+                    factory = new T1GlyphFactory(false);
+                }
+                
+                final UnrendererGlyph glyph=(UnrendererGlyph)pageObjects[i];
+                final Object newGlyph;
+                
+                //generate glyph now if needed
+                final float[][] trm={{a,b},{c,d},{glyph.x,glyph.y}};
+                
+                final int raw=glyph.rawInt;
+                final Integer key= raw;
+                final String disp=glyphs.getDisplayValue(key);
+                final String charGlyph = glyphs.getCharGlyph(key);
+                final String emb = glyphs.getEmbeddedEnc(key);
+                final float width=glyph.currentWidth;
+                
+                if(type==-DynamicVectorRenderer.TEXT){
+                    
+                    final boolean isSTD=DecoderOptions.isRunningOnMac ||(org.jpedal.fonts.StandardFonts.isStandardFont(glyphs.getBaseFontName(),false));
+                    final Area transformedGlyph2= glyphs.getStandardGlyph(trm, raw, disp, width,isSTD);
+                    
+                    //if its already generated we just need to move it
+                    final AffineTransform at2 =AffineTransform.getTranslateInstance(glyph.x,glyph.y);
+                    transformedGlyph2.transform(at2);
+                    
+                    currentArea=RenderUtils.getAreaForGlyph(trm);
+                    
+                    newGlyph= transformedGlyph2;
+                    
+                }else{
+                    newGlyph= glyphs.getEmbeddedGlyph(factory,charGlyph ,trm, raw, disp, width,emb);
+                }
+                
+                //reset values to generated values
+                type=-type;
+                objectTypes[i]=type;
+                pageObjects[i]=newGlyph;
+                
+            }
             
             if(type>0){
                 
@@ -1100,7 +1145,20 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                             
                             break;
                             
-                            //
+                        case DynamicVectorRenderer.MARKER:
+                            
+                            final MarkerGlyph marker=(MarkerGlyph) currentObject;
+                            fontUsed=marker.fontName;
+                            
+                            a=marker.a;
+                            b=marker.b;
+                            c=marker.c;
+                            d=marker.d;
+                            iCount++;
+                            
+                            glyphs=(PdfGlyphs) fonts.get(fontUsed);
+                            
+                            break;                           
                     }
                 }
             }
@@ -2127,7 +2185,8 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         }else{
             //Adjust line width to 1 if less than 1 
             //ignore if using T3Display (such as ap image generation in html / svg conversion
-            if(((BasicStroke)newStroke).getLineWidth()<1 && !(this instanceof T3Display)){
+            if((((BasicStroke)newStroke).getLineWidth()<1 && ((BasicStroke)newStroke).getLineWidth()!=0) &&
+                    !(this instanceof T3Display)){
                 newStroke = new BasicStroke(1,((BasicStroke)newStroke).getEndCap(), ((BasicStroke)newStroke).getLineJoin(), ((BasicStroke)newStroke).getMiterLimit(), ((BasicStroke)newStroke).getDashArray(), ((BasicStroke)newStroke).getDashPhase());
             }
             lastStroke=newStroke;

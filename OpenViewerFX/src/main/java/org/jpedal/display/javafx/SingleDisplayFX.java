@@ -298,8 +298,9 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         
         addForms(formRenderer);
    
-        //
-        /**/
+        if(pdf.isOpen()){
+            FXHelper.scaleDisplay(pdf.getChildren(),crx,cry,crw,crh);
+        }
         
     }
     

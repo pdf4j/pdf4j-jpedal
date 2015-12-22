@@ -92,15 +92,29 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
     
     private JButton createAnnotationFreeText(final FormObject form){
         JButton but = setupAnnotationButton(form);
-
+        
         but.setText("<html>" + form.getTextStreamValue(PdfDictionary.Contents) + "</html>");
-
+        
+        but.setVerticalAlignment(SwingConstants.TOP);
+        but.setHorizontalAlignment(SwingConstants.LEFT);
+        
         final Font font = new Font("TimesRoman", Font.PLAIN, 12);
         form.setTextSize(12);
         but.setFont(font);
-
+        
         form.setFontName("TimesRoman");
         form.setTextFont(font);
+        
+        //Adjust position to counteract swing values misplacing text
+        FontMetrics fm = but.getFontMetrics(font);
+        Rectangle r = form.getBoundingRectangle();
+        int offset = fm.getMaxAscent()-12;
+        if(offset<0){
+            offset = 0;
+        }
+        offset += fm.getDescent();
+        form.setFloatArray(PdfDictionary.Rect, new float[]{r.x+2, r.y+offset, r.x+r.width+2, r.y+r.height+offset});
+        
         return but;
     }
                     

@@ -415,6 +415,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
                 //Point mousePoint = getCoordsOnPage(e.getX(), e.getY(), commonValues.getCurrentPage());
                 final int pagenumber = decode_pdf.getPageNumber();
+                this.page_data = decode_pdf.getPdfPageData();
                 final int crx = page_data.getCropBoxX(pagenumber);
                 final int cry = page_data.getCropBoxY(pagenumber);
                 commonValues.m_x1 = (int)e.getX()+crx;
@@ -524,6 +525,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
                 //Point values = getCoordsOnPage(e.getX(), e.getY(), commonValues.getCurrentPage());
                 final int pagenumber = decode_pdf.getPageNumber();
+                this.page_data = decode_pdf.getPdfPageData();
                 final int crx = page_data.getCropBoxX(pagenumber);
                 final int cry = page_data.getCropBoxY(pagenumber);
                 commonValues.m_x1 = (int)e.getX()+crx;

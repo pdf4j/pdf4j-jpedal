@@ -318,8 +318,96 @@ public class JavaFXPageNavigator {
 								}
 							}
 
-                            //
-                            {
+                            /**
+							 * animate if using drag in facing
+							 */
+							if (count == 1 && decode_pdf.getDisplayView() == Display.FACING
+									&& decode_pdf.getPages().getBoolean(Display.BoolValue.TURNOVER_ON)
+									&& decode_pdf.getPageCount() != 2
+									&& currentGUI.getPageTurnScalingAppropriate()
+									&& updatedTotal / 2 != commonValues.getCurrentPage() / 2
+									&& !decode_pdf.getPdfPageData().hasMultipleSizes()
+									&& !pageTurnAnimating) {
+
+								float pageW = decode_pdf.getPdfPageData().getCropBoxWidth(1);
+								float pageH = decode_pdf.getPdfPageData().getCropBoxHeight(1);
+								if (decode_pdf.getPdfPageData().getRotation(1) % 180 == 90) {
+									final float temp = pageW;
+									pageW = pageH;
+									pageH = temp;
+								}
+
+								final Point corner = new Point();
+								corner.x = (int) ((decode_pdf.getVisibleRect().getWidth() / 2) - pageW);
+								corner.y = (int) (decode_pdf.getInsetH() + pageH);
+
+								final Point cursor = new Point();
+								cursor.x = (int) ((decode_pdf.getVisibleRect().getWidth() / 2) + pageW);
+								cursor.y = (int) (decode_pdf.getInsetH() + pageH);
+
+								final int newPage = updatedTotal;
+								final Thread animation = new Thread() {
+									@Override
+									public void run() {
+										// Fall animation
+										int velocity = 1;
+
+										//ensure cursor is not outside expected range
+										if (cursor.x <= corner.x) {
+											cursor.x = corner.x - 1;
+										}
+
+										//Calculate distance required
+										final double distX = (corner.x - cursor.x);
+
+										//Loop through animation
+										while (cursor.getX() >= corner.getX()) {
+
+											//amount to move this time
+											double xMove = velocity * distX * 0.001;
+
+											//make sure always moves at least 1 pixel in each direction
+											if (xMove > -1) {
+												xMove = -1;
+											}
+
+											cursor.setLocation(cursor.getX() + xMove, cursor.getY());
+											decode_pdf.setUserOffsets((int) cursor.getX(), (int) cursor.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_RIGHT);
+
+											//Double speed til moving 32/frame
+											if (velocity < 32) {
+												velocity *= 2;
+											}
+
+											//sleep til next frame
+											try {
+												Thread.sleep(50);
+											} catch (final Exception e) {
+												e.printStackTrace();
+											}
+
+										}
+
+										//change page
+										commonValues.setCurrentPage(newPage);
+										currentGUI.setPageNumber();
+										decode_pdf.setPageParameters(currentGUI.getScaling(), commonValues.getCurrentPage());
+										currentGUI.decodePage();
+
+										//unlock corner drag
+										setPageTurnAnimating(false, currentGUI);
+
+										//hide turnover
+										decode_pdf.setUserOffsets(0, 0, org.jpedal.external.OffsetOptions.INTERNAL_DRAG_BLANK);
+									}
+								};
+
+								animation.setDaemon(true);
+								//lock corner drag
+								setPageTurnAnimating(true, currentGUI);
+
+								animation.start();
+							}else{
 								commonValues.setCurrentPage(updatedTotal);
 								//							currentGUI.setPageNumber();
 
@@ -383,11 +471,7 @@ public class JavaFXPageNavigator {
 							lastPageDecoded = commonValues.getTiffImageToLoad() + 1;
 							currentGUI.setPageNumber();
 
-							//Display new page
-                            //
-
-						}
-                        else {
+						} else {
 
 							/**
 							 * adjust for double jump on facing
@@ -420,8 +504,96 @@ public class JavaFXPageNavigator {
 								}
 							}
 
-                            //
-                            {
+                            /**
+							 * animate if using drag in facing
+							 */
+							if (count == -1 && decode_pdf.getDisplayView() == Display.FACING
+									&& decode_pdf.getPages().getBoolean(Display.BoolValue.TURNOVER_ON)
+									&& currentGUI.getPageTurnScalingAppropriate()
+									&& decode_pdf.getPageCount() != 2
+									&& (updatedTotal != commonValues.getCurrentPage() - 1 || updatedTotal == 1)
+									&& !decode_pdf.getPdfPageData().hasMultipleSizes()
+									&& !pageTurnAnimating) {
+
+								float pageW = decode_pdf.getPdfPageData().getCropBoxWidth(1);
+								float pageH = decode_pdf.getPdfPageData().getCropBoxHeight(1);
+								if (decode_pdf.getPdfPageData().getRotation(1) % 180 == 90) {
+									final float temp = pageW;
+									pageW = pageH;
+									pageH = temp;
+								}
+
+								final Point corner = new Point();
+								corner.x = (int) ((decode_pdf.getVisibleRect().getWidth() / 2) + pageW);
+								corner.y = (int) (decode_pdf.getInsetH() + pageH);
+
+								final Point cursor = new Point();
+								cursor.x = (int) ((decode_pdf.getVisibleRect().getWidth() / 2) - pageW);
+								cursor.y = (int) (decode_pdf.getInsetH() + pageH);
+
+								final int newPage = updatedTotal;
+								final Thread animation = new Thread() {
+									@Override
+									public void run() {
+										// Fall animation
+										int velocity = 1;
+
+										//ensure cursor is not outside expected range
+										if (cursor.x >= corner.x) {
+											cursor.x = corner.x - 1;
+										}
+
+										//Calculate distance required
+										final double distX = (corner.x - cursor.x);
+
+										//Loop through animation
+										while (cursor.getX() <= corner.getX()) {
+
+											//amount to move this time
+											double xMove = velocity * distX * 0.001;
+
+											//make sure always moves at least 1 pixel in each direction
+											if (xMove < 1) {
+												xMove = 1;
+											}
+
+											cursor.setLocation(cursor.getX() + xMove, cursor.getY());
+											decode_pdf.setUserOffsets((int) cursor.getX(), (int) cursor.getY(), org.jpedal.external.OffsetOptions.INTERNAL_DRAG_CURSOR_BOTTOM_LEFT);
+
+											//Double speed til moving 32/frame
+											if (velocity < 32) {
+												velocity *= 2;
+											}
+
+											//sleep til next frame
+											try {
+												Thread.sleep(50);
+											} catch (final Exception e) {
+												e.printStackTrace();
+											}
+
+										}
+
+										//change page
+										commonValues.setCurrentPage(newPage);
+										currentGUI.setPageNumber();
+										decode_pdf.setPageParameters(currentGUI.getScaling(), commonValues.getCurrentPage());
+										currentGUI.decodePage();
+
+										//hide turnover
+										decode_pdf.setUserOffsets(0, 0, org.jpedal.external.OffsetOptions.INTERNAL_DRAG_BLANK);
+
+										//Unlock corner drag
+										setPageTurnAnimating(false, currentGUI);
+									}
+								};
+
+								animation.setDaemon(true);
+								//lock corner drag
+								setPageTurnAnimating(true, currentGUI);
+
+								animation.start();
+							}else{
 								commonValues.setCurrentPage(updatedTotal);
 								//							currentGUI.setPageNumber();
 
@@ -478,7 +650,19 @@ public class JavaFXPageNavigator {
 
     public static void drawMultiPageTiff(final Values commonValues, final PdfDecoderInt decode_pdf) {
 
-        //
+        if (tiffHelper != null) {
+            commonValues.setBufferedImg(tiffHelper.getImage(commonValues.getTiffImageToLoad()));
+
+            if (commonValues.getBufferedImg() != null) {
+                /**
+                 * flush any previous pages
+                 */
+                decode_pdf.getDynamicRenderer().flush();
+                decode_pdf.getPages().refreshDisplay();
+
+                Images.addImage(decode_pdf, commonValues);
+            }
+        }
     }
 
     public static void setPageTurnAnimating(final boolean a, final GUIFactory currentGUI) {

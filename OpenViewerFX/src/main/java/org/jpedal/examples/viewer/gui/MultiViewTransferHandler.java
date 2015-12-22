@@ -160,8 +160,8 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
                             if (internalFrame.getTitle().equals(commonValues.getSelectedFile())) {
                                 try {
                                     internalFrame.setClosed(true);
-                                } catch (final PropertyVetoException f) {
-                                    LogWriter.writeLog("Exception attempting getframes" + e);
+                                } catch (final PropertyVetoException e1) {
+                                    LogWriter.writeLog("Exception "+e1+" attempting getframes");
                                 }
                                 break;
                             }

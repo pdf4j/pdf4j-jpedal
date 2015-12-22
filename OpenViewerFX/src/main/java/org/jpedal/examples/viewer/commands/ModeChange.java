@@ -40,9 +40,7 @@ import javafx.stage.Stage;
 import javax.swing.SwingUtilities;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -178,7 +176,7 @@ class ModeChange {
                 h = 600;
             }
 
-            if (Viewer.isFX()) {
+            if (SharedViewer.isFX()) {
                 ((Stage) currentGUI.getFrame()).setMinWidth(w);
                 ((Stage) currentGUI.getFrame()).setMinHeight(h);
             } else {

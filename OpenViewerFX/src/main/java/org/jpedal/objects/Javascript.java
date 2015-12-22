@@ -71,8 +71,11 @@ public class Javascript {
             try{
                 //noinspection PointlessBooleanExpression
                 if(!useNewJSParser) {
-                    //
-                    {  //just AF commands coded in Java
+                    // see if javascript jar present and generate JSParser
+					final java.io.InputStream in = DefaultParser.class.getClassLoader().getResourceAsStream("org/mozilla/javascript/Context.class");
+					if (in != null) {
+                        jsParser = new RhinoParser(this);
+                    } else {  //just AF commands coded in Java
                         jsParser = new DefaultParser();
                     }
 				}

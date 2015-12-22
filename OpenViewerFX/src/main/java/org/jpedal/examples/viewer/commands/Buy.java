@@ -45,7 +45,7 @@ public class Buy {
             try {
                 BrowserLauncher.openURL("http://www.idrsolutions.com/jpedal-pricing/");
             } catch (final Exception e1) {
-                currentGUI.showMessageDialog("Please visit http://www.idrsolutions.com/jpedal-pricing/");
+                currentGUI.showMessageDialog(e1+" Please visit http://www.idrsolutions.com/jpedal-pricing/");
             }
         }
     }

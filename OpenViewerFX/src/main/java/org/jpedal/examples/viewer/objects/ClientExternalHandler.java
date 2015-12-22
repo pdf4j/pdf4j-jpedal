@@ -32,8 +32,6 @@
  */
 package org.jpedal.examples.viewer.objects;
 
-import org.jpedal.examples.viewer.gui.FXAdditionalData;
-//
 import org.jpedal.external.*;
 import org.jpedal.io.Speech;
 
@@ -42,7 +40,7 @@ import org.jpedal.io.Speech;
  * 
  * @author markee
  */
-public class ClientExternalHandler implements AdditonalHandler{
+public abstract class ClientExternalHandler implements AdditonalHandler{
 
     
     AnnotationHandler annotationHandler;// =new ExampleAnnotationHandler();
@@ -50,9 +48,6 @@ public class ClientExternalHandler implements AdditonalHandler{
     // [AWI] Used when the UI is ready for Keyboard input (used for touchscreens with virtual keyboards).
     
     private JPedalActionHandler keyboardHandler;
-    
-    /**Used in JavaFX to display additional objects if decoding with transition*/
-    private FXAdditionalData additionaValuesforPage;
     
     private Speech speech; 
     
@@ -67,10 +62,7 @@ public class ClientExternalHandler implements AdditonalHandler{
 
             case Options.SpeechEngine:
                 return speech;
-                
-            case Options.JavaFX_ADDITIONAL_OBJECTS:
-                return additionaValuesforPage;
-            
+             
             case Options.UniqueAnnotationHandler:
                 return annotationHandler;
                
@@ -89,8 +81,6 @@ public class ClientExternalHandler implements AdditonalHandler{
                 annotationHandler =(AnnotationHandler) newHandler;
                 break;
             
-            //
-            
              /* [AWI] Used when the UI is ready for Keyboard input (used for touchscreens with virtual keyboards). */
             case Options.KeyboardReadyHandler:
                 if ( newHandler instanceof JPedalActionHandler ) {
@@ -102,9 +92,6 @@ public class ClientExternalHandler implements AdditonalHandler{
                 if ( newHandler instanceof Speech ) {
                     speech = (Speech)newHandler;
                 }
-                break;
-            case Options.JavaFX_ADDITIONAL_OBJECTS:
-                additionaValuesforPage = (FXAdditionalData)newHandler;
                 break;
                 
             default:

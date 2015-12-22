@@ -53,9 +53,7 @@ package org.jpedal.jbig2.image;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
-// <start-me>
 import java.awt.image.DataBufferByte;
-// <end-me>
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
@@ -1138,19 +1136,11 @@ public final class JBIG2Bitmap {
 		System.arraycopy(bytes, 0, copy, 0, len);
 
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-		// <start-me>
+		
 		/** create an image from the raw data */
 		DataBuffer db = new DataBufferByte(copy, copy.length);
 		WritableRaster raster = Raster.createPackedRaster(db, width, height, 1, null);
-		/* <end-me>
-        WritableRaster raster = image.getRaster();
-        int[] intrgb = new int[copy.length];
-        for(int i=0;i<copy.length;i++){
-            intrgb[i] = (int)copy[i];
-        }
-        raster.setPixels(0, 0, width, height, intrgb);
-        /**/
-
+		
 		image.setData(raster);
 
 		return image;

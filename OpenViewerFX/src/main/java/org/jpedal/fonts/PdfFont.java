@@ -62,6 +62,8 @@ public class PdfFont implements Serializable {
     PdfObject ToUnicode;
     
     String truncatedName;
+
+    private boolean isWidthVertical=false;
     
     private Rectangle BBox;
     
@@ -1109,13 +1111,14 @@ public class PdfFont implements Serializable {
         /**read widths*/
         //@speed may need optimising - done as string for moment
         String widths=Descendent.getName(PdfDictionary.W);
-        
+
         //allow for vertical
         final String verticalWidths=Descendent.getName(PdfDictionary.W2);
         if(verticalWidths!=null){
             widths=verticalWidths;
+            isWidthVertical=true;
         }
-        
+
         if(widths!=null) {
             setCIDFontWidths(widths);
         }
@@ -1125,7 +1128,13 @@ public class PdfFont implements Serializable {
         if(Width>=0) {
             defaultWidth=(Width)/1000f;
         }
-        
+
+        final int[] VerticalWidth=Descendent.getIntArray(PdfDictionary.DW2);
+        if(VerticalWidth!=null){ //may need more detailed implementation of vertical spacing (se PDFspec chapter 5)
+            isWidthVertical=true;
+            defaultWidth=(VerticalWidth[1])/1000f;
+        }
+
         //it looks like in this case it uses average of values
         //but not enough data
         if(handleOddSapFontMapping){
@@ -2005,5 +2014,9 @@ public class PdfFont implements Serializable {
     
     public String[] getCMAP() {
         return CMAP;
+    }
+
+    public boolean isWidthVertical() {
+        return isWidthVertical;
     }
 }

@@ -50,7 +50,17 @@
 package org.jpedal;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import org.jpedal.exception.PdfException;
+import org.jpedal.utils.LogWriter;
 
 /**
  *
@@ -83,5 +93,68 @@ public class JDeliHelper {
     public static byte[] getBytesFromJPEG(boolean isInverted, final byte[] data, boolean isMask) throws Exception {
         
         return null;
+    }
+    
+    public static byte[] getBytesFromJPEG(final byte[] data) throws Exception {
+        
+        Raster ras= getRasterFromJPEG2000(data);
+        
+        return ((DataBufferByte)ras.getDataBuffer()).getData();
+        
+    }
+    
+     
+    private static Raster getRasterFromJPEG2000(final byte[] data) {
+        
+        final ByteArrayInputStream in;
+        
+        ImageReader iir=null;
+        final ImageInputStream iin;
+        
+        Raster ras=null;
+        
+        try {
+            
+            //read the image data
+            in = new ByteArrayInputStream(data);
+            
+            //suggestion from Carol
+            final Iterator iterator = ImageIO.getImageReadersByFormatName("JPEG2000");
+            
+            while (iterator.hasNext()){
+                final Object o = iterator.next();
+                iir = (ImageReader) o;
+                if (iir.canReadRaster()) {
+                    break;
+                }
+            }
+            
+            ImageIO.setUseCache(false);
+            iin = ImageIO.createImageInputStream((in));
+            iir.setInput(iin, true);
+            ras=iir.read(0).getRaster();
+            
+            in.close();
+            iir.dispose();
+            iin.close();
+            
+        }catch(final Exception ee){
+            LogWriter.writeLog("Problem closing  " + ee);
+        }
+        
+        return ras;
+    }
+    
+    public static BufferedImage getTiffImage(final int tiffImageToLoad, final String file) {
+        return null;
+    }
+    
+    public static int getTiffPageCount(final String file) {
+        
+        return 0;
+    }
+    
+    public static void write(BufferedImage image, String type, String file_name, boolean fasterPNG) throws IOException {
+        ImageIO.write(image,type,new File(file_name));
     }
 }

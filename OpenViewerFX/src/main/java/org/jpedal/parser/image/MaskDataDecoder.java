@@ -101,7 +101,7 @@ class MaskDataDecoder {
         BufferedImage img = new BufferedImage(imageData.getWidth(), imageData.getHeight(), BufferedImage.TYPE_INT_ARGB);
         int output[] = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
         byte [] data = imageData.getObjectData();
-        int r,g,b,t,c,m,y,k;
+        int r,g,b,t;
         boolean isMask;
         
         switch(bitDepth){

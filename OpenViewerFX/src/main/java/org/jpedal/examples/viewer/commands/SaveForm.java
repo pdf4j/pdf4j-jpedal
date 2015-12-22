@@ -132,7 +132,9 @@ public class SaveForm {
      * warns user forms unsaved and offers save option
      */
     public static void handleUnsaveForms(final GUIFactory currentGUI, final Values commonValues, final PdfDecoderInt decode_pdf) {
-        // <start-demo><end-demo>
+        
+        if(!org.jpedal.DevFlags.GUITESTINGINPROGRESS){
+           
         	//OLD FORM CHANGE CODE
             if(commonValues.isFormsChanged()){
                 final int n = currentGUI.showConfirmDialog(Messages.getMessage("PdfViewerFormsUnsavedOptions.message"),Messages.getMessage("PdfViewerFormsUnsavedWarning.message"), JOptionPane.YES_NO_OPTION);
@@ -140,8 +142,9 @@ public class SaveForm {
                 if(n==JOptionPane.YES_OPTION) {
                     SaveForm.saveChangedForm(currentGUI, decode_pdf, commonValues);
                 }
-            }
-            // <start-demo><end-demo>
+            }  
+        }
+        
         commonValues.setFormsChanged(false);
     }
 }

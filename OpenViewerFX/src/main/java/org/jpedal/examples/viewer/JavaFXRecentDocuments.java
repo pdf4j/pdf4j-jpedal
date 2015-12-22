@@ -174,8 +174,9 @@ public class JavaFXRecentDocuments implements RecentDocumentsFactory {
         recentDocuments[position].setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(final ActionEvent event) {
-                //
-                if (Values.isProcessing()) {
+                if (Printer.isPrinting()) {
+                    currentGUI.showMessageDialog(Messages.getMessage("PdfViewerPrintWait.message"));
+                } else if (Values.isProcessing()) {
                     currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
                 } else {
                     /**
@@ -187,7 +188,7 @@ public class JavaFXRecentDocuments implements RecentDocumentsFactory {
                     final String fileName = item.getId();
 
                     if (!fileName.isEmpty()) {
-                        if(!Viewer.closeCalled){
+                        if(!SharedViewer.closeCalled){
                             currentGUI.open(fileName);
                         }else {
                              throw new RuntimeException("No resource to open document, call to close() disposes viewer resources");

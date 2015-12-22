@@ -339,11 +339,14 @@ public class FormStream {
 
     			rectX1 = (BBox[0]);
     			rectY1 = (BBox[1]);
+                
+                //Some files have fractions of a pixel in their size In some cases 
+                //this needs to be ignored, other times it should be expanded to a full pixel
+                //At the moment this is not required, this note is left as a reminder.
 				int boxWidth=(int) (((BBox[2]+0.5f)-BBox[0]));
 				if(boxWidth<0) {
                     boxWidth = -boxWidth;
                 }
-				
 				int boxHeight=(int) (((BBox[3]+0.5f)-BBox[1]));
 				if(boxHeight<0) {
                     boxHeight = -boxHeight;

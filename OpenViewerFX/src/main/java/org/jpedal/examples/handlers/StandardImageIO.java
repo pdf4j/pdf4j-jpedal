@@ -40,11 +40,11 @@ import org.jpedal.utils.LogWriter;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.Iterator;
- //
+
+import org.jpedal.JDeliHelper;
 
 public class StandardImageIO implements ImageHelper {
     
@@ -62,11 +62,8 @@ public class StandardImageIO implements ImageHelper {
     @Override
     public void write(BufferedImage image, final String type, final String file_name) throws IOException {
        
-        //
-        ImageIO.write(image,type,new File(file_name));
-        /**/
+        JDeliHelper.write(image, type, file_name,GenericColorSpace.fasterPNG);
         
-        //
     }
 
     /**

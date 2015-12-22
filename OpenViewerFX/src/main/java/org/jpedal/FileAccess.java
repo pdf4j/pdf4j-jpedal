@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.stream.ImageInputStream;
@@ -93,11 +92,7 @@ public class FileAccess {
      */
     int minimumCacheSize = -1;//20000;
 
-    @SuppressWarnings("UnusedDeclaration")
-    private static final Calendar cal=Calendar.getInstance();
-
-    @SuppressWarnings("WeakerAccess")
-    static int bb=5;
+    public static int bb=-5;
 
     /**
      * sed to stop close on method
@@ -212,7 +207,9 @@ public class FileAccess {
 
         final DynamicVectorRenderer latestVersion=currentDisplay;
 
-        //
+        if(reset) {
+            currentDisplay=new SwingDisplay(0, objectStoreRef,false);
+        }
         
         return latestVersion;
     }
@@ -593,13 +590,9 @@ public class FileAccess {
     }
     
     
-
-    //<start-demo>
-    /**
-     //<end-demo>
-
-     //
-
+    static{
+        FileAccessHelper.init();
+    }
 
     /**
      * Provides method for outside class to get data
@@ -744,13 +737,6 @@ public class FileAccess {
 
         waitForDecodingToFinish();
 
-
-        //<start-demo>
-        /**
-         //<end-demo>
-         //
-         /**/
-
         if (!isOpen) {
             return;
         }
@@ -825,12 +811,6 @@ public class FileAccess {
     public void openPdfFile() throws PdfException {
 
         currentPdfFile.setJavaScriptObject(externalHandlers.getJavaScript());
-
-        //<start-demo>
-        /**
-         //<end-demo>
-         //
-         /**/
 
         pageNumber = 1; // reset page number for metadata
 

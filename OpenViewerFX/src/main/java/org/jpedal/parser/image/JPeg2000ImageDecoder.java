@@ -34,11 +34,7 @@
 package org.jpedal.parser.image;
 
 import java.awt.image.*;
-import java.io.ByteArrayInputStream;
-import java.util.Iterator;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
+import org.jpedal.JDeliHelper;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.raw.PdfObject;
@@ -81,56 +77,14 @@ public class JPeg2000ImageDecoder {
         return image;
     }
     
-    //
-    //OS version
     public static byte[] getBytesFromJPEG2000(final byte[] data, GenericColorSpace decodeColorData,final PdfObject XObject) {
-    
-        Raster ras= getRasterFromJPEG2000(data);
-        
-        return ((DataBufferByte)ras.getDataBuffer()).getData();
-    }
-    /**/
-    
-    //
-    
-    static Raster getRasterFromJPEG2000(final byte[] data) {
-        
-        final ByteArrayInputStream in;
-        
-        ImageReader iir=null;
-        final ImageInputStream iin;
-        
-        Raster ras=null;
         
         try {
-            
-            //read the image data
-            in = new ByteArrayInputStream(data);
-            
-            //suggestion from Carol
-            final Iterator iterator = ImageIO.getImageReadersByFormatName("JPEG2000");
-            
-            while (iterator.hasNext()){
-                final Object o = iterator.next();
-                iir = (ImageReader) o;
-                if (iir.canReadRaster()) {
-                    break;
-                }
-            }
-            
-            ImageIO.setUseCache(false);
-            iin = ImageIO.createImageInputStream((in));
-            iir.setInput(iin, true);
-            ras=iir.read(0).getRaster();
-            
-            in.close();
-            iir.dispose();
-            iin.close();
-            
-        }catch(final Exception ee){
-            LogWriter.writeLog("Problem closing  " + ee);
+            return JDeliHelper.getBytesFromJPEG(data);
+        } catch (Exception ex) {
+            LogWriter.writeLog("Exception with JPeg Image " + ex);
         }
+        return null;
         
-        return ras;
     }
 }

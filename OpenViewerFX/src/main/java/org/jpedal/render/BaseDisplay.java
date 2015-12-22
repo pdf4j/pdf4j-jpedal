@@ -594,9 +594,22 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         
         int count = 0;
         final PathIterator i = path.getPathIterator(null);
+        float[] values = new float[6];
+        
         while (!i.isDone() && count < 6) { //see if rectangle or complex clip
+            //Get value before next called otherwise issues with pathIterator ending breaks everything
+            int value = i.currentSegment(values);
+            
             i.next();
+            
             count++;
+            
+            //If there is a curve, class as complex outline
+            if(value==PathIterator.SEG_CUBICTO || value==PathIterator.SEG_QUADTO){
+                count = 6;
+            }
+            
+            
         }
         return count<6;
     }

@@ -95,7 +95,7 @@ public class SelectAll {
 
             decode_pdf.updateCursorBoxOnScreen(currentRectangle, DecoderOptions.highlightColor.getRGB());
 
-            //
+            decode_pdf.repaintPane(commonValues.getCurrentPage());
         } else {
             currentGUI.showMessageDialog(Messages.getMessage("PageLayoutMessage.SinglePageOnly"));
         }

@@ -94,9 +94,9 @@ public class JavaFXOpenFile {
              */
             SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);
 
-            //
-
-            if (Values.isProcessing()) {
+            if (org.jpedal.examples.viewer.utils.Printer.isPrinting()) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewerPrintWait.message"));
+            } else  if (Values.isProcessing()) {
                 currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
             } else {
 
@@ -416,8 +416,6 @@ public class JavaFXOpenFile {
 
                         currentGUI.stopThumbnails();
 
-                        //
-
                         try {
                             //Set to true to show our default download window
                             OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
@@ -491,7 +489,14 @@ public class JavaFXOpenFile {
                 currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
 
             } else {
-                //
+                final Runnable doPaintComponent = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        currentGUI.setDisplayView(Display.SINGLE_PAGE, Display.DISPLAY_CENTERED);
+                    }
+                };
+                Platform.runLater(doPaintComponent);
             }
 
         }
@@ -562,7 +567,7 @@ public class JavaFXOpenFile {
             if (currentGUI.isSingle()) {
                 decode_pdf.flushObjectValues(true);
             } else {
-                //
+                decode_pdf = MultiPages.openNewMultiplePage(commonValues.getSelectedFile(), currentGUI, commonValues);
             }
 
             //reset the viewableArea before opening a new file
@@ -573,8 +578,6 @@ public class JavaFXOpenFile {
 
         }
     }
-
-    //
     
     /**
      * decode and display selected page
@@ -665,7 +668,14 @@ public class JavaFXOpenFile {
         if (commonValues.isPDF()) {
             currentGUI.decodePage();
         } else {
-            //
+            //resize (ensure at least certain size)
+            currentGUI.scaleAndRotate();
+
+            //add a border
+
+            Images.decodeImage(DecoderOptions.hires, decode_pdf, currentGUI, thumbnails, commonValues);
+
+            Values.setProcessing(false);
         }
     }
     
@@ -1180,14 +1190,17 @@ public class JavaFXOpenFile {
                 
 //                currentGUI.stopThumbnails();
 
-                //
-
+                if(!currentGUI.isSingle()) {
+                    MultiPages.openNewMultiplePage(commonValues.getSelectedFile(), currentGUI, commonValues);
+                }
+                
                 OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
             }
             
         } else { //no file selected so redisplay old
-            //
+            decode_pdf.repaintPane(decode_pdf.getPageNumber());
+            
             currentGUI.showMessageDialog(Messages.getMessage("PdfViewerMessage.NoSelection"));
         }
         

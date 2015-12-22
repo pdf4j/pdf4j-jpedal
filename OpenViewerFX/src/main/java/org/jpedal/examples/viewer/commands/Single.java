@@ -35,7 +35,7 @@ package org.jpedal.examples.viewer.commands;
 import org.jpedal.*;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.SharedViewer;
 import org.jpedal.gui.GUIFactory;
 
 /**
@@ -58,7 +58,7 @@ public class Single {
 
             currentGUI.getButtons().alignLayoutMenuOption(Display.SINGLE_PAGE);
 
-            if(Viewer.isFX()){
+            if(SharedViewer.isFX()){
                 ModeChange.changeModeInJavaFX(Display.SINGLE_PAGE,decode_pdf,currentGUI,null,null,null);
             }else{
                 ModeChange.changeModeInSwing(Display.SINGLE_PAGE,decode_pdf,currentGUI,null,null,null);

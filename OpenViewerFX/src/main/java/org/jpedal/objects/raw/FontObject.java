@@ -74,6 +74,7 @@ public class FontObject extends PdfObject {
 
     private String BaseFont,CharSet, CMapName,
     FontName,FontStretch, Ordering,Registry, W, W2;
+    private int[] DW2;
 
     public FontObject(final String ref) {
         super(ref);
@@ -580,6 +581,33 @@ public class FontObject extends PdfObject {
 
         }
 
+    }
+
+    @Override
+    public void setIntArray(final int id, final int[] value) {
+
+        switch(id){
+
+            case PdfDictionary.DW2:
+                DW2=value;
+                break;
+
+            default:
+                super.setIntArray(id, value);
+        }
+    }
+
+    @Override
+    public int[] getIntArray(final int id) {
+
+        switch(id){
+
+            case PdfDictionary.DW2:
+                return deepCopy(DW2);
+
+            default:
+                return super.getIntArray(id);
+        }
     }
 
     @Override

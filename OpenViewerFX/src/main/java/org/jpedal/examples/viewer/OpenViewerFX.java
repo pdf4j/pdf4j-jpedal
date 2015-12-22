@@ -43,7 +43,7 @@ import javafx.stage.WindowEvent;
 import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.examples.viewer.gui.javafx.*;
 import org.jpedal.examples.viewer.utils.*;
-import org.jpedal.examples.viewer.objects.ClientExternalHandler;
+import org.jpedal.examples.viewer.objects.FXClientExternalHandler;
 import org.jpedal.external.Options;
 import org.jpedal.objects.acroforms.actions.JavaFXDefaultActionHandler;
 import org.jpedal.parser.DecoderOptions;
@@ -70,7 +70,7 @@ import org.jpedal.utils.Messages;
  * <p>We recommend you look at the full viewer as it is totally configurable and does everything for you.</p>
  * 
  */
-public class OpenViewerFX extends Viewer implements ViewerInt{
+public class OpenViewerFX extends SharedViewer implements ViewerInt{
 
     //flag if OS or commerical - DO NOT remove quotes as will break code
     public static boolean isOpenFX = OpenViewerFX.class.getResourceAsStream("/org/jpedal/examples/viewer/Open"+"Viewer"+"FX.class")!= null;
@@ -160,7 +160,6 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
         });
     }
     
-    @Override
     void init() {
         
         //load locale file
@@ -172,7 +171,9 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
                     + "Also check you have a file in org.jpedal.international.messages to support Locale=" + java.util.Locale.getDefault());
         }
          
-        //
+        if(!OpenViewerFX.isOpenFX){
+            currentPrinter=new FXPrinter();
+        }
 
         decode_pdf = new PdfDecoderFX();
 
@@ -181,7 +182,7 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
         currentGUI = new JavaFxGUI(stage, decode_pdf, commonValues, thumbnails, properties);
         
         decode_pdf.addExternalHandler(new JavaFXDefaultActionHandler(currentGUI), Options.FormsActionHandler);
-        decode_pdf.addExternalHandler(new ClientExternalHandler(), Options.AdditionalHandler);
+        decode_pdf.addExternalHandler(new FXClientExternalHandler(), Options.AdditionalHandler);
         
         if(GUI.debugFX) {
             System.out.println("OpenViewerFX init()");
@@ -195,9 +196,6 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
                 
 		//enable error messages which are OFF by default
 		DecoderOptions.showErrorMessages=true;
-		
-		//
-		
 		
 		final String prefFile = System.getProperty("org.jpedal.Viewer.Prefs");
 		if(prefFile != null){
@@ -266,7 +264,7 @@ public class OpenViewerFX extends Viewer implements ViewerInt{
      * to close the viewer.
      */
     public void close(){
-        Viewer.closeCalled = true;
+        SharedViewer.closeCalled = true;
         currentCommands.executeCommand(Commands.EXIT, null);
     }
     

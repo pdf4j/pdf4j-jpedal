@@ -44,6 +44,7 @@ import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.OpenViewerFX;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUIButtons;
 import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
@@ -110,7 +111,8 @@ public class JavaFXMenuItems extends GUIMenuItems {
     private MenuItem tipOfTheDay;
    // private MenuItem checkUpdates;
     private MenuItem about;
-    //
+    
+    private MenuItem helpForum;
     
     private Menu exportMenu;
     private Menu pdfMenu;
@@ -278,7 +280,9 @@ public class JavaFXMenuItems extends GUIMenuItems {
 //                return checkUpdates;
             case Commands.ABOUT:
                 return about;
-            //
+            case Commands.HELPFORUM:
+                return helpForum;
+        
         }
 
         return null;
@@ -504,7 +508,11 @@ public class JavaFXMenuItems extends GUIMenuItems {
                         case Commands.ABOUT :
                                 about = (MenuItem)menuItem;
                                 break;
-                        //
+                        
+                        case Commands.HELP :
+                                helpForum = (MenuItem)menuItem;
+                                break;
+                        
                         default :
                 }
         
@@ -540,9 +548,65 @@ public class JavaFXMenuItems extends GUIMenuItems {
             		pageLayout.getItems().add(single);
             		break;
                     
-                     //
-            	} 
-                
+                case Display.CONTINUOUS :
+                    if(!OpenViewerFX.isOpenFX){
+                        //Give copy to Buttons to update items if buttons used
+                        ((JavaFXButtons)buttons).getLayoutGroup().add(pageView);
+                        continuous = pageView;
+                        continuous.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(final ActionEvent t) {
+                                currentCommands.executeCommand(Commands.CONTINUOUS, null);
+                            }
+                        });
+                        pageLayout.getItems().add(continuous);
+                    }
+            		break;
+                    
+            	case Display.FACING :
+                    if(!OpenViewerFX.isOpenFX){
+                        facing = pageView;
+                        facing.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(final ActionEvent t) {
+                                currentCommands.executeCommand(Commands.FACING, null);
+                            }
+                        });
+                        pageLayout.getItems().add(facing);
+                    }
+            		break;
+                    
+            	case Display.CONTINUOUS_FACING :
+                    
+                    if(!OpenViewerFX.isOpenFX){
+                        //Give copy to Buttons to update items if buttons used
+                        ((JavaFXButtons)buttons).getLayoutGroup().add(pageView);
+                        continuousFacing = pageView;
+                        continuousFacing.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(final ActionEvent t) {
+                                currentCommands.executeCommand(Commands.CONTINUOUS_FACING, null);
+                            }
+                        });
+                        pageLayout.getItems().add(continuousFacing);
+                    }
+                    
+            		break;
+                    
+            	case Display.PAGEFLOW :
+                    if(!OpenViewerFX.isOpenFX){
+                        pageFlow = pageView;
+                        pageFlow.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(final ActionEvent t) {
+                                currentCommands.executeCommand(Commands.PAGEFLOW, null);
+                            }
+                        });
+                        pageLayout.getItems().add(pageFlow);
+                    }
+            		break;
+                    
+            	}        
             }
             disableUnimplementedItems(value[i], true);
         }
@@ -909,7 +973,9 @@ public class JavaFXMenuItems extends GUIMenuItems {
 		//addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuUpdates.text"),"",Commands.UPDATE);
 		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuabout.text"),Messages.getMessage("PdfViewerHelpMenuTooltip.about"),Commands.ABOUT);
 
-		//
+		if(includeExtraMenus){
+            addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuTutorial.text"),"Visit http://www.idrsolutions.com/java-pdf-library-support/",Commands.HELP);
+        }
 
 	}
     
@@ -1060,13 +1126,17 @@ public class JavaFXMenuItems extends GUIMenuItems {
                         break;
 
                 }
-            }
-            else{
+            }else if(!OpenViewerFX.isOpenFX){
                 /**
                  * Disable View Modes.
                  */
                 switch(ID){
-                    //
+                    case Display.FACING:
+                        facing.setDisable(debug);
+                        break;
+                    case Display.PAGEFLOW:
+                        pageFlow.setDisable(debug);
+                        break;
                 }
             }
         }else{
@@ -1074,7 +1144,10 @@ public class JavaFXMenuItems extends GUIMenuItems {
             reSaveAsForms.setDisable(debug);
             signPDF.setDisable(debug);
             print.setDisable(debug);
-            //
+            if(!OpenViewerFX.isOpenFX){
+                facing.setDisable(debug);
+                pageFlow.setDisable(debug);
+            }
         }
     }   
     

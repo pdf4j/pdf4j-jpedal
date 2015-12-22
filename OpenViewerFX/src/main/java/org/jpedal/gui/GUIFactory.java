@@ -386,5 +386,8 @@ public interface GUIFactory {
     void setDisplayView(int SINGLE_PAGE, int DISPLAY_CENTERED);
 
     void removePageListener();
-    
+
+    PdfDecoderInt openNewMultiplePage(final String selectedFile, final Values commonValues);
+
+    void triggerPageTurnAnimation(final PdfDecoderInt decode_pdf, final Values commonValues, final int updatedTotal, final boolean rightTurn);
 }

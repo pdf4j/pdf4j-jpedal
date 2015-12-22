@@ -55,7 +55,7 @@ import org.jpedal.utils.LogWriter;
  *
  * @author Simon
  */
-public class JavaFXDefaultActionHandler extends DefaultActionHandler {
+public class JavaFXDefaultActionHandler extends SharedActionHandler {
 
     public JavaFXDefaultActionHandler(GUIFactory currentGUI) {
         super(currentGUI);

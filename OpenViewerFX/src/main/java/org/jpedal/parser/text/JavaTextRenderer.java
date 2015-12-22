@@ -38,8 +38,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.StandardFonts;
-import org.jpedal.fonts.glyph.PdfJavaGlyphs;
-//
+import org.jpedal.fonts.glyph.*;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.parser.ParserOptions;
@@ -63,8 +62,22 @@ class JavaTextRenderer {
         
         final int rawInt=glyphData.getRawInt();
         
-        //
-        { //render now
+        /**
+         * store info needed to create glyph on first render or create now
+         */
+        if(parserOptions.generateGlyphOnRender() && !parserOptions.renderDirectly()){
+            if(glyphData.isfirstTime()){
+                transformedGlyph2=new MarkerGlyph(Trm[0][0],Trm[0][1],Trm[1][0],Trm[1][1],currentFontData.getBaseFontName());
+                
+                current.checkFontSaved(transformedGlyph2,currentFontData.getBaseFontName(),currentFontData);
+                glyphData.setFirstTime(false);
+                
+            }
+            currentFontData.setValuesForGlyph(rawInt,null,glyphData.getDisplayValue(),null);
+            
+            transformedGlyph2=new UnrendererGlyph(Trm[2][0],Trm[2][1],rawInt,currentWidth);
+            
+        }else{ //render now
             final boolean isSTD= actualWidth>0 || DecoderOptions.isRunningOnMac || streamType==ValueTypes.FORM || StandardFonts.isStandardFont(currentFontData.getBaseFontName(),false) || currentFontData.isBrokenFont();
             
             /**flush cache if needed*/

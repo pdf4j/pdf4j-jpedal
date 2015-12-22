@@ -498,8 +498,9 @@ final JPanel viewBGColor = new JPanel();
         printerBlacklist.setToolTipText(Messages.getMessage("PdfPreferences.printerBlackList.toolTip"));
         
         defaultPrinterText = new JLabel(Messages.getMessage("PdfViewerPrint.defaultPrinter"));
-        //
-
+        
+        defaultPrinter = new JComboBox(Printer.getAvailablePrinters(properties.getValue("printerBlacklist")));
+        
         final PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
         if (defaultPrintService!=null) {
             defaultPrinter.addItem(Messages.getMessage("PdfPreferences.systemDefault.text") + " (" + defaultPrintService.getName() + ')');
@@ -680,7 +681,7 @@ final JPanel viewBGColor = new JPanel();
                     try {
                 		properties.writeDoc();
                 	} catch (final Exception e1) {
-                		LogWriter.writeLog("Attempting to write properties " + e);
+                		LogWriter.writeLog("Attempting to write properties " + e1);
                     }
                    
                 }
@@ -706,7 +707,7 @@ final JPanel viewBGColor = new JPanel();
                     try {
                     	properties.writeDoc();
                     } catch (final Exception e2) {
-                    	LogWriter.writeLog("Attempting to write properties " + e);
+                    	LogWriter.writeLog("Attempting to write properties " + e2);
                     }
                     if(GUI.showMessages) {
                         JOptionPane.showMessageDialog(propertiesDialog, Messages.getMessage("PdfPreferences.restart"));
@@ -2008,63 +2009,34 @@ final JPanel viewBGColor = new JPanel();
             return panel;
         }
         
-        private boolean removeOption(final String name){
-            
-            //
-			//Remove help button as it is not in use in gpl version
-			if(name.equals("Helpbutton")){
-				return true;
-			}
-            
-			//Remove rss button as it is not in use in gpl version
-			if(name.equals("RSSbutton")){
-				return true;
-			}
-			/**/
-			
-            //
-			//Remove help menu item as it is not in use in gpl or full version
-			if(name.equals("Helpforum")){
-				return true;
-			}
-			/**/
-            
-            return false;
-        }
-        
         private void  addMenuToTree(final int tab, final NodeList nodes, final CheckNode top, final java.util.List previous){
             
             for(int i=0; i!=nodes.getLength(); i++){
                 
                 if(i<nodes.getLength()){
                     final String name = nodes.item(i).getNodeName();
-                    
-                    if(removeOption(name)){
-                        //Ignore this item
-                    }else{
-                        
-                        if(!name.startsWith("#")){
-                            //Node to add
-                            final CheckNode newLeaf = new CheckNode(Messages.getMessage("PdfCustomGui."+name));
-                            newLeaf.setEnabled(true);
-                            //Set to reversedMessage for saving of preferences
-                            reverseMessage.put(Messages.getMessage("PdfCustomGui."+name), name);
-                            loadBooleanValue(newLeaf, name);
-                            
-                            //If has child nodes
-                            if(nodes.item(i).hasChildNodes()){
-                                //Store this top value
-                                previous.add(top);
-                                //Set this node to ned top
-                                top.add(newLeaf);
-                                //Add new menu to tree
-                                addMenuToTree(tab, nodes.item(i).getChildNodes(), newLeaf, previous);
-                            }else{
-                                //Add to current top
-                                top.add(newLeaf);
-                            }
+                       
+                    if(!name.startsWith("#")){
+                        //Node to add
+                        final CheckNode newLeaf = new CheckNode(Messages.getMessage("PdfCustomGui."+name));
+                        newLeaf.setEnabled(true);
+                        //Set to reversedMessage for saving of preferences
+                        reverseMessage.put(Messages.getMessage("PdfCustomGui."+name), name);
+                        loadBooleanValue(newLeaf, name);
+
+                        //If has child nodes
+                        if(nodes.item(i).hasChildNodes()){
+                            //Store this top value
+                            previous.add(top);
+                            //Set this node to ned top
+                            top.add(newLeaf);
+                            //Add new menu to tree
+                            addMenuToTree(tab, nodes.item(i).getChildNodes(), newLeaf, previous);
+                        }else{
+                            //Add to current top
+                            top.add(newLeaf);
                         }
-                    }
+                    }               
                 }
             }
         }
@@ -2126,7 +2098,7 @@ final JPanel viewBGColor = new JPanel();
                     try {
                         BrowserLauncher.openURL(url);
                     } catch(final Exception ex){
-                        JOptionPane.showMessageDialog(pane, Messages.getMessage("PdfViewer.ErrorWebsite"));
+                        JOptionPane.showMessageDialog(pane, ex.getMessage()+' '+Messages.getMessage("PdfViewer.ErrorWebsite"));
                     }
                 }
             }

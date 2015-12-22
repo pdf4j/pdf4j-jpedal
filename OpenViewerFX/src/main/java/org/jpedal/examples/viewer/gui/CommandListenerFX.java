@@ -27,42 +27,34 @@
 
  *
  * ---------------
- * JBIG2.java
+ * CommandListener.java
  * ---------------
  */
-package org.jpedal.io;
+package org.jpedal.examples.viewer.gui;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import org.jpedal.external.ExternalHandlers;
+import org.jpedal.fonts.glyph.JavaFXSupport;
+import org.jpedal.examples.viewer.Commands;
 
-import org.jpedal.jbig2.*;
+/**
+ * This class is fxSupport wrapper for SwingCommandListener and JavaFXCommandListener.
+ * single listener to execute all GUI commands and call Commands to execute
+ */
+public class CommandListenerFX implements CommandListener {
+	
+    CommandListenerImpl commandListener;
+    
+	public CommandListenerFX(final Commands currentCommands) {
+       
+        JavaFXSupport fxSupport = ExternalHandlers.getFXHandler();
+        if(fxSupport!=null){
+            commandListener =  (CommandListenerImpl) fxSupport.getCommandHandler(currentCommands);
+        }
+	}
 
-public class JBIG2 {
-    
-    /**
-     * if this values is set to any values other than -1 than JBIGDecoder
-     * will write the data to temporary files which is defined in Objectstore.tempdir
-     * recommended value is 1024 for better performance.
-     */
-    public static int MAXIMUM_FILESIZE_IN_MEMORY = -1;
-    public static boolean IS_BITMAPS_ON_FILE;
-    
-    /**
-     * JBIG decode using our own class
-     *
-     */
-    //
-    public static byte[] JBIGDecode(final byte[] data, final byte[] globalData) throws Exception { 
-        byte[] returnData;
-        final org.jpedal.jbig2.JBIG2Decoder decoder = new org.jpedal.jbig2.JBIG2Decoder();
-        if (globalData != null && globalData.length > 0) {
-            decoder.setGlobalData(globalData);
-        }        
-        decoder.decodeJBIG2(data);
-        returnData= decoder.getPageAsJBIG2Bitmap(0).getData(true);
-        return returnData;
-    }    
-    /**/
-    
+    @Override
+    public CommandListenerImpl getCommandListener(){
+        return commandListener;
+    }
     
 }

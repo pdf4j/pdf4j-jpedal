@@ -45,13 +45,10 @@ public class VisitWebsite {
         if (args == null) {
             try {
                
-                //
-                BrowserLauncher.openURL("https://www.idrsolutions.com/open-fx/");
-                /**/
-                //
-                
+                BrowserLauncher.openURL(Messages.getMessage("PdfViewer.VisitWebsite"));
+               
             } catch (final Exception e1) {
-                currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.ErrorWebsite"));
+                currentGUI.showMessageDialog(e1.getMessage()+' '+Messages.getMessage("PdfViewer.ErrorWebsite"));
             }
         }
     }

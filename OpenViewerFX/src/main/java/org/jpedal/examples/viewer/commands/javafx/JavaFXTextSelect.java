@@ -38,7 +38,6 @@ import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.MouseMode;
-import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.gui.GUIFactory;
 
 /**
@@ -53,9 +52,8 @@ public class JavaFXTextSelect {
             //Disable Pan Mode
             currentGUI.getMenuItems().setCheckMenuItemSelected(Commands.PANMODE, false);
             currentGUI.getMenuItems().setCheckMenuItemSelected(Commands.TEXTSELECT, true);
-            if(GUI.debugFX){
-                currentGUI.getButtons().getButton(Commands.SNAPSHOT).setEnabled(true);
-            }
+            currentGUI.getButtons().getButton(Commands.SNAPSHOT).setEnabled(true);
+            
             currentGUI.setPannable(false);
 
             //Set mouse mode

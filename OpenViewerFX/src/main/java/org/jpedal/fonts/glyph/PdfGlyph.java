@@ -86,5 +86,5 @@ public interface PdfGlyph {
 
     Object getPath();
 
-    public boolean hasHintingApplied();
+    boolean hasHintingApplied();
 }

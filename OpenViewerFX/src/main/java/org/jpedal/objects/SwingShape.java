@@ -192,7 +192,7 @@ public class SwingShape implements Serializable, PdfShape
     public final Shape generateShapeFromPath( final float[][] CTM, final float thickness, final int cmd, final int type){
 
         isClosed=false; //will be set to true if closed
-
+        
         boolean is_clip=this.isClip;
         if(cmd==Cmd.n) {
             is_clip = false;

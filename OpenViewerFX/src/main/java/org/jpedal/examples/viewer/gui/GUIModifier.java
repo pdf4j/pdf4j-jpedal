@@ -283,7 +283,12 @@ public class GUIModifier {
             case PropertyTags.SNAPSHOTBUTTON:
                 setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.SNAPSHOT, set);
                 break;
-            //
+            case PropertyTags.HELPBUTTON:
+                setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.HELP, set);
+                break;
+            case PropertyTags.RSSBUTTON:
+                setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.RSS, set);
+                break;
             case PropertyTags.CURSORBUTTON:
                 currentGUI.enableCursor(set, set);
                 break;
@@ -623,7 +628,9 @@ public class GUIModifier {
             case PropertyTags.ABOUT:
                 menuItems.setMenuItem(Commands.ABOUT, set, set);
                 break;
-            //
+            case PropertyTags.HELPFORUM:
+                menuItems.setMenuItem(Commands.HELPFORUM, set, set);
+                break;
             default:
                 used = false;
                 break;

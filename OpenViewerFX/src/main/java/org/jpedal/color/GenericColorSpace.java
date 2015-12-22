@@ -891,17 +891,22 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                             }
                             
                             //set value as white or average of pixels
-                            if(count>0){
-                                if(jj==0) {
-                                    newData[2]=((byteTotal)/count);
-                                } else if(jj==2) {
-                                    newData[0]=((byteTotal)/count);
-                                } else {
-                                    newData[jj]=((byteTotal)/count);
+                            if (count > 0) {
+                                switch (jj) {
+                                    case 0:
+                                        newData[2] = ((byteTotal) / count);
+                                        break;
+
+                                    case 2:
+                                        newData[0] = ((byteTotal) / count);
+                                        break;
+                                    
+                                    default:
+
+                                        newData[jj] = ((byteTotal) / count);
+                                        break;
                                 }
-                                
-                            }
-                            
+                            }                           
                         }
                         
                         //write back into ras
@@ -1440,7 +1445,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     
     public BufferedImage JPEG2000ToImage(final byte[] data, final int pX, final int pY, final float[] decodeArray) throws PdfException {
            
-        BufferedImage image=null;
+        BufferedImage image;
         
         try {
             image = JDeliHelper.JPEG2000ToRGBImage(data);

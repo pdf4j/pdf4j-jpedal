@@ -36,9 +36,7 @@ import java.awt.Container;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -47,6 +45,7 @@ import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 import org.jpedal.display.Display;
+import org.jpedal.examples.viewer.utils.Printer;
 
 /**
  * Clean up and exit programo
@@ -55,8 +54,9 @@ public class Exit {
 
     public static void execute(final Object[] args, final GUIThumbnailPanel thumbnails, final GUIFactory currentGUI, final Values commonValues, final PdfDecoderInt decode_pdf, final PropertiesFile properties) {
         if (args == null) {
-            //
-            {
+            if (Printer.isPrinting()) {
+                currentGUI.showMessageDialog(Messages.getMessage("PdfViewerStillPrinting.text"));
+            }else{
                 exit(thumbnails, currentGUI, commonValues, decode_pdf, properties);
             }
         }
@@ -138,7 +138,7 @@ public class Exit {
         }
 
         //formClickTest needs this so that it does not exit after first test.
-        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !Viewer.exitOnClose) {
+        if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !SharedViewer.exitOnClose) {
             
             ((Container)currentGUI.getFrame()).setVisible(false);
             if (currentGUI.getFrame() instanceof JFrame) {

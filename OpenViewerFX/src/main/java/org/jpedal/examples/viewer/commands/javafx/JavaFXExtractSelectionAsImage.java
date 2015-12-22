@@ -75,7 +75,7 @@ public class JavaFXExtractSelectionAsImage extends GUIExtractSelectionAsImage {
         final FXDialog dialog = new FXDialog((Stage)currentGUI.getFrame(), Modality.APPLICATION_MODAL, pane);
         dialog.setTitle(Messages.getMessage("PdfViewerMessage.SaveImage"));
         dialog.setResizeable(false);
-        String style = null;
+        String style;
         
         //wrap image so we can display
         if (snapShot != null) {

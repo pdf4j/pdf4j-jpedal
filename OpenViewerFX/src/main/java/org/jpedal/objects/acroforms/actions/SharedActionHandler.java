@@ -33,9 +33,7 @@
 package org.jpedal.objects.acroforms.actions;
 
 import org.jpedal.display.*;
-import org.jpedal.examples.viewer.Viewer;
-import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.*;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.examples.viewer.gui.*;
@@ -43,7 +41,6 @@ import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.Javascript;
-import org.jpedal.objects.acroforms.gui.Summary;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.acroforms.actions.privateclasses.FieldsHideObject;
 import org.jpedal.objects.acroforms.AcroRenderer;
@@ -61,10 +58,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.print.PageFormat;
-import java.awt.print.Paper;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -76,7 +69,7 @@ import java.util.Map;
 import org.jpedal.*;
 import org.jpedal.objects.acroforms.ReturnValues;
 
-public class DefaultActionHandler implements ActionHandler {
+public abstract class SharedActionHandler implements ActionHandler {
     
     protected static final boolean showMethods = false;
     
@@ -91,7 +84,7 @@ public class DefaultActionHandler implements ActionHandler {
     
     final GUIFactory gui;
     
-    public DefaultActionHandler(GUIFactory viewerGUI){
+    public SharedActionHandler(GUIFactory viewerGUI){
         this.gui=viewerGUI;
     }
     
@@ -276,16 +269,7 @@ public class DefaultActionHandler implements ActionHandler {
                                 
                                 if(target.endsWith(".pdf")){
                                     
-                                    try{
-                                        final Viewer viewer=new Viewer(Values.RUNNING_NORMAL);
-                                        Viewer.exitOnClose=false;
-                                        
-                                        viewer.setupViewer();
-                                        viewer.openDefaultFile(ObjectStore.temp_dir+target);
-                                        
-                                    }catch(final Exception e){
-                                        LogWriter.writeLog("Exception: " + e.getMessage());
-                                    }
+                                    openNewViewer(target);
                                     
                                 }else if(DecoderOptions.isRunningOnMac){
                                     target="open "+ObjectStore.temp_dir+target;
@@ -356,56 +340,6 @@ public class DefaultActionHandler implements ActionHandler {
         }
     }
     
-    private void additionalAction_OCState(final int eventType, final PdfObject aData) {
-        if (eventType == MOUSECLICKED) {
-            
-            final PdfArrayIterator state = aData.getMixedArray(PdfDictionary.State);
-            
-            if (state != null && state.getTokenCount() > 0) {
-                
-                final PdfLayerList layers = (PdfLayerList)decode_pdf.getJPedalObject(PdfDictionary.Layer);
-                
-                final int count = state.getTokenCount();
-                
-                final int action = state.getNextValueAsConstant(true);
-                String ref;
-                for (int jj = 1; jj < count; jj++) {
-                    ref = state.getNextValueAsString(true);
-                    
-                    final String layerName = layers.getNameFromRef(ref);
-                    
-                    // toggle layer status when clicked
-                    final Runnable updateAComponent = new Runnable() {
-                        @Override
-                        public void run() {
-                            // force refresh
-                            //
-                            
-                            // update settings on display and in PdfDecoder
-                            final boolean newState;
-                            if (action == PdfDictionary.Toggle) {
-                                newState = !layers.isVisible(layerName);
-                            } else {
-                                newState = action != PdfDictionary.OFF;
-                            }
-                            
-                            layers.setVisiblity(layerName, newState);
-                            
-                            // decode again with new settings
-                            try {
-                                decode_pdf.decodePage(-1);
-                            } catch (final Exception e) {
-                                LogWriter.writeLog("Exception: " + e.getMessage());
-                            }
-                        }
-                    };
-                    
-                    SwingUtilities.invokeLater(updateAComponent);
-                }
-            }
-        }
-    }
-    
     private void additionalAction_Named(final int eventType, final PdfObject aData) {
         final int name = aData.getNameAsConstant(PdfDictionary.N);
         
@@ -454,20 +388,8 @@ public class DefaultActionHandler implements ActionHandler {
             
         }else if(name == PdfDictionary.AcroForm_FormsJSGuide) {//AcroForm:FormsJSGuide
             
-            final String acrobatJSGuideURL = "http://www.adobe.com/devnet/acrobat/pdfs/Acro6JSGuide.pdf";
-            final int option = JOptionPane.showConfirmDialog(null, Messages.getMessage("AcroForm_FormsJSGuide.urlQuestion")
-                    + '\n' + acrobatJSGuideURL + " ?\n\n"
-                    + Messages.getMessage("AcroForm_FormsJSGuide.urlFail"), Messages.getMessage("AcroForm_FormsJSGuide.Title"), JOptionPane.YES_NO_OPTION);
+            openAcrobatFormsGuide();
             
-            if (option == 0) {
-                final Viewer viewer = new Viewer(Values.RUNNING_NORMAL);
-                Viewer.exitOnClose = false;
-                
-                viewer.setupViewer();
-                viewer.openDefaultFile(acrobatJSGuideURL);
-                
-            }
-          
         } else {
             LogWriter.writeLog("{internal only} Named Action NOT IMPLEMENTED " + aData.getName(PdfDictionary.N)+ ' ' +decode_pdf.getFileName());
         }
@@ -1159,7 +1081,7 @@ public class DefaultActionHandler implements ActionHandler {
                 && (page > 0 && page < decode_pdf.getPageCount()+1)) {
                     try {
                         
-                        //
+                        switchPage(page);
                         
                         this.decode_pdf.decodePage(page);
                         
@@ -1202,7 +1124,8 @@ public class DefaultActionHandler implements ActionHandler {
             }
         }
         
-        //
+        scrollOnPage(page,location, storeView, type);
+        
     }
 
     @Override
@@ -1631,37 +1554,8 @@ public class DefaultActionHandler implements ActionHandler {
             }
         }
     }
-    
-    public void print() {
-        
-        
-        //
-    }
-    
-    protected void setCursor(final int eventType) {
-
-        //
-    }
-
-    protected void showSig(final PdfObject sigObject) {
-        
-        //
-    }
-    
-    private static JFrame getParentJFrame(Component component) {
-        while (true) {
-            if (component.getParent() == null) {
-                return null;
-            }
-            
-            if (component.getParent() instanceof JFrame) {
-                return (JFrame) component.getParent();
-            } else {
-                component = component.getParent();
-            }
-        }
-    }
-    
+   
+ 
     /** @param listOfFields - defines a list of fields to either include or exclude from the submit option,
      * Dependent on the <B>flag</b>, if is null all fields are submitted.
      * @param excludeList - if true then the listOfFields defines an exclude list,
@@ -1777,4 +1671,37 @@ public class DefaultActionHandler implements ActionHandler {
         }
         
     }
+
+    protected void showSig(PdfObject sigObject) {
+        throw new UnsupportedOperationException("showSig Not supported yet "+sigObject);
+    }
+
+    protected void additionalAction_OCState(int eventType, PdfObject aData) {
+        throw new UnsupportedOperationException("additionalAction_OCState Not supported yet "+eventType+' '+aData);
+    }
+
+    protected void switchPage(final int page) {
+        throw new UnsupportedOperationException("switchPage Not supported yet."+page); 
+    }
+
+    public void print() {
+        throw new UnsupportedOperationException("print Not supported yet."); 
+    }
+
+    protected void scrollOnPage(int page, Object location, final boolean storeView, final int type) {
+        throw new UnsupportedOperationException("scrollOnPage Not supported yet "+page+' '+location+' '+storeView+' '+type); 
+    }
+
+    protected void setCursor(int eventType) {
+        throw new UnsupportedOperationException("setCursor Not supported yet "+eventType); 
+    }
+    
+    protected void openNewViewer(String target) {
+        throw new UnsupportedOperationException("openNewViewer Not supported yet "+target); 
+    }
+    
+    protected void openAcrobatFormsGuide(){
+        throw new UnsupportedOperationException("openAcrobatFormsGuide not supported yet "); 
+    }
+    
 }

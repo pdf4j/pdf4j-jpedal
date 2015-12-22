@@ -90,8 +90,8 @@ public class JavaFXButtons implements GUIButtons{
     //Buttons to navigate pages in the document
     private GUIButton first, fback, back, forward, fforward, last;
 
-    //
-
+    private GUIButton buyButton, helpButton, rssButton;
+    
     private boolean isSingle;
 
     /**
@@ -116,8 +116,10 @@ public class JavaFXButtons implements GUIButtons{
 
         snapshotButton = new JavaFXButton();
 
-        //
-
+        buyButton = new JavaFXButton();
+        helpButton = new JavaFXButton();
+        rssButton = new JavaFXButton();
+        
         singleButton = new JavaFXButton();
         continuousButton = new JavaFXButton();
         continuousFacingButton = new JavaFXButton();
@@ -147,7 +149,12 @@ public class JavaFXButtons implements GUIButtons{
         switch (ID) {
             case Commands.SNAPSHOT:
                 return snapshotButton;
-            //
+            case Commands.RSS:
+                return rssButton;
+            case Commands.HELP:
+                return helpButton;
+            case Commands.BUY:
+                return buyButton;       
             case Commands.ABOUT:
                 return infoButton;
             case Commands.DOCINFO:
@@ -209,8 +216,11 @@ public class JavaFXButtons implements GUIButtons{
         facingButton = null;
         pageFlowButton = null;
         snapshotButton = null;
-        //
-
+       
+        buyButton = null;
+        helpButton = null;
+        rssButton = null;
+        
         layoutGroup = null;
 
         if(topButtons!=null) {
@@ -391,12 +401,18 @@ public class JavaFXButtons implements GUIButtons{
          */
         switch (ID) {
 
-            //
-
-            //
-
-            //
-
+            case Commands.HELP:
+                newButton = getButton(Commands.HELP);
+                break;
+            
+            case Commands.RSS:
+                newButton = getButton(Commands.RSS);
+                break;
+            
+            case Commands.BUY:
+                newButton = getButton(Commands.BUY);
+                break;
+            
             case Commands.FIRSTPAGE:
                 newButton = getButton(Commands.FIRSTPAGE);
                 break;
@@ -639,9 +655,9 @@ public class JavaFXButtons implements GUIButtons{
                 case Commands.PRINT:
                     printButton.setEnabled(debug);
                     break;
-                case Commands.SNAPSHOT:
-                    snapshotButton.setEnabled(debug);
-                    break;
+//                case Commands.SNAPSHOT:
+//                    snapshotButton.setEnabled(debug);
+//                    break;
                     
                     
                 case Commands.CONTINUOUS_FACING:
@@ -661,7 +677,7 @@ public class JavaFXButtons implements GUIButtons{
             }
         }else{
             printButton.setEnabled(debug);
-            snapshotButton.setEnabled(debug);
+            //snapshotButton.setEnabled(debug);
             continuousFacingButton.setEnabled(debug);
             facingButton.setEnabled(debug);
             continuousButton.setEnabled(debug);

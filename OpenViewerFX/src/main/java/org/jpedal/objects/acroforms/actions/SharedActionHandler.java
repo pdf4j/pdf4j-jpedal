@@ -1122,9 +1122,9 @@ public abstract class SharedActionHandler implements ActionHandler {
                     ((org.jpedal.examples.viewer.gui.GUI)gui).setSelectedComboItem(org.jpedal.examples.viewer.Commands.SCALING,type.toString());
                 }
             }
-        }
         
-        scrollOnPage(page,location, storeView, type);
+            scrollOnPage(page,location, storeView, type);
+        }
         
     }
 

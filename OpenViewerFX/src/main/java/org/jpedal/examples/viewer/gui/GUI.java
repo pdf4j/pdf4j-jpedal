@@ -1256,9 +1256,13 @@ public abstract class GUI implements GUIFactory {
              title="("+FileAccess.bb+" days left) "+title;
            
         }else{
-
+            
             //set null title value to empty string
-            title=(windowTitle+' ' + commonValues.getSelectedFile());
+            if(commonValues.getSelectedFile()==null){
+                title=(windowTitle+' ');
+            }else{
+                title=(windowTitle+' ' + commonValues.getSelectedFile());
+            }
 
             final PdfObject linearObj=(PdfObject)decode_pdf.getJPedalObject(PdfDictionary.Linearized);
             if(linearObj!=null){

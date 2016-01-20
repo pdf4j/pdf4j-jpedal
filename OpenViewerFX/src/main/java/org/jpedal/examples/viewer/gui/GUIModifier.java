@@ -34,6 +34,7 @@ package org.jpedal.examples.viewer.gui;
 
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.gui.GUI.PageCounter;
+import org.jpedal.examples.viewer.gui.generic.GUIButton;
 import org.jpedal.examples.viewer.gui.generic.GUIButtons;
 import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -66,8 +67,13 @@ import org.w3c.dom.Node;
 public class GUIModifier {
     
     private static void setButtonEnabledAndVisible(final GUIButtons buttons, final int type, final boolean set) {
-        buttons.getButton(type).setEnabled(set);
-        buttons.getButton(type).setVisible(set);
+        
+        GUIButton button = buttons.getButton(type);
+        
+        if(button!=null){
+            button.setEnabled(set);
+            button.setVisible(set);
+        }
     }
     
     private static void removeUnwantedTabs(final int tabCount, final GUIFactory currentGUI, final boolean set, final String title){

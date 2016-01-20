@@ -1,4 +1,4 @@
-# Maven OpenViewerFX Source Code
+# OpenViewerFX PDF Viewer
 
 
 <h3>Description</h3>

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -160,6 +160,7 @@ public class DecoderOptions {
     public Color altTextColor;
     public Color altDisplayBackground;
     public int altColorThreshold=255;
+    public boolean enhanceFractionalLines = true;
     boolean changeTextAndLine;
 
     //non-static version
@@ -390,6 +391,15 @@ public class DecoderOptions {
                     } else {
                         throw new PdfException("JPedalSettings.ALLOW_PAGES_SMALLER_THAN_PAGE_SIZE expects a Boolean value");
                     }
+                } else if (key.equals(JPedalSettings.ENHANCE_FRACTIONAL_LINES)) {
+
+                    if (rawValue instanceof Boolean) {
+
+                        enhanceFractionalLines = (Boolean) rawValue;
+
+                    } else {
+                        throw new PdfException("JPedalSettings.ENHANCE_FRACTIONAL_LINES expects a Boolean value");
+                    }
                     //expansion room here
 
                 } else //all static values
@@ -556,6 +566,10 @@ public class DecoderOptions {
     
     public int getReplacementColorThreshold() {
         return altColorThreshold;
+    }
+    
+    public boolean isEnhanceFractionalLines() {
+        return enhanceFractionalLines;
     }
     
     public Color getDisplayBackgroundColor(){

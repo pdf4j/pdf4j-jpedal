@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -37,22 +37,6 @@ import javafx.scene.Cursor;
 import org.jpedal.FileAccess;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
-import static org.jpedal.examples.viewer.Commands.ABOUT;
-import static org.jpedal.examples.viewer.Commands.BACKPAGE;
-import static org.jpedal.examples.viewer.Commands.DOCINFO;
-import static org.jpedal.examples.viewer.Commands.EXIT;
-import static org.jpedal.examples.viewer.Commands.FBACKPAGE;
-import static org.jpedal.examples.viewer.Commands.FFORWARDPAGE;
-import static org.jpedal.examples.viewer.Commands.FIRSTPAGE;
-import static org.jpedal.examples.viewer.Commands.FORWARDPAGE;
-import static org.jpedal.examples.viewer.Commands.FULLSCREEN;
-import static org.jpedal.examples.viewer.Commands.GOTO;
-import static org.jpedal.examples.viewer.Commands.HELP;
-import static org.jpedal.examples.viewer.Commands.LASTPAGE;
-import static org.jpedal.examples.viewer.Commands.OPENFILE;
-import static org.jpedal.examples.viewer.Commands.RSS;
-import static org.jpedal.examples.viewer.Commands.TIP;
-import static org.jpedal.examples.viewer.Commands.VISITWEBSITE;
 import org.jpedal.examples.viewer.commands.*;
 import org.jpedal.examples.viewer.commands.generic.Snapshot;
 
@@ -61,6 +45,8 @@ import org.jpedal.examples.viewer.commands.javafx.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.commands.generic.ZoomIn;
+import org.jpedal.examples.viewer.commands.generic.ZoomOut;
 import org.jpedal.examples.viewer.utils.PrinterInt;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
@@ -148,6 +134,15 @@ public class JavaFXCommands extends Commands {
                         ((PdfDecoderFX) decode_pdf).setCursor(Cursor.CROSSHAIR);
                     }
                     break;
+                    
+                case ZOOMIN:
+                    status = ZoomIn.execute(args, currentGUI, decode_pdf);
+                    break;
+            
+                case ZOOMOUT:
+                    status = ZoomOut.execute(args, currentGUI, decode_pdf);
+                    break;
+            
                 case EXTRACTASIMAGE:
                     JavaFXExtractSelectionAsImage.execute(commonValues, currentGUI, decode_pdf);
                     break;
@@ -177,10 +172,10 @@ public class JavaFXCommands extends Commands {
                     JavaFXSaveFile.execute(args, currentGUI, commonValues);
                     break;
                 case PREVIOUSDOCUMENT:
-                    NavigateDocuments.executePrevDoc(args, currentGUI, commonValues, searchFrame, decode_pdf, properties, thumbnails);
+                    NavigateDocuments.executePrevDoc(args, currentGUI);
                     break;
                 case NEXTDOCUMENT:
-                    NavigateDocuments.executeNextDoc(args, currentGUI, commonValues, searchFrame, decode_pdf, properties, thumbnails);
+                    NavigateDocuments.executeNextDoc(args, currentGUI);
                     break;
                 case PREFERENCES:
                     JavaFXPreferences.execute(args, currentGUI);
@@ -206,7 +201,7 @@ public class JavaFXCommands extends Commands {
                     JavaFXDocInfo.execute(args, currentGUI, commonValues, decode_pdf);
                     break;
                 case TIP:
-                    JavaFXTipOfTheDay.execute(args, currentGUI, properties);
+                    JavaFXTipOfTheDay.execute(args, properties);
                     break;
                 case FULLSCREEN:
                     JavaFXFullScreen.execute(args, currentGUI);
@@ -268,6 +263,9 @@ public class JavaFXCommands extends Commands {
                 case SETREPLACEMENTCOLORTHRESHOLD:
                     SetReplacementThreshold.execute(args, decode_pdf);
                     break;
+                case SETENHANCEFRACTIONALLINES: //Used for JavaFX Netbeans PDF Viewer Plugin.
+                    SetEnhanceFractionalLines.execute(args, decode_pdf);
+                    break;
                 default:
                     if(GUI.debugFX) {
                         System.out.println("Command ID " + ID + " not Implemented Yet for JavaFX");
@@ -293,7 +291,7 @@ public class JavaFXCommands extends Commands {
         if (currentGUI.isSingle()) {
             decode_pdf.flushObjectValues(true);
         } else {
-            decode_pdf = MultiPages.openNewMultiplePage(commonValues.getSelectedFile(), currentGUI, commonValues);
+            decode_pdf = MultiPages.openNewMultiplePage(currentGUI, commonValues);
         }
 
         JavaFXOpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);

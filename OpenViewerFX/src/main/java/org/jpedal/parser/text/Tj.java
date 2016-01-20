@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -454,7 +454,7 @@ public class Tj extends BaseDecoder {
                 } else if (isCID){  //could be nonCID cid
                     i=CIDTextUtils.getCIDCharValues(i,stream, streamLength,glyphData,currentFontData, parserOptions);
                 }else{
-                    lastTextChar = getValue(lastTextChar,glyphData, currentFontData, current, parserOptions);
+                    lastTextChar = getValue(lastTextChar,glyphData, currentFontData, current);
                 }
                 
                 //Handle extracting CID Identity fonts
@@ -505,14 +505,19 @@ public class Tj extends BaseDecoder {
                 
                 glyphData.setLeading(0); //reset leading
                 
-                if(currentFontData.isCIDFont() && glyphs.is1C() && !glyphs.isIdentity()){
+                float actualWidth=glyphData.getActualWidth();
+                
+                if(currentFontData.isCIDFont()){
                     
                     final int idx=glyphs.getCMAPValue(glyphData.getRawInt());
-                    if(idx>0) {
-                        glyphData.setRawInt(idx);
-                    }
-                    
+                    if(idx>0){ 
+                        if(glyphs.is1C() && !glyphs.isIdentity()) {
+                            glyphData.setRawInt(idx);
+                        }
+                        actualWidth = currentFontData.getWidth(idx);
+                    }   
                 }
+                
                 int idx=glyphData.getRawInt();
                 
                 if(!glyphs.isCorrupted()){
@@ -522,15 +527,14 @@ public class Tj extends BaseDecoder {
                         if(mappedIdx!=-1) {
                             idx = mappedIdx;
                         }
-                    }else if(currentFontData.getFontType()!=StandardFonts.TYPE3){//if a numeric value we need to replace to get correct glyph
-                        final int diff=currentFontData.getDiffChar(idx);
+                    }else if(currentFontData.getFontType()==StandardFonts.TYPE1){//if a numeric value we need to replace to get correct glyph
+                       final int diff=currentFontData.getDiffChar(idx);
                         if(diff>0){
                             glyphData.setRawInt(diff);
                         }
                     }
                 }
                 
-                final float actualWidth=glyphData.getActualWidth();
                 if(actualWidth>0){
                     currentWidth=actualWidth;
                 }else{
@@ -966,7 +970,7 @@ public class Tj extends BaseDecoder {
         }
     }
     
-    static char getValue(char lastTextChar, GlyphData glyphData, PdfFont currentFontData, DynamicVectorRenderer current, ParserOptions parserOptions) {
+    static char getValue(char lastTextChar, GlyphData glyphData, PdfFont currentFontData, DynamicVectorRenderer current) {
         
         final String newValue=currentFontData.getGlyphValue(glyphData.getRawInt());
         glyphData.setDisplayValue(newValue);

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -84,9 +84,15 @@ public class SH {
             shadeShape = gs.getClippingShape();
         }
 
-        if(shadeShape==null) {
-            shadeShape = new Rectangle(pageData.getMediaBoxX(pageNum), pageData.getMediaBoxY(pageNum), pageData.getMediaBoxWidth(pageNum), pageData.getMediaBoxHeight(pageNum));
+        if (shadeShape == null) {
+            int mh = pageData.getMediaBoxHeight(pageNum);
+            mh = mh == 0 ? 1024 : mh; //this is a hack page height should not be zero
+            int mw = pageData.getMediaBoxWidth(pageNum);
+            mw = mw == 0 ? 1024 : mw; //this is a hack page width should not be zero            
+            shadeShape = new Rectangle(pageData.getMediaBoxX(pageNum), pageData.getMediaBoxY(pageNum), mw, mh);
+            //            shadeShape = new Rectangle(pageData.getMediaBoxX(pageNum), pageData.getMediaBoxY(pageNum), pageData.getMediaBoxWidth(pageNum), pageData.getMediaBoxHeight(pageNum));
         }
+
         
         if (current.isHTMLorSVG() && cache.groupObj==null) {
             current.eliminateHiddenText(shadeShape, gs, 7, true);

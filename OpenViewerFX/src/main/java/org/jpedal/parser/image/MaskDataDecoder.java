@@ -1,16 +1,16 @@
 /*
-* ===========================================
-* Java Pdf Extraction Decoding Access Library
-* ===========================================
-*
-* Project Info:  http://www.idrsolutions.com
-* Help section for developers at http://www.idrsolutions.com/support/
-*
-* (C) Copyright 1997-2015 IDRsolutions and Contributors.
-*
-* This file is part of JPedal/JPDF2HTML5
-*
-    This library is free software; you can redistribute it and/or
+ * ===========================================
+ * Java Pdf Extraction Decoding Access Library
+ * ===========================================
+ *
+ * Project Info:  http://www.idrsolutions.com
+ * Help section for developers at http://www.idrsolutions.com/support/
+ *
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
+ *
+ * This file is part of JPedal/JPDF2HTML5
+ *
+     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
     version 2.1 of the License, or (at your option) any later version.
@@ -25,11 +25,11 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-*
-* ---------------
-* MaskDataDecoder.java
-* ---------------
-*/
+ *
+ * ---------------
+ * MaskDataDecoder.java
+ * ---------------
+ */
 
 package org.jpedal.parser.image;
 
@@ -79,7 +79,7 @@ class MaskDataDecoder {
         if(maskArray!=null){
             objectData=applyMaskArray(w, h, objectData,maskArray);
         }else{
-             objectData=applyMaskStream(maskDataSream,imageData,decodeColorData, newMask, XObject);
+             objectData=applyMaskStream(maskDataSream,imageData, newMask, XObject);
         }
         
         //include Decode if present
@@ -229,12 +229,11 @@ class MaskDataDecoder {
     /**
      * apply the Mask streamto image data directly as a component on argb
      *
-     * @param imageData
-     * @param decodeColorData
      * @param newSMask
+     * @param imageData
      * @return
      */
-    static byte[] applyMaskStream(byte[] maskData, final ImageData imageData,final GenericColorSpace decodeColorData, final PdfObject newMask, final PdfObject XObject) {
+    static byte[] applyMaskStream(byte[] maskData, final ImageData imageData, final PdfObject newMask, final PdfObject XObject) {
         
         byte[] objectData=imageData.getObjectData();
         

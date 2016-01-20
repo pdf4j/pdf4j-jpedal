@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -310,16 +310,17 @@ public class T1GlyphFX extends BaseT1Glyph
                 }
             }
 
-        if(type== PdfGlyph.FontBB_X) {
-            return minX;
-        } else if(type== PdfGlyph.FontBB_Y) {
-            return minY;
-        } else if(type== PdfGlyph.FontBB_WIDTH) {
-            return maxX;
-        } else if(type== PdfGlyph.FontBB_HEIGHT) {
-            return minY;//maxY-minY;
-        } else {
-            return 0;
+        switch (type) {
+            case PdfGlyph.FontBB_X:
+                return minX;
+            case PdfGlyph.FontBB_Y:
+                return minY;
+            case PdfGlyph.FontBB_WIDTH:
+                return maxX;
+            case PdfGlyph.FontBB_HEIGHT:
+                return minY;//maxY-minY;
+            default:
+                return 0;
         }
     }
     
@@ -342,29 +343,29 @@ public class T1GlyphFX extends BaseT1Glyph
         {
 
             //System.out.println(i+" "+x+" "+y);
-            if( commands[i] == T1GlyphFactory.L ){
-                elements.add(new LineTo(x[i],y[i]-ymin));
-            }else if( commands[i] == T1GlyphFactory.H ){
-                elements.add( new ClosePath());
-                elements.add( new MoveTo(0,0));
-            }else if( commands[i] == T1GlyphFactory.M ){
-                elements.add( new MoveTo(x[i], y[i]-ymin));
-                
-            }else if( commands[i] == T1GlyphFactory.C ){
-                elements.add(new CubicCurveTo(x[i], y[i]-ymin,
-                        x2[i],y2[i]-ymin,
-                        x3[i], y3[i]-ymin));
-                
+            switch (commands[i]) {
+                case T1GlyphFactory.L:
+                    elements.add(new LineTo(x[i],y[i]-ymin));
+                    break;
+                case T1GlyphFactory.H:
+                    elements.add( new ClosePath());
+                    elements.add( new MoveTo(0,0));
+                    break;
+                case T1GlyphFactory.M:
+                    elements.add( new MoveTo(x[i], y[i]-ymin));
+                    break;
+                case T1GlyphFactory.C:
+                    elements.add(new CubicCurveTo(x[i], y[i]-ymin,
+                            x2[i],y2[i]-ymin,
+                            x3[i], y3[i]-ymin));
+                    break;
+                default:
+                    break;
             }
 
             i++;
         }
         
         return currentPath;
-    }
-     
-     @Override
-    public boolean hasHintingApplied() {
-        return false;
     }
 }

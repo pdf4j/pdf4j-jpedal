@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -94,13 +94,13 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
 
     public static void mouseClicked(final MouseEvent e) {
         if(PDFListener.debugMouseActions || showMethods) {
-            System.out.println("SwingFormButtonListener.mouseClicked()");
+            System.out.println("SwingFormButtonListener.mouseClicked() "+e);
         }
     }
 
     public void mousePressed(final MouseEvent e) {
         if (PDFListener.debugMouseActions || showMethods) {
-            System.out.println("customMouseListener.mousePressed()");
+            System.out.println("customMouseListener.mousePressed() "+e);
         }
         if ((captionChanger != null && e.getSource() instanceof ButtonBase) &&
              (captionChanger.containsKey("down"))) {

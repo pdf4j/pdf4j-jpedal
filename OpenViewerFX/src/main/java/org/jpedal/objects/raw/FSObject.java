@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -43,9 +43,9 @@ public class FSObject extends FormObject {
 
     //boolean ImageMask=false;
 
-    byte[] rawUF;
+    byte[] rawUF,rawDesc;
 
-    String UF;
+    String UF,Desc;
 
     private byte[][] Names;
 
@@ -443,6 +443,10 @@ public class FSObject extends FormObject {
 
         switch(id){
 
+            case PdfDictionary.Desc:
+                rawDesc=value;
+                break;
+
             case PdfDictionary.UF:
                 rawUF=value;
                 break;
@@ -490,6 +494,15 @@ public class FSObject extends FormObject {
     public String getTextStreamValue(final int id) {
 
         switch(id){
+
+            case PdfDictionary.Desc:
+
+                //setup first time
+                if(Desc==null && rawDesc!=null) {
+                    Desc = new String(rawDesc);
+                }
+
+                return Desc;
 
             case PdfDictionary.UF:
 

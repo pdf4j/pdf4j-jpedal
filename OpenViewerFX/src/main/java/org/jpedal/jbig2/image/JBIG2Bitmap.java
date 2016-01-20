@@ -58,7 +58,6 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.BitSet;
 
 import org.jpedal.jbig2.JBIG2Exception;
 import org.jpedal.jbig2.decoders.ArithmeticDecoder;
@@ -1063,18 +1062,18 @@ public final class JBIG2Bitmap {
         data[index] = (byte)b;
     }
 
-	public void setPixel(int col, int row, int value) {
+    public void setPixel(int col, int row, int value) {
 //        if (useByteArray)
-            newSetPixel(col,row,newData,value);
+        newSetPixel(col, row, newData, value);
 //        else
 //            setPixel(col, row, data, value);
-	}
+    }
 
-        private final static int getPixel(int col, int row, int line, byte[] data) {
-            return (data[(row * line) + (col / 8)] & 1 << 7-(col%8)) != 0 ? 1 : 0;
-        }
+    private static int getPixel(int col, int row, int line, byte[] data) {
+        return (data[(row * line) + (col / 8)] & 1 << 7 - (col % 8)) != 0 ? 1 : 0;
+    }
 
-	public int getPixel(int col, int row) {
+    public int getPixel(int col, int row) {
 //        if (useByteArray)
 //            return getPixel(col,row,line,newData);
 		    return (newData[(row * line) + (col / 8)] & 1 << 7-(col%8)) != 0 ? 1 : 0;

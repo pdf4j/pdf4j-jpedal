@@ -31,6 +31,7 @@
  * the design, construction, operation or maintenance of any nuclear facility.
  *
  * Adapted from the codecs TIFFLZWDecoder for itext
+ * LZWDecoder2.java
  */
 package org.jpedal.sun;
 import java.io.BufferedInputStream;

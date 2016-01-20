@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -94,9 +94,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
     private MenuItem nextDocument;
     private Menu pageLayoutMenu;
     private MenuItem single;
-    private MenuItem continuous;
-    private MenuItem facing;
-    private MenuItem continuousFacing;
+   
     private MenuItem pageFlow;
     private CheckMenuItem textSelect;
     private CheckMenuItem separateCover;
@@ -214,12 +212,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
                 return pageLayoutMenu;
             case Commands.SINGLE:
                 return single;
-            case Commands.CONTINUOUS:
-                return continuous;
-            case Commands.FACING:
-                return facing;
-            case Commands.CONTINUOUS_FACING:
-                return continuousFacing;
             case Commands.PAGEFLOW:
                 return pageFlow;
             case Commands.TEXTSELECT:
@@ -547,52 +539,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
                     });
             		pageLayout.getItems().add(single);
             		break;
-                    
-                case Display.CONTINUOUS :
-                    if(!OpenViewerFX.isOpenFX){
-                        //Give copy to Buttons to update items if buttons used
-                        ((JavaFXButtons)buttons).getLayoutGroup().add(pageView);
-                        continuous = pageView;
-                        continuous.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(final ActionEvent t) {
-                                currentCommands.executeCommand(Commands.CONTINUOUS, null);
-                            }
-                        });
-                        pageLayout.getItems().add(continuous);
-                    }
-            		break;
-                    
-            	case Display.FACING :
-                    if(!OpenViewerFX.isOpenFX){
-                        facing = pageView;
-                        facing.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(final ActionEvent t) {
-                                currentCommands.executeCommand(Commands.FACING, null);
-                            }
-                        });
-                        pageLayout.getItems().add(facing);
-                    }
-            		break;
-                    
-            	case Display.CONTINUOUS_FACING :
-                    
-                    if(!OpenViewerFX.isOpenFX){
-                        //Give copy to Buttons to update items if buttons used
-                        ((JavaFXButtons)buttons).getLayoutGroup().add(pageView);
-                        continuousFacing = pageView;
-                        continuousFacing.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(final ActionEvent t) {
-                                currentCommands.executeCommand(Commands.CONTINUOUS_FACING, null);
-                            }
-                        });
-                        pageLayout.getItems().add(continuousFacing);
-                    }
-                    
-            		break;
-                    
+                   
             	case Display.PAGEFLOW :
                     if(!OpenViewerFX.isOpenFX){
                         pageFlow = pageView;
@@ -637,28 +584,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
 					textSelect.setSelected(false);
 					panMode.setSelected(true);
                 break;
-                
-            case Commands.CONTINUOUS:
-                textSelect.setDisable(false);
-                panMode.setDisable(true);
-                textSelect.setSelected(false);
-                panMode.setSelected(true);
-                break;
-                
-            case Commands.CONTINUOUS_FACING:
-                textSelect.setDisable(false);
-                panMode.setDisable(true);
-                textSelect.setSelected(false);
-                panMode.setSelected(true);
-                break;
-                
-            case Commands.FACING:
-                textSelect.setDisable(false);
-                panMode.setDisable(true);
-                textSelect.setSelected(false);
-                panMode.setSelected(true);
-                break;
-                
+               
             case Commands.MOUSEMODE:
                 switch(mouseMode){
                     case 0 : //Text Select
@@ -835,8 +761,8 @@ public class JavaFXMenuItems extends GUIMenuItems {
 			viewMenu.getItems().add(pageLayoutMenu);
 		}
 		
-		final String[] descriptions={Messages.getMessage("PageLayoutViewMenu.SinglePage"),Messages.getMessage("PageLayoutViewMenu.Continuous"),Messages.getMessage("PageLayoutViewMenu.ContinousFacing"),Messages.getMessage("PageLayoutViewMenu.Facing"),Messages.getMessage("PageLayoutViewMenu.PageFlow")};
-        final int[] value={Display.SINGLE_PAGE, Display.CONTINUOUS,Display.CONTINUOUS_FACING,Display.FACING,Display.PAGEFLOW};
+		final String[] descriptions={Messages.getMessage("PageLayoutViewMenu.SinglePage"),Messages.getMessage("PageLayoutViewMenu.PageFlow")};
+        final int[] value={Display.SINGLE_PAGE, Display.PAGEFLOW};
 
 		if(isSingle) {
             initLayoutMenus(pageLayoutMenu, descriptions, value, buttons, currentCommands, isSingle);
@@ -1131,9 +1057,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
                  * Disable View Modes.
                  */
                 switch(ID){
-                    case Display.FACING:
-                        facing.setDisable(debug);
-                        break;
+                   
                     case Display.PAGEFLOW:
                         pageFlow.setDisable(debug);
                         break;
@@ -1144,10 +1068,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
             reSaveAsForms.setDisable(debug);
             signPDF.setDisable(debug);
             print.setDisable(debug);
-            if(!OpenViewerFX.isOpenFX){
-                facing.setDisable(debug);
-                pageFlow.setDisable(debug);
-            }
         }
     }   
     

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -117,8 +117,11 @@ public class JPedalSettings {
     /**Integer to flag text value should be changed*/
     public static final Integer REPLACE_DISPLAY_BACKGROUND = 22;
 
-    /**Integer to flag text value should be changed*/
-    public static final Integer REPLACEMENT_COLOR_THRESHOLD = 22;
+    /**Integer to flag text value threshold for change*/
+    public static final Integer REPLACEMENT_COLOR_THRESHOLD = 23;
+    
+    /**Integer to flag enhance thin lines*/
+    public static final Integer ENHANCE_FRACTIONAL_LINES = 24;
     
     /**
      * Values for use with TEXT_HIGHLIGHT_MODE

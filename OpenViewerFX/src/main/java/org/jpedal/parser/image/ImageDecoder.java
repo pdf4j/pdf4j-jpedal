@@ -1,16 +1,16 @@
 /*
-* ===========================================
-* Java Pdf Extraction Decoding Access Library
-* ===========================================
-*
-* Project Info:  http://www.idrsolutions.com
-* Help section for developers at http://www.idrsolutions.com/support/
-*
-* (C) Copyright 1997-2015 IDRsolutions and Contributors.
-*
-* This file is part of JPedal/JPDF2HTML5
-*
-    This library is free software; you can redistribute it and/or
+ * ===========================================
+ * Java Pdf Extraction Decoding Access Library
+ * ===========================================
+ *
+ * Project Info:  http://www.idrsolutions.com
+ * Help section for developers at http://www.idrsolutions.com/support/
+ *
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
+ *
+ * This file is part of JPedal/JPDF2HTML5
+ *
+     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
     version 2.1 of the License, or (at your option) any later version.
@@ -25,11 +25,11 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-*
-* ---------------
-* ImageDecoder.java
-* ---------------
-*/
+ *
+ * ---------------
+ * ImageDecoder.java
+ * ---------------
+ */
 package org.jpedal.parser.image;
 
 import com.idrsolutions.pdf.color.shading.BitReader;
@@ -924,7 +924,7 @@ public class ImageDecoder extends BaseDecoder{
                 //breaks if form rotated so only use at top level
                 // (sample file breaks so we added this as hack for fattura 451-10 del 31.10.10.pdf in customers3)
                 if(formLevel<2 && (saveData ||(!imageMask && saveRawData && decodeColorData.getID()==ColorSpaces.DeviceGray ))){
-                    saveRawOneBitDataForResampling(saveData,imageData, index, arrayInverted, decodeColorData, maskCol, XObject);
+                    saveRawOneBitDataForResampling(saveData,imageData, arrayInverted, decodeColorData, maskCol, XObject);
                 }
                 
                 //make 1 bit indexed flat
@@ -1054,7 +1054,7 @@ public class ImageDecoder extends BaseDecoder{
             float mm[][] = gs.CTM;
             AffineTransform affine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
                         
-            BufferedImage temp = ((PatternColorSpace)gs.nonstrokeColorSpace).getRawImage(w,h,affine);
+            BufferedImage temp = ((PatternColorSpace)gs.nonstrokeColorSpace).getRawImage(affine);
             BufferedImage scrap = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             
             if(temp!=null){
@@ -1112,7 +1112,7 @@ public class ImageDecoder extends BaseDecoder{
         return image;
     }
     
-    public void saveRawOneBitDataForResampling(boolean saveData, final ImageData imageData, byte[] index, boolean arrayInverted, GenericColorSpace decodeColorData, final byte[] maskCol, final PdfObject XObject) {
+    public void saveRawOneBitDataForResampling(boolean saveData, final ImageData imageData, boolean arrayInverted, GenericColorSpace decodeColorData, final byte[] maskCol, final PdfObject XObject) {
         
         //cache if binary image (not Mask)
         if(decodeColorData.getID()==ColorSpaces.DeviceRGB && maskCol!=null && imageData.getDepth()==1 ){  //avoid cases like Hand_test/DOC028.PDF

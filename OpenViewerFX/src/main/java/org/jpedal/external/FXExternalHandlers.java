@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -34,6 +34,7 @@ package org.jpedal.external;
 
 import org.jpedal.FileAccess;
 import org.jpedal.display.GUIModes;
+import org.jpedal.objects.javascript.ExpressionEngine;
 import org.jpedal.objects.acroforms.javafx.JavaFXFormCreator;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.parser.PDFtoImageConvertor;
@@ -66,7 +67,7 @@ public class FXExternalHandlers extends ExternalHandlers {
     }
     
     @Override
-    public void openPdfFile(final Object userExpressionEngine) {
+    public void openPdfFile(final ExpressionEngine userExpressionEngine) {
          
         initObjects(userExpressionEngine,new JavaFXFormCreator());
         

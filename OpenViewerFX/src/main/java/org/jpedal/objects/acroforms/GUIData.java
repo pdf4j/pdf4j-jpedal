@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -187,58 +187,55 @@ public class GUIData {
             }
 
         } else {
-            if (subtype ==PdfDictionary.Tx) { //-----------------------------------------------  TEXT --------------------------------------
-
-                boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
-                if (flags != null) {
-                    isMultiline = flags[FormObject.MULTILINE_ID] || (formObject.getTextString()!=null && formObject.getTextString().indexOf('\n')!=-1);
-                    hasPassword = flags[FormObject.PASSWORD_ID];
-                }
-
-                if (isMultiline) {
-
-                    if (hasPassword) {
-
-                        retComponent = formFactory.multiLinePassword(formObject);
-
-                    } else {
-
-                        retComponent = formFactory.multiLineText(formObject);
-
-                    }
-                } else {//singleLine
-
-                    if (hasPassword) {
-
-                        retComponent = formFactory.singleLinePassword(formObject);
-
-                    } else {
-
-                        retComponent = formFactory.singleLineText(formObject);
-
-                    }
-                }
-            }else if (subtype==PdfDictionary.Ch) {//----------------------------------------- CHOICE ----------------------------------------------
-
-                boolean isCombo = false;// multiSelect = false, sort = false, isEditable = false, doNotSpellCheck = false, comminOnSelChange = false;
-                if (flags != null) {
-                    isCombo = flags[FormObject.COMBO_ID];
-                }
-
-                if (isCombo) {// || (type==XFAFORM && ((XFAFormObject)formObject).choiceShown!=XFAFormObject.CHOICE_ALWAYS)){
-
-                    retComponent = formFactory.comboBox(formObject);
-
-                } else {//it is a list
-
-                    retComponent = formFactory.listField(formObject);
-                }
-            } else if (subtype == PdfDictionary.Sig) {
-
-                retComponent = formFactory.signature(formObject);
-
-            } else{	
-                retComponent = formFactory.annotationButton(formObject);
+            switch (subtype) {
+                case PdfDictionary.Tx:
+                    boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
+                    if (flags != null) {
+                        isMultiline = flags[FormObject.MULTILINE_ID] || (formObject.getTextString()!=null && formObject.getTextString().indexOf('\n')!=-1);
+                        hasPassword = flags[FormObject.PASSWORD_ID];
+                    }   if (isMultiline) {
+                        
+                        if (hasPassword) {
+                            
+                            retComponent = formFactory.multiLinePassword(formObject);
+                            
+                        } else {
+                            
+                            retComponent = formFactory.multiLineText(formObject);
+                            
+                        }
+                    } else {//singleLine
+                        
+                        if (hasPassword) {
+                            
+                            retComponent = formFactory.singleLinePassword(formObject);
+                            
+                        } else {
+                            
+                            retComponent = formFactory.singleLineText(formObject);
+                            
+                        }
+                    }   break;
+                case PdfDictionary.Ch:
+                    //----------------------------------------- CHOICE ----------------------------------------------
+                    
+                    boolean isCombo = false;// multiSelect = false, sort = false, isEditable = false, doNotSpellCheck = false, comminOnSelChange = false;
+                    if (flags != null) {
+                        isCombo = flags[FormObject.COMBO_ID];
+                    }   if (isCombo) {// || (type==XFAFORM && ((XFAFormObject)formObject).choiceShown!=XFAFormObject.CHOICE_ALWAYS)){
+                        
+                        retComponent = formFactory.comboBox(formObject);
+                        
+                    } else {//it is a list
+                        
+                        retComponent = formFactory.listField(formObject);
+                    }   break;
+                case PdfDictionary.Sig:
+                    retComponent = formFactory.signature(formObject);
+                    break;
+                default:
+                    retComponent = formFactory.annotationButton(formObject);
+                    break;
             }
         }
 		

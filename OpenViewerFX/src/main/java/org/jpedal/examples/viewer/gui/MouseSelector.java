@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -97,18 +97,23 @@ public class MouseSelector {
         }
 
         final int[] ret = new int[2];
-        if (rotation == 90) {
-            ret[1] = x + cropY;
-            ret[0] = y + cropX;
-        } else if ((rotation == 180)) {
-            ret[0] = mediaW - (x + mediaW - cropW - cropX);
-            ret[1] = y + cropY;
-        } else if ((rotation == 270)) {
-            ret[1] = mediaH - (x + mediaH - cropH - cropY);
-            ret[0] = mediaW - (y + mediaW - cropW - cropX);
-        } else {
-            ret[0] = x + cropX;
-            ret[1] = mediaH - (y + mediaH - cropH - cropY);
+        switch (rotation) {
+            case 90:
+                ret[1] = x + cropY;
+                ret[0] = y + cropX;
+                break;
+            case 180:
+                ret[0] = mediaW - (x + mediaW - cropW - cropX);
+                ret[1] = y + cropY;
+                break;
+            case 270:
+                ret[1] = mediaH - (x + mediaH - cropH - cropY);
+                ret[0] = mediaW - (y + mediaW - cropW - cropX);
+                break;
+            default:
+                ret[0] = x + cropX;
+                ret[1] = mediaH - (y + mediaH - cropH - cropY);
+                break;
         }
         return ret;
     }

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -130,24 +130,27 @@ public class T1GlyphFactory implements GlyphFactory {
         {
 
             //System.out.println(i+" "+x+" "+y);
-            if( commands[i] == L ){
-                current_path.lineTo(x[i],y[i]-ymin);
-            }else if( commands[i] == H ){
-                current_path.closePath();
-
-                //save for later use
-                cached_current_path.addElement(current_path);
-
-                current_path=new GeneralPath(GeneralPath.WIND_NON_ZERO);
-                current_path.moveTo(0,0);
-            }else if( commands[i] == M ){
-                current_path.moveTo( x[i], y[i]-ymin);
-
-            }else if( commands[i] == C ){
-                current_path.curveTo( x[i], y[i]-ymin,
-                        x2[i],y2[i]-ymin,
-                        x3[i], y3[i]-ymin);
-
+            switch (commands[i]) {
+                case L:
+                    current_path.lineTo(x[i],y[i]-ymin);
+                    break;
+                case H:
+                    current_path.closePath();
+                    //save for later use
+                    cached_current_path.addElement(current_path);
+                    current_path=new GeneralPath(GeneralPath.WIND_NON_ZERO);
+                    current_path.moveTo(0,0);
+                    break;
+                case M:
+                    current_path.moveTo( x[i], y[i]-ymin);
+                    break;
+                case C:
+                    current_path.curveTo( x[i], y[i]-ymin,
+                            x2[i],y2[i]-ymin,
+                            x3[i], y3[i]-ymin);
+                    break;
+                default:
+                    break;
             }
 
             i++;

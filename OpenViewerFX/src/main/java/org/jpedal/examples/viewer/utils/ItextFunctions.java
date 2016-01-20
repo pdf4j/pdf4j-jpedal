@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -42,6 +42,7 @@ import org.jpedal.objects.PdfPageData;
 
 /** central location to place external code using itext library */
 
+@SuppressWarnings("UnusedParameters")
 public class ItextFunctions {
 
     public static final boolean IS_DUMMY = true;

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -255,21 +255,17 @@ public class T1Glyph extends BaseT1Glyph
                 }
             }
 
-        if(type== PdfGlyph.FontBB_X) {
-            return minX;
-        } else if(type== PdfGlyph.FontBB_Y) {
-            return minY;
-        } else if(type== PdfGlyph.FontBB_WIDTH) {
-            return maxX;
-        } else if(type== PdfGlyph.FontBB_HEIGHT) {
-            return minY;//maxY-minY;
-        } else {
-            return 0;
+        switch (type) {
+            case PdfGlyph.FontBB_X:
+                return minX;
+            case PdfGlyph.FontBB_Y:
+                return minY;
+            case PdfGlyph.FontBB_WIDTH:
+                return maxX;
+            case PdfGlyph.FontBB_HEIGHT:
+                return minY;//maxY-minY;
+            default:
+                return 0;
         }
-    }
-    
-    @Override
-    public boolean hasHintingApplied() {
-        return false;
     }
 }

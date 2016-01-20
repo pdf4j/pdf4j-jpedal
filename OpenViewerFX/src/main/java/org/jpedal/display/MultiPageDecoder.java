@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -132,7 +132,7 @@ public abstract class MultiPageDecoder {
     }
     
     /**used to decode multiple pages on views*/
-    public void decodeOtherPages(int pageNumber, final int pageCount,int displayView, PdfDecoderInt pdf) {
+    public void decodeOtherPages(int pageNumber, final int pageCount, int displayView) {
         
         try {
             semaphore.acquire();
@@ -364,17 +364,22 @@ public abstract class MultiPageDecoder {
                         
                         pg.rotate(displayRotation*Math.PI/180);
                         try {
-                            if (displayRotation == 90) {
-                                pg.translate(0,-pageW[page]);
-                                pg.drawImage(pdf.getPageAsImage(page),0,0,pageH[page]+1,pageW[page]+1,null);
-                            } else if (displayRotation == 180) {
-                                pg.translate(-pageW[page],-pageH[page]);
-                                pg.drawImage(pdf.getPageAsImage(page),0,0,pageW[page]+1, pageH[page]+1, null);
-                            } else if (displayRotation == 270) {
-                                pg.translate(-pageH[page], 0);
-                                pg.drawImage(pdf.getPageAsImage(page),0,0,pageH[page]+1, pageW[page]+1,null);
-                            } else {
-                                pg.drawImage(pdf.getPageAsImage(page),0,0,pageW[page]+1, pageH[page]+1,null);
+                            switch (displayRotation) {
+                                case 90:
+                                    pg.translate(0,-pageW[page]);
+                                    pg.drawImage(pdf.getPageAsImage(page),0,0,pageH[page]+1,pageW[page]+1,null);
+                                    break;
+                                case 180:
+                                    pg.translate(-pageW[page],-pageH[page]);
+                                    pg.drawImage(pdf.getPageAsImage(page),0,0,pageW[page]+1, pageH[page]+1, null);
+                                    break;
+                                case 270:
+                                    pg.translate(-pageH[page], 0);
+                                    pg.drawImage(pdf.getPageAsImage(page),0,0,pageH[page]+1, pageW[page]+1,null);
+                                    break;
+                                default:
+                                    pg.drawImage(pdf.getPageAsImage(page),0,0,pageW[page]+1, pageH[page]+1,null);
+                                    break;
                             }
                         } catch(final Exception e) {
                             LogWriter.writeLog("Exception: " + e.getMessage());

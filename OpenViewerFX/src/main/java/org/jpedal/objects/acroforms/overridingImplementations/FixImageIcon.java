@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -242,22 +242,27 @@ public class FixImageIcon extends CustomImageIcon implements Icon, SwingConstant
 				finalRotation = pageRotate;
 			}
 			
-			/** with new decode at needed size code the resize (drawImage) may not be needed. */
-			if (finalRotation ==270) {
-				g2.rotate(-Math.PI / 2);
-				g2.translate(-drawWidth, 0);
-				g2.drawImage(image, -posX, posY, drawWidth, drawHeight, null);
-			} else if (finalRotation == 90) {
-				g2.rotate(Math.PI / 2);
-				g2.translate(0, -drawHeight);
-				g2.drawImage(image, posX, -posY, drawWidth, drawHeight, null);
-			} else if (finalRotation == 180) {
-				g2.rotate(Math.PI);
-				g2.translate(-drawWidth, -drawHeight);
-				g2.drawImage(image, -posX, -posY, drawWidth, drawHeight, null);
-			}else {
-				g2.drawImage(image, posX, posY, drawWidth, drawHeight, null);
-			}
+            /** with new decode at needed size code the resize (drawImage) may not be needed. */
+            switch (finalRotation) {
+                case 270:
+                    g2.rotate(-Math.PI / 2);
+                    g2.translate(-drawWidth, 0);
+                    g2.drawImage(image, -posX, posY, drawWidth, drawHeight, null);
+                    break;
+                case 90:
+                    g2.rotate(Math.PI / 2);
+                    g2.translate(0, -drawHeight);
+                    g2.drawImage(image, posX, -posY, drawWidth, drawHeight, null);
+                    break;
+                case 180:
+                    g2.rotate(Math.PI);
+                    g2.translate(-drawWidth, -drawHeight);
+                    g2.drawImage(image, -posX, -posY, drawWidth, drawHeight, null);
+                    break;
+                default:
+                    g2.drawImage(image, posX, posY, drawWidth, drawHeight, null);
+                    break;
+            }
 		} else {
             g2.drawImage(image, 0, 0, null);
         }

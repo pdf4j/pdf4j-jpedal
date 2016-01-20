@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -1694,8 +1694,8 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
      * @return Swing component to use as popup (see org.jpedal.objects.acroforms.overridingImplementations.PdfSwingPopup)
      */
     @SuppressWarnings("MethodMayBeStatic")
-    public Object getPopupComponent(final FormObject form, final int cropBoxWith) {
-        return new PdfJavaFXPopup(form,cropBoxWith);
+    public Object getPopupComponent(final FormObject form, @SuppressWarnings("UnusedParameters") final int cropBoxWith) {
+        return new PdfJavaFXPopup(form);
     }
     
     private static void setBorder(final FormObject formObject, final StringBuilder styleBuilder){

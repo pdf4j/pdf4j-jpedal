@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -196,6 +196,7 @@ public abstract class GUI implements GUIFactory {
      * @param item :: Key for the property
      * @param value :: New value for the property
      */
+    @Deprecated
     @SuppressWarnings("UnusedDeclaration")
     public void setProperties(final String item, final boolean value){
         properties.setValue(item, String.valueOf(value));
@@ -508,6 +509,11 @@ public abstract class GUI implements GUIFactory {
                 currentCommands.executeCommand(Commands.SETREPLACEMENTCOLORTHRESHOLD, new Object[]{Integer.parseInt(propValue)});
             }
 
+            propValue = properties.getValue("enhanceFractionalLines");
+            if (!propValue.isEmpty()) {
+                currentCommands.executeCommand(Commands.SETENHANCEFRACTIONALLINES, new Object[]{Boolean.parseBoolean(propValue)});
+            }
+            
             //Set autoScroll default and add to properties file
             propValue = properties.getValue("autoScroll");
             if (!propValue.isEmpty()) {
@@ -1077,8 +1083,6 @@ public abstract class GUI implements GUIFactory {
             Values.setProcessing(false);//remove processing flag so that the viewer can be exited.
             currentGUI.setViewerTitle(null); //restore title
         }
-
-        currentGUI.selectBookmark();
 
         //Update multibox
         if(!SharedViewer.isFX()){

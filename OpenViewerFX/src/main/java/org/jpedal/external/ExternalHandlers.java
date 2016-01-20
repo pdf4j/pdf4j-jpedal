@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -64,7 +64,7 @@ public class ExternalHandlers {
     
     private static final boolean isXFAPresent;
     
-    private static boolean ULCSupport=false;
+    private static boolean ULCSupport;
     
     static {
         
@@ -163,7 +163,7 @@ public class ExternalHandlers {
     //copy for callback
     Object swingGUI;
     
-    private Enum modeSelected=GUIModes.SWING;
+    private GUIModes modeSelected=GUIModes.SWING;
 
     public ExternalHandlers(){
     
@@ -545,7 +545,7 @@ public class ExternalHandlers {
     
     private static final String xfaClassName="org.jpedal.objects.acroforms.AcroRendererXFA";
     
-    public void openPdfFile(final Object userExpressionEngine) {
+    public void openPdfFile(final ExpressionEngine userExpressionEngine) {
         
         initObjects(userExpressionEngine, new SwingFormCreator());
         
@@ -570,7 +570,7 @@ public class ExternalHandlers {
 
     }
 
-    void initObjects(final Object userExpressionEngine1, SwingFormCreator formCreator) {
+    void initObjects(final ExpressionEngine userExpressionEngine1, SwingFormCreator formCreator) {
         
         if(isXFAPresent){
             try {
@@ -597,21 +597,21 @@ public class ExternalHandlers {
         /**
          * setup Javascript object and pass into objects which use it
          */
-        javascript = new Javascript((ExpressionEngine) userExpressionEngine1, formRenderer, swingGUI);
+        javascript = new Javascript(userExpressionEngine1, formRenderer);
     }
     
     /**
-     * show if we are Swing or JavaFX (Enums in GUIModes)
+     * show if we are Swing or JavaFX
      */
-    public void setMode(final Enum mode) {
+    public void setMode(final GUIModes mode) {
         modeSelected=mode;
 }
     
     /**
-     * show if we are Swing or JavaFX (Enum in GUIModes)
+     * show if we are Swing or JavaFX
      * @return 
      */
-    public Enum getMode() {    
+    public GUIModes getMode() {    
         return modeSelected;
     }
 

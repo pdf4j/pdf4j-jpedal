@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -27,7 +27,7 @@
 
  *
  * ---------------
- * DefaultActionHandler.java
+ * EmptyActionHandler.java
  * ---------------
  */
 package org.jpedal.objects.acroforms.actions;
@@ -54,11 +54,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jpedal.*;
 import org.jpedal.objects.acroforms.ReturnValues;
-import static org.jpedal.objects.acroforms.actions.ActionHandler.MOUSECLICKED;
-import static org.jpedal.objects.acroforms.actions.ActionHandler.MOUSEENTERED;
-import static org.jpedal.objects.acroforms.actions.ActionHandler.MOUSEEXITED;
-import static org.jpedal.objects.acroforms.actions.ActionHandler.MOUSEPRESSED;
-import static org.jpedal.objects.acroforms.actions.ActionHandler.MOUSERELEASED;
 
 public class EmptyActionHandler implements ActionHandler {
     
@@ -95,12 +90,12 @@ public class EmptyActionHandler implements ActionHandler {
         return new MouseListener(){
             @Override
             public void mouseEntered(final MouseEvent e) {
-                setCursor(ActionHandler.MOUSEENTERED);
+
             }
             
             @Override
             public void mouseExited(final MouseEvent e) {
-                setCursor(ActionHandler.MOUSEEXITED);
+
             }
             
             @Override
@@ -127,15 +122,22 @@ public class EmptyActionHandler implements ActionHandler {
             System.out.println("DefaultActionHandler.A() ");
         }
         
-        if(eventType == MOUSEENTERED){
-            javascript.execute(formObj, PdfDictionary.E, ActionHandler.TODO, ' ');
-        }else if(eventType == MOUSEEXITED){
-            javascript.execute(formObj, PdfDictionary.X, ActionHandler.TODO, ' ');
-        }else if(eventType == MOUSEPRESSED){
-            javascript.execute(formObj, PdfDictionary.D, ActionHandler.TODO, ' ');
-        }else if(eventType == MOUSERELEASED){
-            javascript.execute(formObj, PdfDictionary.A, ActionHandler.TODO, ' ');
-            javascript.execute(formObj, PdfDictionary.U, ActionHandler.TODO, ' ');
+        switch (eventType) {
+            case MOUSEENTERED:
+                javascript.execute(formObj, PdfDictionary.E, ActionHandler.TODO, ' ');
+                break;
+            case MOUSEEXITED:
+                javascript.execute(formObj, PdfDictionary.X, ActionHandler.TODO, ' ');
+                break;
+            case MOUSEPRESSED:
+                javascript.execute(formObj, PdfDictionary.D, ActionHandler.TODO, ' ');
+                break;
+            case MOUSERELEASED:
+                javascript.execute(formObj, PdfDictionary.A, ActionHandler.TODO, ' ');
+                javascript.execute(formObj, PdfDictionary.U, ActionHandler.TODO, ' ');
+                break;
+            default:
+                break;
         }
         
         // new version
@@ -148,21 +150,25 @@ public class EmptyActionHandler implements ActionHandler {
         if(aData==null){
             aData = formObj.getDictionary(PdfDictionary.AA);
             if(aData!=null){
-                if(eventType == MOUSEENTERED){
-                    aData = aData.getDictionary(PdfDictionary.E);
-                }else if(eventType == MOUSEEXITED){
-                    aData = aData.getDictionary(PdfDictionary.X);
-                }else if(eventType == MOUSEPRESSED){
-                    aData = aData.getDictionary(PdfDictionary.D);
-                }else if(eventType == MOUSERELEASED){
-                    aData = aData.getDictionary(PdfDictionary.U);
+                switch (eventType) {
+                    case MOUSEENTERED:
+                        aData = aData.getDictionary(PdfDictionary.E);
+                        break;
+                    case MOUSEEXITED:
+                        aData = aData.getDictionary(PdfDictionary.X);
+                        break;
+                    case MOUSEPRESSED:
+                        aData = aData.getDictionary(PdfDictionary.D);
+                        break;
+                    case MOUSERELEASED:
+                        aData = aData.getDictionary(PdfDictionary.U);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
-        
-        //change cursor for each event
-        setCursor(eventType);
-        
+
         gotoDest(formObj,eventType,PdfDictionary.Dest);
         
         final int subtype=formObj.getParameterConstant(PdfDictionary.Subtype);
@@ -171,7 +177,7 @@ public class EmptyActionHandler implements ActionHandler {
         
         if (subtype == PdfDictionary.Sig) {
             
-            additionalAction_Signature(formObj, eventType);
+           // additionalAction_Signature(formObj, eventType);
             
         } else if (eventType==MOUSECLICKED && (popupFlag == FormObject.POPUP || subtype==PdfDictionary.Text)){
             // If the form object has an IRT entry and is part of a group, the popup that get's shown 
@@ -189,91 +195,101 @@ public class EmptyActionHandler implements ActionHandler {
             }
             
             final int command = aData.getNameAsConstant(PdfDictionary.S);
-            
+
             // S is Name of action
-            if (command != PdfDictionary.Unknown) {
-                
-                if (command == PdfDictionary.Named) {
-                    
-                    additionalAction_Named(eventType, aData);
-                    
-                }else if(command==PdfDictionary.GoTo || command==PdfDictionary.GoToR){
-                    gotoDest(aData, eventType,command);
-                    
-                } else if (command == PdfDictionary.ResetForm) {
-                    
+            switch (command) {
+                case PdfDictionary.Named:
+                    additionalAction_Named(aData);
+                    break;
+
+                case PdfDictionary.GoTo:
+                    gotoDest(aData, eventType, command);
+                    break;
+
+                case PdfDictionary.GoToR:
+                    gotoDest(aData, eventType, command);
+                    break;
+
+                case PdfDictionary.ResetForm:
                     additionalAction_ResetForm(aData);
-                    
-                } else if (command == PdfDictionary.SubmitForm) {
-                    
+                    break;
+
+                case PdfDictionary.SubmitForm:
                     additionalAction_SubmitForm(aData);
-                    
-                } else if (command == PdfDictionary.JavaScript) {
-                    
+                    break;
+
+                case PdfDictionary.JavaScript:
                     //javascript called above.
-                    
-                } else if (command == PdfDictionary.Hide) {
-                    
+                    break;
+
+                case PdfDictionary.Hide:
                     additionalAction_Hide(aData);
-                    
-                } else if (command == PdfDictionary.URI) {
-                    
-                    additionalAction_URI(aData.getTextStreamValue(PdfDictionary.URI));
-                    
-                } else if (command == PdfDictionary.Launch) {
+                    break;
+
+                case PdfDictionary.URI:
+                   // additionalAction_URI(aData.getTextStreamValue(PdfDictionary.URI));
+                    break;
+
+                case PdfDictionary.Launch:
 
                     LogWriter.writeFormLog("{stream} launch activate action NOT IMPLEMENTED", FormStream.debugUnimplemented);
-                    
+
                     if (FormStream.debugUnimplemented) {
                         System.out.println("{internal only} launch activate action NOT IMPLEMENTED");
                     }
-                    
-                } else if (command == PdfDictionary.SetOCGState) {
-                    
+                    break;
+
+                case PdfDictionary.SetOCGState:
                     additionalAction_OCState(eventType, aData);
-                    
-                } else if (command == PdfDictionary.Sound) {
-                    
-                    if (eventType == MOUSECLICKED || eventType==MOUSERELEASED) {
-                        
-                        final PdfObject soundObj=aData.getDictionary(PdfDictionary.Sound);
-                        
-                        // read now as lazy initialisation
-                        currentPdfFile.checkResolved(soundObj);
-                        
-                        try {
-                            
-                            int channels = soundObj.getInt(PdfDictionary.C);
-                            if (channels == -1) {
-                                channels = 1;
-                            }
-                            
-                            int bitsPerSample = soundObj.getInt(PdfDictionary.B);
-                            if (bitsPerSample == -1) {
-                                bitsPerSample = 8;
-                            }
-                            
-                            final float samplingRate = soundObj.getInt(PdfDictionary.R);
-                            
-                            int e = soundObj.getNameAsConstant(PdfDictionary.E);
-                            if (e == PdfDictionary.Unknown) {
-                                e = PdfDictionary.Unsigned;
-                            }
-                            
-                            SoundHandler.setAudioFormat(e, bitsPerSample, samplingRate, channels);
-                            SoundHandler.PlaySound(soundObj.getDecodedStream());
-                            
-                        } catch (final Exception e) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
+                    break;
+
+                case PdfDictionary.Sound: 
+
+                    if (eventType == MOUSECLICKED || eventType == MOUSERELEASED) {
+                        additionalAction_Sound(aData);
                     }
-                    
-                } else {
-                    LogWriter.writeFormLog("{stream} UNKNOWN Command "+aData.getName(PdfDictionary.S)+" Action", FormStream.debugUnimplemented);
-                }
-            } else if(command!=-1){
-                LogWriter.writeFormLog("{stream} Activate Action UNKNOWN command "+aData.getName(PdfDictionary.S)+ ' ' +formObj.getObjectRefAsString(), FormStream.debugUnimplemented);
+                break;
+
+                case PdfDictionary.Unknown:
+                    LogWriter.writeFormLog("{stream} Activate Action UNKNOWN command " + aData.getName(PdfDictionary.S) + ' ' + formObj.getObjectRefAsString(), FormStream.debugUnimplemented);
+                    break;
+
+                default:
+                    LogWriter.writeFormLog("{stream} UNKNOWN Command " + aData.getName(PdfDictionary.S) + " Action", FormStream.debugUnimplemented);
             }
+        }
+    }
+
+    private void additionalAction_Sound(PdfObject aData) {
+        final PdfObject soundObj = aData.getDictionary(PdfDictionary.Sound);
+        
+        // read now as lazy initialisation
+        currentPdfFile.checkResolved(soundObj);
+        
+        try {
+            
+            int channels = soundObj.getInt(PdfDictionary.C);
+            if (channels == -1) {
+                channels = 1;
+            }
+            
+            int bitsPerSample = soundObj.getInt(PdfDictionary.B);
+            if (bitsPerSample == -1) {
+                bitsPerSample = 8;
+            }
+            
+            final float samplingRate = soundObj.getInt(PdfDictionary.R);
+            
+            int e = soundObj.getNameAsConstant(PdfDictionary.E);
+            if (e == PdfDictionary.Unknown) {
+                e = PdfDictionary.Unsigned;
+            }
+            
+            SoundHandler.setAudioFormat(e, bitsPerSample, samplingRate, channels);
+            SoundHandler.PlaySound(soundObj.getDecodedStream());
+            
+        } catch (final Exception e) {
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
     
@@ -325,13 +341,13 @@ public class EmptyActionHandler implements ActionHandler {
         }
     }
     
-    private void additionalAction_Named(final int eventType, final PdfObject aData) {
+    private void additionalAction_Named(final PdfObject aData) {
         final int name = aData.getNameAsConstant(PdfDictionary.N);
         
         if (name == PdfDictionary.Print) {
-            additionalAction_Print(eventType);
+           // additionalAction_Print(eventType);
         } else if(name == PdfDictionary.SaveAs){
-            additionalAction_SaveAs();
+            //additionalAction_SaveAs();
         }else if(name == PdfDictionary.NextPage){
             changeTo(null, decode_pdf.getlastPageDecoded()+1, null, null,true);
         }else if(name == PdfDictionary.PrevPage){
@@ -351,18 +367,6 @@ public class EmptyActionHandler implements ActionHandler {
             
         } else if (FormStream.debugUnimplemented) {
             System.out.println("{internal only} Named Action NOT IMPLEMENTED " + aData.getName(PdfDictionary.N)+ ' ' +decode_pdf.getFileName());
-        }
-    }
-    
-    private void additionalAction_SaveAs() {
-        //- we should call it directly - I have put code below from Commands
-        
-    }
-    
-    static void additionalAction_URI(final String url) {
-        
-        if (showMethods) {
-            System.out.println("DefaultActionHandler.additionalAction_URI()");
         }
     }
     
@@ -911,48 +915,10 @@ public class EmptyActionHandler implements ActionHandler {
                         break;
                     
                 }
-            } else {
-                setCursor(eventType);
             }
         }
         
         return page;
-    }
-    
-    private void additionalAction_Print(final int eventType) {
-        if (showMethods) {
-            System.out.println("DefaultActionHandler.additionalAction_Print()");
-        }
-        
-        if (eventType == MOUSERELEASED) {
-            print();
-        }
-        
-    }
-    
-    /**
-     * display signature details in popup frame
-     * @param formObj
-     * @param eventType
-     */
-    private void additionalAction_Signature(final FormObject formObj, final int eventType) {
-        if (showMethods) {
-            System.out.println("DefaultActionHandler.additionalAction_Signature()");
-        }
-        
-        if (eventType == MOUSECLICKED) {
-            
-            final PdfObject sigObject=formObj.getDictionary(PdfDictionary.V);//.getDictionary(PdfDictionary.Sig);
-            
-            if (sigObject == null) {
-                return;
-            }
-            
-            showSig(sigObject);
-            
-        } else {
-            setCursor(eventType);
-        }
     }
 
     /**
@@ -1394,17 +1360,6 @@ public class EmptyActionHandler implements ActionHandler {
                 
             }
         }
-    }
-    
-    public void print() {
-          
-    }
-    
-    protected void setCursor(final int eventType) {
-    }
-    
-    protected void showSig(final PdfObject sigObject) {
-        
     }
     
     /** @param listOfFields - defines a list of fields to either include or exclude from the submit option,

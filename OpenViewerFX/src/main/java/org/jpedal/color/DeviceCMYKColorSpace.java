@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -33,34 +33,23 @@
 package org.jpedal.color;
 
 import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_Profile;
 import java.awt.image.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jpedal.JDeliHelper;
-
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
 
 import org.jpedal.exception.PdfException;
 
 /**
  * handle DeviceCMYKColorSpace
  */
-public class DeviceCMYKColorSpace extends  GenericColorSpace{
+public class DeviceCMYKColorSpace extends GenericColorSpace {
 
     private static final long serialVersionUID = 4054062852632000027L;
 
-    private float lastC = -1, lastM=-1, lastY=-1, lastK=-1;
+    private float lastC = -1, lastM = -1, lastY = -1, lastK = -1;
 
-    public  static ColorSpace CMYK;
+    private static final ColorSpace CMYK = new FastColorSpaceCMYK();
 
     /**
      * ensure next setColor will not match with old color as value may be out of
@@ -71,62 +60,9 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
         lastC = -1;
     }
 
-    /**
-     * initialise CMYK profile
-     */
-    private void initColorspace() {
-
-        /**
-         * load the cmyk profile - I am using the Adobe version from the web.
-         * There are lots out there.
-         */
-        InputStream stream = null;
-
-        try {
-            final String profile = System.getProperty("org.jpedal.CMYKprofile");
-
-            if (profile == null) {
-                stream = this.getClass().getResourceAsStream("/org/jpedal/res/cmm/cmyk.icm");
-            } else {
-                try {
-                    stream = new FileInputStream(profile);
-                } catch (final FileNotFoundException ee) {
-                    try {
-                        throw new PdfException("PdfException attempting to use user profile " + profile + " Message=" + ee);
-                    } catch (PdfException ex) {
-                        Logger.getLogger(DeviceCMYKColorSpace.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-
-            final ICC_Profile p = ICC_Profile.getInstance(stream);
-            CMYK = new ICC_ColorSpace(p);
-
-        } catch (final IOException e) {
-            LogWriter.writeLog("Exception " + e);
-            
-            throw new RuntimeException("Problem setting CMYK Colorspace with message " + e + " Possible cause file cmyk.icm corrupted");
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (final IOException e) {
-                    LogWriter.writeLog("Exception " + e);
-                }
-            }
-        }
-    }
-
-    /**
-     * setup colorspaces
-     */
     public DeviceCMYKColorSpace() {
 
         componentCount = 4;
-
-        if (CMYK == null) {
-            initColorspace();
-        }
 
         cs = CMYK;
 
@@ -212,55 +148,16 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
 
             int[] bb = JDeliHelper.convertCMYKtoRGB(cc, mm, yy, kk);
             if (bb == null) {
-                convertCMYKToRGBWithJavaProfiles();
-            } else {
-                this.currentColor = new PdfColor(bb[0], bb[1], bb[2]);
-            }         
+                bb = new int[3];
+                bb[0] = 255 * (1 - cc) * (1 - kk);
+                bb[1] = 255 * (1 - mm) * (1 - kk);
+                bb[2] = 255 * (1 - yy) * (1 - kk);
+            }
+            this.currentColor = new PdfColor(bb[0], bb[1], bb[2]);
+
         }
     }
 
-    private void convertCMYKToRGBWithJavaProfiles() {
-        if (c > .99) {
-            c = 1.0f;
-        } else if (c < 0.01) {
-            c = 0.0f;
-        }
-        if (m > .99) {
-            m = 1.0f;
-        } else if (m < 0.01) {
-            m = 0.0f;
-        }
-        if (y > .99) {
-            y = 1.0f;
-        } else if (y < 0.01) {
-            y = 0.0f;
-        }
-        if (k > .99) {
-            k = 1.0f;
-        } else if (k < 0.01) {
-            k = 0.0f;
-        }
-        
-        //we store values to speedup operation
-        float[] rgb = null;
-        
-        if (rgb == null) {
-            final float[] cmykValues = {c, m, y, k};
-            rgb = CMYK.toRGB(cmykValues);
-            
-            //check rounding
-            for (int jj = 0; jj < 3; jj++) {
-                if (rgb[jj] > .99) {
-                    rgb[jj] = 1.0f;
-                } else if (rgb[jj] < 0.01) {
-                    rgb[jj] = 0.0f;
-                }
-            }
-            
-            currentColor = new PdfColor(rgb[0], rgb[1], rgb[2]);
-        }
-    }
-    
     /**
      * <p>
      * Convert DCT encoded image bytestream to sRGB
@@ -297,60 +194,31 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
         if (pixelCount > dataSize) { //allow for mis-sized
             pixelCount = dataSize - 3;
         }
-        
-            
+
         final byte[] output = JDeliHelper.convertCMYK2RGB(w, h, pixelCount, data);
-        if(output!=null){
+        if (output != null) {
             return output;
-        }else{
-            return convertCMYK2RGBWithJavaProfiles(w, h, pixelCount, data);
-        }      
+        } else {
+            return convertCMYK2RGBWithSimple(w, h, pixelCount, data);
+        }
     }
 
-    static byte[] convertCMYK2RGBWithJavaProfiles(final int w, final int h, int pixelCount, final byte[] data) {
-        /**
-         * set colorspaces and color models using profiles if set
-         */
-        final ColorSpace CMYK = DeviceCMYKColorSpace.getColorSpaceInstance();
-        int C, M, Y, K, lastC = -1, lastM = -1, lastY = -1, lastK = -1;
-        byte[] rgbData = new byte[w * h * 3];
-        int j = 0;
-        float[] RGB = {0f, 0f, 0f};
-        //turn YCC in Buffer to CYM using profile
+    public static byte[] convertCMYK2RGBWithSimple(final int w, final int h, int pixelCount, final byte[] data) {
+        byte[] output = new byte[w * h * 3];
+        float cc, mm, yy, kk;
+        int pp = 0;
+
         for (int i = 0; i < pixelCount; i += 4) {
+            cc = (data[i] & 0xff) / 255f;
+            mm = (data[i + 1] & 0xff) / 255f;
+            yy = (data[i + 2] & 0xff) / 255f;
+            kk = (data[i + 3] & 0xff) / 255f;
 
-            C = (data[i] & 255);
-            M = (data[i + 1] & 255);
-            Y = (data[i + 2] & 255);
-            K = (data[i + 3] & 255);
-
-            //cache last value, black and white
-            if (C == lastC && M == lastM && Y == lastY && K == lastK) {
-                //no change so use last value
-            } else if (C == 0 && M == 0 && Y == 0 && K == 0) {
-                RGB = new float[]{1f, 1f, 1f};
-            } else if (C == 255 && M == 255 && Y == 255 && K == 255) {
-                RGB = new float[]{0f, 0f, 0f};
-            } else { //new value
-
-                RGB = CMYK.toRGB(new float[]{C / 255f, M / 255f, Y / 255f, K / 255f});
-
-                //flag so we can just reuse if next value the same
-                lastC = C;
-                lastM = M;
-                lastY = Y;
-                lastK = K;
-            }
-
-            //put back as CMY
-            rgbData[j] = (byte) (RGB[0] * 255f);
-            rgbData[j + 1] = (byte) (RGB[1] * 255f);
-            rgbData[j + 2] = (byte) (RGB[2] * 255f);
-
-            j += 3;
-
+            output[pp++] = (byte) (255 * (1 - cc) * (1 - kk));
+            output[pp++] = (byte) (255 * (1 - mm) * (1 - kk));
+            output[pp++] = (byte) (255 * (1 - yy) * (1 - kk));
         }
-        return rgbData;
+        return output;
     }
 
     /**
@@ -366,7 +234,7 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
         if (image != null) {
             return image;
         } else {
-            return JPEG2000ToImage(data, pX, pY, decodeArray);
+            return JPEG2000ToImage(data, pX, pY);
         }
     }
 
@@ -381,22 +249,4 @@ public class DeviceCMYKColorSpace extends  GenericColorSpace{
         return convert4Index(index);
     }
 
-    public static ColorSpace getColorSpaceInstance() {
-
-        ColorSpace CMYK = new DeviceCMYKColorSpace().getColorSpace();
-
-        //optional alternative CMYK
-        final String CMYKprofile = System.getProperty("org.jpedal.CMYKprofile");
-
-        if (CMYKprofile != null) {
-
-            try {
-                CMYK = new ICC_ColorSpace(ICC_Profile.getInstance(new FileInputStream(CMYKprofile)));
-            } catch (final IOException e) {
-                throw new RuntimeException("Unable to create CMYK colorspace with  " + CMYKprofile + "\nPlease check Path and file valid or use built-in " + e);
-            }
-        }
-
-        return CMYK;
-    }
 }

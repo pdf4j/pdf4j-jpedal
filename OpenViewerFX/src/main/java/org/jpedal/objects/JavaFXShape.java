@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -138,7 +138,7 @@ public class JavaFXShape implements Serializable, PdfShape
      * in Java, and it could be set anywhere in the command stream
      */
     @Override
-    public final java.awt.Shape generateShapeFromPath( final float[][] CTM, final float thickness, final int cmd, final int type){
+    public final java.awt.Shape generateShapeFromPath( final float[][] CTM, final float thickness, final int cmd){
 
         //may need to code this in if we ever implement
        // isClosed=false; // set in code if H called

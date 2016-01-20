@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -74,7 +74,7 @@ public class FXOptionDialog extends FXMessageDialog {
         
     }
     
-    public FXOptionDialog(final Stage parent, final Object message, final String title, final int optionType, final int messageType, final Object[] options, final Object initialValue) {
+    public FXOptionDialog(final Stage parent, final Object message, final String title, final int optionType, final Object[] options, final Object initialValue) {
         super(parent, Modality.APPLICATION_MODAL, message.toString());
         
         setTitle(title);
@@ -111,18 +111,25 @@ public class FXOptionDialog extends FXMessageDialog {
                 positiveClose();
             }});
             
-            if(optionType == DEFAULT_OPTION){
-                buttons.add(yes);
-            }else if (optionType == YES_NO_OPTION){
-                buttons.add(yes);
-                buttons.add(no);
-            }else if(optionType == YES_NO_CANCEL_OPTION){
-                buttons.add(yes);
-                buttons.add(no);
-                buttons.add(cancel);
-            }else if(optionType == OK_CANCEL_OPTION){
-                buttons.add(ok);
-                buttons.add(cancel);
+            switch (optionType) {
+                case DEFAULT_OPTION:
+                    buttons.add(yes);
+                    break;
+                case YES_NO_OPTION:
+                    buttons.add(yes);
+                    buttons.add(no);
+                    break;
+                case YES_NO_CANCEL_OPTION:
+                    buttons.add(yes);
+                    buttons.add(no);
+                    buttons.add(cancel);
+                    break;
+                case OK_CANCEL_OPTION:
+                    buttons.add(ok);
+                    buttons.add(cancel);
+                    break;
+                default:
+                    break;
             }
         }else{
             for(int i = 0; i < options.length; i++){

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -98,15 +98,15 @@ class HexTextUtils {
         
         //also check if mapped in Charstring
         final boolean hasCharString=glyphData.getRawInt()>0 && currentFontData.CMapName!=null && currentFontData.getFontType()==StandardFonts.CIDTYPE0 && currentFontData.getGlyphData().getCharStrings().containsKey(String.valueOf(glyphData.getRawInt()));
-        
+       
         final boolean debug=false;
 
         boolean isMultiByte=false;
         //ignore these cases
-        if(currentFontData.CMapName!=null && currentFontData.CMapName.equals("OneByteIdentityH") || stream[i]=='>'){
+        if(currentFontData.CMapName!=null && currentFontData.getUnicodeMapping(glyphData.getRawInt())!=null || stream[i]=='>'){
             
             if(debug) {
-                System.out.println("ignore currentFontData.CMapName=" + currentFontData.CMapName + " stream[i+2]=" + (char)stream[i]+ ' ' + (char)stream[i+1]+ ' ' + (char)stream[i+2]);
+                System.out.println("ignore currentFontData.CMapName=" + currentFontData + ' ' +currentFontData.CMapName + " stream[i+2]=" + (char)stream[i]+ ' ' + (char)stream[i+1]+ ' ' + (char)stream[i+2]);
             }
             
         }else if(!hasCharString){//not sure if really needed
@@ -126,6 +126,20 @@ class HexTextUtils {
                 }
             }
         }
+        /**
+        float actualWidth =-1;
+            
+        //if((currentFontData.getFontType()==StandardFonts.CIDTYPE0 || currentFontData.getFontType()==StandardFonts.CIDTYPE2)){
+                actualWidth = currentFontData.getDefaultWidth(val);
+
+                if(actualWidth==-1){
+                    actualWidth = currentFontData.getDefaultWidth(-1)/2;
+                //    System.exit(1);
+                }
+        //}
+        
+        glyphData.setActualWidth(actualWidth);
+        /**/
         
         if(isMultiByte){
             return setValue(glyphData, val, i, charSize, currentFontData, parserOptions);

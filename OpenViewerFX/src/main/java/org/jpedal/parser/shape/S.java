@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -65,7 +65,7 @@ public class S {
             if(useJavaFX){
                 fxPath=currentDrawShape.getPath();
             }else {
-                currentShape = currentDrawShape.generateShapeFromPath(gs.CTM, gs.getLineWidth(), Cmd.S, current.getType());
+                currentShape = currentDrawShape.generateShapeFromPath(gs.CTM, gs.getLineWidth(), Cmd.S);
                 
                 if (currentDrawShape.adjustLineWidth()) {
                     gs.setLineWidth(0.6f);//0.6f because the scaling will multiply by 1.527 (we want the final value < 1)
@@ -124,7 +124,7 @@ public class S {
                     gs.setFillType(GraphicsState.STROKE);
                     
                     if(useJavaFX){
-                        current.drawShape(fxPath,gs, Cmd.S);
+                        current.drawShape(fxPath,gs);
                     }else{
                         current.drawShape(currentShape,gs, Cmd.S);
                     }

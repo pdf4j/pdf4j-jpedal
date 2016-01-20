@@ -7,7 +7,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -320,7 +320,10 @@ public class JPEGDecoder {
             
             boolean isInverted = ArrayUtils.isArrayInverted(XObject.getFloatArray(PdfDictionary.Decode));
             boolean isMask=XObject instanceof MaskObject;
-            db = JDeliHelper.getBytesFromJPEG(isInverted, data, isMask);
+            boolean isDeviceN = decodeColorData instanceof DeviceNColorSpace;
+            if(!isDeviceN){
+                db = JDeliHelper.getBytesFromJPEG(isInverted, data, isMask);
+            }
             if(db==null){
                 db=getBytesFromJPEGWithImageIO(data, decodeColorData, XObject);   
             }

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -89,6 +89,7 @@ import org.jpedal.io.*;
 import org.jpedal.objects.*;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.actions.*;
+import org.jpedal.objects.javascript.ExpressionEngine;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.outlines.OutlineData;
 import org.jpedal.objects.raw.PdfObject;
@@ -399,6 +400,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      * please use getPages().setViewableArea instead.
      * @deprecated
      */
+    @Deprecated
     @Override
     public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
         
@@ -1724,7 +1726,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         fileAccess.setDecoding(false);
         parser.resetOnOpen();
         
-        final Object userExpressionEngine=externalHandlers.getExternalHandler(Options.ExpressionEngine);
+        final ExpressionEngine userExpressionEngine=(ExpressionEngine)externalHandlers.getExternalHandler(Options.ExpressionEngine);
         externalHandlers.openPdfFile(userExpressionEngine);
         
     
@@ -2308,6 +2310,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      * updateCursorBoxOnScreen(final int[] rectParams, final int outlineColor) instead
      * @deprecated
      */
+    @Deprecated
     @Override
     public final void updateCursorBoxOnScreen(final Rectangle newOutlineRectangle, final Color outlineColor) {
         

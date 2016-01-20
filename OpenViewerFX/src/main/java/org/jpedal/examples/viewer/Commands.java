@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -112,6 +112,8 @@ public class Commands {
     public static final int PAGEFLOW = 61;
     
     public static final int FULLSCREEN=62;
+    public static final int ZOOMIN = 63;
+    public static final int ZOOMOUT = 64;
     //50-249 handled in executeDisplayCommands(final int ID, Object[] args)
     
     //250-299 handled in executeComboCommands(final int ID, Object[] args)
@@ -184,6 +186,7 @@ public class Commands {
     public static final int SETDISPLAYBACKGROUND=714;
     public static final int SETREPLACEMENTCOLORTHRESHOLD=715;
     public static final int GETPDFNAME=716; //Used for JavaFX Netbeans PDF Viewer Plugin.
+    public static final int SETENHANCEFRACTIONALLINES=717; 
     //700-899 handled in executeViewerFunctionalityCommands(final int ID, Object[] args)
     
     //997-999 handled in executeDemoVersionCommands(final int ID, Object[] args)
@@ -352,7 +355,7 @@ public class Commands {
                 
                 final String fileNameToAdd=recentDocs[i];
                 
-                currentGUI.getRecentDocument().createMenuItems(fileNameToAdd, i, currentGUI, commonValues, decode_pdf, properties, thumbnails, searchFrame);
+                currentGUI.getRecentDocument().createMenuItems(fileNameToAdd, i, currentGUI, commonValues, decode_pdf);
                 
             }catch(final Exception ee){
                 ee.printStackTrace();

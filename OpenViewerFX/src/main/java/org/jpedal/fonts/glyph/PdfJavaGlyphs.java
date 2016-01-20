@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -154,7 +154,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
             if (isSTD) {
 
-                transformedGlyph2=getGlyph(rawInt, displayValue, currentWidth);
+                transformedGlyph2=getGlyph(displayValue, currentWidth);
 
                 //hack to fix problem with Java Arial font
                 if(transformedGlyph2!=null && rawInt==146 && isArialInstalledLocally) {
@@ -207,7 +207,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
     }
 
     /**returns a generic glyph using inbuilt fonts*/
-    public Area getGlyph(final int rawInt, final String displayValue, final float currentWidth){
+    public Area getGlyph(final String displayValue, final float currentWidth){
 
         boolean fontMatched=true;
 

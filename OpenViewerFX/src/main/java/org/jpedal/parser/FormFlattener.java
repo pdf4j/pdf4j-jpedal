@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -437,7 +437,7 @@ public class FormFlattener {
             final int h=(int) (BBox[3]-BBox[1]);
 
             if(w>0 && h>0){
-                final BufferedImage image= MaskUtils.createTransparentForm(imgObj, 0, 0, w, h, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
+                final BufferedImage image= MaskUtils.createTransparentForm(imgObj, 0, w, h, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
 
                 //draw the image to HTML
 
@@ -508,7 +508,7 @@ public class FormFlattener {
         }
     }
     
-    private boolean showForm(final PdfObject form){
+    private static boolean showForm(final PdfObject form){
         
         switch (exclusionOption) {
             case ExcludeFormsAndAnnotations:

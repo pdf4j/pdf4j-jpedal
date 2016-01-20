@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -339,14 +339,19 @@ public class TTGlyphs extends PdfJavaGlyphs {
 
             final String name;
 
-            if(mode==PdfDecoderInt.SUBSTITUTE_FONT_USING_POSTSCRIPT_NAME){
-                name=currentName.getString(Name.POSTSCRIPT_NAME);
-            }else if(mode==PdfDecoderInt.SUBSTITUTE_FONT_USING_FAMILY_NAME){
-                name=currentName.getString(Name.FONT_FAMILY_NAME);
-            }else if(mode==PdfDecoderInt.SUBSTITUTE_FONT_USING_FULL_FONT_NAME){
-                name=currentName.getString(Name.FULL_FONT_NAME);
-            }else{ //tell user if invalid
-                throw new RuntimeException("Unsupported mode "+mode+". Unable to resolve font names");
+            switch (mode) {
+                case PdfDecoderInt.SUBSTITUTE_FONT_USING_POSTSCRIPT_NAME:
+                    name=currentName.getString(Name.POSTSCRIPT_NAME);
+                    break;
+                case PdfDecoderInt.SUBSTITUTE_FONT_USING_FAMILY_NAME:
+                    name=currentName.getString(Name.FONT_FAMILY_NAME);
+                    break;
+                case PdfDecoderInt.SUBSTITUTE_FONT_USING_FULL_FONT_NAME:
+                    name=currentName.getString(Name.FULL_FONT_NAME);
+                    break;
+                default:
+                    //tell user if invalid
+                    throw new RuntimeException("Unsupported mode "+mode+". Unable to resolve font names");
             }
 
             if(name==null){

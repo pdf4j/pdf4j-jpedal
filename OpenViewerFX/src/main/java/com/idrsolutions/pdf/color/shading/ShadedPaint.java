@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -275,8 +275,11 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
                 break;
 
             case AXIAL:
-
-                pt = new AxialContext(xform, renderingType, isPrinting, offX, offY, cropX, cropH, 1f / scaling, isExtended, domain, coords, shadingColorSpace, colorsReversed, background, function);
+                if(cropH == 0){
+                    pt = new AxialShadeContext(xform, shadingColorSpace, background, Shading, matrix, function, textX, textY);
+                }else{
+                    pt = new AxialContext(xform, renderingType, isPrinting, offX, offY, cropX, cropH, 1f / scaling, isExtended, domain, coords, shadingColorSpace, colorsReversed, background, function);
+                }
                 break;
 
             case RADIAL:

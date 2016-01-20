@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -118,7 +118,8 @@ public interface DynamicVectorRenderer  {
 	int CREATE_HTML =4;
 	int CREATE_SVG =5;
 	int CREATE_EPOS =7;
-    int CREATE_SMASK =8;
+        int CREATE_SMASK =8;
+        int CREATE_T3 =9;
 	
 	
 	/**
@@ -128,6 +129,7 @@ public interface DynamicVectorRenderer  {
 	int ALT_FOREGROUND_COLOR=2;
 	int FOREGROUND_INCLUDE_LINEART=3; //Alt foreground color changes lineart as well
 	int COLOR_REPLACEMENT_THRESHOLD=4;
+	int ENHANCE_FRACTIONAL_LINES=5; //Any line with width <1 is set to 1 to ensure visible (0 to turn off, 1 to turn on)
 	
     /**
      * used to pass in Graphics2D for all versions
@@ -188,7 +190,7 @@ public interface DynamicVectorRenderer  {
 	void drawShape(Shape currentShape, GraphicsState currentGraphicsState, int cmd);
 
         /*save shape in array to draw cmd is Cmd.F or Cmd.S */
-		void drawShape(Object currentShape, GraphicsState currentGraphicsState, int cmd);
+		void drawShape(Object currentShape, GraphicsState currentGraphicsState);
 
 	/**reset on colorspace change to ensure cached data up to data*/
 	void resetOnColorspaceChange();
@@ -303,6 +305,7 @@ public interface DynamicVectorRenderer  {
      * @param i
      * @return 
      */
+	@Deprecated
 	Rectangle getArea(int i);
     
     int[] getAreaAsArray(int i);

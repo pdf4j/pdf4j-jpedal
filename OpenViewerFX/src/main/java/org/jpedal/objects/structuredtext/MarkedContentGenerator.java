@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -177,10 +177,10 @@ public class MarkedContentGenerator {
         root = doc.createElement("TaggedPDF-doc");
         doc.appendChild(root);
         
-        traverseContentTree(structTreeRootObj,null);
+        traverseContentTree(structTreeRootObj);
     }
 
-    public void traverseContentTree(PdfObject structTreeRootObj, PdfStreamDecoder current) {
+    public void traverseContentTree(PdfObject structTreeRootObj) {
         /**
          * read struct K value and decide what type
          * (can be dictionary or Array so we check both options)
@@ -194,7 +194,7 @@ public class MarkedContentGenerator {
             }
             
         
-            readKarray(Karray, root,null,null,"");
+            readKarray(Karray, root,null, "");
             
             if(debug) {
                 System.out.println("Karray read");
@@ -293,13 +293,13 @@ public class MarkedContentGenerator {
         
         
         if (Karray != null) {
-            readKarray(Karray,child,pageStream,S,fullS);
+            readKarray(Karray,child,pageStream, fullS);
         }else if(Kdict!=null){
             readChildNode(Kdict, child,pageStream,fullS);
         } else if (Kint != -1 && !isHTML) { // actual value
             
             //reached the bottom so allow recursion to unwind naturally
-            addContentToNode(pageStream, String.valueOf(Kint), child,S,fullS);
+            addContentToNode(pageStream, String.valueOf(Kint), child);
         } else if(K.getTextStreamValue(PdfDictionary.T)!=null){
             //System.out.println("ANnot");
         } else if(debug){
@@ -313,7 +313,7 @@ public class MarkedContentGenerator {
         }
     }
     
-    private void addContentToNode(final Map pageStream, final String Kint, final Element child, String S, String fullS) {
+    private void addContentToNode(final Map pageStream, final String Kint, final Element child) {
         
         if(!isHTML){
             
@@ -341,7 +341,7 @@ public class MarkedContentGenerator {
         return text;
     }
     
-    private void readKarray(final byte[][] Karray, final Element root, final Map pageStream,final String S,String fullS) {
+    private void readKarray(final byte[][] Karray, final Element root, final Map pageStream, String fullS) {
         
         final int count=Karray.length;
         PdfObject kidObj;
@@ -370,7 +370,7 @@ public class MarkedContentGenerator {
                     i += 2; //allow for 3 values read in loop
                     
                 }else{
-                    addContentToNode(pageStream, KValue, root,S,fullS);
+                    addContentToNode(pageStream, KValue, root);
                 }
             }else{
                
@@ -380,7 +380,7 @@ public class MarkedContentGenerator {
                     }
                 }
                 
-                addContentToNode(pageStream, KValue, root,S,fullS);
+                addContentToNode(pageStream, KValue, root);
             }
         }
     }

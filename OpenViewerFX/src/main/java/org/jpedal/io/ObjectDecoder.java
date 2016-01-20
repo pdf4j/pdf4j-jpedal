@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -56,7 +56,7 @@ public class ObjectDecoder implements Serializable {
     
     //not final in IDE but in build do our static analysis does not flag as dead debug code
     //which we  want compiler to ooptimise out
-    public static boolean debugFastCode=false; //objRef.equals("68 0 R")
+    public static boolean debugFastCode; //objRef.equals("68 0 R")
     
     private int pdfKeyType, PDFkeyInt;
     
@@ -174,7 +174,7 @@ public class ObjectDecoder implements Serializable {
             if(raw[i]==60 && raw[i+1]==60){
                 i++;
                 level++;
-            }else if(raw[i]==62 && i+1!=length && raw[i+1]==62 && raw[i-1]!=62){
+            }else if(raw[i]==62 && i+1!=length && raw[i+1]==62){
                 i++;
                 level--;
                 
@@ -571,21 +571,37 @@ public class ObjectDecoder implements Serializable {
     }
 
     static int setArray(PdfObject pdfObject, int i, byte[] raw, int PDFkeyInt, boolean ignoreRecursion, PdfFileReader objectReader, int endPt) {
-        if(PDFkeyInt== PdfDictionary.XFA){
-            final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_MIXED_ARRAY);
-            i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
-        }else if(PDFkeyInt== PdfDictionary.K){
-            final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_STRING_ARRAY);
-            i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
-        }else if(PDFkeyInt== PdfDictionary.C){
-            final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_FLOAT_ARRAY);
-            i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
-        }else if(PDFkeyInt== PdfDictionary.OCGs){
-            final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_KEY_ARRAY);
-            i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
-        }else{
-            final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_STRING_ARRAY);
-            i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+        switch (PDFkeyInt) {
+            case PdfDictionary.XFA:
+                {
+                    final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_MIXED_ARRAY);
+                    i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                    break;
+                }
+            case PdfDictionary.K:
+                {
+                    final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_STRING_ARRAY);
+                    i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                    break;
+                }
+            case PdfDictionary.C:
+                {
+                    final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_FLOAT_ARRAY);
+                    i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                    break;
+                }
+            case PdfDictionary.OCGs:
+                {
+                    final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_KEY_ARRAY);
+                    i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                    break;
+                }
+            default:
+                {
+                    final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_STRING_ARRAY);
+                    i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                    break;
+                }
         }
         return i;
     }

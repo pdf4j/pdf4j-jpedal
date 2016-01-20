@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -38,8 +38,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuItem;
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.utils.*;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;
@@ -159,7 +157,7 @@ public class JavaFXRecentDocuments implements RecentDocumentsFactory {
 
  
     @Override
-    public void createMenuItems(final String fileNameToAdd, final int position, final GUIFactory currentGUI, final Values commonValues, final PdfDecoderInt decode_pdf, final PropertiesFile properties, final GUIThumbnailPanel thumbnails, final GUISearchWindow searchFrame) {
+    public void createMenuItems(final String fileNameToAdd, final int position, final GUIFactory currentGUI, final Values commonValues, final PdfDecoderInt decode_pdf) {
      
         
         final String shortenedFileName = RecentDocuments.getShortenedFileName(fileNameToAdd);

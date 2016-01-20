@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -56,7 +56,7 @@ public class N {
             if(useJavaFX) {
                 gs.updateClip(currentDrawShape.getPath());
             }else{
-                gs.updateClip(new Area(currentDrawShape.generateShapeFromPath(gs.CTM, 0, Cmd.n, current.getType())));
+                gs.updateClip(new Area(currentDrawShape.generateShapeFromPath(gs.CTM, 0, Cmd.n)));
             }
             
             if(formLevel==0){

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -140,11 +140,14 @@ public class MaskUtils {
         gs1.CTM[2][0]= (gs1.x*gs.CTM[0][0])+gs.CTM[2][0];
         gs1.CTM[2][1]= (gs1.y*gs.CTM[1][1])+gs.CTM[2][1];
         
-        gs1.CTM[1][1]=-gs1.CTM[1][1];
+        //factor in any scaling and invert
+        gs1.CTM[0][0]=gs1.CTM[0][0]*gs.CTM[0][0];
+        gs1.CTM[1][1]=-gs1.CTM[1][1]*gs.CTM[1][1];
+        
         gs1.CTM[2][1]-=gs1.CTM[1][1];
             
         //separate call needed to paint image on thumbnail or background image in HTML/SVG
-        if(current.isHTMLorSVG()){            
+        if(current.isHTMLorSVG()){ 
             current.drawImage(parserOptions.getPageNumber(),image,gs1,false,name, -3);
             current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -2);
         }else{
@@ -160,7 +163,7 @@ public class MaskUtils {
         }
     }
 
-    public static BufferedImage createTransparentForm(final PdfObject XObject, final int fx, final int fy, final int fw, final int fh,
+    public static BufferedImage createTransparentForm(final PdfObject XObject, final int fy, final int fw, final int fh,
                                                       final PdfObjectReader currentPdfFile, final ParserOptions parserOptions, final int formLevel, final float multiplyer) {
 
         final BufferedImage image;

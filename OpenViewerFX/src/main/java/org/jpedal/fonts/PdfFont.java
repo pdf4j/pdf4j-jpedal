@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -63,7 +63,7 @@ public class PdfFont implements Serializable {
     
     String truncatedName;
 
-    private boolean isWidthVertical=false;
+    private boolean isWidthVertical;
     
     private Rectangle BBox;
     
@@ -228,6 +228,7 @@ public class PdfFont implements Serializable {
     
     /**lookup CID index mappings*/
     private String[] CMAP;
+    private int[] rawCMAP;
     
     /** CID font encoding*/
     private String CIDfontEncoding;
@@ -663,6 +664,8 @@ public class PdfFont implements Serializable {
             glyphs.setIsIdentity(false);
             
             CMAP=new String[65536];
+            rawCMAP=new int[65536];
+            
             glyphs.CMAP_Translate=new int[65536];
             
             //load standard if not embedded
@@ -759,9 +762,11 @@ public class PdfFont implements Serializable {
                     if (multiple_values) {
                         //put either single values or range
                         entry =Integer.parseInt(CIDentry.nextToken(), 16);
+                        rawCMAP[i]= entry;
                         CMAP[i]= String.valueOf((char) entry);
                     } else {
                         CMAP[i]= String.valueOf((char) entry);
+                        rawCMAP[i]= entry;
                         entry++;
                     }
                 }
@@ -1041,6 +1046,13 @@ public class PdfFont implements Serializable {
             width =  widthTable[charInt];
         }
         
+        if(isCIDFont && rawCMAP!=null && width==noWidth){
+            int ptr=rawCMAP[charInt];
+            if(ptr>0){
+                width =  widthTable[ptr];
+            }
+        }
+        
         if (width == noWidth) {
             
             if(isCIDFont){
@@ -1060,12 +1072,12 @@ public class PdfFont implements Serializable {
                 //allow for remapping of base 14 with no width
                 if(value==null && rawFontName!=null){
                     
-                    //check loaded
-                    StandardFonts.loadStandardFontWidth(rawFontName);
-                    
-                    //try again
-                    value =StandardFonts.getStandardWidth(rawFontName , charName);
-                    
+                        //check loaded
+                        StandardFonts.loadStandardFontWidth(rawFontName);
+
+                        //try again
+                        value =StandardFonts.getStandardWidth(rawFontName , charName);
+
                 }
                 
                 if (value != null) {

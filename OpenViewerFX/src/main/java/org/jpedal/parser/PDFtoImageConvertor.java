@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -128,6 +128,15 @@ public abstract class PDFtoImageConvertor {
                 
                 imageDisplay.setValue(DynamicVectorRenderer.COLOR_REPLACEMENT_THRESHOLD, options.getReplacementColorThreshold());
             }
+            
+            //Method accepts int so use 1 for true and 0 for false
+            if (options.isEnhanceFractionalLines()) {
+                imageDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 1);
+            } else {
+                imageDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 0);
+            }
+        }else{
+            imageDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 0);
         }
         
         final PdfStreamDecoder currentImageDecoder = formRenderer.getStreamDecoder(currentPdfFile,true,null,true);

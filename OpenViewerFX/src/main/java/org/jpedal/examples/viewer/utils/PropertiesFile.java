@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -178,6 +178,8 @@ public class PropertiesFile {
       "Show the document properties button on the button bar","Propertiesbutton", "false",
       "Show the about button on the button bar","Aboutbutton", "false",
       "Show the snapshot button on the button bar","Snapshotbutton", "true",
+      "Show the Zoom in button on the button bar","ZoomInbutton", "true",
+      "Show the Zoom out button on the button bar","ZoomOutbutton", "true",
       "Show the help button on the button bar","Helpbutton", "true",
       "Show the rss feed button on the button bar","RSSbutton", "true",
       "Show the cursor button on the button bar","CursorButton", "true",
@@ -241,7 +243,7 @@ public class PropertiesFile {
       "Flag to use enhanced facing mode","enhancedFacingMode","true",
       "Text to use in the window title","windowTitle","",
       "Flag to control if we requestion confirmation to close the viewer","confirmClose","false",
-      "Location where the icons to be used by the viewer are stored","iconLocation","/org/jpedal/examples/simpleviewer/res/",
+      "Location where the icons to be used by the viewer are stored","iconLocation","/org/jpedal/examples/viewer/res/",
       "Flag to control if we show a message when entering page flow mode","showpageflowmessage","true",
       "Specify a default printer to use","defaultPrinter","",
       "Flag to output additional printer / printing info","debugPrinter","false",
@@ -267,7 +269,8 @@ public class PropertiesFile {
       "Viewer width to use on viewer start up, used/modified when tracking between sessions","startViewerWidth","-1", //Set to this size, if less than 0 create default width.
       "Viewer height to use on viewer start up, used/modified when tracking between sessions","startViewerHeight","-1", //Set to this size, if less than 0 create default height.
       "Flag to track the side tab bar expanded width between sessions","trackSideTabExpandedSize","false", //Track side tab bar
-      "Allow search result list to update during search (SWING VERSION ONLY)","updateResultsDuringSearch","true" //Allow search result list to update during search
+      "Allow search result list to update during search (SWING VERSION ONLY)","updateResultsDuringSearch","true", //Allow search result list to update during search
+      "Allow thin lines (width less than 1) to be made wider and clearly visible","enhanceFractionalLines","true" //Allow thin lines (width less than 1) to be made wider and clearly visible
     };
     
     public PropertiesFile(){
@@ -731,7 +734,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.8.24")){
+                        if(properties[position+1].equals("6.9b20")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

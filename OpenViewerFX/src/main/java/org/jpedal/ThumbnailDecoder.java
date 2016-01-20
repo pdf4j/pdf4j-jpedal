@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
 import org.jpedal.objects.acroforms.AcroRenderer;
 
 /**
- * generates thumbnails of pages for display
+ * generates the thumbnails of pages for display
  */
 public class ThumbnailDecoder {
     

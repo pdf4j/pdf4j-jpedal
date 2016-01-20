@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -789,7 +789,7 @@ public class Parser {
 
                                     if (nextVal != null) {
 
-                                        formRenderer.getFormFlattener().drawFlattenedForm(current,(org.jpedal.objects.raw.FormObject) nextVal, true, (PdfObject) formRenderer.getFormResources()[0]);
+                                        formRenderer.getFormFlattener().drawFlattenedForm(current,(PdfObject) nextVal, true, (PdfObject) formRenderer.getFormResources()[0]);
 
                                     }
                                 }
@@ -916,10 +916,11 @@ public class Parser {
 
         currentDisplay.init(pageData.getMediaBoxWidth(page), pageData.getMediaBoxHeight(page), options.getPageColor());
 
-        if((!currentDisplay.isHTMLorSVG())&& (options.getTextColor()!=null)){
+        if (!currentDisplay.isHTMLorSVG()) {
+            if (options.getTextColor() != null) {
                 currentDisplay.setValue(DynamicVectorRenderer.ALT_FOREGROUND_COLOR, options.getTextColor().getRGB());
 
-                if(options.getChangeTextAndLine()) {
+                if (options.getChangeTextAndLine()) {
                     currentDisplay.setValue(DynamicVectorRenderer.FOREGROUND_INCLUDE_LINEART, 1);
                 } else {
                     currentDisplay.setValue(DynamicVectorRenderer.FOREGROUND_INCLUDE_LINEART, 0);
@@ -927,6 +928,16 @@ public class Parser {
 
                 currentDisplay.setValue(DynamicVectorRenderer.COLOR_REPLACEMENT_THRESHOLD, options.getReplacementColorThreshold());
             }
+
+            //Method accepts int so use 1 for true and 0 for false
+            if (options.isEnhanceFractionalLines()) {
+                currentDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 1);
+            } else {
+                currentDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 0);
+            }
+        }else{
+            currentDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 0);
+        }
         
         return current;
     }

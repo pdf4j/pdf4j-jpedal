@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -931,19 +931,23 @@ public class JSFunction {
             }
 
             // tell user
-            if (code == ErrorCodes.JSInvalidFormat) {
-                JOptionPane.showMessageDialog(null, "The values entered does not match the format of the field [" + args[0] + " ]",
-                        "Warning: Javascript Window", JOptionPane.INFORMATION_MESSAGE);
-            } else if (code == ErrorCodes.JSInvalidDateFormat) {
-                JOptionPane.showMessageDialog(null, "Invalid date/time: please ensure that the date/time exists. Field [" + args[0] + " ] should match format " + args[1],
-                        "Warning: Javascript Window", JOptionPane.INFORMATION_MESSAGE);
-            } else if (code == ErrorCodes.JSInvalidRangeFormat) {
-
-                JOptionPane.showMessageDialog(null, args[1],
-                        "Warning: Javascript Window",JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "The values entered does not match the format of the field",
-                        "Warning: Javascript Window", JOptionPane.INFORMATION_MESSAGE);
+            switch (code) {
+                case ErrorCodes.JSInvalidFormat:
+                    JOptionPane.showMessageDialog(null, "The values entered does not match the format of the field [" + args[0] + " ]",
+                            "Warning: Javascript Window", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case ErrorCodes.JSInvalidDateFormat:
+                    JOptionPane.showMessageDialog(null, "Invalid date/time: please ensure that the date/time exists. Field [" + args[0] + " ] should match format " + args[1],
+                            "Warning: Javascript Window", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case ErrorCodes.JSInvalidRangeFormat:
+                    JOptionPane.showMessageDialog(null, args[1],
+                            "Warning: Javascript Window",JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "The values entered does not match the format of the field",
+                            "Warning: Javascript Window", JOptionPane.INFORMATION_MESSAGE);
+                    break;
             }
 
         }

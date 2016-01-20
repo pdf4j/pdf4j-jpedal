@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -62,48 +62,38 @@ public class ScalingFactory {
         final int x_size=(int) (crw+(crx-mediaX));
         final int y_size=(int) (crh+(cry-mediaY));
 	
-	/**
-	 * XFA needs to be other way up so set page as inverted so option added
-	 */
-        if (rotation == 270) {
-
-            displayScaling.rotate(-Math.PI / 2.0, x_size/ 2, y_size / 2);
-
-	    if (pageData.getOrigin() == PageOrigins.BOTTOM_LEFT) {
-		final double x_change = (displayScaling.getTranslateX());
-		final double y_change = (displayScaling.getTranslateY());
-		displayScaling.translate((y_size - y_change), -x_change);
-		displayScaling.translate(0, y_size);
-		displayScaling.scale(1, -1);
-		displayScaling.translate(-(crx+mediaX), -(mediaH-crh-(cry-mediaY)));
-	    }
-	    
-        } else if (rotation == 180) {
-
-            displayScaling.rotate(Math.PI, x_size / 2, y_size / 2);
-	    
-	    if (pageData.getOrigin() == PageOrigins.BOTTOM_LEFT) {
-		displayScaling.translate(-(crx+mediaX),y_size+(cry+mediaY)-(mediaH-crh-(cry-mediaY)));
-		displayScaling.scale(1, -1);
-	    }
-
-        } else if (rotation == 90) {
-
-            displayScaling.rotate(Math.PI / 2.0);
-	    
-	    if (pageData.getOrigin() == PageOrigins.BOTTOM_LEFT) {
-		displayScaling.translate(0,(cry+mediaY)-(mediaH-crh-(cry-mediaY)));
-		displayScaling.scale(1, -1);
-	    }
-
-        }else{
-	    
-	    if (pageData.getOrigin() ==PageOrigins.BOTTOM_LEFT) {
-		displayScaling.translate(0, y_size);
-		displayScaling.scale(1, -1);
-		displayScaling.translate(0, -(mediaH - crh - (cry - mediaY)));
-	    }
-            
+        /**
+         * XFA needs to be other way up so set page as inverted so option added
+         */
+        switch (rotation) {
+            case 270:
+                displayScaling.rotate(-Math.PI / 2.0, x_size/ 2, y_size / 2);
+                if (pageData.getOrigin() == PageOrigins.BOTTOM_LEFT) {
+                    final double x_change = (displayScaling.getTranslateX());
+                    final double y_change = (displayScaling.getTranslateY());
+                    displayScaling.translate((y_size - y_change), -x_change);
+                    displayScaling.translate(0, y_size);
+                    displayScaling.scale(1, -1);
+                    displayScaling.translate(-(crx+mediaX), -(mediaH-crh-(cry-mediaY)));
+                }       break;
+            case 180:
+                displayScaling.rotate(Math.PI, x_size / 2, y_size / 2);
+                if (pageData.getOrigin() == PageOrigins.BOTTOM_LEFT) {
+                    displayScaling.translate(-(crx+mediaX),y_size+(cry+mediaY)-(mediaH-crh-(cry-mediaY)));
+                    displayScaling.scale(1, -1);
+                }       break;
+            case 90:
+                displayScaling.rotate(Math.PI / 2.0);
+                if (pageData.getOrigin() == PageOrigins.BOTTOM_LEFT) {
+                    displayScaling.translate(0,(cry+mediaY)-(mediaH-crh-(cry-mediaY)));
+                    displayScaling.scale(1, -1);
+                }       break;
+            default:
+                if (pageData.getOrigin() ==PageOrigins.BOTTOM_LEFT) {
+                    displayScaling.translate(0, y_size);
+                    displayScaling.scale(1, -1);
+                    displayScaling.translate(0, -(mediaH - crh - (cry - mediaY)));
+                }       break;
         }
 
         displayScaling.scale(scaling,scaling);

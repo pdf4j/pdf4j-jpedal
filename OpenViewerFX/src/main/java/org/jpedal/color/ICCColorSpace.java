@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -318,7 +318,7 @@ extends GenericColorSpace {
         if(cs.getNumComponents()==3 || index!=null) {
             return super.JPEG2000ToRGBImage(data, w, h, decodeArray, pX, pY,d);
         }else{
-            return  JPEG2000ToImage(data, pX, pY, decodeArray);
+            return  JPEG2000ToImage(data, pX, pY);
         }
     }
     

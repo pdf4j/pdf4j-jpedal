@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -407,55 +407,48 @@ public class Array extends ObjectDecoder{
                 }else{
 
                     //handle (string)
-                    if(arrayData[endPtr]=='('){
-                        elementCount++;
-
-                        if(debugFastCode) {
-                            System.out.println(padding + "string");
-                        }
-                        while(true){
-                            if(arrayData[endPtr]==')' && !ObjectUtils.isEscaped(arrayData, endPtr)) {
-                                break;
-                            }
-
-                            endPtr++;
-
+                    switch (arrayData[endPtr]) {
+                        case '(':
+                            elementCount++;
+                            if(debugFastCode) {
+                                System.out.println(padding + "string");
+                            }   while(true){
+                                if(arrayData[endPtr]==')' && !ObjectUtils.isEscaped(arrayData, endPtr)) {
+                                    break;
+                                }
+                                
+                                endPtr++;
+                                
+                                lastCharIsSpace=true; //needs to be space for code to work eve if no actual space
+                            }   break;
+                        case '<':
+                            elementCount++;
+                            if(debugFastCode) {
+                                System.out.println(padding + "direct");
+                            }   while(true){
+                                if(arrayData[endPtr]=='>') {
+                                    break;
+                                }
+                                
+                                endPtr++;
+                                
+                                lastCharIsSpace=true; //needs to be space for code to work eve if no actual space
+                            }   break;
+                        case 91:
+                            //handle recursion
+                            
+                            elementCount++;
+                            if(debugFastCode) {
+                                System.out.println(padding + "recursion");
+                            }   endPtr = skipThroughRecursiveLevels(arrayData, endPtr);
+                            isRecursive=true;
                             lastCharIsSpace=true; //needs to be space for code to work eve if no actual space
-                        }
-                    }else if(arrayData[endPtr]=='<'){
-                        elementCount++;
-
-                        if(debugFastCode) {
-                            System.out.println(padding + "direct");
-                        }
-                        while(true){
-                            if(arrayData[endPtr]=='>') {
-                                break;
-                            }
-
-                            endPtr++;
-
-                            lastCharIsSpace=true; //needs to be space for code to work eve if no actual space
-                        }
-                    }else if(arrayData[endPtr]==91){ //handle recursion
-
-                        elementCount++;
-
-                        if(debugFastCode) {
-                            System.out.println(padding + "recursion");
-                        }
-                        endPtr = skipThroughRecursiveLevels(arrayData, endPtr);
-
-                        isRecursive=true;
-                        lastCharIsSpace=true; //needs to be space for code to work eve if no actual space
-
-                    }else{
-
-                        charIsSpace = arrayData[endPtr] == 10 || arrayData[endPtr] == 13 || arrayData[endPtr] == 32 || arrayData[endPtr] == 47;
-
-                        elementCount = handleSpace(isRef, elementCount, arrayData, endPtr, charIsSpace, lastCharIsSpace);
-
-                        lastCharIsSpace=charIsSpace;
+                            break;
+                        default:
+                            charIsSpace = arrayData[endPtr] == 10 || arrayData[endPtr] == 13 || arrayData[endPtr] == 32 || arrayData[endPtr] == 47;
+                            elementCount = handleSpace(isRef, elementCount, arrayData, endPtr, charIsSpace, lastCharIsSpace);
+                            lastCharIsSpace=charIsSpace;
+                            break;
                     }
                 }
 
@@ -556,21 +549,28 @@ public class Array extends ObjectDecoder{
         /**
          * read all values and convert
          */
-        //if(isSingleNull && arrayData[j2]=='n' && arrayData[j2+1]=='u' &&
         if(arrayData[j2]=='n' && arrayData[j2+1]=='u' &&
                 arrayData[j2+2]=='l' && arrayData[j2+3]=='l' && isSingleNull &&
                 (type!= PdfDictionary.VALUE_IS_OBJECT_ARRAY || elementCount==1)){
 
             j2 += 3;
 
-            if(type==PdfDictionary.VALUE_IS_MIXED_ARRAY) {
+            switch (type) {
+                case PdfDictionary.VALUE_IS_MIXED_ARRAY:
                 mixedValues[currentElement] = null;
-            } else if(type==PdfDictionary.VALUE_IS_KEY_ARRAY) {
+                    break;
+                    
+                case PdfDictionary.VALUE_IS_KEY_ARRAY:
                 keyValues[currentElement] = null;
-            } else if(type==PdfDictionary.VALUE_IS_STRING_ARRAY) {
+                    break;
+                    
+                case PdfDictionary.VALUE_IS_STRING_ARRAY:
                 stringValues[currentElement] = null;
-            } else if(type==PdfDictionary.VALUE_IS_OBJECT_ARRAY) {
+                    break;
+                    
+                case PdfDictionary.VALUE_IS_OBJECT_ARRAY:
                 objectValues[currentElement] = null;
+                    break;
             }
 
         }else {
@@ -583,22 +583,38 @@ public class Array extends ObjectDecoder{
         }
 
         //set value in PdfObject
-        if(type==PdfDictionary.VALUE_IS_FLOAT_ARRAY) {
-            pdfObject.setFloatArray(PDFkeyInt, floatValues);
-        } else if(type==PdfDictionary.VALUE_IS_INT_ARRAY) {
-            pdfObject.setIntArray(PDFkeyInt, intValues);
-        } else if(type==PdfDictionary.VALUE_IS_BOOLEAN_ARRAY) {
-            pdfObject.setBooleanArray(PDFkeyInt, booleanValues);
-        } else if(type==PdfDictionary.VALUE_IS_DOUBLE_ARRAY) {
-            pdfObject.setDoubleArray(PDFkeyInt, doubleValues);
-        } else if(type==PdfDictionary.VALUE_IS_MIXED_ARRAY) {
-           pdfObject.setMixedArray(PDFkeyInt, mixedValues);
-        } else if(type==PdfDictionary.VALUE_IS_KEY_ARRAY) {
-            setKeyArrayValue(pdfObject, PDFkeyInt, elementCount);
-        } else if(type==PdfDictionary.VALUE_IS_STRING_ARRAY) {
-            pdfObject.setStringArray(PDFkeyInt, stringValues);
-        } else if(type==PdfDictionary.VALUE_IS_OBJECT_ARRAY) {
-            setObjectArrayValue(pdfObject, PDFkeyInt, objectValuesArray, keyReached);
+        switch (type) {
+            case PdfDictionary.VALUE_IS_FLOAT_ARRAY:
+                pdfObject.setFloatArray(PDFkeyInt, floatValues);
+                break;
+
+            case PdfDictionary.VALUE_IS_INT_ARRAY:
+                pdfObject.setIntArray(PDFkeyInt, intValues);
+                break;
+
+            case PdfDictionary.VALUE_IS_BOOLEAN_ARRAY:
+                pdfObject.setBooleanArray(PDFkeyInt, booleanValues);
+                break;
+
+            case PdfDictionary.VALUE_IS_DOUBLE_ARRAY:
+                pdfObject.setDoubleArray(PDFkeyInt, doubleValues);
+                break;
+
+            case PdfDictionary.VALUE_IS_MIXED_ARRAY:
+                pdfObject.setMixedArray(PDFkeyInt, mixedValues);
+                break;
+
+            case PdfDictionary.VALUE_IS_KEY_ARRAY:
+                setKeyArrayValue(pdfObject, PDFkeyInt, elementCount);
+                break;
+
+            case PdfDictionary.VALUE_IS_STRING_ARRAY:
+                pdfObject.setStringArray(PDFkeyInt, stringValues);
+                break;
+
+            case PdfDictionary.VALUE_IS_OBJECT_ARRAY:
+                setObjectArrayValue(pdfObject, PDFkeyInt, objectValuesArray, keyReached);
+                break;
         }
     }
 
@@ -920,32 +936,35 @@ public class Array extends ObjectDecoder{
             i = j2;
         }
 
-        if(type==PdfDictionary.VALUE_IS_MIXED_ARRAY){
-            if(hexString){
-                mixedValues[currentElement] = ArrayUtils.handleHexString(newValues, decryption, ref);
-            }else{
-                mixedValues[currentElement]=newValues;
-            }
-        }else if(type==PdfDictionary.VALUE_IS_KEY_ARRAY){
-            keyValues[currentElement]= ObjectUtils.convertReturnsToSpaces(newValues);
-        }else if(type==PdfDictionary.VALUE_IS_STRING_ARRAY){
-            if(hexString){
-                stringValues[currentElement] = ArrayUtils.handleHexString(newValues, decryption, ref);
-            }else{
-                stringValues[currentElement]=newValues;
-            }
-
-        }else if(type==PdfDictionary.VALUE_IS_OBJECT_ARRAY){
-
-            if(hexString){
-                objectValues[currentElement] = ArrayUtils.handleHexString(newValues, decryption, ref);
-            }else{
-                objectValues[currentElement]=newValues;
-            }
-
-            if(debugFastCode) {
-                System.out.println(padding + "objectValues[" + currentElement + "]=" + Arrays.toString(objectValues) + ' ');
-            }
+        switch (type) {
+            case PdfDictionary.VALUE_IS_MIXED_ARRAY:
+                if(hexString){
+                    mixedValues[currentElement] = ArrayUtils.handleHexString(newValues, decryption, ref);
+                }else{
+                    mixedValues[currentElement]=newValues;
+                }   
+                break;
+            case PdfDictionary.VALUE_IS_KEY_ARRAY:
+                keyValues[currentElement]= ObjectUtils.convertReturnsToSpaces(newValues);
+                break;
+            case PdfDictionary.VALUE_IS_STRING_ARRAY:
+                if(hexString){
+                    stringValues[currentElement] = ArrayUtils.handleHexString(newValues, decryption, ref);
+                }else{
+                    stringValues[currentElement]=newValues;
+                }   
+                break;
+            case PdfDictionary.VALUE_IS_OBJECT_ARRAY:
+                if(hexString){
+                    objectValues[currentElement] = ArrayUtils.handleHexString(newValues, decryption, ref);
+                }else{
+                    objectValues[currentElement]=newValues;
+                }   if(debugFastCode) {
+                    System.out.println(padding + "objectValues[" + currentElement + "]=" + Arrays.toString(objectValues) + ' ');
+                }   
+                break;
+            default:
+                break;
         }
         return j2;
     }
@@ -971,22 +990,39 @@ public class Array extends ObjectDecoder{
     }
 
     private void initObjectArray(final int elementCount) {
-        if(type== PdfDictionary.VALUE_IS_FLOAT_ARRAY) {
-            floatValues = new float[elementCount];
-        } else if(type==PdfDictionary.VALUE_IS_INT_ARRAY) {
-            intValues = new int[elementCount];
-        } else if(type==PdfDictionary.VALUE_IS_BOOLEAN_ARRAY) {
-            booleanValues = new boolean[elementCount];
-        } else if(type==PdfDictionary.VALUE_IS_DOUBLE_ARRAY) {
-            doubleValues = new double[elementCount];
-        } else if(type==PdfDictionary.VALUE_IS_MIXED_ARRAY) {
-            mixedValues = new byte[elementCount][];
-        } else if(type==PdfDictionary.VALUE_IS_KEY_ARRAY) {
-            keyValues = new byte[elementCount][];
-        } else if(type==PdfDictionary.VALUE_IS_STRING_ARRAY) {
-            stringValues = new byte[elementCount][];
-        } else if(type==PdfDictionary.VALUE_IS_OBJECT_ARRAY) {
-            objectValues = new Object[elementCount];
+        
+        switch (type) {
+            case PdfDictionary.VALUE_IS_FLOAT_ARRAY:
+                floatValues = new float[elementCount];
+                break;
+
+            case PdfDictionary.VALUE_IS_INT_ARRAY:
+                intValues = new int[elementCount];
+                break;
+
+            case PdfDictionary.VALUE_IS_BOOLEAN_ARRAY:
+                booleanValues = new boolean[elementCount];
+                break;
+
+            case PdfDictionary.VALUE_IS_DOUBLE_ARRAY:
+                doubleValues = new double[elementCount];
+                break;
+
+            case PdfDictionary.VALUE_IS_MIXED_ARRAY:
+                mixedValues = new byte[elementCount][];
+                break;
+
+            case PdfDictionary.VALUE_IS_KEY_ARRAY:
+                keyValues = new byte[elementCount][];
+                break;
+
+            case PdfDictionary.VALUE_IS_STRING_ARRAY:
+                stringValues = new byte[elementCount][];
+                break;
+
+            case PdfDictionary.VALUE_IS_OBJECT_ARRAY:
+                objectValues = new Object[elementCount];
+                break;
         }
     }
 
@@ -1097,60 +1133,71 @@ public class Array extends ObjectDecoder{
      */
     private void showValues() {
 
-        StringBuilder values=new StringBuilder("[");
+        final StringBuilder values = new StringBuilder("[");
 
-        if(type== PdfDictionary.VALUE_IS_FLOAT_ARRAY){
-            for (final float floatValue : floatValues){
-                values.append(floatValue).append(' ');
-            }
-
-        }else if(type==PdfDictionary.VALUE_IS_DOUBLE_ARRAY){
-            for (final double doubleValue : doubleValues){
-                values.append(doubleValue).append(' ');
-            }
-
-        }else if(type==PdfDictionary.VALUE_IS_INT_ARRAY){
-            for (final int intValue : intValues){
-                values.append(intValue).append(' ');
-            }
-
-        }else if(type==PdfDictionary.VALUE_IS_BOOLEAN_ARRAY){
-            for (final boolean booleanValue : booleanValues){
-                values.append(booleanValue).append(' ');
-            }
-
-        }else if(type==PdfDictionary.VALUE_IS_MIXED_ARRAY){
-            for (final byte[] mixedValue : mixedValues){
-                if (mixedValue == null) {
-                    values.append("null ");
-                } else {
-                    values.append(new String(mixedValue)).append(' ');
+        switch (type) {
+            case PdfDictionary.VALUE_IS_FLOAT_ARRAY:
+                for (final float floatValue : floatValues) {
+                    values.append(floatValue).append(' ');
                 }
-            }
+                break;
 
-        }else if(type==PdfDictionary.VALUE_IS_KEY_ARRAY){
-            for (final byte[] keyValue : keyValues) {
-                if (keyValue == null) {
-                    values.append("null ");
-                } else {
-                    values.append(new String(keyValue)).append(' ');
+            case PdfDictionary.VALUE_IS_DOUBLE_ARRAY:
+                for (final double doubleValue : doubleValues) {
+                    values.append(doubleValue).append(' ');
                 }
-            }
-        }else if(type==PdfDictionary.VALUE_IS_STRING_ARRAY){
-            for (final byte[] stringValue : stringValues) {
-                if (stringValue == null) {
-                    values.append("null ");
-                } else {
-                    values.append(new String(stringValue)).append(' ');
+                break;
+
+            case PdfDictionary.VALUE_IS_INT_ARRAY:
+                for (final int intValue : intValues) {
+                    values.append(intValue).append(' ');
                 }
-            }
-        }else if(type==PdfDictionary.VALUE_IS_OBJECT_ARRAY){
-            values.append(ObjectUtils.showMixedValuesAsString(objectValues, ""));
+                break;
+
+            case PdfDictionary.VALUE_IS_BOOLEAN_ARRAY:
+                for (final boolean booleanValue : booleanValues) {
+                    values.append(booleanValue).append(' ');
+                }
+                break;
+
+            case PdfDictionary.VALUE_IS_MIXED_ARRAY:
+                for (final byte[] mixedValue : mixedValues) {
+                    if (mixedValue == null) {
+                        values.append("null ");
+                    } else {
+                        values.append(new String(mixedValue)).append(' ');
+                    }
+                }
+                break;
+
+            case PdfDictionary.VALUE_IS_KEY_ARRAY:
+                for (final byte[] keyValue : keyValues) {
+                    if (keyValue == null) {
+                        values.append("null ");
+                    } else {
+                        values.append(new String(keyValue)).append(' ');
+                    }
+                }
+                break;
+
+            case PdfDictionary.VALUE_IS_STRING_ARRAY:
+                for (final byte[] stringValue : stringValues) {
+                    if (stringValue == null) {
+                        values.append("null ");
+                    } else {
+                        values.append(new String(stringValue)).append(' ');
+                    }
+                }
+                break;
+
+            case PdfDictionary.VALUE_IS_OBJECT_ARRAY:
+                values.append(ObjectUtils.showMixedValuesAsString(objectValues, ""));
+                break;
         }
 
         values.append(" ]");
 
-        System.out.println(padding+"values="+ values);
+        System.out.println(padding + "values=" + values);
     }
 
     

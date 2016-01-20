@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -151,14 +151,19 @@ public class TTGraphicsState implements Cloneable, Serializable {
         //Get phase
         p = (roundState >> 4) & 3;
         final double phase;
-        if (p==0) {
-            phase = 0;
-        } else if (p==1) {
-            phase = period / 4;
-        } else if (p==2) {
-            phase = period / 2;
-        } else {
-            phase = (3 * period) / 4;
+        switch (p) {
+            case 0:
+                phase = 0;
+                break;
+            case 1:
+                phase = period / 4;
+                break;
+            case 2:
+                phase = period / 2;
+                break;
+            default:
+                phase = (3 * period) / 4;
+                break;
         }
 
         //Get threshold
@@ -273,8 +278,8 @@ public class TTGraphicsState implements Cloneable, Serializable {
 //        double xProj = TTVM.getDoubleFromF2Dot14(pv[0]) * TTVM.getDoubleFromF26Dot6(x);
 //        double yProj = TTVM.getDoubleFromF2Dot14(pv[1]) * TTVM.getDoubleFromF26Dot6(y);
 //        return TTVM.storeDoubleAsF26Dot6(xProj + yProj);
-        final long xProj = (long)pv[0] * (long)x;
-        final long yProj = (long)pv[1] * (long)y;
+        final long xProj = pv[0] * (long)x;
+        final long yProj = pv[1] * (long)y;
         long bigResult = xProj + yProj;
         final boolean roundUp = (bigResult & 0x3FFF) >= 0x7F;
         bigResult >>= 14;
@@ -328,14 +333,19 @@ public class TTGraphicsState implements Cloneable, Serializable {
         //Get phase
         p = (roundState >> 4) & 3;
         final String phase;
-        if (p==0) {
-            phase = "Phase:0";
-        } else if (p==1) {
-            phase = "Phase:Period/4";
-        } else if (p==2) {
-            phase = "Phase:Period/2";
-        } else {
-            phase = "Phase:Period*(3/4)";
+        switch (p) {
+            case 0:
+                phase = "Phase:0";
+                break;
+            case 1:
+                phase = "Phase:Period/4";
+                break;
+            case 2:
+                phase = "Phase:Period/2";
+                break;
+            default:
+                phase = "Phase:Period*(3/4)";
+                break;
         }
 
         //Get threshold

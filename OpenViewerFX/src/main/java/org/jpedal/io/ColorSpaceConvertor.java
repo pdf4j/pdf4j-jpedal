@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -33,9 +33,9 @@
 package org.jpedal.io;
 
 import java.awt.Graphics2D;
-import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
+import org.jpedal.JDeliHelper;
 import org.jpedal.color.CMYKtoRGB;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.DeviceCMYKColorSpace;
@@ -65,26 +65,31 @@ public class ColorSpaceConvertor {
      */
     public static BufferedImage convertFromICCCMYK(final int width, final int height,byte[] data) {
 
-        LogWriter.writeLog("Converting ICC/CMYK colorspace to sRGB ");
-        
-        try {
-
-            /**make sure data big enough and pad out if not*/
-            final int size = width * height * 4;
-            if (data.length < size) {
-                final byte[] newData = new byte[size];
-                System.arraycopy(data, 0, newData, 0, data.length);
-                data = newData;
-            }
-            
-            return profileConvertCMYKImageToRGB(data, width, height);
-            
-        } catch (final Exception ee) {
-            LogWriter.writeLog("Exception  " + ee + " converting from ICC colorspace");
+        /**make sure data big enough and pad out if not*/
+        final int size = width * height * 4;
+        if (data.length < size) {
+            final byte[] newData = new byte[size];
+            System.arraycopy(data, 0, newData, 0, data.length);
+            data = newData;
         }
-
-        return null;
-
+            
+        int dim = width * height;
+        byte [] bp = JDeliHelper.convertCMYK2RGB(width, height, size, data);
+        
+        if(bp == null){
+            bp = DeviceCMYKColorSpace.convertCMYK2RGBWithSimple(width, height, size, data);
+        }
+        
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int [] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+        int r,g,b,pos = 0;
+        for (int i = 0; i < dim; i++) {
+            r = bp[pos++]&0xff;
+            g = bp[pos++]&0xff;
+            b = bp[pos++]&0xff;
+            pixels[i] = (r<<16) | (g<<8) | b ;
+        }
+        return img;
     }
 
     /**
@@ -153,159 +158,6 @@ public class ColorSpaceConvertor {
         }
 
         isUsingARGB = true;
-
-        return image;
-    }
-
-
-    /**
-     * save raw CMYK data by converting to RGB using algorithm method -
-     * pdfsages supplied the C source and I have converted -
-     * This works very well on most colours but not dark shades which are
-     * all rolled into black
-     *
-     * This is what xpdf seems to use -
-     * <b>Note</b> we store the output data in our input queue to reduce memory
-     * usage - we have seen raw 2000 * 2000 images and having input and output
-     * buffers is a LOT of memory -
-     * I have kept the doubles in as I just rewrote Leonard's code -
-     * I haven't really looked at optimisation beyond memory issues
-     * 
-     * @param buffer is of type byte[]
-     * @param w is of type final int
-     * @param h is of type final int
-     * @return type BufferedImage
-     */
-    public static BufferedImage algorithmicConvertCMYKImageToRGB(final byte[] buffer, final int w, final int h) {
-
-        BufferedImage image = null;
-        final byte[] new_data = new byte[w * h * 3];
-
-        final int pixelCount = w * h*4;
-
-        double lastC=-1,lastM=-1.12,lastY=-1.12,lastK=-1.21;
-        final double x=255;
-
-
-        double c, m, y, aw, ac, am, ay, ar, ag, ab;
-        double outRed=0, outGreen=0, outBlue=0;
-
-        int pixelReached = 0;
-        for (int i = 0; i < pixelCount; i += 4) {
-
-            final double inCyan = (buffer[i]&0xff)/x ;
-            final double inMagenta = (buffer[i + 1]&0xff) / x;
-            final double inYellow = (buffer[i + 2]&0xff) / x;
-            final double inBlack = (buffer[i + 3]&0xff) / x;
-
-            if((lastC==inCyan)&&(lastM==inMagenta)&&
-                    (lastY==inYellow)&&(lastK==inBlack)){
-                //use existing values
-            }else{//work out new
-                final double k = 1;
-                c = clip01(inCyan + inBlack);
-                m = clip01(inMagenta + inBlack);
-                y = clip01(inYellow + inBlack);
-                aw = (k - c) * (k - m) * (k - y);
-                ac = c * (k - m) * (k - y);
-                am = (k - c) * m * (k - y);
-                ay = (k - c) * (k - m) * y;
-                ar = (k - c) * m * y;
-                ag = c * (k - m) * y;
-                ab = c * m * (k - y);
-                outRed = x*clip01(aw + 0.9137 * am + 0.9961 * ay + 0.9882 * ar);
-                outGreen = x*clip01(aw + 0.6196 * ac + ay + 0.5176 * ag);
-                outBlue =
-                        x*clip01(
-                                aw
-                                        + 0.7804 * ac
-                                        + 0.5412 * am
-                                        + 0.0667 * ar
-                                        + 0.2118 * ag
-                                        + 0.4863 * ab);
-
-                lastC=inCyan;
-                lastM=inMagenta;
-                lastY=inYellow;
-                lastK=inBlack;
-            }
-
-            new_data[pixelReached++] =(byte)(outRed);
-            new_data[pixelReached++] = (byte) (outGreen);
-            new_data[pixelReached++] = (byte) (outBlue);
-
-        }
-
-        try {
-            /***/
-            image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-
-            final Raster raster = createInterleavedRaster(new_data, w, h);
-            image.setData(raster);
-
-        } catch (final Exception e) {
-            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
-        }
-
-        return image;
-    }
-    
-    public static BufferedImage profileConvertCMYKImageToRGB(final byte[] buffer, final int w, final int h) {
-
-    	final ColorSpace CMYK=DeviceCMYKColorSpace.getColorSpaceInstance();
-    	
-        BufferedImage image = null;
-        final byte[] new_data = new byte[w * h * 3];
-
-        final int pixelCount = w * h*4;
-
-        float lastC=-1,lastM=-1,lastY=-1,lastK=-1;
-        float C, M, Y, K;
-        
-        float[] rgb=new float[3];
-        
-        /**
-         * loop through each pixel changing CMYK values to RGB
-         */
-        int pixelReached = 0;
-        for (int i = 0; i < pixelCount; i += 4) {
-
-            C = (buffer[i]&0xff)/255f;
-            M = (buffer[i + 1]&0xff)/255f;
-            Y = (buffer[i + 2]&0xff)/255f;
-            K = (buffer[i + 3]&0xff)/255f;
-
-            if(lastC==C && lastM==M && lastY==Y && lastK==K){
-                //use existing values if not changed
-            }else{//work out new
-                
-            	rgb=CMYK.toRGB(new float[]{C,M,Y,K});
-
-                lastC=C;
-                lastM=M;
-                lastY=Y;
-                lastK=K;
-            }
-            
-            
-            new_data[pixelReached++] =(byte)(rgb[0]*255);
-            new_data[pixelReached++] = (byte) (rgb[1]*255);
-            new_data[pixelReached++] = (byte) (rgb[2]*255);
-
-        }
-
-        /**
-         * turn data into RGB image
-         */
-        try {
-           
-            image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-            final Raster raster = createInterleavedRaster(new_data, w, h);
-            image.setData(raster);
-
-        } catch (final Exception e) {
-            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
-        }
 
         return image;
     }
@@ -952,4 +804,156 @@ public class ColorSpaceConvertor {
         
         return image;
     }
+    
+    /* save raw CMYK data by converting to RGB using algorithm method -
+     * pdfsages supplied the C source and I have converted -
+     * This works very well on most colours but not dark shades which are
+     * all rolled into black
+     *
+     * This is what xpdf seems to use -
+     * <b>Note</b> we store the output data in our input queue to reduce memory
+     * usage - we have seen raw 2000 * 2000 images and having input and output
+     * buffers is a LOT of memory -
+     * I have kept the doubles in as I just rewrote Leonard's code -
+     * I haven't really looked at optimisation beyond memory issues
+     * 
+     * @param buffer is of type byte[]
+     * @param w is of type final int
+     * @param h is of type final int
+     * @return type BufferedImage
+     */
+    public static BufferedImage algorithmicConvertCMYKImageToRGB(final byte[] buffer, final int w, final int h) {
+
+        BufferedImage image = null;
+        final byte[] new_data = new byte[w * h * 3];
+
+        final int pixelCount = w * h*4;
+
+        double lastC=-1,lastM=-1.12,lastY=-1.12,lastK=-1.21;
+        final double x=255;
+
+
+        double c, m, y, aw, ac, am, ay, ar, ag, ab;
+        double outRed=0, outGreen=0, outBlue=0;
+
+        int pixelReached = 0;
+        for (int i = 0; i < pixelCount; i += 4) {
+
+            final double inCyan = (buffer[i]&0xff)/x ;
+            final double inMagenta = (buffer[i + 1]&0xff) / x;
+            final double inYellow = (buffer[i + 2]&0xff) / x;
+            final double inBlack = (buffer[i + 3]&0xff) / x;
+
+            if((lastC==inCyan)&&(lastM==inMagenta)&&
+                    (lastY==inYellow)&&(lastK==inBlack)){
+                //use existing values
+            }else{//work out new
+                final double k = 1;
+                c = clip01(inCyan + inBlack);
+                m = clip01(inMagenta + inBlack);
+                y = clip01(inYellow + inBlack);
+                aw = (k - c) * (k - m) * (k - y);
+                ac = c * (k - m) * (k - y);
+                am = (k - c) * m * (k - y);
+                ay = (k - c) * (k - m) * y;
+                ar = (k - c) * m * y;
+                ag = c * (k - m) * y;
+                ab = c * m * (k - y);
+                outRed = x*clip01(aw + 0.9137 * am + 0.9961 * ay + 0.9882 * ar);
+                outGreen = x*clip01(aw + 0.6196 * ac + ay + 0.5176 * ag);
+                outBlue =
+                        x*clip01(
+                                aw
+                                        + 0.7804 * ac
+                                        + 0.5412 * am
+                                        + 0.0667 * ar
+                                        + 0.2118 * ag
+                                        + 0.4863 * ab);
+
+                lastC=inCyan;
+                lastM=inMagenta;
+                lastY=inYellow;
+                lastK=inBlack;
+            }
+
+            new_data[pixelReached++] =(byte)(outRed);
+            new_data[pixelReached++] = (byte) (outGreen);
+            new_data[pixelReached++] = (byte) (outBlue);
+
+        }
+
+        try {
+            /***/
+            image = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
+
+            final Raster raster = createInterleavedRaster(new_data, w, h);
+            image.setData(raster);
+
+        } catch (final Exception e) {
+            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
+        }
+
+        return image;
+    }   
+    
 }
+//    /** remove this code below in future
+//    public static BufferedImage profileConvertCMYKImageToRGB(final byte[] buffer, final int w, final int h) {
+//
+//    	final ColorSpace CMYK=DeviceCMYKColorSpace.getColorSpaceInstance();
+//    	
+//        BufferedImage image = null;
+//        final byte[] new_data = new byte[w * h * 3];
+//
+//        final int pixelCount = w * h*4;
+//
+//        float lastC=-1,lastM=-1,lastY=-1,lastK=-1;
+//        float C, M, Y, K;
+//        
+//        float[] rgb=new float[3];
+//        
+//        /**
+//         * loop through each pixel changing CMYK values to RGB
+//         */
+//        int pixelReached = 0;
+//        for (int i = 0; i < pixelCount; i += 4) {
+//
+//            C = (buffer[i]&0xff)/255f;
+//            M = (buffer[i + 1]&0xff)/255f;
+//            Y = (buffer[i + 2]&0xff)/255f;
+//            K = (buffer[i + 3]&0xff)/255f;
+//
+//            if(lastC==C && lastM==M && lastY==Y && lastK==K){
+//                //use existing values if not changed
+//            }else{//work out new
+//                
+//            	rgb=CMYK.toRGB(new float[]{C,M,Y,K});
+//
+//                lastC=C;
+//                lastM=M;
+//                lastY=Y;
+//                lastK=K;
+//            }
+//            
+//            
+//            new_data[pixelReached++] =(byte)(rgb[0]*255);
+//            new_data[pixelReached++] = (byte) (rgb[1]*255);
+//            new_data[pixelReached++] = (byte) (rgb[2]*255);
+//
+//        }
+//
+//        /**
+//         * turn data into RGB image
+//         */
+//        try {
+//           
+//            image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
+//            final Raster raster = createInterleavedRaster(new_data, w, h);
+//            image.setData(raster);
+//
+//        } catch (final Exception e) {
+//            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
+//        }
+//
+//        return image;
+//    }

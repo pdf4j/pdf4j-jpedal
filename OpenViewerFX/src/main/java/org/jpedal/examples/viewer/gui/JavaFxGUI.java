@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -2474,19 +2474,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
     }
 
-    @Override
-    public void selectBookmark() {
-
-        if (debugFX) {
-            System.out.println("selectBookmark");
-        }
-
-        if (decode_pdf.hasOutline() && (tree != null)) {
-            tree.selectBookmark();
-        }
-
-    }
-
     private void initStatus() {
 
         if (debugFX) {
@@ -2654,15 +2641,8 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         if (isSingle) {
             fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.SinglePage"), "single.gif", Commands.SINGLE, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
 
-            if(!OpenViewerFX.isOpenFX){
-                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.Continuous"), "continuous.gif", Commands.CONTINUOUS, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
-                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.ContinousFacing"), "continuous_facing.gif", Commands.CONTINUOUS_FACING, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
-                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.Facing"), "facing.gif", Commands.FACING, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
-                fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.PageFlow"), "pageflow.gif", Commands.PAGEFLOW, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-            }
+            fxButtons.addButton(PAGES, Messages.getMessage("PageLayoutButton.PageFlow"), "pageflow.gif", Commands.PAGEFLOW, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
+            
         }
 
         //on top in plugin
@@ -2948,7 +2928,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                     message,
                     Messages.getMessage("PdfViewerMessage.Overwrite"),
                     FXOptionDialog.DEFAULT_OPTION,
-                    FXOptionDialog.QUESTION_MESSAGE,
                     buttonRowObjects,
                     buttonRowObjects[0]);
 
@@ -2959,7 +2938,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                     message,
                     Messages.getMessage("PdfViewerMessage.Overwrite"),
                     FXOptionDialog.DEFAULT_OPTION,
-                    FXOptionDialog.QUESTION_MESSAGE,
                     null,
                     null);
 
@@ -3106,7 +3084,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
 
         if (returnMessage == -1) {
-            final FXOptionDialog dialog = new FXOptionDialog(stage, message, title, optionType, messageType, null, null);
+            final FXOptionDialog dialog = new FXOptionDialog(stage, message, title, optionType, null, null);
             return dialog.showOptionDialog();
         } else {
             return returnMessage;

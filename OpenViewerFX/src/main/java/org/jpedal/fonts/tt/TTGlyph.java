@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -32,7 +32,6 @@
  */
 package org.jpedal.fonts.tt;
 
-import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.tt.hinting.TTVM;
 import org.jpedal.io.PathSerializer;
 import org.jpedal.objects.GraphicsState;
@@ -48,7 +47,7 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 
-public class TTGlyph extends BaseTTGlyph implements PdfGlyph, Serializable{
+public class TTGlyph extends BaseTTGlyph implements Serializable{
 
 
 
@@ -663,10 +662,5 @@ public class TTGlyph extends BaseTTGlyph implements PdfGlyph, Serializable{
     @Override
     void clearPaths() {
         paths.clear();
-    }
-    
-    @Override
-    public boolean hasHintingApplied() {
-        return this.hasHintingApplied;
     }
 }

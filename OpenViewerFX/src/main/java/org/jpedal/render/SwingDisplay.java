@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -195,7 +195,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      */
     private boolean hasOCR;
     
-    protected int type =DynamicVectorRenderer.DISPLAY_SCREEN;
+//    protected int type =DynamicVectorRenderer.DISPLAY_SCREEN;
     
     static {
         
@@ -205,6 +205,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     public SwingDisplay() {
     	currentItem = 0;
+        type =DynamicVectorRenderer.DISPLAY_SCREEN;
     }
     
     /**
@@ -246,6 +247,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         this.addBackground=addBackground;
         
         setupArrays(defaultSize);
+        type =DynamicVectorRenderer.DISPLAY_SCREEN;
     }
     
     
@@ -256,6 +258,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         this.isPrinting=isPrinting;
         
         setupArrays(defaultSize);
+        type =DynamicVectorRenderer.DISPLAY_SCREEN;
         
     }
     
@@ -1536,7 +1539,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 
                 final double[] matrix=new double[6];
                 g2.getTransform().getMatrix(matrix);
-                final double ratio=((float)pY)/((BufferedImage)currentObject).getHeight();
+                final double ratio=((float)pY)/((RenderedImage)currentObject).getHeight();
                 
                 matrix[0]=ratio;
                 matrix[1]=0;
@@ -1899,6 +1902,10 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
         //System.out.println(y+" "+h+" "+nextAf[3]);
         this.drawAffine(nextAf);
+        lastAf[0]=nextAf[0];
+        lastAf[1]=nextAf[1];
+        lastAf[2]=nextAf[2];
+        lastAf[3]=nextAf[3];
          
         if(!useHiResImageForDisplay) {
 
@@ -1917,11 +1924,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 w= (Integer) cachedWidths.get(key);
                 h= (Integer) cachedHeights.get(key);
             }
-            
-            lastAf[0]=nextAf[0];
-            lastAf[1]=nextAf[1];
-            lastAf[2]=nextAf[2];
-            lastAf[3]=nextAf[3];
             
             if(!alreadyCached && !cacheInMemory){
                 
@@ -2183,12 +2185,12 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         if((lastStroke!=null)&&(lastStroke.equals(newStroke))){
             
         }else{
-            //Adjust line width to 1 if less than 1 
-            //ignore if using T3Display (such as ap image generation in html / svg conversion
-            if((((BasicStroke)newStroke).getLineWidth()<1 && ((BasicStroke)newStroke).getLineWidth()!=0) &&
-                    !(this instanceof T3Display)){
-                newStroke = new BasicStroke(1,((BasicStroke)newStroke).getEndCap(), ((BasicStroke)newStroke).getLineJoin(), ((BasicStroke)newStroke).getMiterLimit(), ((BasicStroke)newStroke).getDashArray(), ((BasicStroke)newStroke).getDashPhase());
-            }
+//            //Adjust line width to 1 if less than 1 
+//            //ignore if using T3Display (such as ap image generation in html / svg conversion
+//            if((((BasicStroke)newStroke).getLineWidth()<1 && ((BasicStroke)newStroke).getLineWidth()!=0) &&
+//                    !(this instanceof T3Display)){
+//                newStroke = new BasicStroke(1,((BasicStroke)newStroke).getEndCap(), ((BasicStroke)newStroke).getLineJoin(), ((BasicStroke)newStroke).getMiterLimit(), ((BasicStroke)newStroke).getDashArray(), ((BasicStroke)newStroke).getDashPhase());
+//            }
             lastStroke=newStroke;
             drawStroke((newStroke));
         }
@@ -2992,6 +2994,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             LogWriter.writeLog("Exception: " + e.getMessage());
         }
         
+        type =DynamicVectorRenderer.DISPLAY_SCREEN;
         //used in loop to draw so needs to be set
         currentItem=pageObjects.get().length;
         
@@ -3194,6 +3197,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      * @param i
      * @return 
      */
+    @Deprecated
     @Override
     public Rectangle getArea(final int i) {
         return new Rectangle(areas.elementAt(i)[0], areas.elementAt(i)[1],areas.elementAt(i)[2],areas.elementAt(i)[3]);

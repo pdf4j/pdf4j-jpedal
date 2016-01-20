@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -32,8 +32,7 @@
  */
 package org.jpedal.fonts.glyph;
 
-import java.awt.*;
-import java.awt.geom.Area;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -53,7 +52,7 @@ import org.jpedal.utils.LogWriter;
  * shape. Has to be done this way as Winding rule is not necessarily
  * declared at start.
   */
-public class T3Glyph implements PdfGlyph
+public class T3Glyph extends PdfGlyph
 {
 	
 	private boolean lockColours;
@@ -64,8 +63,6 @@ public class T3Glyph implements PdfGlyph
 	private int maxWidth,maxHeight;
 
     float glyphScale=1f;
-
-    private int glyphNumber = -1;
 
     /**
 	 * create the glyph as a wrapper around the DynamicVectorRenderer 
@@ -82,16 +79,6 @@ public class T3Glyph implements PdfGlyph
     public void setScaling(final float glyphScaling){
         this.glyphScale=glyphScaling;
     }
-	
-	
-    /**
-	 * draw the t3 glyph
-	 */
-	@Override
-    public Area getShape()
-	{
-		return null;
-	}
 	
 	/**
 	 * draw the t3 glyph
@@ -160,17 +147,6 @@ public class T3Glyph implements PdfGlyph
 		return lockColours;
 	}
 
-    @Override
-    public int getGlyphNumber() {
-        return glyphNumber;
-    }
-
-    @Override
-    public void setGlyphNumber(final int no) {
-        glyphNumber = no;
-    }
-
-
 	/**
 	 * method to serialize all the paths in this object.  This method is needed because
 	 * GeneralPath does not implement Serializable so we need to serialize it ourself.
@@ -213,37 +189,4 @@ public class T3Glyph implements PdfGlyph
             LogWriter.writeLog("Exception: " + e.getMessage());
         }
 	}
-
-
-    @Override
-    public void setWidth(final float width) {
-		// TODO Auto-generated method stub
-		
-	}
-
-    @Override
-    public int getFontBB(final int type) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setStrokedOnly(final boolean b) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    //use by TT to handle broken TT fonts
-    @Override
-    public boolean containsBrokenData() {
-        return false;
-    }
-
-    @Override
-    public Object getPath() {
-        throw new UnsupportedOperationException("getPath Not supported yet.");
-    }
-    
-    @Override
-    public boolean hasHintingApplied() {
-        return false;
-    }
 }

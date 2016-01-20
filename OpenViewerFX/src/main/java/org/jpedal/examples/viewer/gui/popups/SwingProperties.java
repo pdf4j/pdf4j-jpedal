@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -202,6 +202,9 @@ public class SwingProperties extends JPanel {
     
     //Use enhanced viewer
     JCheckBox enhancedViewer;
+    
+    //Use enhanced viewer
+    JCheckBox enhanceFractionalLines;
     
     //Use enhanced viewer
     JCheckBox enhancedFacing;
@@ -475,8 +478,8 @@ final JPanel viewBGColor = new JPanel();
         pageLayout = new JComboBox(
                 new String[]{Messages.getMessage("PageLayoutViewMenu.SinglePage"),
                     Messages.getMessage("PageLayoutViewMenu.Continuous"),
-                    Messages.getMessage("PageLayoutViewMenu.Facing"),
                     Messages.getMessage("PageLayoutViewMenu.ContinousFacing"),
+                    Messages.getMessage("PageLayoutViewMenu.Facing"),
                     Messages.getMessage("PageLayoutViewMenu.PageFlow")});
         pageLayout.setToolTipText(Messages.getMessage("PdfPreferences.pageLayout.toolTip"));
         
@@ -547,6 +550,9 @@ final JPanel viewBGColor = new JPanel();
         
         enhancedViewer = new JCheckBox(Messages.getMessage("PdfCustomGui.enhancedViewer"));
         enhancedViewer.setToolTipText("Set to use enahnced viewer mode");
+        
+        enhanceFractionalLines = new JCheckBox(Messages.getMessage("PdfCustomGui.enhanceFractionalLines"));
+        enhanceFractionalLines.setToolTipText("Set to widen thin lines to ensure visiblity at any scaling");
         
         enhancedFacing = new JCheckBox(Messages.getMessage("PdfCustomGui.enhancedFacing"));
         enhancedFacing.setToolTipText("Set to turn facing mode to page turn mode");
@@ -838,6 +844,7 @@ final JPanel viewBGColor = new JPanel();
         properties.setValue("allowRightClick", String.valueOf(rightClick.isSelected()));
         properties.setValue("allowScrollwheelZoom", String.valueOf(scrollwheelZoom.isSelected()));
         properties.setValue("enhancedViewerMode", String.valueOf(enhancedViewer.isSelected()));
+        properties.setValue("enhanceFractionalLines", String.valueOf(enhanceFractionalLines.isSelected()));
         properties.setValue("enhancedFacingMode", String.valueOf(enhancedFacing.isSelected()));
         properties.setValue("previewOnSingleScroll", String.valueOf(thumbnailScroll.isSelected()));
         properties.setValue("printerBlacklist", String.valueOf(printerBlacklist.getText()));
@@ -1052,6 +1059,7 @@ final JPanel viewBGColor = new JPanel();
              * Set values from Properties file
              */
             loadBooleanValue(enhancedViewer, "enhancedViewerMode");
+            loadBooleanValue(enhanceFractionalLines, "enhanceFractionalLines");
             loadBooleanValue(border, "borderType");
             loadBooleanValue(enhancedFacing, "enhancedFacingMode");
             loadBooleanValue(thumbnailScroll, "previewOnSingleScroll");
@@ -1096,6 +1104,15 @@ final JPanel viewBGColor = new JPanel();
             enhancedViewer.setMargin(new Insets(0,0,0,0));
             enhancedViewer.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
             pane.add(enhancedViewer, c);
+            
+            c.gridy++;
+            
+            c.insets = new Insets(5,0,0,0);
+            c.gridwidth = 2;
+            c.gridx = 0;
+            enhanceFractionalLines.setMargin(new Insets(0,0,0,0));
+            enhanceFractionalLines.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            pane.add(enhanceFractionalLines, c);
             
             c.gridy++;
             

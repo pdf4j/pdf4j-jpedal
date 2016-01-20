@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -73,7 +73,7 @@ public class B {
                 fxPath=currentDrawShape.getPath();
             }else{
                 //generate swing shape and stroke and status. Type required to check if EvenOdd rule emulation required.
-                currentShape =currentDrawShape.generateShapeFromPath(gs.CTM,gs.getLineWidth(),Cmd.B,current.getType());
+                currentShape =currentDrawShape.generateShapeFromPath(gs.CTM,gs.getLineWidth(),Cmd.B);
             
                 //hack which fixes blocky text on Customers3/demo_3.pdf in Swing
                 if(currentShape!=null && currentShape.getBounds2D().getWidth()<1 && currentShape.getBounds2D().getHeight()<1){
@@ -107,7 +107,7 @@ public class B {
                 }
 
                 if(useJavaFX){
-                    current.drawShape(fxPath,gs, Cmd.B);
+                    current.drawShape(fxPath,gs);
                 }else{
                     current.drawShape(currentShape,gs, Cmd.B);
                     if (current.isHTMLorSVG()) {

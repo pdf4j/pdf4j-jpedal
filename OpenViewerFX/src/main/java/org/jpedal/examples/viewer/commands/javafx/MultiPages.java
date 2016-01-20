@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -33,7 +33,7 @@ public class MultiPages {
      *
      * @return
      */
-    public static PdfDecoderInt openNewMultiplePage(final String fileName, final GUIFactory currentGUI,final Values commonValues) {
+    public static PdfDecoderInt openNewMultiplePage(final GUIFactory currentGUI,final Values commonValues) {
 
         return null;
 

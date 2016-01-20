@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -62,7 +62,7 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
     // save image in array to draw
     @Override
     public final int drawImage(final int pageNumber, final BufferedImage image, final GraphicsState gs, final boolean alreadyCached, final String name, final int previousUse) {
-
+        
         //track objects
         int iw = (int) gs.CTM[0][0];
         if (iw < 0) {
@@ -90,7 +90,7 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
         areas.addElement(rectParams);
 
         blendMode=gs.getBMValue();
-
+        
         renderImage(null, image, gs.getAlpha(GraphicsState.FILL), gs, gs.x, gs.y);
 
         return -1;
@@ -232,7 +232,7 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
     }
 
     @Override
-    public void drawShape(final Object currentShape, final GraphicsState currentGraphicsState, final int cmd){
+    public void drawShape(final Object currentShape, final GraphicsState currentGraphicsState){
         // Stub method to supress BaseDisplay message
     }
 

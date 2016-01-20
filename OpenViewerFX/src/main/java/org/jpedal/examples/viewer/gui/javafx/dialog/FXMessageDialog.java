@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -77,7 +77,7 @@ public class FXMessageDialog extends FXDialog {
     private final HBox bottom;
     private final VBox center;
     
-    public FXMessageDialog(final Stage parent, final Modality modality) {
+    public FXMessageDialog(final Stage parent) {
         content = new BorderPane();
         iconView = new ImageView();
         message = new SimpleStringProperty();
@@ -126,17 +126,17 @@ public class FXMessageDialog extends FXDialog {
     }
 
     public FXMessageDialog(final Stage parent, final Modality modality, final String message) {
-        this(parent, modality);
+        this(parent);
         this.message.set(message);
     }
     
     public FXMessageDialog(final Stage parent, final Modality modality, final Image icon) {
-        this(parent, modality);
+        this(parent);
         setImage(icon);
     }
     
     public FXMessageDialog(final Stage parent, final Modality modality, final Image icon, final String message) {
-        this(parent, modality);
+        this(parent);
         setImage(icon);
         this.message.set(message);
     }
@@ -149,7 +149,7 @@ public class FXMessageDialog extends FXDialog {
      * @param group The group of the Dialog
      */
     public FXMessageDialog(final Stage parent, final Modality modality, final Parent group){
-        this(parent, modality);
+        this(parent);
         content.setCenter(group);
     }
     

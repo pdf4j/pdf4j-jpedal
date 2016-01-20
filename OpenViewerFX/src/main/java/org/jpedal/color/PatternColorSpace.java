@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -323,7 +323,7 @@ public class PatternColorSpace extends GenericColorSpace{
         return new float[][]{{(float)af.getScaleX(), (float)af.getShearX(), 0f}, {(float)af.getShearY(), (float)af.getScaleY(), 0f}, {(float)af.getTranslateX(), (float)af.getTranslateY(), 1f}};
     }
     
-    public BufferedImage getRawImage(int iw, int ih, AffineTransform callerAffine){
+    public BufferedImage getRawImage(AffineTransform callerAffine){
         byte[] streamData=currentPdfFile.readStream(PatternObj,true,true,true, false,false, PatternObj.getCacheName(currentPdfFile.getObjectReader()));
         final ObjectStore localStore = new ObjectStore();
         //float[] inputs = PatternObj.getFloatArray(PdfDictionary.Matrix);

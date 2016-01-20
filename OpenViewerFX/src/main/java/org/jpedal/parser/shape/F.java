@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -135,7 +135,7 @@ public class F {
                 fxPath=currentDrawShape.getPath();
             }else{
                 //generate swing shape and stroke and status. Type required to check if EvenOdd rule emulation required.
-                currentShape =currentDrawShape.generateShapeFromPath(gs.CTM,gs.getLineWidth(), Cmd.F,current.getType());
+                currentShape =currentDrawShape.generateShapeFromPath(gs.CTM,gs.getLineWidth(), Cmd.F);
             }
             
             boolean hasShape=currentShape!=null || fxPath!=null;
@@ -187,7 +187,7 @@ public class F {
                 gs.setFillType(GraphicsState.FILL);
                 
                 if(parserOptions.useJavaFX()){
-                    current.drawShape(fxPath,gs, Cmd.F);
+                    current.drawShape(fxPath,gs);
                 }else{
                     current.drawShape(currentShape,gs, Cmd.F);
 
@@ -216,10 +216,10 @@ public class F {
         BBox= maskObj.getFloatArray(PdfDictionary.BBox);
         
         /**get dimensions as an image*/
-        int fx=(int)BBox[0];
-        final int fy=(int)BBox[1];
-        final int fw=(int)BBox[2];
-        final int fh=(int)(BBox[3]);
+        int fx=(int)(BBox[0]+0.5f);
+        final int fy=(int)(BBox[1]+0.5f);
+        final int fw=(int)(BBox[2]+0.5f);
+        final int fh=(int)(BBox[3]+0.5f);
         
         //check x,y offsets and factor in
         if(fx<0) {

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -268,6 +268,8 @@ public class PdfDictionary {
 
     public static final int DecodeParms=1888135062;
 
+    public static final int Desc=339034931;
+
     public static final int DescendantFonts=-1547306032;
 
     public static final int Descent=860451719;
@@ -301,6 +303,8 @@ public class PdfDictionary {
     public static final int EF=5398;
 
     public static final int EFF=1381910;
+
+    public static final int EmbeddedFiles=-1432117598;
     
     public static final int EOPROPtype=1684763764;
 
@@ -343,6 +347,8 @@ public class PdfDictionary {
     public static final int FileAccess=1869245103;
 
     public static final int FileAttachment=-1113876231;
+
+    public static final int Filespec=1501131112;
 
     public static final int Filter=1011108731;
 
@@ -1490,6 +1496,9 @@ public class PdfDictionary {
             case Decode:
                 return VALUE_IS_FLOAT_ARRAY;
 
+            case Desc:
+                return VALUE_IS_TEXTSTREAM;
+
             case DecodeParms:
                 return VALUE_IS_DICTIONARY;
 
@@ -1550,6 +1559,9 @@ public class PdfDictionary {
 
             case EarlyChange:
                 return VALUE_IS_INT;
+
+            case EmbeddedFiles:
+                return VALUE_IS_DICTIONARY;
 
             case EncodedByteAlign:
                 return VALUE_IS_BOOLEAN;
@@ -1689,14 +1701,15 @@ public class PdfDictionary {
 
             case H:
 
-                if(type==Linearized) {
-                    return VALUE_IS_INT_ARRAY;
-                } else if(type==Form) {
-                    return VALUE_IS_VARIOUS;
-                } else if(type==Outlines) {
-                    return VALUE_IS_BOOLEAN;
-                } else {
-                    return PDFkey;
+                switch (type) {
+                    case Linearized:
+                        return VALUE_IS_INT_ARRAY;
+                    case Form:
+                        return VALUE_IS_VARIOUS;
+                    case Outlines:
+                        return VALUE_IS_BOOLEAN;
+                    default:
+                        return PDFkey;
                 }
 
             case Height:
@@ -1766,18 +1779,19 @@ public class PdfDictionary {
                 return VALUE_IS_VARIOUS;
 
             case K:
-                if(type==PdfDictionary.Group) {
-                    return VALUE_IS_BOOLEAN;
-                } else if(type==XObject) {
-                    return VALUE_IS_VARIOUS;
-                } else if(type==Form) {
-                    return VALUE_IS_VARIOUS;//KEY_ARRAY;
-                } else if(type==MCID) {
-                    return VALUE_IS_VARIOUS;//KEY_ARRAY;
-                } else if(type==OCProperties) {
-                    return VALUE_IS_VARIOUS;//KEY_ARRAY;
-                } else {
-                    return VALUE_IS_INT;
+                switch (type) {
+                    case PdfDictionary.Group:
+                        return VALUE_IS_BOOLEAN;
+                    case XObject:
+                        return VALUE_IS_VARIOUS;
+                    case Form:
+                        return VALUE_IS_VARIOUS;//KEY_ARRAY;
+                    case MCID:
+                        return VALUE_IS_VARIOUS;//KEY_ARRAY;
+                    case OCProperties:
+                        return VALUE_IS_VARIOUS;//KEY_ARRAY;
+                    default:
+                        return VALUE_IS_INT;
                 }
 
             case Keywords:
@@ -1857,14 +1871,15 @@ public class PdfDictionary {
                 return VALUE_IS_FLOAT;
 
             case M:
-            	if(type==Form) {
-                    return VALUE_IS_VARIOUS;
-                } else if(type==PdfDictionary.MCID) {
-                    return VALUE_IS_INT;
-                } else if(type==Sig) {
-                    return VALUE_IS_TEXTSTREAM;
-                } else {
-                    return VALUE_IS_TEXTSTREAM;
+                switch (type) {
+                    case Form:
+                        return VALUE_IS_VARIOUS;
+                    case PdfDictionary.MCID:
+                        return VALUE_IS_INT;
+                    case Sig:
+                        return VALUE_IS_TEXTSTREAM;
+                    default:
+                        return VALUE_IS_TEXTSTREAM;
                 }
 
             case MarkInfo:
@@ -1904,16 +1919,18 @@ public class PdfDictionary {
                 return VALUE_IS_TEXTSTREAM;
 
             case N:
-                if(type==Linearized) {
-                    return VALUE_IS_INT;
-                } else if(type==PdfDictionary.CompressedObject) {
-                    return VALUE_IS_INT;
-                } else if(type==PdfDictionary.Form || type==PdfDictionary.MK) {
-                    return VALUE_IS_VARIOUS;
-                }else if(type==Shading) {
-                    return VALUE_IS_FLOAT;
-                } else {
-                    return VALUE_IS_NAME;
+                switch (type) {
+                    case Linearized:
+                        return VALUE_IS_INT;
+                    case PdfDictionary.CompressedObject:
+                        return VALUE_IS_INT;
+                    case PdfDictionary.Form:
+                    case PdfDictionary.MK:
+                        return VALUE_IS_VARIOUS;
+                    case Shading:
+                        return VALUE_IS_FLOAT;
+                    default:
+                        return VALUE_IS_NAME;
                 }
 
             case Name:
@@ -2355,17 +2372,18 @@ public class PdfDictionary {
            case VP:
                 return VALUE_IS_OBJECT_ARRAY;
 
-                //hack as odd structure
+            //hack as odd structure
             case W:
-            	if(type==PdfDictionary.CompressedObject) // int not int array
-                {
-                    return PdfDictionary.VALUE_IS_INT_ARRAY;
-                } else if(type==PdfDictionary.Form) {
-                    return VALUE_IS_VARIOUS;
-                } else if(type==PdfDictionary.MCID) {
-                    return VALUE_IS_FLOAT;
-                } else {
-                    return VALUE_IS_TEXTSTREAM;
+                switch (type) {
+                    // int not int array
+                    case PdfDictionary.CompressedObject:
+                        return PdfDictionary.VALUE_IS_INT_ARRAY;
+                    case PdfDictionary.Form:
+                        return VALUE_IS_VARIOUS;
+                    case PdfDictionary.MCID:
+                        return VALUE_IS_FLOAT;
+                    default:
+                        return VALUE_IS_TEXTSTREAM;
                 }
 
             case W2:

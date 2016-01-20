@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -52,10 +52,12 @@ public class T3Display extends SwingDisplay implements T3Renderer{
         this.addBackground=addBackground;
 
         setupArrays(defaultSize);
+        type = CREATE_T3;
     }
 
     public T3Display(final byte[] dvr, final Map map) {
         super(dvr,map);
+        type = CREATE_T3;
     }
 
     /**

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -567,7 +567,7 @@ public class JavaFXOpenFile {
             if (currentGUI.isSingle()) {
                 decode_pdf.flushObjectValues(true);
             } else {
-                decode_pdf = MultiPages.openNewMultiplePage(commonValues.getSelectedFile(), currentGUI, commonValues);
+                decode_pdf = MultiPages.openNewMultiplePage(currentGUI, commonValues);
             }
 
             //reset the viewableArea before opening a new file
@@ -1191,7 +1191,7 @@ public class JavaFXOpenFile {
 //                currentGUI.stopThumbnails();
 
                 if(!currentGUI.isSingle()) {
-                    MultiPages.openNewMultiplePage(commonValues.getSelectedFile(), currentGUI, commonValues);
+                    MultiPages.openNewMultiplePage(currentGUI, commonValues);
                 }
                 
                 OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -501,6 +501,11 @@ public class OpenFile {
             openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
         }
+        
+        //When opening set displaymode to -1 to force viewer to intialise display mode
+        decode_pdf.getDecoderOptions().setDisplayView(-1);
+        currentGUI.setDisplayView(decode_pdf.getDecoderOptions().getPageMode(), decode_pdf.getPageAlignment());
+        
     }
 
     /**
@@ -831,18 +836,34 @@ public class OpenFile {
                         LogWriter.writeLog("Exception " + e + Messages.getMessage("PdfViewerError.Loading") + commonValues.getSelectedFile());
                     }
                 } else {
-                    
-                    try {
-                        // Load the source image from a file.
-                        if (isURL) {
-                            commonValues.setBufferedImg(ImageIO.read(new URL(selectedFile)));
-                        } else {
-                            commonValues.setBufferedImg(ImageIO.read(new File(selectedFile)));
+                    String fName = selectedFile.toLowerCase();
+                    if (fName.endsWith(".jpx") || fName.endsWith(".jp2") || fName.endsWith(".j2k")) {
+                        
+                        File f = new File(selectedFile);
+                        byte[] jpxRawData = new byte[(int) f.length()];
+                        FileInputStream fis;
+                        try {
+                            fis = new FileInputStream(f);
+                            fis.read(jpxRawData);
+                            java.awt.image.BufferedImage img = JDeliHelper.JPEG2000ToRGBImage(jpxRawData);
+                            commonValues.setBufferedImg(img);
+                        } catch (Exception ex) {
+                            LogWriter.writeLog("Exception " + ex + "loading " + commonValues.getSelectedFile());
                         }
-                    } catch (final Exception e) {
-                        LogWriter.writeLog("Exception " + e + "loading " + commonValues.getSelectedFile());
-                    }
 
+                    } else {
+                        try {
+                            // Load the source image from a file.
+                            if (isURL) {
+                                commonValues.setBufferedImg(ImageIO.read(new URL(selectedFile)));
+                            } else {
+                                commonValues.setBufferedImg(ImageIO.read(new File(selectedFile)));
+                            }
+                        } catch (final Exception e) {
+                            LogWriter.writeLog("Exception " + e + "loading " + commonValues.getSelectedFile());
+                        }
+                    }
+                    
                 }
             }
             //<<>>

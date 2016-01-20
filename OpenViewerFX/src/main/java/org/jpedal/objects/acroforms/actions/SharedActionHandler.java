@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -27,7 +27,7 @@
 
  *
  * ---------------
- * DefaultActionHandler.java
+ * SharedActionHandler.java
  * ---------------
  */
 package org.jpedal.objects.acroforms.actions;
@@ -142,15 +142,22 @@ public abstract class SharedActionHandler implements ActionHandler {
             System.out.println("DefaultActionHandler.A() ");
         }
         
-        if(eventType == MOUSEENTERED){
-            javascript.execute(formObj, PdfDictionary.E, ActionHandler.TODO, ' ');
-        }else if(eventType == MOUSEEXITED){
-            javascript.execute(formObj, PdfDictionary.X, ActionHandler.TODO, ' ');
-        }else if(eventType == MOUSEPRESSED){
-            javascript.execute(formObj, PdfDictionary.D, ActionHandler.TODO, ' ');
-        }else if(eventType == MOUSERELEASED){
-            javascript.execute(formObj, PdfDictionary.A, ActionHandler.TODO, ' ');
-            javascript.execute(formObj, PdfDictionary.U, ActionHandler.TODO, ' ');
+        switch (eventType) {
+            case MOUSEENTERED:
+                javascript.execute(formObj, PdfDictionary.E, ActionHandler.TODO, ' ');
+                break;
+            case MOUSEEXITED:
+                javascript.execute(formObj, PdfDictionary.X, ActionHandler.TODO, ' ');
+                break;
+            case MOUSEPRESSED:
+                javascript.execute(formObj, PdfDictionary.D, ActionHandler.TODO, ' ');
+                break;
+            case MOUSERELEASED:
+                javascript.execute(formObj, PdfDictionary.A, ActionHandler.TODO, ' ');
+                javascript.execute(formObj, PdfDictionary.U, ActionHandler.TODO, ' ');
+                break;
+            default:
+                break;
         }
         
         // new version
@@ -163,14 +170,21 @@ public abstract class SharedActionHandler implements ActionHandler {
         if(aData==null){
             aData = formObj.getDictionary(PdfDictionary.AA);
             if(aData!=null){
-                if(eventType == MOUSEENTERED){
-                    aData = aData.getDictionary(PdfDictionary.E);
-                }else if(eventType == MOUSEEXITED){
-                    aData = aData.getDictionary(PdfDictionary.X);
-                }else if(eventType == MOUSEPRESSED){
-                    aData = aData.getDictionary(PdfDictionary.D);
-                }else if(eventType == MOUSERELEASED){
-                    aData = aData.getDictionary(PdfDictionary.U);
+                switch (eventType) {
+                    case MOUSEENTERED:
+                        aData = aData.getDictionary(PdfDictionary.E);
+                        break;
+                    case MOUSEEXITED:
+                        aData = aData.getDictionary(PdfDictionary.X);
+                        break;
+                    case MOUSEPRESSED:
+                        aData = aData.getDictionary(PdfDictionary.D);
+                        break;
+                    case MOUSERELEASED:
+                        aData = aData.getDictionary(PdfDictionary.U);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -204,197 +218,227 @@ public abstract class SharedActionHandler implements ActionHandler {
             }
             
             final int command = aData.getNameAsConstant(PdfDictionary.S);
-            
-            // S is Name of action
-            if (command != PdfDictionary.Unknown) {
-                
-                if (command == PdfDictionary.Named) {
-                    
+
+            switch (command) {
+                // S is Name of action
+                case PdfDictionary.Named:
                     additionalAction_Named(eventType, aData);
-                    
-                }else if(command==PdfDictionary.GoTo || command==PdfDictionary.GoToR){
+                    break;
+
+                case PdfDictionary.GoTo:
                     if (aData != null) {
-                        gotoDest(aData, eventType,command);
+                        gotoDest(aData, eventType, command);
                     }
-                } else if (command == PdfDictionary.ResetForm) {
-                    
+                    break;
+
+                case PdfDictionary.GoToR:
+                    if (aData != null) {
+                        gotoDest(aData, eventType, command);
+                    }
+                    break;
+
+                case PdfDictionary.ResetForm:
                     additionalAction_ResetForm(aData);
-                    
-                } else if (command == PdfDictionary.SubmitForm) {
-                    
+                    break;
+
+                case PdfDictionary.SubmitForm:
                     additionalAction_SubmitForm(aData);
-                    
-                } else if (command == PdfDictionary.JavaScript) {
-                    
+                    break;
+
+                case PdfDictionary.JavaScript:
                     //javascript called above.
-                    
-                } else if (command == PdfDictionary.Hide) {
-                    
+                    break;
+
+                case PdfDictionary.Hide:
                     additionalAction_Hide(aData);
-                    
-                } else if (command == PdfDictionary.URI) {
-                    
+                    break;
+
+                case PdfDictionary.URI:
                     additionalAction_URI(aData.getTextStreamValue(PdfDictionary.URI));
-                    
-                } else if (command == PdfDictionary.Launch) {
-                    
-                    try {
-                        //get the F dictionary
-                        final PdfObject dict=aData.getDictionary(PdfDictionary.F);
-                        
-                        //System.out.println("dict="+dict+" "+dict.getObjectRefAsString());
-                        
-                        //then get the submit URL to use
-                        if(dict!=null){
-                            String target = dict.getTextStreamValue(PdfDictionary.F);
-                            
-                            final InputStream sourceFile = getClass().getResourceAsStream("/org/jpedal/res/"+target);
-                            
-                            if(sourceFile==null){
-                                JOptionPane.showMessageDialog(null,"Unable to locate "+target);
-                            }else{
-                                //System.out.printl("name="+getClass().getResource("/org/jpedal/res/"+target).get);
-                                
-                                //get name without path
-                                final int ptr=target.lastIndexOf('/');
-                                if(ptr!=-1) {
-                                    target = target.substring(ptr + 1);
-                                }
-                                
-                                final File output=new File(ObjectStore.temp_dir+target);
-                                output.deleteOnExit();
-                                
-                                ObjectStore.copy(new BufferedInputStream(sourceFile),
-                                        new BufferedOutputStream(new FileOutputStream(output)));
-                                
-                                if(target.endsWith(".pdf")){
-                                    
-                                    openNewViewer(target);
-                                    
-                                }else if(DecoderOptions.isRunningOnMac){
-                                    target="open "+ObjectStore.temp_dir+target;
-                                    
-                                    Runtime.getRuntime().exec(target);
-                                }
-                            }
-                            
-                        }
-                    } catch (final Exception e) {
-                        LogWriter.writeLog("Exception: " + e.getMessage());
-                    } catch (final Error err) {
-                        LogWriter.writeLog("Error: " + err.getMessage());
-                    }
-                   
-                    LogWriter.writeFormLog("{stream} launch activate action NOT IMPLEMENTED", FormStream.debugUnimplemented);
-                    
-                    if (FormStream.debugUnimplemented) {
-                        System.out.println("{internal only} launch activate action NOT IMPLEMENTED");
-                    }
-                    
-                } else if (command == PdfDictionary.SetOCGState) {
-                    
+                    break;
+
+                case PdfDictionary.Launch:
+                    launch(aData);
+                    break;
+
+                case PdfDictionary.SetOCGState:
                     additionalAction_OCState(eventType, aData);
+                    break;
+
+                case PdfDictionary.Sound:
+                    if (eventType == MOUSECLICKED || eventType == MOUSERELEASED) {
+                        playSound(aData);
+                    }
+                    break;
+
+                default:
+                    LogWriter.writeFormLog("{stream} Activate Action UNKNOWN command " + aData.getName(PdfDictionary.S) + ' ' + formObj.getObjectRefAsString(), FormStream.debugUnimplemented);
+                    break;
+            }
+        }
+    }
+
+    private void launch(PdfObject aData) {
+        try {
+            //get the F dictionary
+            final PdfObject dict = aData.getDictionary(PdfDictionary.F);
+            
+            //System.out.println("dict="+dict+" "+dict.getObjectRefAsString());
+            //then get the submit URL to use
+            if (dict != null) {
+                String target = dict.getTextStreamValue(PdfDictionary.F);
+                
+                final InputStream sourceFile = getClass().getResourceAsStream("/org/jpedal/res/" + target);
+                
+                if (sourceFile == null) {
+                    JOptionPane.showMessageDialog(null, "Unable to locate " + target);
+                } else {
+                    //System.out.printl("name="+getClass().getResource("/org/jpedal/res/"+target).get);
                     
-                } else if (command == PdfDictionary.Sound) {
-                    
-                    if (eventType == MOUSECLICKED || eventType==MOUSERELEASED) {
-                        
-                        final PdfObject soundObj=aData.getDictionary(PdfDictionary.Sound);
-                        
-                        // read now as lazy initialisation
-                        currentPdfFile.checkResolved(soundObj);
-                        
-                        try {
-                            
-                            int channels = soundObj.getInt(PdfDictionary.C);
-                            if (channels == -1) {
-                                channels = 1;
-                            }
-                            
-                            int bitsPerSample = soundObj.getInt(PdfDictionary.B);
-                            if (bitsPerSample == -1) {
-                                bitsPerSample = 8;
-                            }
-                            
-                            final float samplingRate = soundObj.getInt(PdfDictionary.R);
-                            
-                            int e = soundObj.getNameAsConstant(PdfDictionary.E);
-                            if (e == PdfDictionary.Unknown) {
-                                e = PdfDictionary.Unsigned;
-                            }
-                            
-                            SoundHandler.setAudioFormat(e, bitsPerSample, samplingRate, channels);
-                            SoundHandler.PlaySound(soundObj.getDecodedStream());
-                            
-                        } catch (final Exception e) {
-                            LogWriter.writeLog("Exception: " + e.getMessage());
-                        }
+                    //get name without path
+                    final int ptr = target.lastIndexOf('/');
+                    if (ptr != -1) {
+                        target = target.substring(ptr + 1);
                     }
                     
-                } else {
-                    LogWriter.writeFormLog("{stream} UNKNOWN Command "+aData.getName(PdfDictionary.S)+" Action", FormStream.debugUnimplemented);
+                    final File output = new File(ObjectStore.temp_dir + target);
+                    output.deleteOnExit();
+                    
+                    ObjectStore.copy(new BufferedInputStream(sourceFile),
+                            new BufferedOutputStream(new FileOutputStream(output)));
+                    
+                    if (target.endsWith(".pdf")) {
+                        
+                        openNewViewer(target);
+                        
+                    } else if (DecoderOptions.isRunningOnMac) {
+                        target = "open " + ObjectStore.temp_dir + target;
+                        
+                        Runtime.getRuntime().exec(target);
+                    }
                 }
-            } else if(command!=-1){
-                LogWriter.writeFormLog("{stream} Activate Action UNKNOWN command "+aData.getName(PdfDictionary.S)+ ' ' +formObj.getObjectRefAsString(), FormStream.debugUnimplemented);
+                
             }
+        } catch (final Exception e) {
+            LogWriter.writeLog("Exception: " + e.getMessage());
+        } catch (final Error err) {
+            LogWriter.writeLog("Error: " + err.getMessage());
+        }
+        
+        LogWriter.writeFormLog("{stream} launch activate action NOT IMPLEMENTED", FormStream.debugUnimplemented);
+        
+        if (FormStream.debugUnimplemented) {
+            System.out.println("{internal only} launch activate action NOT IMPLEMENTED");
+        }
+    }
+
+    private void playSound(PdfObject aData) {
+        final PdfObject soundObj = aData.getDictionary(PdfDictionary.Sound);
+        
+        // read now as lazy initialisation
+        currentPdfFile.checkResolved(soundObj);
+        
+        try {
+            
+            int channels = soundObj.getInt(PdfDictionary.C);
+            if (channels == -1) {
+                channels = 1;
+            }
+            
+            int bitsPerSample = soundObj.getInt(PdfDictionary.B);
+            if (bitsPerSample == -1) {
+                bitsPerSample = 8;
+            }
+            
+            final float samplingRate = soundObj.getInt(PdfDictionary.R);
+            
+            int e = soundObj.getNameAsConstant(PdfDictionary.E);
+            if (e == PdfDictionary.Unknown) {
+                e = PdfDictionary.Unsigned;
+            }
+            
+            SoundHandler.setAudioFormat(e, bitsPerSample, samplingRate, channels);
+            SoundHandler.PlaySound(soundObj.getDecodedStream());
+            
+        } catch (final Exception e) {
+            LogWriter.writeLog("Exception: " + e.getMessage());
         }
     }
     
     private void additionalAction_Named(final int eventType, final PdfObject aData) {
+
         final int name = aData.getNameAsConstant(PdfDictionary.N);
-        
-        if (name == PdfDictionary.Print) {
-            additionalAction_Print(eventType);
-        } else if(name == PdfDictionary.SaveAs){
-            additionalAction_SaveAs();
-        }else if(name == PdfDictionary.NextPage){
-            changeTo(null, decode_pdf.getlastPageDecoded()+1, null, null,true);
-        }else if(name == PdfDictionary.PrevPage){
-            changeTo(null, decode_pdf.getlastPageDecoded()-1, null, null,true);
-        }else if(name == PdfDictionary.FirstPage){
-            changeTo(null, 1, null, null,true);
-        }else if(name == PdfDictionary.GoBack){
-            final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
-            if(gui!=null) {
-                gui.getCommand().executeCommand(Commands.BACK, null);
+
+        switch (name) {
+            case PdfDictionary.Print:
+                additionalAction_Print(eventType);
+                break;
+
+            case PdfDictionary.SaveAs:
+                additionalAction_SaveAs();
+                break;
+
+            case PdfDictionary.NextPage:
+                changeTo(null, decode_pdf.getlastPageDecoded() + 1, null, null, true);
+                break;
+
+            case PdfDictionary.PrevPage:
+                changeTo(null, decode_pdf.getlastPageDecoded() - 1, null, null, true);
+                break;
+
+            case PdfDictionary.FirstPage:
+                changeTo(null, 1, null, null, true);
+                break;
+
+            case PdfDictionary.GoBack: {
+                final GUIFactory gui = ((GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                if (gui != null) {
+                    gui.getCommand().executeCommand(Commands.BACK, null);
+                }
             }
-            
-        }else if(name == PdfDictionary.LastPage){
-            changeTo(null, decode_pdf.getPageCount(), null, null,true);
-        }else if(name == PdfDictionary.ZoomTo){
-            //create scaling values list, taken from Viewer.init(resourceBundle)
-            final JComboBox scaling = new JComboBox(new String[]{Messages.getMessage("PdfViewerScaleWindow.text"),Messages.getMessage("PdfViewerScaleHeight.text"),
-                Messages.getMessage("PdfViewerScaleWidth.text"),
-                "25","50","75","100","125","150","200","250","500","750","1000"});
-            final int option = JOptionPane.showConfirmDialog(null, scaling, Messages.getMessage("PdfViewerToolbarScaling.text")+ ':', JOptionPane.DEFAULT_OPTION);
-            
-            if(option!=-1){
-                final int selection = scaling.getSelectedIndex();
-                if(selection!=-1){
-                    final GUIFactory swing = (GUI)decode_pdf.getExternalHandler(Options.GUIContainer);
-                    if(swing!=null){
-                        ((GUI)swing).setSelectedComboIndex(Commands.SCALING, selection);
-                        swing.scaleAndRotate();
+            break;
+
+            case PdfDictionary.LastPage:
+                changeTo(null, decode_pdf.getPageCount(), null, null, true);
+                break;
+
+            case PdfDictionary.ZoomTo: {//create scaling values list, taken from Viewer.init(resourceBundle)
+                final JComboBox scaling = new JComboBox(new String[]{Messages.getMessage("PdfViewerScaleWindow.text"), Messages.getMessage("PdfViewerScaleHeight.text"),
+                    Messages.getMessage("PdfViewerScaleWidth.text"),
+                    "25", "50", "75", "100", "125", "150", "200", "250", "500", "750", "1000"});
+                final int option = JOptionPane.showConfirmDialog(null, scaling, Messages.getMessage("PdfViewerToolbarScaling.text") + ':', JOptionPane.DEFAULT_OPTION);
+
+                if (option != -1) {
+                    final int selection = scaling.getSelectedIndex();
+                    if (selection != -1) {
+                        final GUIFactory swing = (GUI) decode_pdf.getExternalHandler(Options.GUIContainer);
+                        if (swing != null) {
+                            ((GUI) swing).setSelectedComboIndex(Commands.SCALING, selection);
+                            swing.scaleAndRotate();
+                        }
                     }
                 }
             }
-            
-        }else if(name == PdfDictionary.FullScreen){
-            
-            final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
-            if(gui!=null) {
-                gui.getCommand().executeCommand(Commands.FULLSCREEN, null);
+            break;
+
+            case PdfDictionary.FullScreen: {
+                final GUIFactory gui = ((GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                if (gui != null) {
+                    gui.getCommand().executeCommand(Commands.FULLSCREEN, null);
+                }
             }
-            
-        }else if(name == PdfDictionary.AcroForm_FormsJSGuide) {//AcroForm:FormsJSGuide
-            
-            openAcrobatFormsGuide();
-            
-        } else {
-            LogWriter.writeLog("{internal only} Named Action NOT IMPLEMENTED " + aData.getName(PdfDictionary.N)+ ' ' +decode_pdf.getFileName());
+            break;
+
+            case PdfDictionary.AcroForm_FormsJSGuide: //AcroForm:FormsJSGuide
+                openAcrobatFormsGuide();
+                break;
+
+            default:
+                LogWriter.writeLog("{internal only} Named Action NOT IMPLEMENTED " + aData.getName(PdfDictionary.N) + ' ' + decode_pdf.getFileName());
+
         }
     }
-    
+
     private void additionalAction_SaveAs() {
         //- we should call it directly - I have put code below from Commands
         

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -36,5 +36,5 @@ package org.jpedal.objects.acroforms;
  * return options for Forms methods 
  */
 public enum ReturnValues {
-    GUI_FORMS_FROM_NAME, FORM_NAMES, FORMOBJECTS_FROM_NAME,FORMOBJECTS_FROM_REF 
+    GUI_FORMS_FROM_NAME, FORM_NAMES, FORMOBJECTS_FROM_NAME,FORMOBJECTS_FROM_REF, EMBEDDED_FILES
 }

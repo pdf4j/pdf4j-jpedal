@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -417,7 +417,7 @@ public class SwingData extends GUIData {
         
         if (formObject.getParameterConstant(PdfDictionary.Subtype) == PdfDictionary.Popup &&
              formObject.getBoolean(PdfDictionary.Open)){
-                FormRenderUtilsG2.renderPopupWindow(g2, formObject, bgColor, page, isPrinting, pageData.getCropBoxHeight(page));
+                FormRenderUtilsG2.renderPopupWindow(g2, formObject, bgColor, isPrinting, pageData.getCropBoxHeight(page));
             }
         
         
@@ -456,7 +456,7 @@ public class SwingData extends GUIData {
             }
 
             if (formObject.getObjectArray(PdfDictionary.Opt) != null && !formObject.getFieldFlags()[FormObject.COMBO_ID]) {
-                FormRenderUtilsG2.renderComboForms(g2, formObject, metrics, r, page, borderWidth, justification, pageData.getCropBoxHeight(page));
+                FormRenderUtilsG2.renderComboForms(g2, formObject, metrics, r, borderWidth, justification, pageData.getCropBoxHeight(page));
             } else {
                 if (!textValue.isEmpty()) {
                     g2.setClip(new Rectangle(formObject.getBoundingRectangle().x + borderWidth - 1,
@@ -465,15 +465,15 @@ public class SwingData extends GUIData {
                             formObject.getBoundingRectangle().height - (borderWidth * 2) + 2));
 
                     if (formObject.getFieldFlags()[FormObject.MULTILINE_ID]) {
-                        FormRenderUtilsG2.renderMultilineTextField(g2, formObject, metrics, r, textValue, page, borderWidth, justification, pageData.getCropBoxHeight(page));
+                        FormRenderUtilsG2.renderMultilineTextField(g2, formObject, metrics, r, textValue, borderWidth, justification, pageData.getCropBoxHeight(page));
                     } else { //Single Line Field
-                        FormRenderUtilsG2.renderSingleLineTextField(g2, formObject, metrics, r, textValue, page, borderWidth, justification, pageData.getCropBoxHeight(page));
+                        FormRenderUtilsG2.renderSingleLineTextField(g2, formObject, metrics, r, textValue, borderWidth, justification, pageData.getCropBoxHeight(page));
                     }
                 }
             }
         }
 
-        FormRenderUtilsG2.renderQuadPoint(g2, formObject, bgColor, page, pageData.getCropBoxHeight(page));
+        FormRenderUtilsG2.renderQuadPoint(g2, formObject, bgColor, pageData.getCropBoxHeight(page));
 
         g2.setTransform(ax);
         g2.setFont(backup);

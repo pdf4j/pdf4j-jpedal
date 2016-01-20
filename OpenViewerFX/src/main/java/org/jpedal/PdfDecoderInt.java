@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -64,7 +64,7 @@ public interface PdfDecoderInt {
     /**
      * build number of this version
      */
-    String version = "6.8.24";
+    String version = "6.9b20";
     /**
      * flag to show extraction mode should include any text
      */
@@ -321,6 +321,7 @@ public interface PdfDecoderInt {
      * updateCursorBoxOnScreen(final int[] rectParams, final int outlineColor) instead
      * @deprecated
      */
+    @Deprecated
     void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor);
     
     void updateCursorBoxOnScreen(int[] rectParams, int outlineColor);
@@ -384,6 +385,7 @@ public interface PdfDecoderInt {
      * please use getPages().setViewableArea instead.
      * @deprecated
      */
+    @Deprecated
     AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
     
     boolean hasEmbeddedFonts();

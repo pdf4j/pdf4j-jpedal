@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -154,6 +154,7 @@ public class JavaFXPreferences {
      * Declare Objects for Page Layout Menu.
      */
     private static CheckBox enhancedViewerCB;
+    private static CheckBox enhancedFractionalLinesCB;
     private static CheckBox showBorderCB;
     private static TextField pageInsetsTF;
     private static ComboBox displayCombo;
@@ -225,6 +226,7 @@ public class JavaFXPreferences {
          * Initialise Objects for Page Layout Menu.
          */
         enhancedViewerCB = new CheckBox(Messages.getMessage("PdfCustomGui.enhancedViewer"));
+        enhancedFractionalLinesCB = new CheckBox(Messages.getMessage("PdfCustomGui.enhanceFractionalLines"));
         showBorderCB = new CheckBox(Messages.getMessage("PageLayoutViewMenu.Borders_Show"));
         pageInsetsTF = new TextField();
         final ObservableList<String> pageOptions
@@ -328,7 +330,7 @@ public class JavaFXPreferences {
         properties = currentGUI.getProperties();
         init(currentGUI);
         loadSettings();
-        borderPane.setLeft(setupSideNavBar(currentGUI));     //Add the Side Menu Bar.
+        borderPane.setLeft(setupSideNavBar());     //Add the Side Menu Bar.
         borderPane.setCenter(getGeneralContent()); //Set General as the Default.
         borderPane.setBottom(setupBottomBar(currentGUI));    //Add the Bottom Buttons.
 
@@ -345,7 +347,7 @@ public class JavaFXPreferences {
      *
      * @return ScrollPane Object
      */
-    private static ScrollPane setupSideNavBar(final GUIFactory currentGUI) {
+    private static ScrollPane setupSideNavBar() {
 
         /**
          * Setup SideBar Buttons.
@@ -386,7 +388,7 @@ public class JavaFXPreferences {
                         /**
                          * Update the Current Main Content.
                          */
-                        updateDisplay(i, currentGUI);
+                        updateDisplay(i);
                     }
                 }
 
@@ -408,9 +410,7 @@ public class JavaFXPreferences {
      *
      * @param menuSelection is of type int
      */
-    private static void updateDisplay(final int menuSelection, final GUIFactory currentGUI) {
-
-
+    private static void updateDisplay(final int menuSelection) {
 
         switch (menuSelection) {
 
@@ -421,7 +421,7 @@ public class JavaFXPreferences {
                 borderPane.setCenter(getPageDisplayContent());
                 break;
             case INTERFACE:
-                borderPane.setCenter(getInterfaceContent(currentGUI));
+                borderPane.setCenter(getInterfaceContent());
                 break;
             case COLOR:
                 borderPane.setCenter(getColorContent());
@@ -623,7 +623,7 @@ public class JavaFXPreferences {
         final HBox displayModeHBox = new HBox();
         displayModeHBox.getChildren().addAll(new Label(Messages.getMessage("PageLayoutViewMenu.PageLayout")), displayCombo);
 
-        contentVBox.getChildren().addAll(title, generalOptions, enhancedViewerCB, showBorderCB, pageInsetsHBox, displayOptions, displayModeHBox, enablePageFlipCB, scrollableThumbsCB);
+        contentVBox.getChildren().addAll(title, generalOptions, enhancedViewerCB, enhancedFractionalLinesCB, showBorderCB, pageInsetsHBox, displayOptions, displayModeHBox, enablePageFlipCB, scrollableThumbsCB);
         contentVBox.setPadding(new Insets(contentGap));
         contentVBox.setSpacing(contentGap);
 
@@ -639,7 +639,7 @@ public class JavaFXPreferences {
      *
      * @return ScrollPane Object
      */
-    private static ScrollPane getInterfaceContent(final GUIFactory currentGUI) {
+    private static ScrollPane getInterfaceContent() {
         contentScrollPane = new ScrollPane();
         title.setText(Messages.getMessage("PdfPreferences.InterfaceTitle"));
 
@@ -1269,6 +1269,7 @@ public class JavaFXPreferences {
          * Update Page Display Settings.
          */
         properties.setValue("enhancedViewerMode", String.valueOf(enhancedViewerCB.isSelected()));
+        properties.setValue("enhanceFractionalLines", String.valueOf(enhancedFractionalLinesCB.isSelected()));
         // properties.setValue("borderType", String.valueOf(showBorderCB.isSelected()));
         properties.setValue("pageInsets", String.valueOf(pageInsetsTF.getText()));
         // properties.setValue("startView", String.valueOf(displayCombo.getValue()));
@@ -1431,6 +1432,13 @@ public class JavaFXPreferences {
             enhancedViewerCB.setSelected(false);
         }
 
+        propValue = properties.getValue("enhanceFractionalLines");
+        if (!propValue.isEmpty() && propValue.equals("true")) {
+            enhancedFractionalLinesCB.setSelected(true);
+        } else {
+            enhancedFractionalLinesCB.setSelected(false);
+        }
+        
         propValue = properties.getValue("borderType");
         if (!propValue.isEmpty()) {
             if (Integer.parseInt(propValue) == 1) {

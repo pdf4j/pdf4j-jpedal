@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -1965,42 +1965,42 @@ public class FormObject extends PdfObject{
         }
 
 		Color newColor = null;
-		if(i==0){
-		    //LogWriter.writeFormLog("{stream} CHECK transparent color",debugUnimplemented);
-		    newColor = new Color(0,0,0,0);//if num of tokens is 0 transparant, fourth variable my need to be 1
-		
-		}else if(i==1){
-		    
-		    final float tok0 = toks[0];
-		    
-		    if(tok0<=1){
-		    	newColor = new Color(tok0,tok0,tok0);
-		    }else {
-		    	newColor = new Color((int)tok0,(int)tok0,(int)tok0);
-		    }
-		    
-		}else if(i==3){
-		    if(debug) {
-                System.out.println("rgb color=" + toks[0] + ' ' + toks[1] + ' ' + toks[2]);
-            }
-		    
-		    final float tok0 = toks[0];
-		    final float tok1 = toks[1];
-		    final float tok2 = toks[2];
-		    
-		    if(tok0<=1 && tok1<=1 && tok2<=1){
-		    	newColor = new Color(tok0,tok1,tok2);
-		    }else {
-		    	newColor = new Color((int)tok0,(int)tok1,(int)tok2);
-		    }
-
-		}else if(i==4){
-	       
-		    final DeviceCMYKColorSpace cs=new DeviceCMYKColorSpace();
-            cs.setColor(new float[]{toks[3],toks[2],toks[1],toks[0]},4);
-		    newColor =(Color) cs.getColor();
-
-		}
+        switch (i) {
+            case 0:
+                //LogWriter.writeFormLog("{stream} CHECK transparent color",debugUnimplemented);
+                newColor = new Color(0,0,0,0);//if num of tokens is 0 transparant, fourth variable my need to be 1
+                break;
+            case 1:
+                {
+                    final float tok0 = toks[0];
+                    if(tok0<=1){
+                        newColor = new Color(tok0,tok0,tok0);
+                    }else {
+                        newColor = new Color((int)tok0,(int)tok0,(int)tok0);
+                    }       break;
+                }
+            case 3:
+                {
+                    if(debug) {
+                        System.out.println("rgb color=" + toks[0] + ' ' + toks[1] + ' ' + toks[2]);
+                    }       
+                    final float tok0 = toks[0];
+                    final float tok1 = toks[1];
+                    final float tok2 = toks[2];
+                    if(tok0<=1 && tok1<=1 && tok2<=1){
+                        newColor = new Color(tok0,tok1,tok2);
+                    }else {
+                        newColor = new Color((int)tok0,(int)tok1,(int)tok2);
+                    }       break;
+                }
+            case 4:
+                final DeviceCMYKColorSpace cs=new DeviceCMYKColorSpace();
+                cs.setColor(new float[]{toks[3],toks[2],toks[1],toks[0]},4);
+                newColor =(Color) cs.getColor();
+                break;
+            default:
+                break;
+        }
 		
 		return newColor;
 	}
@@ -3753,7 +3753,7 @@ public class FormObject extends PdfObject{
             if(guiType == FormFactory.JAVAFX){
                 
                  if(fxSupport!=null){
-                    fxSupport.renderGUIComponent(formType, value,guiComp, guiType); 
+                    JavaFXSupport.renderGUIComponent(formType, value,guiComp);
                  }
                 
             }else if(guiType == FormFactory.SWING){

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -113,8 +113,11 @@ public class ObjectFactory {
                 return new FormObject(ref);
                 
             case PdfDictionary.EF:
-            	return new FSObject(ref);    
-            	
+            	return new FSObject(ref);
+
+            case PdfDictionary.EmbeddedFiles:
+                return new FSObject(ref);
+
             case PdfDictionary.Encoding:
                 return new FontObject(ref);
 
@@ -459,7 +462,10 @@ return new OutlineObject(ref);
             
             case PdfDictionary.EF:
             	return new FSObject(ref, gen);
-            	
+
+            case PdfDictionary.EmbeddedFiles:
+                return new FSObject(ref,gen);
+
             case PdfDictionary.Encoding:
                  return new FontObject(ref, gen);
 

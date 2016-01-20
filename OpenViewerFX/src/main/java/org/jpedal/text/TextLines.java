@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -58,7 +58,8 @@ public class TextLines {
 	 * Deprecated on 16/06/2014, please use setFoundParagraphAsArray(int x, int y, int page).
      * @deprecated
 	 */
-	public Rectangle setFoundParagraph(final int x, final int y, final int page){
+	@Deprecated
+    public Rectangle setFoundParagraph(final int x, final int y, final int page){
         
         final int[][] rectParams = getLineAreasAs2DArray(page);
         
@@ -296,6 +297,7 @@ public class TextLines {
      * @param writingMode
      * @param page 
      */
+    @Deprecated
     public void addToLineAreas(final Rectangle area, final int writingMode, final int page) {
         boolean addNew = true;
 
@@ -673,6 +675,7 @@ public class TextLines {
      * @param rectArea
      * @param page 
      */
+    @Deprecated
     public void removeFoundTextArea(final Rectangle rectArea, final int page){
 
         //clearHighlights();
@@ -740,6 +743,7 @@ public class TextLines {
      * @param rectArea
      * @param page 
      */
+    @Deprecated
     @SuppressWarnings("UnusedDeclaration")
     public void removeFoundTextAreas(final Rectangle[] rectArea, final int page){
 
@@ -789,6 +793,7 @@ public class TextLines {
      *
      * @deprecated
      */
+    @Deprecated
     public void addHighlights(final Rectangle[] highlights, final boolean areaSelect, final int page){
 
         if(highlights!=null){ //If null do nothing to clear use the clear method
@@ -1381,7 +1386,8 @@ public class TextLines {
      * @return A Rectangle array containing any highlights on the page
      * @deprecated 
      */
-	public Rectangle[] getHighlightedAreas(final int page){
+	@Deprecated
+    public Rectangle[] getHighlightedAreas(final int page){
 
         if(areas==null) {
             return null;
@@ -1505,6 +1511,7 @@ public class TextLines {
      * @return A Rectangle array containing any lines on the page
      * @deprecated 
      */
+    @Deprecated
     public Rectangle[] getLineAreas(final int page) {
 
         if(lineAreas==null) {
@@ -1605,6 +1612,7 @@ public class TextLines {
      * @param area
      * @return 
      */
+    @Deprecated
     private static Rectangle mergePartLines(final Rectangle lastArea, final Rectangle area){
         /**
          * Check coords from both areas and merge them to make

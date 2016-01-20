@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -86,6 +86,7 @@ public interface Display {
      * Please use public int[] getCursorBoxOnScreenAsArray() instead.
      * @deprecated on 04/07/2014
      */
+    @Deprecated
     Rectangle getCursorBoxOnScreen();
     
     int[] getCursorBoxOnScreenAsArray();
@@ -109,6 +110,7 @@ public interface Display {
      * updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead.
      * @deprecated
      */
+    @Deprecated
     void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor, int pageNumber, int x_size, int y_size);
 
     void drawCursor(Graphics g, float scaling);
@@ -119,6 +121,7 @@ public interface Display {
      * 
      * @deprecated
      */
+    @Deprecated
     AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
     
     AffineTransform setViewableArea(int[] viewport) throws PdfException;

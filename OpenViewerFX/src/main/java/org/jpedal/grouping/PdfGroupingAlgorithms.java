@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -847,32 +847,37 @@ public class PdfGroupingAlgorithms {
 			//extract values for data
 			raw = this.pdf_data.contents[i];
 
-			/**
-			 * set pointers so left to right text
-			 */
-			if(currentWritingMode==PdfData.HORIZONTAL_LEFT_TO_RIGHT){
-				x1=this.f_x1[i];
-				x2=this.f_x2[i];
-				y1=this.f_y1[i];
-				y2=this.f_y2[i];
-			}else if(currentWritingMode==PdfData.HORIZONTAL_RIGHT_TO_LEFT){
-				x2=this.f_x1[i];
-				x1=this.f_x2[i];
-				y1=this.f_y1[i];
-				y2=this.f_y2[i];
-			}else if(currentWritingMode==PdfData.VERTICAL_BOTTOM_TO_TOP){
-				x1=this.f_y1[i];
-				x2=this.f_y2[i];
-				y1=this.f_x2[i];
-				y2=this.f_x1[i];
-			}else if(currentWritingMode==PdfData.VERTICAL_TOP_TO_BOTTOM){
-				x1=this.f_y2[i];
-				x2=this.f_y1[i];
-				y2=this.f_x1[i];
-				y1=this.f_x2[i];
-			}else{
-				throw new PdfException("Illegal value "+currentWritingMode+"for currentWritingMode");
-			}
+            /**
+             * set pointers so left to right text
+             */
+            switch (currentWritingMode) {
+                case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                    x1=this.f_x1[i];
+                    x2=this.f_x2[i];
+                    y1=this.f_y1[i];
+                    y2=this.f_y2[i];
+                    break;
+                case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                    x2=this.f_x1[i];
+                    x1=this.f_x2[i];
+                    y1=this.f_y1[i];
+                    y2=this.f_y2[i];
+                    break;
+                case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                    x1=this.f_y1[i];
+                    x2=this.f_y2[i];
+                    y1=this.f_x2[i];
+                    y2=this.f_x1[i];
+                    break;
+                case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                    x1=this.f_y2[i];
+                    x2=this.f_y1[i];
+                    y2=this.f_x1[i];
+                    y1=this.f_x2[i];
+                    break;
+                default:
+                    throw new PdfException("Illegal value "+currentWritingMode+"for currentWritingMode");
+            }
 			
 			//if in the area, process
 			if ((x1 > minX - .5)&& (x2 < maxX + .5)&& (y2 > minY - .5)&& (y1 < maxY + .5)) {
@@ -1283,14 +1288,21 @@ public class PdfGroupingAlgorithms {
         }
 
     private StringBuilder writeOnVerticalLineBreak(boolean keepFont, boolean isWordlist, float linePos, StringBuilder text, Fragment fragment, int i, String value) {
-        if (fragment.getWritingMode() == PdfData.HORIZONTAL_LEFT_TO_RIGHT) {
-            addFragment(i, text, fragment.getX1(), linePos, fragment.getY1(), fragment.getY2(),  keepFont, fragment, isWordlist);
-        } else if (fragment.getWritingMode() == PdfData.HORIZONTAL_RIGHT_TO_LEFT) {
-            addFragment(i, text, linePos, fragment.getX2(), fragment.getY1(), fragment.getY2(),  keepFont, fragment, isWordlist);
-        } else if (fragment.getWritingMode() == PdfData.VERTICAL_BOTTOM_TO_TOP) {
-            addFragment(i, text, fragment.getX1(), fragment.getX2(), linePos, fragment.getY2(), keepFont, fragment, isWordlist);
-        } else if (fragment.getWritingMode() == PdfData.VERTICAL_TOP_TO_BOTTOM) {
-            addFragment(i, text, fragment.getX1(), fragment.getX2(), fragment.getY1(), linePos, keepFont, fragment, isWordlist);
+        switch (fragment.getWritingMode()) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                addFragment(i, text, fragment.getX1(), linePos, fragment.getY1(), fragment.getY2(),  keepFont, fragment, isWordlist);
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                addFragment(i, text, linePos, fragment.getX2(), fragment.getY1(), fragment.getY2(),  keepFont, fragment, isWordlist);
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                addFragment(i, text, fragment.getX1(), fragment.getX2(), linePos, fragment.getY2(), keepFont, fragment, isWordlist);
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                addFragment(i, text, fragment.getX1(), fragment.getX2(), fragment.getY1(), linePos, keepFont, fragment, isWordlist);
+                break;
+            default:
+                break;
         }
 
         text = new StringBuilder(Fonts.getActiveFontTag(text.toString(), fragment.getRawData()));
@@ -1324,27 +1336,29 @@ public class PdfGroupingAlgorithms {
             text.append(value.trim());
         }
 
-        if (fragment.getWritingMode() == PdfData.HORIZONTAL_LEFT_TO_RIGHT) {
-
-            if (debugSplit) {
-                System.out.println("Add " + fragment.getX1() + ' ' + pt + " text=" + text + " i=" + i);
-            }
-            addFragment(i, text, fragment.getX1(), pt, fragment.getY1(), fragment.getY2(),  keepFont, fragment, isWordlist);
-        } else if (fragment.getWritingMode() == PdfData.HORIZONTAL_RIGHT_TO_LEFT) {
-            if (debugSplit) {
-                System.out.println("b");
-            }
-            addFragment(i, text, pt, fragment.getX2(), fragment.getY1(), fragment.getY2(), keepFont, fragment, isWordlist);
-        } else if (fragment.getWritingMode() == PdfData.VERTICAL_BOTTOM_TO_TOP) {
-            if (debugSplit) {
-                System.out.println("c");
-            }
-            addFragment(i, text, fragment.getX1(), fragment.getX2(), pt, fragment.getY2(), keepFont, fragment, isWordlist);
-        } else if (fragment.getWritingMode() == PdfData.VERTICAL_TOP_TO_BOTTOM) {
-            if (debugSplit) {
-                System.out.println("d");
-            }
-            addFragment(i, text, fragment.getX1(), fragment.getX2(), fragment.getY1(), pt, keepFont, fragment, isWordlist);
+        switch (fragment.getWritingMode()) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                if (debugSplit) {
+                    System.out.println("Add " + fragment.getX1() + ' ' + pt + " text=" + text + " i=" + i);
+                }   addFragment(i, text, fragment.getX1(), pt, fragment.getY1(), fragment.getY2(),  keepFont, fragment, isWordlist);
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                if (debugSplit) {
+                    System.out.println("b");
+                }   addFragment(i, text, pt, fragment.getX2(), fragment.getY1(), fragment.getY2(), keepFont, fragment, isWordlist);
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                if (debugSplit) {
+                    System.out.println("c");
+                }   addFragment(i, text, fragment.getX1(), fragment.getX2(), pt, fragment.getY2(), keepFont, fragment, isWordlist);
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                if (debugSplit) {
+                    System.out.println("d");
+                }   addFragment(i, text, fragment.getX1(), fragment.getX2(), fragment.getY1(), pt, keepFont, fragment, isWordlist);
+                break;
+            default:
+                break;
         }
         return pt;
     }
@@ -1390,14 +1404,21 @@ public class PdfGroupingAlgorithms {
     
     static void alterCoordsBasedOnWritingMode(Fragment fragment, float value){
 
-        if (fragment.getWritingMode() == PdfData.HORIZONTAL_LEFT_TO_RIGHT) {
-            fragment.setX1(value);
-        } else if (fragment.getWritingMode() == PdfData.HORIZONTAL_RIGHT_TO_LEFT) {
-            fragment.setX2(value);
-        } else if (fragment.getWritingMode() == PdfData.VERTICAL_BOTTOM_TO_TOP) {
-            fragment.setY2(value);
-        } else if (fragment.getWritingMode() == PdfData.VERTICAL_TOP_TO_BOTTOM) {
-            fragment.setY1(value);
+        switch (fragment.getWritingMode()) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                fragment.setX1(value);
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                fragment.setX2(value);
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                fragment.setY2(value);
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                fragment.setY1(value);
+                break;
+            default:
+                break;
         }
     }
 	private void initArrays(int count) {
@@ -1745,51 +1766,51 @@ public class PdfGroupingAlgorithms {
         final float[] f_x2;
 
         /**
-		 * set pointers so left to right text
-		 */
-		if(currentWritingMode==PdfData.HORIZONTAL_LEFT_TO_RIGHT){
-			f_x1=this.f_x1;
-			f_x2=this.f_x2;
-			//f_y1=this.f_y1;
-			//f_y2=this.f_y2;
-		}else if(currentWritingMode==PdfData.HORIZONTAL_RIGHT_TO_LEFT){
-			f_x2=this.f_x1;
-			f_x1=this.f_x2;
-			//f_y1=this.f_y1;
-			//f_y2=this.f_y2;
-		}else if(currentWritingMode==PdfData.VERTICAL_BOTTOM_TO_TOP){
-			f_x1=this.f_y2;
-			f_x2=this.f_y1;
-			//f_y1=this.f_x2;
-			//f_y2=this.f_x1;
-		}else if(currentWritingMode==PdfData.VERTICAL_TOP_TO_BOTTOM){
-			f_x1=this.f_y1;
-			f_x2=this.f_y2;
-			//f_y2=this.f_x1;
-			//f_y1=this.f_x2;
-			
-			/**
-			 * fiddle x,y co-ords so it works
-			 */
-			
-			//get max size
-			int maxX=0;
-            for (final float aF_x1 : f_x1) {
-                if (maxX < aF_x1) {
-                    maxX = (int) aF_x1;
-                }
-            }
-			
-			maxX++; //allow for fp error
-			//turn around
-			for(int ii=0;ii<f_x2.length;ii++){
-				f_x1[ii]=maxX-f_x1[ii];
-				f_x2[ii]=maxX-f_x2[ii];
-			}
-			
-		}else{
-			throw new PdfException("Illegal value "+currentWritingMode+"for currentWritingMode");
-		}
+         * set pointers so left to right text
+         */
+        switch (currentWritingMode) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                f_x1=this.f_x1;
+                f_x2=this.f_x2;
+                //f_y1=this.f_y1;
+                //f_y2=this.f_y2;
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                f_x2=this.f_x1;
+                f_x1=this.f_x2;
+                //f_y1=this.f_y1;
+                //f_y2=this.f_y2;
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                f_x1=this.f_y2;
+                f_x2=this.f_y1;
+                //f_y1=this.f_x2;
+                //f_y2=this.f_x1;
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                f_x1=this.f_y1;
+                f_x2=this.f_y2;
+                //f_y2=this.f_x1;
+                //f_y1=this.f_x2;
+                /**
+                 * fiddle x,y co-ords so it works
+                 */
+                
+                //get max size
+                int maxX=0;
+                for (final float aF_x1 : f_x1) {
+                    if (maxX < aF_x1) {
+                        maxX = (int) aF_x1;
+                    }
+                }   maxX++; //allow for fp error
+                //turn around
+                for(int ii=0;ii<f_x2.length;ii++){
+                    f_x1[ii]=maxX-f_x1[ii];
+                    f_x2[ii]=maxX-f_x2[ii];
+                }   break;
+            default:
+                throw new PdfException("Illegal value "+currentWritingMode+"for currentWritingMode");
+        }
 
 		int item, i;//, current_col = -1;
 
@@ -2574,7 +2595,7 @@ public class PdfGroupingAlgorithms {
 		final boolean breakFragments)
 		throws PdfException {
 
-
+        
         reset();
 
         if((breakFragments)&&(!pdf_data.IsEmbedded())) {
@@ -2817,40 +2838,43 @@ public class PdfGroupingAlgorithms {
         final float[] f_y1;
         final float[] f_y2;
 
-        if(currentWritingMode==PdfData.HORIZONTAL_LEFT_TO_RIGHT){
-			f_x1=this.f_x1;
-			f_x2=this.f_x2;
-			f_y1=this.f_y1;
-			f_y2=this.f_y2;
-			indices = getsortedUnusedFragments(false, true);
-			middlePage = (x1 + x2) / 2;
-		}else if(currentWritingMode==PdfData.HORIZONTAL_RIGHT_TO_LEFT){
-			f_x2=this.f_x1;
-			f_x1=this.f_x2;
-			f_y1=this.f_y1;
-			f_y2=this.f_y2;
-			indices = getsortedUnusedFragments(false, true);
-			middlePage = (x1 + x2) / 2;
-		}else if(currentWritingMode==PdfData.VERTICAL_BOTTOM_TO_TOP){
-			f_x1=this.f_y1;
-			f_x2=this.f_y2;
-			f_y1=this.f_x2;
-			f_y2=this.f_x1;
-			indices = getsortedUnusedFragments(true, true);
-
-			indices=reverse(indices);
-			middlePage = (y1 + y2) / 2;
-			
-		}else if(currentWritingMode==PdfData.VERTICAL_TOP_TO_BOTTOM){
-			f_x1=this.f_y2;
-			f_x2=this.f_y1;
-			f_y2=this.f_x2;
-			f_y1=this.f_x1;
-			indices = getsortedUnusedFragments(true, true);
-			middlePage = (y1 + y2) / 2;
-		}else{
-			throw new PdfException("Illegal value "+currentWritingMode+"for currentWritingMode");
-		}
+        switch (currentWritingMode) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                f_x1=this.f_x1;
+                f_x2=this.f_x2;
+                f_y1=this.f_y1;
+                f_y2=this.f_y2;
+                indices = getsortedUnusedFragments(false, true);
+                middlePage = (x1 + x2) / 2;
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                f_x2=this.f_x1;
+                f_x1=this.f_x2;
+                f_y1=this.f_y1;
+                f_y2=this.f_y2;
+                indices = getsortedUnusedFragments(false, true);
+                middlePage = (x1 + x2) / 2;
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                f_x1=this.f_y1;
+                f_x2=this.f_y2;
+                f_y1=this.f_x2;
+                f_y2=this.f_x1;
+                indices = getsortedUnusedFragments(true, true);
+                indices=reverse(indices);
+                middlePage = (y1 + y2) / 2;
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                f_x1=this.f_y2;
+                f_x2=this.f_y1;
+                f_y2=this.f_x2;
+                f_y1=this.f_x1;
+                indices = getsortedUnusedFragments(true, true);
+                middlePage = (y1 + y2) / 2;
+                break;
+            default:
+                throw new PdfException("Illegal value "+currentWritingMode+"for currentWritingMode");
+        }
 		final int quarter = middlePage / 2;
 		final int count = indices.length;
 		final int master = indices[count - 1];
@@ -2954,7 +2978,7 @@ public class PdfGroupingAlgorithms {
 		while(ptr<count){
 			final char nextChar=buffer.charAt(ptr);
 			
-			if((!inTag)&&((nextChar=='<')||(isXMLExtraction && nextChar=='&'))){
+			if((!inTag)&&(isXMLExtraction && (nextChar=='<' || nextChar=='&'))){
 				inTag=true;
 				openChar=nextChar;
 				
@@ -2983,7 +3007,7 @@ public class PdfGroupingAlgorithms {
 			if((inTag)&&(openChar=='&')&&(nextChar==' ')){
 				i=openChar;
 				ptr=count;
-			}else if((inTag)&&((nextChar=='>')||(isXMLExtraction && openChar=='&' && nextChar==';'))){
+			}else if((inTag)&&(isXMLExtraction && ((nextChar=='>') || (openChar=='&' && nextChar==';')))){
 				
 				//put back < or >
 				if(nextChar==';' && openChar=='&' && ptr>2 && buffer.charAt(ptr-1)=='t'){
@@ -3125,7 +3149,7 @@ public class PdfGroupingAlgorithms {
 	 * convert fragments into lines of text
 	 */
 	@SuppressWarnings("unused")
-	private void createLinesForSearch(final int count, int[] items, final int mode, final boolean breakOnSpace, final boolean addMultiplespaceXMLTag, final boolean sameLineOnly, final boolean isSearch) throws PdfException{
+	private void createLinesForSearch(final int count, int[] items, final int mode, final boolean breakOnSpace, final boolean addMultiplespaceXMLTag, final boolean isSearch) throws PdfException{
 		
 		String separator;
 
@@ -3146,32 +3170,37 @@ public class PdfGroupingAlgorithms {
             items=reverse(items);
         }
 
-		/**
-		 * set pointers so left to right text
-		 */
-		if(mode==PdfData.HORIZONTAL_LEFT_TO_RIGHT){
-			f_x1=this.f_x1;
-			f_x2=this.f_x2;
-			f_y1=this.f_y1;
-			f_y2=this.f_y2;
-		}else if(mode==PdfData.HORIZONTAL_RIGHT_TO_LEFT){
-			f_x2=this.f_x1;
-			f_x1=this.f_x2;
-			f_y1=this.f_y1;
-			f_y2=this.f_y2;
-		}else if(mode==PdfData.VERTICAL_BOTTOM_TO_TOP){
-			f_x1=this.f_y2;
-			f_x2=this.f_y1;
-			f_y1=this.f_x2;
-			f_y2=this.f_x1;
-		}else if(mode==PdfData.VERTICAL_TOP_TO_BOTTOM){
-			f_x1=this.f_y2;
-			f_x2=this.f_y1;
-			f_y2=this.f_x1;
-			f_y1=this.f_x2;
-		}else{
-			throw new PdfException("Illegal value "+mode+"for currentWritingMode");
-		}
+        /**
+         * set pointers so left to right text
+         */
+        switch (mode) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                f_x1=this.f_x1;
+                f_x2=this.f_x2;
+                f_y1=this.f_y1;
+                f_y2=this.f_y2;
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                f_x2=this.f_x1;
+                f_x1=this.f_x2;
+                f_y1=this.f_y1;
+                f_y2=this.f_y2;
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                f_x1=this.f_y2;
+                f_x2=this.f_y1;
+                f_y1=this.f_x2;
+                f_y2=this.f_x1;
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                f_x1=this.f_y2;
+                f_x2=this.f_y1;
+                f_y2=this.f_x1;
+                f_y1=this.f_x2;
+                break;
+            default:
+                throw new PdfException("Illegal value "+mode+"for currentWritingMode");
+        }
         
 		/**
 		 * scan items joining best fit to right of each fragment to build
@@ -3354,32 +3383,37 @@ public class PdfGroupingAlgorithms {
             items=reverse(items);
         }
 
-		/**
-		 * set pointers so left to right text
-		 */
-		if(mode==PdfData.HORIZONTAL_LEFT_TO_RIGHT){
-			f_x1=this.f_x1;
-			f_x2=this.f_x2;
-			f_y1=this.f_y1;
-			f_y2=this.f_y2;
-		}else if(mode==PdfData.HORIZONTAL_RIGHT_TO_LEFT){
-			f_x2=this.f_x1;
-			f_x1=this.f_x2;
-			f_y1=this.f_y1;
-			f_y2=this.f_y2;
-		}else if(mode==PdfData.VERTICAL_BOTTOM_TO_TOP){
-			f_x1=this.f_y1;
-			f_x2=this.f_y2;
-			f_y1=this.f_x2;
-			f_y2=this.f_x1;
-		}else if(mode==PdfData.VERTICAL_TOP_TO_BOTTOM){
-			f_x1=this.f_y2;
-			f_x2=this.f_y1;
-			f_y2=this.f_x1;
-			f_y1=this.f_x2;
-		}else{
-			throw new PdfException("Illegal value "+mode+"for currentWritingMode");
-		}
+        /**
+         * set pointers so left to right text
+         */
+        switch (mode) {
+            case PdfData.HORIZONTAL_LEFT_TO_RIGHT:
+                f_x1=this.f_x1;
+                f_x2=this.f_x2;
+                f_y1=this.f_y1;
+                f_y2=this.f_y2;
+                break;
+            case PdfData.HORIZONTAL_RIGHT_TO_LEFT:
+                f_x2=this.f_x1;
+                f_x1=this.f_x2;
+                f_y1=this.f_y1;
+                f_y2=this.f_y2;
+                break;
+            case PdfData.VERTICAL_BOTTOM_TO_TOP:
+                f_x1=this.f_y1;
+                f_x2=this.f_y2;
+                f_y1=this.f_x2;
+                f_y2=this.f_x1;
+                break;
+            case PdfData.VERTICAL_TOP_TO_BOTTOM:
+                f_x1=this.f_y2;
+                f_x2=this.f_y1;
+                f_y2=this.f_x1;
+                f_y1=this.f_x2;
+                break;
+            default:
+                throw new PdfException("Illegal value "+mode+"for currentWritingMode");
+        }
 
 		/**
 		 * scan items joining best fit to right of each fragment to build
@@ -3725,7 +3759,7 @@ public class PdfGroupingAlgorithms {
 		
 		includeTease = true;
 		
-		final List highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, page_number, terms, searchType, listener);
+		final List highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, terms, searchType, listener);
 
 		final SortedMap highlightsWithTeasers = new TreeMap(new ResultsComparatorRectangle(rotation));
 		
@@ -3812,7 +3846,7 @@ public class PdfGroupingAlgorithms {
 		multipleTermTeasers.clear();
 		teasers = null;
 		
-		final List highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, page_number, terms, searchType, listener);
+		final List highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, terms, searchType, listener);
 		
 		if (orderResults) {
 			Collections.sort(highlights, new ResultsComparator(rotation));
@@ -3823,8 +3857,8 @@ public class PdfGroupingAlgorithms {
 		return highlights;
 	}
 
-	private List findMultipleTermsInRectangle(final int x1, final int y1, final int x2, final int y2, final int page_number, final String[] terms, final int searchType,
-			final SearchListener listener) throws PdfException {
+	private List findMultipleTermsInRectangle(final int x1, final int y1, final int x2, final int y2, final String[] terms, final int searchType,
+											  final SearchListener listener) throws PdfException {
 		
         final List list = new ArrayList();
 
@@ -4002,7 +4036,8 @@ public class PdfGroupingAlgorithms {
 	 * Note: input variable page_number no longer functions due to refactoring. FindText functions for the currently decoded page.
 	 * @deprecated
 	 */
-    @SuppressWarnings("UnusedParameters")
+    @Deprecated
+	@SuppressWarnings("UnusedParameters")
     public final float[] findText(
 			final Rectangle searchArea,
 			final int page_number,
@@ -4214,7 +4249,7 @@ public class PdfGroupingAlgorithms {
         boolean useRegEx = false;
 
         //Merge text fragments into lines as displayed on page
-        createLinesForSearch(items.length, items, mode, true, false, true, true);
+        createLinesForSearch(items.length, items, mode, true, false, true);
         
         //Bitwise flags for regular expressions engine, options always required 
         int options = loadSearcherOptions(searchType);

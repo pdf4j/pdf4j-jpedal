@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -33,14 +33,11 @@
 package org.jpedal.io;
 
 import org.jpedal.objects.Javascript;
-import org.jpedal.objects.raw.NamesObject;
-import org.jpedal.objects.raw.PdfArrayIterator;
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.objects.raw.*;
 import org.jpedal.utils.StringUtils;
 
 import java.util.HashMap;
-import org.jpedal.objects.raw.XObject;
+import java.util.Iterator;
 
 /**
  * convert names to refs
@@ -48,6 +45,8 @@ import org.jpedal.objects.raw.XObject;
 public class NameLookup extends HashMap {
 
     private final PdfFileReader objectReader;
+
+    private final HashMap embeddedFiles=new HashMap();
 
     /**
      *
@@ -73,7 +72,7 @@ public class NameLookup extends HashMap {
         /**
          *  loop to read required values into lookup
          */
-        final int[] nameLists= {PdfDictionary.Dests, PdfDictionary.JavaScript,PdfDictionary.XFAImages};
+        final int[] nameLists= {PdfDictionary.Dests, PdfDictionary.EmbeddedFiles, PdfDictionary.JavaScript,PdfDictionary.XFAImages};
         int count=nameLists.length;
         if(isKid) {
             count = 1;
@@ -124,8 +123,12 @@ public class NameLookup extends HashMap {
             //read all the values
             if (namesArray != null && namesArray.getTokenCount()>0) {
                 while (namesArray.hasMoreTokens()) {
-                    name =namesArray.getNextValueAsString(true);
 
+                    if(nameLists[ii]==PdfDictionary.EmbeddedFiles) {
+                        name = StringUtils.getTextString(namesArray.getNextValueAsByte(true), false);
+                    }else{
+                        name =namesArray.getNextValueAsString(true);
+                    }
                     //fix for baseline_screens/11jun/Bundy_vs_F_Kruger_Sons_Bundy_v_F_Kruger!~!2200.pdf
                     //as code assumes paired values and not in this file (List a list)
                     if(!namesArray.hasMoreTokens()) {
@@ -135,6 +138,13 @@ public class NameLookup extends HashMap {
                     value =namesArray.getNextValueAsString(true);
 
                     switch(nameLists[ii]){
+
+                        case PdfDictionary.EmbeddedFiles:
+
+                            embeddedFiles.put(name,value);
+
+                            break;
+
                         //if Javascript, get full value and store, otherwise just get name
                         case PdfDictionary.JavaScript:
                             setJavaScriptName(value, objectDecoder, javascript, name);
@@ -208,4 +218,44 @@ public class NameLookup extends HashMap {
         }
     }
 
+    /**
+     * used to parser on demand if needed and return as key pair of name, PdfObject
+     * @return
+     */
+    public Object[] getEmbeddedFiles() {
+
+        Object[] returnValues=new Object[embeddedFiles.keySet().size()*2];
+        int ptr=0;
+
+        String name, value;
+        Iterator embeddedFileNames=embeddedFiles.keySet().iterator();
+
+        final ObjectDecoder objectDecoder=new ObjectDecoder(objectReader);
+
+        while(embeddedFileNames.hasNext()){
+            name= (String) embeddedFileNames.next();
+            returnValues[ptr++]=name;
+            value= (String) embeddedFiles.get(name);
+
+            final PdfObject embeddedObj =new FSObject(value);
+            final byte[] jsData=StringUtils.toBytes(value);
+            if(jsData[0]=='<') {
+                embeddedObj.setStatus(PdfObject.UNDECODED_DIRECT);
+            } else {
+                embeddedObj.setStatus(PdfObject.UNDECODED_REF);
+            }
+
+            if(value.contains(" ") || value.contains("<")){
+                //must be done AFTER setStatus()
+                embeddedObj.setUnresolvedData(jsData, PdfDictionary.JS);
+                objectDecoder.checkResolved(embeddedObj);
+
+
+                returnValues[ptr++]= embeddedObj;
+            }else{
+                returnValues[ptr++]=null;
+            }
+        }
+        return returnValues;
+    }
 }

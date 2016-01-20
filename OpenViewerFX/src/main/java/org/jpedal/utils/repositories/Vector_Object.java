@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -34,6 +34,7 @@ package org.jpedal.utils.repositories;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -374,7 +375,7 @@ public class Vector_Object implements Serializable
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 
                 /** store the image in a byte array */
-                ImageIO.write((BufferedImage) nextObj, "png", baos);
+                ImageIO.write((RenderedImage) nextObj, "png", baos);
                 
                 /** write the image as a byte array to the stream */
                 os.writeObject(baos.toByteArray());
@@ -385,7 +386,7 @@ public class Vector_Object implements Serializable
                 os.writeObject(Vector_Object.GENERAL_PATH);
                 
                 /** use out custom path serializer to serialize the path */
-                PathSerializer.serializePath(os, ((GeneralPath)items[i]).getPathIterator(new AffineTransform()));
+                PathSerializer.serializePath(os, ((Shape)items[i]).getPathIterator(new AffineTransform()));
                 
             }else if(nextObj instanceof T1Glyph){
                 //t1glyphs++;
@@ -437,11 +438,11 @@ public class Vector_Object implements Serializable
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 
                 /** store the image in a byte array */
-                ImageIO.write(((org.jpedal.color.PdfTexturePaint)nextObj).getImage(), "png", baos);
+                ImageIO.write(((TexturePaint)nextObj).getImage(), "png", baos);
                 os.writeObject(baos.toByteArray());
                 
                 /**and anchor as well*/
-                final Rectangle2D rect=((org.jpedal.color.PdfTexturePaint)nextObj).getAnchorRect();
+                final Rectangle2D rect=((TexturePaint)nextObj).getAnchorRect();
                 os.writeDouble(rect.getBounds2D().getX());
                 os.writeDouble(rect.getBounds2D().getY());
                 os.writeDouble(rect.getBounds2D().getWidth());

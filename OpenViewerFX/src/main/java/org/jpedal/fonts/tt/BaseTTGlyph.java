@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -32,19 +32,16 @@
  */
 package org.jpedal.fonts.tt;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Area;
 import java.util.HashSet;
-import org.jpedal.color.PdfPaint;
 import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.tt.hinting.TTVM;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.*;
 
 
-public abstract class BaseTTGlyph {
+public abstract class BaseTTGlyph extends PdfGlyph {
 
-    boolean hasHintingApplied=false;
+    boolean hasHintingApplied;
         
     /**paths for the letter, marked as transient so it wont be serialized */
     transient Vector_Path paths=new Vector_Path(10);
@@ -101,8 +98,6 @@ public abstract class BaseTTGlyph {
 
     public static boolean debug;
 
-    protected int glyphNumber = -1;
-
     //used to track which glyf for complex glyph
     protected int compCount=1;
 
@@ -140,7 +135,7 @@ public abstract class BaseTTGlyph {
      */
     public BaseTTGlyph(final Glyf currentGlyf, final FontFile2 glyfTable, final Hmtx currentHmtx, final int idx, final float unitsPerEm, final TTVM vm){
 
-        glyphNumber = idx+1;
+        setGlyphNumber(idx+1);
 
         isHinted=true;
 
@@ -174,7 +169,7 @@ public abstract class BaseTTGlyph {
 
         //debug=idx==2246;
 
-        glyphNumber = idx+1;
+        setGlyphNumber(idx+1);
 
        // this.glyfName=glyfName;
         //this.idx=idx;
@@ -287,28 +282,6 @@ public abstract class BaseTTGlyph {
      */
     static int midPt(final int a, final int b) {
         return a + (b - a)/2;
-    }
-
-    /* (non-Javadoc)
-     * @see org.jpedal.fonts.PdfGlyph#getWidth()
-     */
-    public float getmaxWidth() {
-
-        return 0;
-    }
-
-    /* (non-Javadoc)
-     * @see org.jpedal.fonts.PdfGlyph#setT3Colors(java.awt.Color, java.awt.Color)
-     */
-    public void setT3Colors(final PdfPaint strokeColor, final PdfPaint nonstrokeColor, final boolean lockColours) {
-
-    }
-
-    /* (non-Javadoc)
-     * @see org.jpedal.fonts.PdfGlyph#ignoreColors()
-     */
-    public boolean ignoreColors() {
-        return false;
     }
 
     /**create the actual shape
@@ -803,66 +776,41 @@ public abstract class BaseTTGlyph {
         throw new UnsupportedOperationException("clearPaths Not supported yet.");
     }
 
-    public void render(final int text_fill_type, final Graphics2D g2, final float scaling, final boolean isFormGlyph) {
-        throw new UnsupportedOperationException("render Not supported yet."); 
-    }
-
-    public void setWidth(final float width) {
-
-    }
-
     public int getFontBB(final int type) {
 
         if(isComposite){
-            if(type== PdfGlyph.FontBB_X) {
-                return compMinX;
-            } else if(type== PdfGlyph.FontBB_Y) {
-                return compMinY;
-            } else if(type== PdfGlyph.FontBB_WIDTH) {
-                return compMaxX;
-            } else if(type== PdfGlyph.FontBB_HEIGHT) {
-                return compMaxY;
-            } else {
-                return 0;
+            switch (type) {
+                case PdfGlyph.FontBB_X:
+                    return compMinX;
+                case PdfGlyph.FontBB_Y:
+                    return compMinY;
+                case PdfGlyph.FontBB_WIDTH:
+                    return compMaxX;
+                case PdfGlyph.FontBB_HEIGHT:
+                    return compMaxY;
+                default:
+                    return 0;
             }
         }else{
-            if(type== PdfGlyph.FontBB_X) {
-                return minX;
-            } else if(type== PdfGlyph.FontBB_Y) {
-                return minY;
-            } else if(type== PdfGlyph.FontBB_WIDTH) {
-                return maxX;
-            } else if(type== PdfGlyph.FontBB_HEIGHT) {
-                return maxY;
-            } else {
-                return 0;
+            switch (type) {
+                case PdfGlyph.FontBB_X:
+                    return minX;
+                case PdfGlyph.FontBB_Y:
+                    return minY;
+                case PdfGlyph.FontBB_WIDTH:
+                    return maxX;
+                case PdfGlyph.FontBB_HEIGHT:
+                    return maxY;
+                default:
+                    return 0;
             }
         }
     }
 
-    public void setStrokedOnly(final boolean b) {
-        //not used here
-    }
-
     //use by TT to handle broken TT fonts
+    @Override
     public boolean containsBrokenData() {
         return this.containsBrokenGlyfData;
-    }
-
-    public Object getPath() {
-        throw new UnsupportedOperationException("getPath Not supported yet."); 
-    }
-
-    public int getGlyphNumber() {
-        return glyphNumber;
-    }
-
-    public void setGlyphNumber(final int no) {
-        glyphNumber = no;
-    }
-
-    public Area getShape() {
-        throw new UnsupportedOperationException("getShape Not supported yet.");
     }
 
     void createHintedGlyph() {
@@ -998,5 +946,10 @@ public abstract class BaseTTGlyph {
             offset += componentLengths[i];
         }
         
+    }
+    
+    @Override
+    public boolean hasHintingApplied() {
+        return this.hasHintingApplied;
     }
 }

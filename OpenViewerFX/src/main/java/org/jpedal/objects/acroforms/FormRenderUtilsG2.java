@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -80,7 +80,7 @@ public class FormRenderUtilsG2 {
         return BG;
     }
     
-    private static void renderBorderSolid(Graphics2D g2, FormObject formObject, int page, int borderWidth, int pageHeight) {
+    private static void renderBorderSolid(Graphics2D g2, FormObject formObject, int borderWidth, int pageHeight) {
         g2.setStroke(new BasicStroke(borderWidth));
         g2.drawRect(formObject.getBoundingRectangle().x + borderWidth - 1,
                 pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height) + borderWidth - 1,
@@ -88,7 +88,7 @@ public class FormRenderUtilsG2 {
                 formObject.getBoundingRectangle().height - (borderWidth * 2) + 2);
     }
 
-    private static void renderBorderDashed(Graphics2D g2, FormObject formObject, PdfArrayIterator dashPattern, int page, int borderWidth, int pageHeight) {
+    private static void renderBorderDashed(Graphics2D g2, FormObject formObject, PdfArrayIterator dashPattern, int borderWidth, int pageHeight) {
 
         float[] dash = {3};
         int phase = 0;
@@ -116,7 +116,7 @@ public class FormRenderUtilsG2 {
                 formObject.getBoundingRectangle().height - (borderWidth * 2) + 2);
     }
 
-    private static void renderBorderBeveled(Graphics2D g2, FormObject formObject, Color BG, int page, int borderWidth, int pageHeight) {
+    private static void renderBorderBeveled(Graphics2D g2, FormObject formObject, Color BG, int borderWidth, int pageHeight) {
 
         final Color bckUp = g2.getColor();
 
@@ -158,7 +158,7 @@ public class FormRenderUtilsG2 {
         g2.setColor(bckUp);
     }
 
-    private static void renderBorderInset(Graphics2D g2, FormObject formObject, int page, int borderWidth, int pageHeight) {
+    private static void renderBorderInset(Graphics2D g2, FormObject formObject, int borderWidth, int pageHeight) {
 
         final Color bckUp = g2.getColor();
 
@@ -198,7 +198,7 @@ public class FormRenderUtilsG2 {
         g2.setColor(bckUp);
     }
 
-    private static void renderBorderUnderline(Graphics2D g2, FormObject formObject, int page, int borderWidth, int pageHeight) {
+    private static void renderBorderUnderline(Graphics2D g2, FormObject formObject, int borderWidth, int pageHeight) {
         g2.setStroke(new BasicStroke(borderWidth));
         g2.drawLine(formObject.getBoundingRectangle().x + borderWidth - 1,
                 pageHeight - (formObject.getBoundingRectangle().y) + borderWidth - 1,
@@ -232,20 +232,20 @@ public class FormRenderUtilsG2 {
                 g2.setColor(BC);
 
                 if (s == null || s.equals("S")) {
-                    renderBorderSolid(g2, formObject, borderWidth, page, pageHeight);
+                    renderBorderSolid(g2, formObject, page, pageHeight);
                     borderCreated = true;
                 } else if (s.equals("D")) {
                     final PdfArrayIterator dashPattern = BS.getMixedArray(PdfDictionary.D);
-                    renderBorderDashed(g2, formObject, dashPattern, borderWidth, page, pageHeight);
+                    renderBorderDashed(g2, formObject, dashPattern, page, pageHeight);
                     borderCreated = true;
                 } else if (s.equals("B")) {
-                    renderBorderBeveled(g2, formObject, BG, borderWidth, page, pageHeight);
+                    renderBorderBeveled(g2, formObject, BG, page, pageHeight);
                     borderCreated = true;
                 } else if (s.equals("I")) {
-                    renderBorderInset(g2, formObject, borderWidth, page, pageHeight);
+                    renderBorderInset(g2, formObject, page, pageHeight);
                     borderCreated = true;
                 } else if (s.equals("U")) {
-                    renderBorderUnderline(g2, formObject, borderWidth, page, pageHeight);
+                    renderBorderUnderline(g2, formObject, page, pageHeight);
                     borderCreated = true;
                 }
 
@@ -321,7 +321,7 @@ public class FormRenderUtilsG2 {
         return g2.getFontMetrics();
     }
     
-    public static void renderComboForms(Graphics2D g2, FormObject formObject, FontMetrics metrics, Rectangle2D r, int page, int borderWidth, int justification, int pageHeight) {
+    public static void renderComboForms(Graphics2D g2, FormObject formObject, FontMetrics metrics, Rectangle2D r, int borderWidth, int justification, int pageHeight) {
         final String[] values = formObject.getItemsList();
         if (values != null) {
             final int[] selected = formObject.getIntArray(PdfDictionary.I);
@@ -371,7 +371,7 @@ public class FormRenderUtilsG2 {
         }
     }
     
-    public static void renderMultilineTextField(Graphics2D g2, FormObject formObject, FontMetrics metrics, Rectangle2D r, String textValue, int page, int borderWidth, int justification, int pageHeight) {
+    public static void renderMultilineTextField(Graphics2D g2, FormObject formObject, FontMetrics metrics, Rectangle2D r, String textValue, int borderWidth, int justification, int pageHeight) {
 
         final int x = formObject.getBoundingRectangle().x + (borderWidth);
         int y = (pageHeight - (formObject.getBoundingRectangle().y + (formObject.getBoundingRectangle().height))) - (borderWidth) - borderWidth;
@@ -383,7 +383,7 @@ public class FormRenderUtilsG2 {
         }
     }
     
-    public static void renderSingleLineTextField(Graphics2D g2, FormObject formObject, FontMetrics metrics, Rectangle2D r, String textValue, int page, int borderWidth, int justification, int pageHeight){
+    public static void renderSingleLineTextField(Graphics2D g2, FormObject formObject, FontMetrics metrics, Rectangle2D r, String textValue, int borderWidth, int justification, int pageHeight){
 
         final int x = formObject.getBoundingRectangle().x + (borderWidth);
         final int y = (pageHeight - (formObject.getBoundingRectangle().y)) - (formObject.getBoundingRectangle().height - metrics.getHeight());
@@ -405,7 +405,7 @@ public class FormRenderUtilsG2 {
         }
     }
     
-    public static void renderQuadPoint(Graphics2D g2, FormObject formObject, Color bgColor, int page, int pageHeight){
+    public static void renderQuadPoint(Graphics2D g2, FormObject formObject, Color bgColor, int pageHeight){
         final float[] quadPoints = formObject.getFloatArray(PdfDictionary.QuadPoints);
         if (quadPoints != null) {
             final Color c = g2.getColor();
@@ -460,7 +460,7 @@ public class FormRenderUtilsG2 {
         }
     }
     
-    public static void renderPopupWindow(Graphics2D g2, FormObject formObject, Color bgColor, int page, boolean isPrinting, int pageHeight) {
+    public static void renderPopupWindow(Graphics2D g2, FormObject formObject, Color bgColor, boolean isPrinting, int pageHeight) {
 
         //read in date for title bar
         final String mStream = formObject.getParentPdfObj().getTextStreamValue(PdfDictionary.M);

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -85,12 +85,12 @@ public class TTVM implements Serializable {
      * In order to place this in context the glyph program's execution path is printed with it. Again, I'd recommend
      * isolating the glyph in TTGlyph's constructor before using this flag.
      */
-    
+
     private static boolean watchAPoint = true;
     static {
         watchAPoint = false;//off by default
     }
-    
+
     private static final int watchPoint=53;
     private int watchX, watchY;
 
@@ -107,7 +107,7 @@ public class TTVM implements Serializable {
     private JLabel currentCode, debugXLabel, debugYLabel;
     private final java.util.Stack<int[]> codeStack = new java.util.Stack();
     private final java.util.Stack<Integer> numberStack = new java.util.Stack();
-    
+
     /**
      * Prints the name and a brief description of an instruction when it is executed.
      */
@@ -461,7 +461,7 @@ public class TTVM implements Serializable {
             "SCANTYPE  - We don't scan convert, so only pops a value",
             "INSTCTRL  - Allows for setting flags to do with glyph execution"
     };
-    
+
     //parameters for MDRP/MIRP
     private static final int paramRESETRP0 = 16;
     private static final int paramUSEMINDIST = 8;
@@ -532,11 +532,11 @@ public class TTVM implements Serializable {
      * @param contours Whether each point is the last in a contour
      */
     public void processGlyph(final int[] instructions, final int[] glyfX, final int[] glyfY, final boolean[] curves, final boolean[] contours) {
-        
+
         if (printCoordsAfterEachInstruction || watchAPoint) {
             printOut=true;
         }
-        
+
         x[GLYPH_ZONE] = glyfX;
         x[ORIGINAL+GLYPH_ZONE] = new int[glyfX.length];
         System.arraycopy(x[GLYPH_ZONE],0,x[ORIGINAL+GLYPH_ZONE],0,x[GLYPH_ZONE].length);
@@ -558,7 +558,7 @@ public class TTVM implements Serializable {
         if (printGlyphInstructions) {
             print(instructions);
         }
-        
+
         stack = new Stack();
 
         //Sort out graphicsState
@@ -573,7 +573,7 @@ public class TTVM implements Serializable {
                 gs.resetForGlyph();
             } catch(final CloneNotSupportedException e) {
                 LogWriter.writeLog("Exception: " + e.getMessage());
-                
+
                 gs = new TTGraphicsState();
             }
         }
@@ -593,7 +593,7 @@ public class TTVM implements Serializable {
             programToDebug = instructions;
             programToDebugIsData = getInstructionStreamIsData(programToDebug);
         }
-        
+
         execute(instructions, gs);
 
         if (printCoordsAfterEachInstruction || watchAPoint) {
@@ -629,7 +629,7 @@ public class TTVM implements Serializable {
             setCurrentCodeForDebug(program, -1, !debuggerRunningInBackground);
             return;
         }
-        
+
         for (int currentPointer = 0; currentPointer < program.length; currentPointer++) {
             if (printOut) {
                 System.out.print(currentPointer + "\t");
@@ -671,7 +671,7 @@ public class TTVM implements Serializable {
             if (printCoordsAfterEachInstruction && printOut) {
                 printCoords();
             }
-            
+
             //Check if errors have been encountered and cease execution if they have
             if (BaseTTGlyph.redecodePage) {
                 return;
@@ -693,8 +693,9 @@ public class TTVM implements Serializable {
     private int process(int code, int currentPointer, final int[] program, final TTGraphicsState gs) {
 
         //Warning supressed as originalPointer is used by debug code
+        @SuppressWarnings("UnusedAssignment")
         int originalPointer = currentPointer;
-        
+
         //If it's reading data find how much to read & redirect to first command
         int bytesToRead=0;
         if (code >= 0xB0 && code <= 0xBF) {
@@ -706,7 +707,7 @@ public class TTVM implements Serializable {
         if (printOut && code < OPCODE_DESCRIPTIONS.length) {
             System.out.println(OPCODE_DESCRIPTIONS[code]);
         }
-        
+
         try {
 
             switch(code) {
@@ -895,7 +896,7 @@ public class TTVM implements Serializable {
 //                    if (value > 1 || value < 0) {
 //                        System.out.println("ZP0 set incorrectly!");
 //                    }
-                    
+
                     gs.zp0 = stack.pop();
                     break;
                 }
@@ -904,7 +905,7 @@ public class TTVM implements Serializable {
                     if (value > 1 || value < 0) {
                         System.out.println("ZP1 set incorrectly!");
                     }
-                    
+
                     gs.zp1 = value;
                     break;
                 }
@@ -913,7 +914,7 @@ public class TTVM implements Serializable {
 //                    if (value > 1 || value < 0) {
 //                        System.out.println("ZP2 set incorrectly!");
 //                    }
-                    
+
                    // gs.zp2 = value;
                     break;
                 }
@@ -922,7 +923,7 @@ public class TTVM implements Serializable {
 //                    if (value > 1 || value < 0) {
 //                        System.out.println("All zone pointers set incorrectly!");
 //                    }
-                    
+
                     gs.zp0 = value;
                     gs.zp1 = value;
                     gs.zp2 = value;
@@ -1082,7 +1083,7 @@ public class TTVM implements Serializable {
                         print(function);
                         System.out.println("");
                     }
-                    
+
                     for (int i = 0; i < count; i++) {
                         execute(function, gs);
                     }
@@ -1101,7 +1102,7 @@ public class TTVM implements Serializable {
                         print(function);
                         System.out.println("");
                     }
-                    
+
                     execute(function, gs);
                     if (printOut) {
                         System.out.println("CALL finished");
@@ -2458,7 +2459,7 @@ public class TTVM implements Serializable {
         } catch(final Exception e) {
 
             LogWriter.writeLog("Exception: " + e.getMessage()+ " at line "+currentPointer+"- hinting turned off");
-            
+
             BaseTTGlyph.useHinting = false;
             BaseTTGlyph.redecodePage = true;
         }
@@ -2470,7 +2471,7 @@ public class TTVM implements Serializable {
                 return debugPointer;
             }
         }
-        
+
         return currentPointer;
     }
 
@@ -2781,7 +2782,7 @@ public class TTVM implements Serializable {
             pointer--;
             return result;
         }
-        
+
         /**
          * DEBUG METHOD -
          *
@@ -2809,7 +2810,7 @@ public class TTVM implements Serializable {
             return result;
         }
     }
-    
+
     /**
      * DEBUG METHOD -
      *
@@ -4059,5 +4060,5 @@ public class TTVM implements Serializable {
         }
 
         return result;
-    } 
+    }
 }

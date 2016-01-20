@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -111,21 +111,29 @@ class EscapedTextUtils {
             } else {
                 
                 char testChar=glyphData.getRawChar();
-                if(testChar=='n'){
-                    rawInt='\n';
-                    glyphData.setRawChar('\n');
-                }else if(testChar=='b'){
-                    rawInt='\b';
-                    glyphData.setRawChar('\b');
-                }else if(testChar=='t'){
-                    rawInt='\t';
-                    glyphData.setRawChar('\t');
-                }else if(testChar=='r'){
-                    rawInt='\r';
-                    glyphData.setRawChar('\r');
-                }else if(testChar=='f'){
-                    rawInt='\f';
-                    glyphData.setRawChar('\f');
+                switch (testChar) {
+                    case 'n':
+                        rawInt='\n';
+                        glyphData.setRawChar('\n');
+                        break;
+                    case 'b':
+                        rawInt='\b';
+                        glyphData.setRawChar('\b');
+                        break;
+                    case 't':
+                        rawInt='\t';
+                        glyphData.setRawChar('\t');
+                        break;
+                    case 'r':
+                        rawInt='\r';
+                        glyphData.setRawChar('\r');
+                        break;
+                    case 'f':
+                        rawInt='\f';
+                        glyphData.setRawChar('\f');
+                        break;
+                    default:
+                        break;
                 }
                 
                 glyphData.setDisplayValue(currentFontData.getGlyphValue(rawInt));

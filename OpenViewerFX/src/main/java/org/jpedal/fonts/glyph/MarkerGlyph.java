@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -32,27 +32,20 @@
  */
 package org.jpedal.fonts.glyph;
 
-import org.jpedal.color.PdfPaint;
-
-import java.awt.*;
-import java.awt.geom.Area;
 import java.io.Serializable;
-
 
 /**
  * holds data so we can draw glyph on first appearance
  *
  */
-public class MarkerGlyph implements PdfGlyph, Serializable {
-
+public class MarkerGlyph extends PdfGlyph implements Serializable{
 
     public final float a;
     public final float b;
     public final float c;
     public final float d;
     public final String fontName;
-    private int glyphNumber=-1;
-	
+    
 	public MarkerGlyph(final float a, final float b, final float c, final float d, final String fontName) {
 
 		this.a=a;
@@ -62,71 +55,4 @@ public class MarkerGlyph implements PdfGlyph, Serializable {
 		this.fontName=fontName;
 		
 	}
-
-    @Override
-    public void setGlyphNumber(final int no) {
-        glyphNumber = no;
-    }
-
-    @Override
-    public int getGlyphNumber() {
-        return glyphNumber;
-    }
-
-    @Override
-    public void render(final int text_fill_type, final Graphics2D g2, final float scaling, final boolean isFormGlyph) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public float getmaxWidth() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setT3Colors(final PdfPaint strokeColor, final PdfPaint nonstrokeColor, final boolean lockColours) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean ignoreColors() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Area getShape() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-	@Override
-    public void setWidth(final float width) {
-		// TODO Auto-generated method stub
-		
-	}
-
-    @Override
-    public int getFontBB(final int type) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setStrokedOnly(final boolean b) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    //use by TT to handle broken TT fonts
-    @Override
-    public boolean containsBrokenData() {
-        return false;
-    }
-
-    @Override
-    public Object getPath() {
-        throw new UnsupportedOperationException("getPath Not supported yet.");
-    }
-    
-    @Override
-    public boolean hasHintingApplied() {
-        return false;
-    }
 }

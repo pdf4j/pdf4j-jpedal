@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -48,6 +48,7 @@ import org.jpedal.utils.Matrix;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
+import org.jpedal.render.DynamicVectorRenderer;
 
 public class XFormDecoder {
     /**
@@ -387,8 +388,8 @@ public class XFormDecoder {
         if(debug) {
             System.out.println("createMaskForm " + newSMask);
         }
-
-        if(newSMask==null){ //needs to be normal for actual Mask
+        
+        if(newSMask==null && pdfStreamDecoder.current.getType()==DynamicVectorRenderer.CREATE_T3){ //needs to be normal for actual Mask
             pdfStreamDecoder.current.setGraphicsState(GraphicsState.STROKE, pdfStreamDecoder.gs.getAlpha(GraphicsState.STROKE), PdfDictionary.Normal);
             pdfStreamDecoder.current.setGraphicsState(GraphicsState.FILL, pdfStreamDecoder.gs.getAlpha(GraphicsState.FILL), PdfDictionary.Normal);
         }
@@ -397,7 +398,7 @@ public class XFormDecoder {
 
         MaskUtils.createMaskForm(XObject, name, newSMask, pdfStreamDecoder.gs, pdfStreamDecoder.current, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer, useTransparancy);
 
-        if(newSMask==null){
+if(newSMask==null && pdfStreamDecoder.current.getType()==DynamicVectorRenderer.CREATE_T3){ //needs to be normal for actual Mask
             pdfStreamDecoder.current.setGraphicsState(GraphicsState.STROKE, pdfStreamDecoder.gs.getAlpha(GraphicsState.STROKE), blendMode);
             pdfStreamDecoder.current.setGraphicsState(GraphicsState.FILL, pdfStreamDecoder.gs.getAlpha(GraphicsState.FILL), blendMode);
         }
@@ -407,16 +408,13 @@ public class XFormDecoder {
         float[] BBox;
         BBox= XObject.getFloatArray(PdfDictionary.BBox);
         /**get form as an image*/
-        int fx=(int)BBox[0];
+        //int fx=(int)BBox[0];
         final int fy=(int)BBox[1];
         final int fw=(int)BBox[2];
         final int fh=(int)(BBox[3]);
-        //check x,y offsets and factor in
-        if(fx<0) {
-            fx = 0;
-        }
+
         //get the form as an image
-        final BufferedImage currentImage= MaskUtils.createTransparentForm(XObject, fx, fy, fw, fh, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
+        final BufferedImage currentImage= MaskUtils.createTransparentForm(XObject, fy, fw, fh, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer);
         final String imgName='R'+ pdfStreamDecoder.formName;
         //store  final image on disk & in memory
         pdfStreamDecoder.pdfImages.setImageInfo(imgName, pdfStreamDecoder.parserOptions.getPageNumber(), pdfStreamDecoder.gs.CTM[2][0], pdfStreamDecoder.gs.CTM[2][1], fw, fh);

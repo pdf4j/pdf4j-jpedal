@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -165,69 +165,81 @@ public class PdfFilteredReader {
                     setupCachedObjectForDecoding(cacheName);
                 }
 
-    			// apply decode
-    			if (filterType==FlateDecode || filterType==Fl){
-    				filter=new Flate(DecodeParms);
-    			}else if (filterType==PdfFilteredReader.ASCII85Decode || filterType==PdfFilteredReader.A85) {
-                    filter=new ASCII85(DecodeParms);
-    			}else if (filterType==CCITTFaxDecode || filterType==CCF) {
-                    filter=new CCITT(DecodeParms,width, height);
-    			} else if(filterType==LZWDecode || filterType==LZW){
-                    filter=new LZW(DecodeParms, width, height);
-                    resetDataToNull=true;
-
-    			} else if(filterType==RunLengthDecode || filterType==RL) {
-                    filter=new RunLength(DecodeParms);
-    			} else if(filterType==JBIG2Decode){
-    			    
-//    			    filter = new JBIGFilter(DecodeParms);
-
-                    // To work we need to add data as an input to JSD to save the resulting data.
-    				//We do not write back to stream.
-    				
-    				if(data==null){ //hack to read into byte[] and spool back for cache
-    					System.err.println("should not come here");
-    					data=new byte[bis.available()];
-    					bis.read(data);
-    					
-    					int ptr=-1;
-    					//resize as JBIG fussy
-    					for (int ii=data.length-1;ii>9;ii--){
-    						if(data[ii]=='e' && data[ii+1]=='n' && data[ii+2]=='d' && data[ii+3]=='s' &&
-    								data[ii+4]=='t' && data[ii+5]=='r' && data[ii+6]=='e' && data[ii+7]=='a' && data[ii+8]=='m'){
-    							ptr=ii-1;
-    							ii=-1;
-    						}	
-    					}
-    					
-    					if(ptr!=-1){
-    						
-    						if(data[ptr]==10 && data[ptr-1]==13) {
-                                ptr--;
+                // apply decode
+                switch (filterType) {
+                    case FlateDecode:
+                    case Fl:
+                        filter=new Flate(DecodeParms);
+                        break;
+                    case PdfFilteredReader.ASCII85Decode:
+                    case PdfFilteredReader.A85:
+                        filter=new ASCII85(DecodeParms);
+                        break;
+                    case CCITTFaxDecode:
+                    case CCF:
+                        filter=new CCITT(DecodeParms,width, height);
+                        break;
+                    case LZWDecode:
+                    case LZW:
+                        filter=new LZW(DecodeParms, width, height);
+                        resetDataToNull=true;
+                        break;
+                    case RunLengthDecode:
+                    case RL:
+                        filter=new RunLength(DecodeParms);
+                        break;
+                    case JBIG2Decode:
+                        //    			    filter = new JBIGFilter(DecodeParms);
+                        
+                        // To work we need to add data as an input to JSD to save the resulting data.
+                        //We do not write back to stream.
+                        
+                        if(data==null){ //hack to read into byte[] and spool back for cache
+                            System.err.println("should not come here");
+                            data=new byte[bis.available()];
+                            bis.read(data);
+                            
+                            int ptr=-1;
+                            //resize as JBIG fussy
+                            for (int ii=data.length-1;ii>9;ii--){
+                                if(data[ii]=='e' && data[ii+1]=='n' && data[ii+2]=='d' && data[ii+3]=='s' &&
+                                        data[ii+4]=='t' && data[ii+5]=='r' && data[ii+6]=='e' && data[ii+7]=='a' && data[ii+8]=='m'){
+                                    ptr=ii-1;
+                                    ii=-1;
+                                }
                             }
-    						
-    						final byte[] tmp=data;
-    						data=new byte[ptr];    						
-    						System.arraycopy(tmp, 0, data, 0, ptr);
-    					}
-
-                        data=JBIG2.JBIGDecode(data, globalData,ObjectStore.temp_dir);
-                       
-    					streamCache.write(data);
-    					data=null;
-    					
-    				}else{    					
-    			        data=JBIG2.JBIGDecode(data, globalData,ObjectStore.temp_dir);   			        					
-    				}
-
-                    filter = null;
-
-    			} else if (filterType==ASCIIHexDecode || filterType==AHx){
-    				filter=new ASCIIHex(DecodeParms);
-    			}else if(filterType==Crypt){ //just pass though
-                    filter = null;
-    			} else {
-    				filter = null; // handled elsewhere
+                            
+                            if(ptr!=-1){
+                                
+                                if(data[ptr]==10 && data[ptr-1]==13) {
+                                    ptr--;
+                                }
+                                
+                                final byte[] tmp=data;
+                                data=new byte[ptr];
+                                System.arraycopy(tmp, 0, data, 0, ptr);
+                            }
+                            
+                            data=JBIG2.JBIGDecode(data, globalData,ObjectStore.temp_dir);
+                            
+                            streamCache.write(data);
+                            data=null;
+                            
+                        }else{
+                            data=JBIG2.JBIGDecode(data, globalData,ObjectStore.temp_dir);
+                        }   filter = null;
+                        break;
+                    case ASCIIHexDecode:
+                    case AHx:
+                        filter=new ASCIIHex(DecodeParms);
+                        break;
+                    case Crypt:
+                        //just pass though
+                        filter = null;
+                        break;
+                    default:
+                        filter = null; // handled elsewhere
+                        break;
                 }
 
                 if(filter!=null){

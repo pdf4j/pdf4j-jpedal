@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -636,20 +636,30 @@ public class StandardFonts {
         
         String return_character=null;
         
-        if(font_encoding== WIN) {
-            return_character=WIN_char_encoding_table[char_int];
-        } else if(font_encoding==STD) {
-            return_character=STD_char_encoding_table[char_int];
-        } else if(font_encoding==MAC) {
-            return_character=MAC_char_encoding_table[char_int];
-        } else if(font_encoding==PDF) {
-            return_character=PDF_char_encoding_table[char_int];
-        } else if(font_encoding==ZAPF) {
-            return_character=ZAPF_char_encoding_table[char_int];
-        } else if(font_encoding==SYMBOL) {
-            return_character=SYMBOL_char_encoding_table[char_int];
-        } else if(font_encoding==MACEXPERT) {
-            return_character=MACEXPERT_char_encoding_table[char_int];
+        switch (font_encoding) {
+            case WIN:
+                return_character=WIN_char_encoding_table[char_int];
+                break;
+            case STD:
+                return_character=STD_char_encoding_table[char_int];
+                break;
+            case MAC:
+                return_character=MAC_char_encoding_table[char_int];
+                break;
+            case PDF:
+                return_character=PDF_char_encoding_table[char_int];
+                break;
+            case ZAPF:
+                return_character=ZAPF_char_encoding_table[char_int];
+                break;
+            case SYMBOL:
+                return_character=SYMBOL_char_encoding_table[char_int];
+                break;
+            case MACEXPERT:
+                return_character=MACEXPERT_char_encoding_table[char_int];
+                break;
+            default:
+                break;
         }
         
         if (return_character== null) {

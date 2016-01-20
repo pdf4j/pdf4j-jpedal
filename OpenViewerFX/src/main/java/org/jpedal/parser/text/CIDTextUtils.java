@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -290,18 +290,20 @@ public class CIDTextUtils {
         return i;
     }
 
-    static int convertEscapeChar(int secondVal) {
-        if(secondVal=='n'){
-            secondVal='\n';
-        }else if(secondVal=='b'){
-            secondVal='\b';
-        }else if(secondVal=='t'){
-            secondVal='\t';
-        }else if(secondVal=='r'){
-            secondVal='\r';
-        }else if(secondVal=='f'){
-            secondVal='\f';
+    static int convertEscapeChar(final int secondVal) {
+        switch (secondVal) {
+            case 'n':
+                return '\n';
+            case 'b':
+                return '\b';
+            case 't':
+                return '\t';
+            case 'r':
+                return '\r';
+            case 'f':
+                return '\f';
+            default:
+                return secondVal;
         }
-        return secondVal;
     }
 }

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -34,7 +34,6 @@ package org.jpedal.fonts.glyph;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
-import org.jpedal.color.PdfPaint;
 
 /**
  * <p>defines the current shape which is created by command stream</p> 
@@ -44,7 +43,7 @@ import org.jpedal.color.PdfPaint;
  * shape. Has to be done this way as Winding rule is not necessarily
  * declared at start.
   */
-public abstract class BaseT1Glyph implements Serializable, PdfGlyph
+public abstract class BaseT1Glyph extends PdfGlyph implements Serializable
 {
 	
     protected float  glyfwidth=1000f;
@@ -52,8 +51,6 @@ public abstract class BaseT1Glyph implements Serializable, PdfGlyph
     protected boolean isStroked;
 
     protected final Map strokedPositions=new HashMap();
-
-    protected int glyphNumber = -1;
 
     public BaseT1Glyph(){}
     
@@ -63,32 +60,11 @@ public abstract class BaseT1Glyph implements Serializable, PdfGlyph
 
     }
 
-    //use by TT to handle broken TT fonts
-    @Override
-    public boolean containsBrokenData() {
-        return false;
-    }
-
-    @Override
-    public Object getPath() {
-        throw new UnsupportedOperationException("getPath Not supported yet.");
-    }
-    
     @Override
     public void setWidth(final float width) {
 		this.glyfwidth=width;
 		
 	}
-
-    @Override
-    public int getGlyphNumber() {
-        return glyphNumber;
-    }
-
-    @Override
-    public void setGlyphNumber(final int no) {
-        glyphNumber = no;
-    }
 
     /* (non-Javadoc)
      * @see org.jpedal.fonts.PdfGlyph#getmaxWidth()
@@ -98,21 +74,4 @@ public abstract class BaseT1Glyph implements Serializable, PdfGlyph
     	
         return glyfwidth;
     }
-
-	/* (non-Javadoc)
-	 * @see org.jpedal.fonts.PdfGlyph#setT3Colors(java.awt.Color, java.awt.Color)
-	 */
-    @Override
-    public void setT3Colors(final PdfPaint strokeColor, final PdfPaint nonstrokeColor, final boolean lockColours) {
-
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.jpedal.fonts.PdfGlyph#ignoreColors()
-	 */
-    @Override
-    public boolean ignoreColors() {
-		return false;
-	}
 }

@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -83,13 +83,13 @@ public class CS {
             
             newColorSpace= new PatternColorSpace(currentPdfFile, new DeviceRGBColorSpace());
 
-        }else if(!alreadyUsed && cache.containsKey(PdfObjectCache.ColorspacesObjects, ref)){
+        }else if(!alreadyUsed && cache.containsKey(PdfObjectCache.ColorspacesObjects)){
 
             newColorSpace=(GenericColorSpace) cache.get(PdfObjectCache.ColorspacesObjects, ref);
 
             //reinitialise
             newColorSpace.reset();
-        }else if(alreadyUsed && cache.containsKey(PdfObjectCache.ColorspacesObjects, ref2)){
+        }else if(alreadyUsed && cache.containsKey(PdfObjectCache.ColorspacesObjects)){
 
             newColorSpace=(GenericColorSpace) cache.get(PdfObjectCache.ColorspacesObjects, ref2);
 

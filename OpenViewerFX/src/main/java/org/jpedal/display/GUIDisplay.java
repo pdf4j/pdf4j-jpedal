@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -727,6 +727,7 @@ public class GUIDisplay implements Display{
      * Please use public int[] getCursorBoxOnScreenAsArray() instead.
      * @deprecated on 04/07/2014
      */
+    @Deprecated
     @Override
     public Rectangle getCursorBoxOnScreen() {
         throw new UnsupportedOperationException("Please use public int[] getCursorBoxOnScreenAsArray() instead");
@@ -774,19 +775,23 @@ public class GUIDisplay implements Display{
         final int insetH=options.getInsetH();
         
         // Affine transformations
-        if(newRotation == 90){
-            
-            displayScalingDbl[4] += ((insetW/scaling) * displayScalingDbl[1] );
-            displayScalingDbl[5] += ((insetH/scaling) * displayScalingDbl[2] );
-        }else if(newRotation == 270){
-            displayScalingDbl[4] += ((-insetW/scaling) * displayScalingDbl[1] );
-            displayScalingDbl[5] += ((-insetH/scaling) * displayScalingDbl[2] );
-        }else if(newRotation == 180){
-            displayScalingDbl[4] += ((-insetW/scaling) * displayScalingDbl[0] );
-            displayScalingDbl[5] += ((insetH/scaling) * displayScalingDbl[3] );
-        }else{
-            displayScalingDbl[4] += ((insetW/scaling) * displayScalingDbl[0] );
-            displayScalingDbl[5] += ((-insetH/scaling) * displayScalingDbl[3] );
+        switch (newRotation) {
+            case 90:
+                displayScalingDbl[4] += ((insetW/scaling) * displayScalingDbl[1] );
+                displayScalingDbl[5] += ((insetH/scaling) * displayScalingDbl[2] );
+                break;
+            case 270:
+                displayScalingDbl[4] += ((-insetW/scaling) * displayScalingDbl[1] );
+                displayScalingDbl[5] += ((-insetH/scaling) * displayScalingDbl[2] );
+                break;
+            case 180:
+                displayScalingDbl[4] += ((-insetW/scaling) * displayScalingDbl[0] );
+                displayScalingDbl[5] += ((insetH/scaling) * displayScalingDbl[3] );
+                break;
+            default:
+                displayScalingDbl[4] += ((insetW/scaling) * displayScalingDbl[0] );
+                displayScalingDbl[5] += ((-insetH/scaling) * displayScalingDbl[3] );
+                break;
         }
         
         //force redraw if screen being cached
@@ -808,6 +813,7 @@ public class GUIDisplay implements Display{
      * updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead.
      * @deprecated
      */
+    @Deprecated
     @Override
     public void updateCursorBoxOnScreen(final Rectangle newOutlineRectangle, final Color outlineColor, final int pageNumber, final int x_size, final int y_size) {
         throw new UnsupportedOperationException("please use updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead");
@@ -828,6 +834,7 @@ public class GUIDisplay implements Display{
      * Please use setViewableArea(int[] viewport) instead.
      * @deprecated
      */
+    @Deprecated
     @Override
     public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
         throw new UnsupportedOperationException("setViewableArea Not supported yet."); 

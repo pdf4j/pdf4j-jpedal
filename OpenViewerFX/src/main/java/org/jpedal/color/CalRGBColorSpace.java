@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -181,9 +181,9 @@ public class CalRGBColorSpace extends  GenericColorSpace{
             final int ptr=(int) (number_values[0]*3);
             final byte[] cmap=getIndexedMap();
             
-            A[0]=((float)(cmap[ptr] & 255))/255f;
-            A[1]=((float)(cmap[ptr+1] & 255))/255f;
-            A[2]=((float)(cmap[ptr+2] & 255))/255f;
+            A[0]=(cmap[ptr] & 255)/255f;
+            A[1]=(cmap[ptr+1] & 255)/255f;
+            A[2]=(cmap[ptr+2] & 255)/255f;
             
             convertToRGB(A[0],A[1],A[2]);
             

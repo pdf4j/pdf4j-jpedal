@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -194,20 +194,25 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             }
             
             /** with new decode at needed size code the resize (drawImage) may not be needed. */
-            if (finalRotation ==270) {
-                g2.rotate(-Math.PI / 2);
-                g2.translate(-drawWidth, 0);
-                g2.drawImage(image, -posX, posY, drawWidth, drawHeight, null);
-            } else if (finalRotation == 90) {
-                g2.rotate(Math.PI / 2);
-                g2.translate(0, -drawHeight);
-                g2.drawImage(image, posX, -posY, drawWidth, drawHeight, null);
-            } else if (finalRotation == 180) {
-                g2.rotate(Math.PI);
-                g2.translate(-drawWidth, -drawHeight);
-                g2.drawImage(image, -posX, -posY, drawWidth, drawHeight, null);
-            }else {
-                g2.drawImage(image, posX, posY, drawWidth, drawHeight, null);
+            switch (finalRotation) {
+                case 270:
+                    g2.rotate(-Math.PI / 2);
+                    g2.translate(-drawWidth, 0);
+                    g2.drawImage(image, -posX, posY, drawWidth, drawHeight, null);
+                    break;
+                case 90:
+                    g2.rotate(Math.PI / 2);
+                    g2.translate(0, -drawHeight);
+                    g2.drawImage(image, posX, -posY, drawWidth, drawHeight, null);
+                    break;
+                case 180:
+                    g2.rotate(Math.PI);
+                    g2.translate(-drawWidth, -drawHeight);
+                    g2.drawImage(image, -posX, -posY, drawWidth, drawHeight, null);
+                    break;
+                default:
+                    g2.drawImage(image, posX, posY, drawWidth, drawHeight, null);
+                    break;
             }
         } else {
             g2.drawImage(image, 0, 0, null);
@@ -541,27 +546,33 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
                     //find the start of the Tj command
                     int brackets = 0;
                     boolean strFound = false;
+                    OUTER:
                     for (int i = endTj-3; i > startTj; i--) {
-                        if(bytes[i]==' ' || bytes[i]==10 || bytes[i]==13){
-                            if(strFound && brackets==0){
-                                //+1 as we dont want the gap we just found in our text string
-                                startTj = i+1;
+                        switch (bytes[i]) {
+                            case ' ':
+                            case 10:
+                            case 13:
+                                if (strFound && brackets==0) {
+                                    //+1 as we dont want the gap we just found in our text string
+                                    startTj = i+1;
+                                    break OUTER;
+                                }
                                 break;
-                            }
-                        }else if(bytes[i]==')'){
-                            brackets++;
-                        }else if(bytes[i]=='('){
-                            brackets--;
-                            if(brackets==0 && strFound){
-                                startTj = i;
+                            case ')':
+                                brackets++;
                                 break;
-                            }
-                        }else {
-                            strFound = true;
+                            case '(':
+                                brackets--;
+                                if (brackets==0 && strFound) {
+                                    startTj = i;
+                                    break OUTER;
+                                }
+                                break;
+                            default:
+                                strFound = true;
+                                break;
                         }
                     }
-                    
-                    //******* startTJ and endTj should both have a value and start should be before end ******
                 }
                 
                 //find actual end of Tf including any rg or g command after the Tf.

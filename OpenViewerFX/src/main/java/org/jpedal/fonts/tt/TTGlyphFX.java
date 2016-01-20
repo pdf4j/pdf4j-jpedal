@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -33,7 +33,6 @@
 package org.jpedal.fonts.tt;
 
 import javafx.scene.shape.*;
-import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.tt.hinting.TTVM;
 
 import java.io.Serializable;
@@ -43,7 +42,7 @@ import javafx.collections.ObservableList;
 /**
  * Provides addition javafx code if using JavaFX module
  */
-public class TTGlyphFX extends BaseTTGlyph implements PdfGlyph, Serializable{
+public class TTGlyphFX extends BaseTTGlyph implements Serializable{
 
     /**paths for the letter, marked as transient so it wont be serialized */
     transient Path pathsFX;
@@ -65,12 +64,6 @@ public class TTGlyphFX extends BaseTTGlyph implements PdfGlyph, Serializable{
         super(currentGlyf, glyfTable, currentHmtx, idx, unitsPerEm,  vm);
 
     }
-
-    @Override
-    void clearPaths() {
-        //  pathsFX=null;
-    }
-
 
     /**create the actual shape*/
     @Override
@@ -423,10 +416,4 @@ public class TTGlyphFX extends BaseTTGlyph implements PdfGlyph, Serializable{
 
         return pathsFX;
     }
-    
-     @Override
-    public boolean hasHintingApplied() {
-        return this.hasHintingApplied;
-    }
-
 }

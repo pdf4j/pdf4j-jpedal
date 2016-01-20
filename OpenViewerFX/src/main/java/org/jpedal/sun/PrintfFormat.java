@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -3340,34 +3340,36 @@ public class PrintfFormat {
       leadingSpace = false;
       alternateForm = false;
       leadingZeros = false;
-      for ( ; pos < fmt.length(); pos++) {
-        final char c = fmt.charAt(pos);
-        if (c == '\'') {
-            thousands = true;
-        } else if (c == '-') {
-          leftJustify = true;
-          leadingZeros = false;
+        OUTER:
+        for (; pos < fmt.length(); pos++) {
+            final char c = fmt.charAt(pos);
+            switch (c) {
+                case '\'':
+                    thousands = true;
+                    break;
+                case '-':
+                    leftJustify = true;
+                    leadingZeros = false;
+                    break;
+                case '+':
+                    leadingSign = true;
+                    leadingSpace = false;
+                    break;
+                case ' ':
+                    if (!leadingSign) {
+                        leadingSpace = true;
+                    }         break;
+                case '#':
+                    alternateForm = true;
+                    break;
+                case '0':
+                    if (!leftJustify) {
+                        leadingZeros = true;
+                    }         break;
+                default:
+                    break OUTER;
+            }
         }
-        else if (c == '+') {
-          leadingSign = true;
-          leadingSpace = false;
-        }
-        else if (c == ' ') {
-          if (!leadingSign) {
-              leadingSpace = true;
-          }
-        }
-        else if (c == '#') {
-            alternateForm = true;
-        } else if (c == '0') {
-          if (!leftJustify) {
-              leadingZeros = true;
-          }
-        }
-        else {
-            break;
-        }
-      }
     }
     /**
      * The integer portion of the result of a decimal

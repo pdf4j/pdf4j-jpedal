@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -62,11 +62,11 @@ abstract class GUIDisplay extends BaseDisplay implements DynamicVectorRenderer{
             
             switch(currentType){
                 case DynamicVectorRenderer.FILLOPACITY:
-                    setGraphicsState(GraphicsState.FILL, ((Float)obj[i]).floatValue(),PdfDictionary.Normal);
+                    setGraphicsState(GraphicsState.FILL, ((Number)obj[i]).floatValue(),PdfDictionary.Normal);
                     break;
                     
                 case DynamicVectorRenderer.STROKEOPACITY:
-                    setGraphicsState(GraphicsState.STROKE, ((Float)obj[i]).floatValue(),PdfDictionary.Normal);
+                    setGraphicsState(GraphicsState.STROKE, ((Number)obj[i]).floatValue(),PdfDictionary.Normal);
                     break;
                     
                 case DynamicVectorRenderer.STROKEDSHAPE:

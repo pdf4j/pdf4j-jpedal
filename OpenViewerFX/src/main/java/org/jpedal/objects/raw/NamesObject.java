@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -49,7 +49,7 @@ public class NamesObject extends PdfObject {
 
 	//int FormType=0, Height=1, Width=1;
 
-	private PdfObject Dests, JavaScript, JS,XFAImages;
+	private PdfObject Dests, EmbeddedFiles, JavaScript, JS,XFAImages;
 
     private byte[][] Kids,Names;
     
@@ -101,6 +101,9 @@ public class NamesObject extends PdfObject {
 
 	        case PdfDictionary.Dests:
                 return Dests;
+
+            case PdfDictionary.EmbeddedFiles:
+                return EmbeddedFiles;
 
             case PdfDictionary.JavaScript:
                 return JavaScript;
@@ -166,6 +169,10 @@ public class NamesObject extends PdfObject {
             
             case PdfDictionary.Dests:
                 Dests=value;
+                break;
+
+            case PdfDictionary.EmbeddedFiles:
+                EmbeddedFiles=value;
                 break;
                 
             case PdfDictionary.JavaScript:

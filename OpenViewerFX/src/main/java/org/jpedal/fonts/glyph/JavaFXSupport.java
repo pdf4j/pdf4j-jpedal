@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -35,8 +35,10 @@ package org.jpedal.fonts.glyph;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import org.jpedal.fonts.tt.FontFile2;
 import org.jpedal.fonts.tt.Glyf;
@@ -73,32 +75,32 @@ public class JavaFXSupport {
         throw new UnsupportedOperationException("getFXClipNot supported yet."); 
     }
 
-    public void renderGUIComponent(final int formType, final Object value, final Object guiComp, final int guiType) {
+    public static void renderGUIComponent(final int formType, final Object value, final Object guiComp) {
 
         if (Platform.isFxApplicationThread()) {
-            setGUI(formType, value, guiComp, guiType);
+            setGUI(formType, value, guiComp);
         } else {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    setGUI(formType, value, guiComp, guiType);
+                    setGUI(formType, value, guiComp);
                 }
             });
         }
     }
 
-    private static void setGUI(final int formType, final Object value, final Object guiComp, final int guiType) {
+    private static void setGUI(final int formType, final Object value, final Object guiComp) {
 
         if (GenericFormFactory.isTextForm(formType)) {
             ((TextInputControl) guiComp).setText((String) value);
         } else if (formType == FormFactory.checkboxbutton) {
-            ((ToggleButton) guiComp).setSelected(Boolean.valueOf((String) value));
+            ((Toggle) guiComp).setSelected(Boolean.valueOf((String) value));
         } else if (GenericFormFactory.isButtonForm(formType)) {
-            ((ToggleButton) guiComp).setText((String) value);
-            ((ToggleButton) guiComp).setSelected(Boolean.valueOf((String) value));
+            ((Labeled) guiComp).setText((String) value);
+            ((Toggle) guiComp).setSelected(Boolean.valueOf((String) value));
         } else if (formType == FormFactory.annotation
                 && guiComp instanceof ToggleButton) {
-            ((ToggleButton) guiComp).setSelected(Boolean.valueOf((String) value));
+            ((Toggle) guiComp).setSelected(Boolean.valueOf((String) value));
         }
     }
 

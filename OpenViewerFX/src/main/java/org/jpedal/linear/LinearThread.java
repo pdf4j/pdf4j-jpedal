@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -145,7 +145,7 @@ public class LinearThread extends Thread {
                     System.arraycopy(buffer, size1-aa, lastBuffer,0,aa);
                 }
 
-                percentageDone= (int) (100*((float)bytesRead/(float)linearfileLength));
+                percentageDone= (int) (100*(bytesRead/(float)linearfileLength));
 
                 //debug code to simulate slow file stream by slowing down read of data from file
                // System.out.println("percentage="+percentageDone);

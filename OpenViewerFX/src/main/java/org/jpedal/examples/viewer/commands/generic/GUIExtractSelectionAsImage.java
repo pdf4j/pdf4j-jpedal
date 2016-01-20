@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -43,7 +43,6 @@ import java.io.IOException;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.gui.GUIFactory;
-import org.jpedal.parser.DecoderOptions;
 
 /**
  * This is a generic class which holds generic code for
@@ -77,13 +76,8 @@ public class GUIExtractSelectionAsImage {
             t_x2=commonValues.m_x1;
             t_x1=commonValues.m_x2;
         }
-        float scaling = 100;
         
-        if(DecoderOptions.isRunningOnWindows) {
-            scaling = 100 * currentGUI.getScaling();
-        }
-        
-        snapShot=decode_pdf.getSelectedRectangleOnscreen(t_x1,t_y1,t_x2,t_y2,scaling);
+        snapShot=decode_pdf.getSelectedRectangleOnscreen(t_x1,t_y1,t_x2,t_y2,100 * currentGUI.getScaling());
     }
     
     

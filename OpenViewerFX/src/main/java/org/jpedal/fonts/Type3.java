@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -188,7 +188,7 @@ public class Type3 extends PdfFont {
                         otherKey=-1;
                         
                        // System.out.println("str="+" "+rawDiffKeys.keySet());
-                        key=((Integer)rawDiffKeys.get(keyPairs.getNextKeyAsString())).intValue();
+                        key=((Number)rawDiffKeys.get(keyPairs.getNextKeyAsString())).intValue();
                         
                         glyphs.setT3Glyph(key,otherKey, glyph);
                         

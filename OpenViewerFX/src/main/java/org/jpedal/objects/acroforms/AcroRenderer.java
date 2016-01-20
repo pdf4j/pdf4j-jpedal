@@ -6,7 +6,7 @@
  * Project Info:  http://www.idrsolutions.com
  * Help section for developers at http://www.idrsolutions.com/support/
  *
- * (C) Copyright 1997-2015 IDRsolutions and Contributors.
+ * (C) Copyright 1997-2016 IDRsolutions and Contributors.
  *
  * This file is part of JPedal/JPDF2HTML5
  *
@@ -522,6 +522,9 @@ public class AcroRenderer{
                         
                         try{
                             formObject=convertRefToFormObject(objRef,page);
+                            if(!isAnnotation(formObject)){
+                                continue;
+                            }
                         }catch(Exception e){
                             LogWriter.writeLog("Exception "+e+" with "+objRef);
                             continue;
@@ -771,6 +774,49 @@ public class AcroRenderer{
         }
     }
 
+    /**
+     * Utility method to ensure formObject is actually an annotation before we continue
+     * @param form FormObject to check
+     * @return True if annotation
+     */
+    private boolean isAnnotation(FormObject formObject){
+        
+        if(formObject.getParameterConstant(PdfDictionary.Type)==PdfDictionary.Annot){
+            return true;
+        }
+        
+        switch(formObject.getParameterConstant(PdfDictionary.Subtype)){
+            case PdfDictionary.Text :
+            case PdfDictionary.Link :
+            case PdfDictionary.FreeText :
+//            case PdfDictionary.Line :
+            case PdfDictionary.Square :
+//            case PdfDictionary.Circle :
+//            case PdfDictionary.Polygon :
+//            case PdfDictionary.PolyLine :
+            case PdfDictionary.Highlight :
+            case PdfDictionary.Underline :
+//            case PdfDictionary.Squiggly :
+            case PdfDictionary.StrickOut :
+            case PdfDictionary.Stamp :
+//            case PdfDictionary.Caret :
+            case PdfDictionary.Ink :
+            case PdfDictionary.Popup :
+            case PdfDictionary.FileAttachment :
+            case PdfDictionary.Sound :
+//            case PdfDictionary.Movie :
+            case PdfDictionary.Widget :
+            case PdfDictionary.Screen :
+//            case PdfDictionary.PrinterMark :
+//            case PdfDictionary.TrapNet :
+//            case PdfDictionary.Watermark :
+//            case PdfDictionary.3D :
+                return true;
+            default :
+                return false;
+        }
+    }
+    
     private void storeSignatures(final FormObject formObject, final int subtype) {
 
         //if sig object set global sig object so we can access later
@@ -1002,15 +1048,17 @@ public class AcroRenderer{
      */
     public void displayComponentsOnscreen(final int startPage, int endPage) {
         
-       // System.out.println("displayComponentsOnscreen "+startPage+" "+endPage);
-        
-        //make sure this page is inclusive in loop
-        endPage++;
-        
-        compData.displayComponents(startPage, endPage);
-        
-        //used in tests
-        org.jpedal.DevFlags.formsLoaded = true;
+        //On rare occurances compData can be null as dispose called during paint.
+        //As dispose only called on viewer close we can lock issue out here
+        if (compData != null) {
+            //make sure this page is inclusive in loop
+            endPage++;
+
+            compData.displayComponents(startPage, endPage);
+
+            //used in tests
+            org.jpedal.DevFlags.formsLoaded = true;
+        }
     }
     
     private void initJSonFields(final Map<String, String> formsCreated) {
@@ -1125,62 +1173,62 @@ public class AcroRenderer{
             }
             
         } else {
-            if (subtype ==PdfDictionary.Tx) { //-----------------------------------------------  TEXT --------------------------------------
-                
-                //flags used for text types
-                // 20100212 (ms) commented out ones not used
-                boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
-                if (flags != null) {
-                    isMultiline = flags[FormObject.MULTILINE_ID];
-                    hasPassword = flags[FormObject.PASSWORD_ID];
-                    //doNotScroll = flags[FormObject.DONOTSCROLL_ID];
-                    //richtext = flags[FormObject.RICHTEXT_ID];
-                    //fileSelect = flags[FormObject.FILESELECT_ID];
-                    //doNotSpellCheck = flags[FormObject.DONOTSPELLCHECK_ID];
-                }
-                
-                if (isMultiline) {
-                    
-                    if (hasPassword) {
+            switch (subtype) {
+                case PdfDictionary.Tx:
+                    boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
+                    if (flags != null) {
+                        isMultiline = flags[FormObject.MULTILINE_ID];
+                        hasPassword = flags[FormObject.PASSWORD_ID];
+                        //doNotScroll = flags[FormObject.DONOTSCROLL_ID];
+                        //richtext = flags[FormObject.RICHTEXT_ID];
+                        //fileSelect = flags[FormObject.FILESELECT_ID];
+                        //doNotSpellCheck = flags[FormObject.DONOTSPELLCHECK_ID];
+                    }   
+                    if (isMultiline) {
                         
-                        widgetType=FormFactory.MULTILINEPASSWORD;
+                        if (hasPassword) {
+                            
+                            widgetType=FormFactory.MULTILINEPASSWORD;
+                            
+                        } else {
+                            widgetType=FormFactory.MULTILINETEXT;
+                        }
+                    } else {//singleLine
                         
-                    } else {                        
-                        widgetType=FormFactory.MULTILINETEXT;
-                    }
-                } else {//singleLine
+                        if (hasPassword) {
+                            widgetType=FormFactory.SINGLELINEPASSWORD;
+                        } else {
+                            widgetType=FormFactory.SINGLELINETEXT;
+                        }
+                    }   
+                    break;
+                case PdfDictionary.Ch:
+                    //----------------------------------------- CHOICE ----------------------------------------------
                     
-                    if (hasPassword) {                      
-                        widgetType=FormFactory.SINGLELINEPASSWORD;                       
-                    } else {
-                        widgetType=FormFactory.SINGLELINETEXT;                       
-                    }
-                }
-            }else if (subtype==PdfDictionary.Ch) {//----------------------------------------- CHOICE ----------------------------------------------
-                
-                //flags used for choice types
-                //20100212 (ms) Unused ones commented out
-                boolean isCombo = false;// multiSelect = false, sort = false, isEditable = false, doNotSpellCheck = false, comminOnSelChange = false;
-                if (flags != null) {
-                    isCombo = flags[FormObject.COMBO_ID];
-                    //multiSelect = flags[FormObject.MULTISELECT_ID];
-                    //sort = flags[FormObject.SORT_ID];
-                    //isEditable = flags[FormObject.EDIT_ID];
-                    //doNotSpellCheck = flags[FormObject.DONOTSPELLCHECK_ID];
-                    //comminOnSelChange = flags[FormObject.COMMITONSELCHANGE_ID];
-                }
-                
-                if (isCombo) {// || (type==XFAFORM && ((XFAFormObject)formObject).choiceShown!=XFAFormObject.CHOICE_ALWAYS)){                   
-                    widgetType=FormFactory.COMBOBOX;
-                } else {//it is a list                   
-                    widgetType=FormFactory.LIST;
-                }
-            } else if (subtype == PdfDictionary.Sig) {                
-                widgetType=FormFactory.SIGNATURE;
-            } else{//assume annotation if (formType == ANNOTATION) {
-                
-                widgetType=FormFactory.ANNOTATION;
-                
+                    //flags used for choice types
+                    //20100212 (ms) Unused ones commented out
+                    boolean isCombo = false;// multiSelect = false, sort = false, isEditable = false, doNotSpellCheck = false, comminOnSelChange = false;
+                    if (flags != null) {
+                        isCombo = flags[FormObject.COMBO_ID];
+                        //multiSelect = flags[FormObject.MULTISELECT_ID];
+                        //sort = flags[FormObject.SORT_ID];
+                        //isEditable = flags[FormObject.EDIT_ID];
+                        //doNotSpellCheck = flags[FormObject.DONOTSPELLCHECK_ID];
+                        //comminOnSelChange = flags[FormObject.COMMITONSELCHANGE_ID];
+                    }   if (isCombo) {// || (type==XFAFORM && ((XFAFormObject)formObject).choiceShown!=XFAFormObject.CHOICE_ALWAYS)){                   
+                        widgetType=FormFactory.COMBOBOX;
+                    } else {//it is a list
+                        widgetType=FormFactory.LIST;
+                    }   
+                    break;
+                case PdfDictionary.Sig:
+                    widgetType=FormFactory.SIGNATURE;
+                    break;
+                default:
+                    //assume annotation if (formType == ANNOTATION) {
+                    
+                    widgetType=FormFactory.ANNOTATION;
+                    break;
             }
         }
         
@@ -1209,21 +1257,28 @@ public class AcroRenderer{
      * Object[] will vary depending on what ReturnValues enum is passed in and could contain String (Names), FormObject or Component 
      */
     public Object[] getFormComponents(final String objectName, final ReturnValues value, final int pageNumber) {
-        
-        //if(formFactory.getType()!=FormFactory.ULC){
-            /**make sure all forms decoded*/
-            if(pageNumber==-1){
-                for (int p = 1; p < this.pageCount + 1; p++) //add init method and move scaling/rotation to it
-                {
-                    createDisplayComponentsForPage(p, null);
+
+        switch(value) {
+
+            case EMBEDDED_FILES:
+
+                return currentPdfFile.getNamesLookup().getEmbeddedFiles();
+
+            default:
+
+                //if(formFactory.getType()!=FormFactory.ULC){
+                /**make sure all forms decoded*/
+                if (pageNumber == -1) {
+                    for (int p = 1; p < this.pageCount + 1; p++) //add init method and move scaling/rotation to it
+                    {
+                        createDisplayComponentsForPage(p, null);
+                    }
+                } else {
+                    createDisplayComponentsForPage(pageNumber, null);
                 }
-            }else{
-                createDisplayComponentsForPage(pageNumber, null);
-            }
-        //}
-        
-        return compData.getFormComponents(objectName,value,pageNumber).toArray();
-        
+
+                return compData.getFormComponents(objectName, value, pageNumber).toArray();
+        }
     }
     
     /**
@@ -1316,6 +1371,7 @@ public class AcroRenderer{
      * @deprecated - getFormComponents(String objectName, ReturnValues value,int pageNumber) recommended
      * as much more flexible
      */
+    @Deprecated
     public PdfArrayIterator getAnnotsOnPage(final int page) {
         
         //check annots decoded - will just return if done

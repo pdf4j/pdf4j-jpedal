@@ -54,9 +54,9 @@ public class DirectDictionaryToObject {
             valueObj=pdfObject;
             
             //if only 1 item use that ref not parent and indirect (ie <</Metadata 38 0 R>>)
-            int objCount=0, refStarts=-1,refEnds=-1;
+            int objCount=0, refStarts=-1,refEnds=-1,length=raw.length;
             if(raw[0]=='<'){
-                for(int ii=0;ii<raw.length;ii++){
+                for(int ii=0;ii<length;ii++){
                     
                     //avoid binary data
                     if(raw[ii]=='s' && raw[ii+1]=='t' && raw[ii+2]=='r' && raw[ii+3]=='e' && raw[ii+4]=='a' && raw[ii+5]=='m') {
@@ -64,7 +64,7 @@ public class DirectDictionaryToObject {
                     }
                     
                     //count keys
-                    if(raw[ii]=='/' && raw[ii+1]!='L' && raw[ii+2]!='e' && raw[ii+3]!='n' ) {
+                    if(raw[ii]=='/' &&((length-ii>2) || (raw[ii+1]!='L' && raw[ii+2]!='e' && raw[ii+3]!='n' ))) {
                         objCount++;
                     }
                     //find start of ref

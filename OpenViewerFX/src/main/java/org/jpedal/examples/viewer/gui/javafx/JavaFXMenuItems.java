@@ -44,7 +44,6 @@ import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.OpenViewerFX;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUIButtons;
 import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;

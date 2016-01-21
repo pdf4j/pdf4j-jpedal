@@ -361,8 +361,8 @@ public class FormStream {
     			
     			//if the width and height scaling are miles apart then the width and height 
    				//are probably the wrong way round so swap them. and recalc the scalings.
-    			float ws = ((float)width)/((float)boxWidth);
-				float hs = ((float)height)/((float)boxHeight);
+    			float ws = width/((float)boxWidth);
+				float hs = height/((float)boxHeight);
 				
 				//check if dimensions are correct and alter if not
 				final float diff = ws-hs;
@@ -374,8 +374,8 @@ public class FormStream {
 					width = height;
 					height = tmpI;
 					
-					ws = ((float)width)/((float)boxWidth);
-					hs = ((float)height)/((float)boxHeight);
+					ws = width/((float)boxWidth);
+					hs = height/((float)boxHeight);
 				}
 				//NOTE now we re set the width and height to scaled 
 				//value of Bounding box to keep the orientation
@@ -410,8 +410,8 @@ public class FormStream {
                     width = (int) defaultSize;
                 }
     			
-				final float ws = ((float)width)/defaultSize;
-				final float hs = ((float)height)/defaultSize;
+				final float ws = width/defaultSize;
+				final float hs = height/defaultSize;
 				if(ws>hs){
 					scaling = ws;
 					height=(int)(defaultSize*scaling);

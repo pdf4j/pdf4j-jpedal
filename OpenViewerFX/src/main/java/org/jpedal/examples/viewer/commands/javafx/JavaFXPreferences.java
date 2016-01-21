@@ -544,7 +544,7 @@ public class JavaFXPreferences {
                     }
                     if (GUI.showMessages) {
 
-                        new FXMessageDialog(preferenceDialog.getDialog(), Modality.APPLICATION_MODAL, Messages.getMessage("PdfPreferences.restart")).showAndWait();
+                        new FXMessageDialog(preferenceDialog.getDialog(), Messages.getMessage("PdfPreferences.restart")).showAndWait();
                     }
                     preferenceDialog.close();
                 }
@@ -1114,7 +1114,7 @@ public class JavaFXPreferences {
         copyBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(final ActionEvent e) {
-                final FXMessageDialog dialog = new FXMessageDialog(null, Modality.APPLICATION_MODAL, Messages.getMessage("PdfExtensions.clipboard"));
+                final FXMessageDialog dialog = new FXMessageDialog(null, Messages.getMessage("PdfExtensions.clipboard"));
                 dialog.show();
                 final Clipboard clipboard = Clipboard.getSystemClipboard();
                 final ClipboardContent clipboardContent = new ClipboardContent();

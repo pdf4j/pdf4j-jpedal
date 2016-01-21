@@ -125,17 +125,17 @@ public class FXMessageDialog extends FXDialog {
         dialog.sizeToScene();
     }
 
-    public FXMessageDialog(final Stage parent, final Modality modality, final String message) {
+    public FXMessageDialog(final Stage parent, final String message) {
         this(parent);
         this.message.set(message);
     }
     
-    public FXMessageDialog(final Stage parent, final Modality modality, final Image icon) {
+    public FXMessageDialog(final Stage parent, final Image icon) {
         this(parent);
         setImage(icon);
     }
     
-    public FXMessageDialog(final Stage parent, final Modality modality, final Image icon, final String message) {
+    public FXMessageDialog(final Stage parent, final Image icon, final String message) {
         this(parent);
         setImage(icon);
         this.message.set(message);
@@ -143,12 +143,10 @@ public class FXMessageDialog extends FXDialog {
     
     /**
      * MessageDialog with custom center node
-     * 
-     * @param parent The stage of Dialog
-     * @param modality The mode of the Dialog
+     *  @param parent The stage of Dialog
      * @param group The group of the Dialog
      */
-    public FXMessageDialog(final Stage parent, final Modality modality, final Parent group){
+    public FXMessageDialog(final Stage parent, final Parent group){
         this(parent);
         content.setCenter(group);
     }

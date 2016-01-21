@@ -152,16 +152,18 @@ public class RenderUtils {
      */
     public static void renderClip(final Area clip, final Rectangle dirtyRegion,  final Shape defaultClip, final Graphics2D g2) {
 
-        if (clip != null){
-            g2.setClip(clip);
+        if (g2 != null) {
+            if (clip != null) {
+                g2.setClip(clip);
 
-            //can cause problems in Canoo so limit effect if Canoo running
-            if(dirtyRegion!=null)// && (!isRunningOnRemoteClient || clip.intersects(dirtyRegion)))
-            {
-                g2.clip(dirtyRegion);
+                //can cause problems in Canoo so limit effect if Canoo running
+                if (dirtyRegion != null)// && (!isRunningOnRemoteClient || clip.intersects(dirtyRegion)))
+                {
+                    g2.clip(dirtyRegion);
+                }
+            } else {
+                g2.setClip(defaultClip);
             }
-        }else if(g2!=null) {
-            g2.setClip(defaultClip);
         }
     }
 

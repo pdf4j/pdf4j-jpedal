@@ -2796,7 +2796,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
 
         if (showMessage) {
-            final FXMessageDialog dialog = new FXMessageDialog(stage, Modality.APPLICATION_MODAL, message.toString());
+            final FXMessageDialog dialog = new FXMessageDialog(stage, message.toString());
             dialog.setTitle(title);
             dialog.show();
         }
@@ -2961,18 +2961,18 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                final FXMessageDialog dialog = new FXMessageDialog(stage, Modality.APPLICATION_MODAL, message);
+                final FXMessageDialog dialog = new FXMessageDialog(stage, message);
                 dialog.show();
             }
         });
     }
 
-    public void showMessageDialog(final String message, final String hstitle) {
+    public void showMessageDialog(final String message, final String title) {
 
         if (debugFX) {
-            System.out.println("showMessageDialog - Implemented");
+            System.out.println("showMessageDialog - Implemented "+title);
         }
-        final FXMessageDialog dialog = new FXMessageDialog(stage, Modality.APPLICATION_MODAL, message);
+        final FXMessageDialog dialog = new FXMessageDialog(stage, message);
         dialog.showAndWait();
     }
 
@@ -2997,7 +2997,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
         }
 
         if (showMessage) {
-            final FXMessageDialog dialog = new FXMessageDialog(stage, Modality.APPLICATION_MODAL, (Parent) info);
+            final FXMessageDialog dialog = new FXMessageDialog(stage, (Parent) info);
             dialog.show();
         }
 
@@ -3047,7 +3047,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
             supportLink.getChildren().addAll(supportImg, supportText);
 
-            final FXMessageDialog supportDialog = new FXMessageDialog(stage, Modality.APPLICATION_MODAL, supportLink);
+            final FXMessageDialog supportDialog = new FXMessageDialog(stage, supportLink);
             supportDialog.setResizeable(true);
             supportDialog.setWidth(280);
             supportDialog.setHeight(220);

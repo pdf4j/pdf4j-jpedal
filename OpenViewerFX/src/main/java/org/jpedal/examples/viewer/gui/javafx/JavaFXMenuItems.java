@@ -541,16 +541,16 @@ public class JavaFXMenuItems extends GUIMenuItems {
             		break;
                    
             	case Display.PAGEFLOW :
-                    if(!OpenViewerFX.isOpenFX){
-                        pageFlow = pageView;
-                        pageFlow.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(final ActionEvent t) {
-                                currentCommands.executeCommand(Commands.PAGEFLOW, null);
-                            }
-                        });
-                        pageLayout.getItems().add(pageFlow);
-                    }
+                    
+                    pageFlow = pageView;
+                    pageFlow.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(final ActionEvent t) {
+                            currentCommands.executeCommand(Commands.PAGEFLOW, null);
+                        }
+                    });
+                    pageLayout.getItems().add(pageFlow);
+                    
             		break;
                     
             	}        
@@ -1052,7 +1052,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
                         break;
 
                 }
-            }else if(!OpenViewerFX.isOpenFX){
+            }else{
                 /**
                  * Disable View Modes.
                  */

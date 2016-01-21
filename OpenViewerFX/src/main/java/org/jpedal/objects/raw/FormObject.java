@@ -2529,8 +2529,8 @@ public class FormObject extends PdfObject{
                 y2 = tmp;
             }
 
-            final double ix1 = (double)x1; //truncates to ensure form area fully contained
-            final double iy1 = (double)y1;
+            final double ix1 = x1; //truncates to ensure form area fully contained
+            final double iy1 = y1;
 
             final double ix2 = x2 + ((x2 - x2 > 0) ? 1 : 0);
             final double iy2 = y2 + ((y2 - y2 > 0) ? 1 : 0);
@@ -3760,13 +3760,13 @@ public class FormObject extends PdfObject{
                     if (GenericFormFactory.isTextForm(formType)) {
                         ((JTextComponent) guiComp).setText((String) value);
                     }else if(formType==FormFactory.checkboxbutton){
-                        ((JCheckBox) guiComp).setSelected(Boolean.valueOf((String) value));
+                        ((AbstractButton) guiComp).setSelected(Boolean.valueOf((String) value));
                     }else if (GenericFormFactory.isButtonForm(formType)) {
-                        ((JRadioButton) guiComp).setText((String) value);
-                        ((JRadioButton) guiComp).setSelected(Boolean.valueOf((String) value));
+                        ((AbstractButton) guiComp).setText((String) value);
+                        ((AbstractButton) guiComp).setSelected(Boolean.valueOf((String) value));
                     }else if(formType==FormFactory.annotation && 
                         guiComp instanceof JButton){
-                            ((JButton) guiComp).setSelected(Boolean.valueOf((String) value));
+                            ((AbstractButton) guiComp).setSelected(Boolean.valueOf((String) value));
                         }
                     
                 }
@@ -3964,7 +3964,7 @@ public class FormObject extends PdfObject{
                     JavaFXSupport.setVisible(guiComp, isVisible);
                 }
             }else{
-                ((JComponent)guiComp).setVisible(isVisible);
+                ((Component)guiComp).setVisible(isVisible);
             }
         }
     }

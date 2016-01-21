@@ -105,7 +105,7 @@ public class JavaFXImageIcon extends ImageView {
 	 */
 	protected boolean displaySingle;
     
-    JavaFXImageIcon(final ButtonBase parentButton, final PdfObject formObject, final PdfObject imgObj, final int iconRot, final PdfObjectReader pdfObjectReader, final int type, final int offset){
+    JavaFXImageIcon(final ButtonBase parentButton, final PdfObject formObject, final PdfObject imgObj, final PdfObjectReader pdfObjectReader, final int type, final int offset){
     	//this.iconRot=iconRot;
         this.formObject=formObject;
     	
@@ -144,8 +144,8 @@ public class JavaFXImageIcon extends ImageView {
         setupButton(parentButton);
     }
     
-    JavaFXImageIcon(final ButtonBase parentButton, final PdfObject formObject, final PdfObject selObject, final PdfObject unselObject, final int iconRot, final int sel,
-    		final PdfObjectReader pdfObjectReader, final int type, final int offset) {
+    JavaFXImageIcon(final ButtonBase parentButton, final PdfObject formObject, final PdfObject selObject, final PdfObject unselObject, final int sel,
+                    final PdfObjectReader pdfObjectReader, final int type, final int offset) {
 		//this.iconRot=iconRot;
         this.formObject=formObject;
     	selObj = selObject;

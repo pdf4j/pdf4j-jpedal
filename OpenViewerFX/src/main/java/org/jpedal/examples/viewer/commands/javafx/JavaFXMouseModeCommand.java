@@ -34,7 +34,6 @@ package org.jpedal.examples.viewer.commands.javafx;
 
 import java.net.URL;
 import javafx.scene.Cursor;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
@@ -94,7 +93,7 @@ public class JavaFXMouseModeCommand {
                     ((PdfDecoderFX) decode_pdf).setDefaultCursor(Cursor.TEXT);
                 }
             } else {
-                final FXMessageDialog newMessage = new FXMessageDialog((Stage)currentGUI.getFrame(), Modality.APPLICATION_MODAL, Messages.getMessage("PdfCustomGui.textSelectionUnavailible"));
+                final FXMessageDialog newMessage = new FXMessageDialog((Stage)currentGUI.getFrame(), Messages.getMessage("PdfCustomGui.textSelectionUnavailible"));
                 newMessage.show();
             }
         } else {

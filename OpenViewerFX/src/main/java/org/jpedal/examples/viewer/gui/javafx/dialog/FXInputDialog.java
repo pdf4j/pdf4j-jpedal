@@ -43,7 +43,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -55,7 +54,7 @@ public class FXInputDialog extends FXMessageDialog {
     private final StringProperty input;
     
     public FXInputDialog(final Stage parent, final String message) {
-        super(parent, Modality.APPLICATION_MODAL, message);
+        super(parent, message);
         
         input = new SimpleStringProperty();
         final TextField textField = new TextField();

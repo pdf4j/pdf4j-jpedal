@@ -38,7 +38,6 @@ import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -67,7 +66,7 @@ public class FXOptionDialog extends FXMessageDialog {
     private int choice = -1;
     
     public FXOptionDialog(final Stage parent, final String message, final String title, final int optionType, final Object[] options, final Object initialValue) {
-        super(parent, Modality.APPLICATION_MODAL, message);
+        super(parent, message);
         
         setTitle(title);
         setupButtons(optionType, options, initialValue);
@@ -75,7 +74,7 @@ public class FXOptionDialog extends FXMessageDialog {
     }
     
     public FXOptionDialog(final Stage parent, final Object message, final String title, final int optionType, final Object[] options, final Object initialValue) {
-        super(parent, Modality.APPLICATION_MODAL, message.toString());
+        super(parent, message.toString());
         
         setTitle(title);
         setupButtons(optionType, options, initialValue);

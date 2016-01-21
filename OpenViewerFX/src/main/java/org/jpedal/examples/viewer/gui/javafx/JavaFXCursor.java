@@ -57,17 +57,17 @@ public class JavaFXCursor {
     /**/
     
     public static Cursor getCursor(final int type) {
-        System.out.println("Method getCursor in JavaFXCursor.java is not implemented for JavaFX");
+        System.out.println("Method getCursor in JavaFXCursor.java is not implemented for JavaFX "+type);
         return null;
     }
     
     public static URL getURLForImage(final String path){
-        System.out.println("Method getURLForImage in JavaFXCursor.java is not implemented for JavaFX");
+        System.out.println("Method getURLForImage in JavaFXCursor.java is not implemented for JavaFX "+path);
         return null;
     }
     
     public static Image getCursorImageForFX(final int type) {
-        System.out.println("Method getURLForImage in JavaFXCursor.java is not implemented for JavaFX");
+        System.out.println("Method getURLForImage in JavaFXCursor.java is not implemented for JavaFX "+type);
         return null;
     }
     

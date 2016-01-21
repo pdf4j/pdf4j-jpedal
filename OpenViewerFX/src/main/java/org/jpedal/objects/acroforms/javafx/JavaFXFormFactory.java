@@ -1346,7 +1346,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
             
             if(normalOffDic!=null){
                 comp.setText(null);
-                normal = new JavaFXImageIcon(comp, form,normalOffDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),currentPdfFile,subtype,0);
+                normal = new JavaFXImageIcon(comp, form,normalOffDic, currentPdfFile,subtype,0);
             }
             
             if(APobjN.getDictionary(PdfDictionary.On) !=null){
@@ -1369,7 +1369,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
             
             if(normalOnDic!=null){
                 comp.setText(null);
-                selected = new JavaFXImageIcon(comp, form,normalOnDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),currentPdfFile,subtype,0);
+                selected = new JavaFXImageIcon(comp, form,normalOnDic, currentPdfFile,subtype,0);
                 if(normal == null){
                     normal = new JavaFXImageIcon(comp,form,(Image)null,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R));
                 }
@@ -1426,12 +1426,12 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
             
             if (downOffDic == null || downOnDic == null) {
                 if (downOffDic != null) {
-                    down=new JavaFXImageIcon(comp,form,downOffDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),currentPdfFile,subtype,offsetDownImage);
+                    down=new JavaFXImageIcon(comp,form,downOffDic, currentPdfFile,subtype,offsetDownImage);
                 } else if (downOnDic != null) {
-                    down=new JavaFXImageIcon(comp,form,downOnDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),currentPdfFile,subtype,offsetDownImage);
+                    down=new JavaFXImageIcon(comp,form,downOnDic, currentPdfFile,subtype,offsetDownImage);
                 }
             } else {
-                down = new JavaFXImageIcon(comp,form,downOnDic,downOffDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),comp.isPressed()?1:0,currentPdfFile,subtype,offsetDownImage);
+                down = new JavaFXImageIcon(comp,form,downOnDic,downOffDic, comp.isPressed()?1:0,currentPdfFile,subtype,offsetDownImage);
             }
         }
         
@@ -1444,7 +1444,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
             }
             
             if(rollOffDic!=null){
-                rollover = new JavaFXImageIcon(comp,form,rollOffDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),currentPdfFile,subtype,0);
+                rollover = new JavaFXImageIcon(comp,form,rollOffDic, currentPdfFile,subtype,0);
             }
             
             //if we have a root stream then it is the off value
@@ -1465,7 +1465,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
             }
             
             if(rollOnDic!=null){                
-                rolloverSelected = new JavaFXImageIcon(comp,form,rollOnDic,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R),currentPdfFile,subtype,0);
+                rolloverSelected = new JavaFXImageIcon(comp,form,rollOnDic, currentPdfFile,subtype,0);
                 if(rollover==null){
                     rollover = new JavaFXImageIcon(comp,form,(Image)null,form.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R));
                 }

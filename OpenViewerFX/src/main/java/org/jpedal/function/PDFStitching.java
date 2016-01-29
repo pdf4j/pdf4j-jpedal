@@ -72,6 +72,14 @@ public class PDFStitching extends PDFGenericFunction implements PDFFunction {
 	 */
 	@Override
     public float[] compute(final float[] values){
+        
+//        if(functions.length == 1){
+//            float x = min(max(values[0],domain[0]),domain[1]);
+//            x = encode[0]+(x-domain[0])*(encode[1]-encode[0])/(domain[1]-domain[0]);
+//            float[] vv = functions[0].compute(new float[]{x}); 
+//            vv[0] = 1-vv[0];
+//            return vv;
+//        }
 
         //take raw input number
         final float x=min(max(values[0],domain[0*2]),domain[0*2+1]);
@@ -132,7 +140,7 @@ public class PDFStitching extends PDFGenericFunction implements PDFFunction {
 	 */
 	@Override
     public float[] computeStitch(final float[] values){
-
+        
         //take raw input number
         final float x=min(max(values[0],domain[0*2]),domain[0*2+1]);
 

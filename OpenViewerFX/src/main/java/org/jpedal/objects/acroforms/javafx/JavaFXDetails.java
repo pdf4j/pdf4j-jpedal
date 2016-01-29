@@ -32,7 +32,6 @@
  */
 package org.jpedal.objects.acroforms.javafx;
 
-import java.math.BigInteger;
 import javafx.beans.property.SimpleStringProperty;
 
 import javafx.scene.control.TableColumn;
@@ -45,8 +44,7 @@ class JavaFXDetails {
     
 //    private final TableView<Model> table1 = new TableView<Model>();
 
-    public static void setValues(final int version, final String hashAlgorithm, final String subject, final String issuer, final BigInteger serialNumber, final String notBefore,
-                                 final String notAfter, final String publicKeyDescription, final String publicKey, final String x509Data, final String sha1Digest, final String md5Digest) {
+    public static void setValues() {
 
 //        this.publicKey = publicKey;
         

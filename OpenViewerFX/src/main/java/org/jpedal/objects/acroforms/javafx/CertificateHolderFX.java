@@ -54,8 +54,8 @@ public class CertificateHolderFX {
         generalTab = new JavaFXGeneral();
        
         generalTab.setValues(name, notBefore, notAfter);
-        JavaFXDetails.setValues(version, hashAlgorithm, subjectFields, issuerFields,
-            serialNumber, notBefore, notAfter, publicKeyDescription, publicKey, x509Data, sha1Digest, md5Digest);
+        JavaFXDetails.setValues(
+        );
         
         
      }

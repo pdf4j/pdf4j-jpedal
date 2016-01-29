@@ -297,7 +297,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(!arg2.booleanValue()){
+				if(!arg2){
 					double page = 0.0;
                     
                     if(!leftT.getText().isEmpty()){
@@ -332,7 +332,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(!arg2.booleanValue()){
+				if(!arg2){
 					double page = 0.0;
                     
                     if(!rightT.getText().isEmpty()){
@@ -366,7 +366,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(!arg2.booleanValue()){
+				if(!arg2){
 					double page = 0.0;
                     
                     if(!topT.getText().isEmpty()){
@@ -401,7 +401,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(!arg2.booleanValue()){
+				if(!arg2){
 					double page = 0.0;
                     
                     if(!bottomT.getText().isEmpty()){
@@ -485,7 +485,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(arg2.booleanValue()){
+				if(arg2){
                     allStateChanged();
                 }
 			}
@@ -499,7 +499,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(arg2.booleanValue()){
+				if(arg2){
                     printRangeCurrentView();
                 }
 			}
@@ -513,7 +513,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(arg2.booleanValue()){
+				if(arg2){
                     currentPageStateChanged();
                 }
 			}
@@ -527,7 +527,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(arg2.booleanValue()){
+				if(arg2){
                     pagesFromStateChanged();
                 }
 			}
@@ -554,7 +554,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(!arg2.booleanValue()){
+				if(!arg2){
 					int page = 1;
                     
                     if(!numberFrom.getText().isEmpty()){
@@ -590,7 +590,7 @@ public class PrintPanelFX extends Pane implements PrintPanelInt{
 			@Override
 			public void changed(final ObservableValue<? extends Boolean> arg0,
 					final Boolean arg1, final Boolean arg2) {
-				if(!arg2.booleanValue()){
+				if(!arg2){
 					int page = pdf.getPageCount();
                     
                     if(!numberTo.getText().isEmpty()){

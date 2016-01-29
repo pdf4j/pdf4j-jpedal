@@ -643,7 +643,7 @@ public abstract class MultiPageDecoder {
             //// END SI'S PAGE COUNTER ////////////
 
             //update page number
-            if(newPage!=-1)// && customSwingHandle!=null)
+            if(newPage!=-1 && gui!=null)// && customSwingHandle!=null)
             {
                 gui.setPage(newPage);//( (org.jpedal.gui.GUIFactory) customSwingHandle).setPage(newPage);
             }

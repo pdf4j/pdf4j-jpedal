@@ -648,7 +648,7 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
         
         //Update cursor position if over page
         throw new UnsupportedOperationException("We do not currently use this method for JavaFX as it appears the X and Y coords\n" +
-                                                    " can be retrieved from the bottom left in JavaFX compared to the top left in Swing");
+                                                    " can be retrieved from the bottom left in JavaFX compared to the top left in Swing "+x+" "+y+" "+page);
         
 //        Point pagePosition;
 //        switch(decode_pdf.getDisplayView()){

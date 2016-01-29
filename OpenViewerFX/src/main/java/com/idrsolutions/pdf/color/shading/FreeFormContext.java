@@ -74,7 +74,7 @@ public class FreeFormContext implements PaintContext {
     private final BitReader reader;
 
     FreeFormContext(final GenericColorSpace shadingColorSpace,
-            final float[] background, PdfObject shadingObject, float[][] matrix, int pageHeight, float scaling, int offX, int offY) {
+                    PdfObject shadingObject, float[][] matrix, int pageHeight, float scaling, int offX, int offY) {
 
        // this.shadingColorSpace = shadingColorSpace;
       //  this.background = background;

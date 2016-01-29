@@ -32,6 +32,7 @@
  */
 package org.jpedal.examples.viewer.gui;
 
+import org.jpedal.gui.GUIFactory;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.*;
@@ -121,7 +122,6 @@ import org.jpedal.external.ExternalHandlers;
 import org.jpedal.external.Options;
 import org.jpedal.external.RenderChangeListener;
 import org.jpedal.fonts.tt.TTGlyph;
-import org.jpedal.gui.*;
 import org.jpedal.io.StatusBarFX;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.AcroRenderer;
@@ -2017,7 +2017,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
                         break;
                     case Display.CONTINUOUS_FACING:
-                        tw = tw * 2;
+                        tw *= 2;
                         switch (index) {
                             case 0://fit page
                                 tempScaling = (float) getScalingRatio(tw, th, width, height);

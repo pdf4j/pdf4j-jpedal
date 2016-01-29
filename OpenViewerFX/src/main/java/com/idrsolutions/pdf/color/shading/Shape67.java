@@ -33,11 +33,7 @@
 package com.idrsolutions.pdf.color.shading;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +47,6 @@ import java.util.List;
 @SuppressWarnings("ALL")
 public class Shape67 {
 
-    private Rectangle boundingBox;
     private final GeneralPath shape;
     private final Color colorsArr[];
     private final Point2D pointsArr[];
@@ -74,62 +69,17 @@ public class Shape67 {
         shape.curveTo(sp[7].getX(), sp[7].getY(), sp[8].getX(), sp[8].getY(), sp[9].getX(), sp[9].getY());
         shape.curveTo(sp[10].getX(), sp[10].getY(), sp[11].getX(), sp[11].getY(), sp[0].getX(), sp[0].getY());
         shape.closePath();
-        boundingBox = shape.getBounds();
     }
 
     public GeneralPath getShape() {
         return shape;
     }
 
-    public void applyTransformation(AffineTransform af) {
-        shape.transform(af);
-        double[] coords = new double[6];
-        PathIterator iter = shape.getPathIterator(null); //set to null bcoz already tranformed
-        int count = 0;
-        while (!iter.isDone()) {
-            iter.currentSegment(coords);
-            switch (count) {
-                case 0:
-                    pointsArr[0] = new Point2D.Double(coords[0], coords[1]);
-                    break;
-                case 1:
-                    pointsArr[1] = new Point2D.Double(coords[0], coords[1]);
-                    pointsArr[2] = new Point2D.Double(coords[2], coords[3]);
-                    pointsArr[3] = new Point2D.Double(coords[4], coords[5]);
-                    break;
-                case 2:
-                    pointsArr[4] = new Point2D.Double(coords[0], coords[1]);
-                    pointsArr[5] = new Point2D.Double(coords[2], coords[3]);
-                    pointsArr[6] = new Point2D.Double(coords[4], coords[5]);
-                    break;
-                case 3:
-                    pointsArr[7] = new Point2D.Double(coords[0], coords[1]);
-                    pointsArr[8] = new Point2D.Double(coords[2], coords[3]);
-                    pointsArr[9] = new Point2D.Double(coords[4], coords[5]);
-                    break;
-                case 4:
-                    pointsArr[10] = new Point2D.Double(coords[0], coords[1]);
-                    pointsArr[11] = new Point2D.Double(coords[2], coords[3]);
-                    break;
-            }
-            count++;
-            iter.next();
-        }
-        determineSteps();
-        boundingBox = shape.getBounds();
-    }
-
     public Point2D[] getPointsArray() {
         return pointsArr;
     }
 
-    public Rectangle getBoundingBox() {
-        return boundingBox;
-    }
-
-    public void setBoundingBox(Rectangle boundingBox) {
-        this.boundingBox = boundingBox;
-    }
+   
 
 //    private double getC1Length() {
 //        return curveLength(pointsArr[9], pointsArr[10], pointsArr[11], pointsArr[0], nSteps);
@@ -165,16 +115,16 @@ public class Shape67 {
         return arr;
     }
 
-    private static Point2D[] linePoints(Point2D p1, Point2D p2, int nSteps) {
-        double len = p1.distance(p2);
-        Point2D[] arr = new Point2D[nSteps + 1];
-        double d = len / nSteps;
-        for (int i = 0; i <= nSteps; i++) {
-            double ratio = (d * i) / len;
-            double x = ratio * p2.getX() + (1.0 - ratio) * p1.getX();
-            double y = ratio * p2.getY() + (1.0 - ratio) * p1.getY();
-            arr[i] = new Point2D.Double(x, y);
-        }
+    private static float[][] linePoints(Point2D p1, Point2D p2) {       
+        float[][] arr = new float[3][2];
+        arr[0][0] = (float) p1.getX();
+        arr[0][1] = (float) p1.getY();
+
+        arr[1][0] = (float) (p1.getX() + p2.getX()) / 2;
+        arr[1][1] = (float) (p1.getY() + p2.getY()) / 2;
+
+        arr[2][0] = (float) p2.getX();
+        arr[2][1] = (float) p2.getY();
         return arr;
     }
 
@@ -207,38 +157,38 @@ public class Shape67 {
         Point2D[][] xy = new Point2D[szv][szu];
         Color[][] cc = new Color[szv][szu];
 
-        double stepV = 1.0 / (szv - 1);
-        double stepU = 1.0 / (szu - 1);
-        double v = -stepV;
+        float stepV = 1f / (szv - 1);
+        float stepU = 1f / (szu - 1);
+        float v = -stepV;
         int[][] pointColors = new int[4][4];
         for (int i = 0; i < 4; i++) {
             pointColors[i] = new int[]{colorsArr[i].getRed(), colorsArr[i].getGreen(), colorsArr[i].getBlue(), colorsArr[i].getAlpha()};
         }
 
-        double vMinus, uMinus, scx, scy, sdx, sdy, sbx, sby;
+        float vMinus, uMinus, scx, scy, sdx, sdy, sbx, sby;
 
         for (int i = 0; i < szv; i++) {
             v += stepV;
             vMinus = 1 - v;
-            double u = -stepU;
+            float u = -stepU;
             for (int j = 0; j < szu; j++) {
                 u += stepU;
                 uMinus = 1 - u;
-                scx = vMinus * C1[j].getX() + v * C2[j].getX();
-                scy = vMinus * C1[j].getY() + v * C2[j].getY();
+                scx = (float) (vMinus * C1[j].getX() + v * C2[j].getX());
+                scy = (float) (vMinus * C1[j].getY() + v * C2[j].getY());
 
-                sdx = uMinus * D1[i].getX() + u * D2[i].getX();
-                sdy = uMinus * D1[i].getY() + u * D2[i].getY();
+                sdx = (float) (uMinus * D1[i].getX() + u * D2[i].getX());
+                sdy = (float) (uMinus * D1[i].getY() + u * D2[i].getY());
 
-                sbx = vMinus * (uMinus * C1[0].getX() + u * C1[C1.length - 1].getX())
-                        + v * (uMinus * C2[0].getX() + u * C2[C2.length - 1].getX());
-                sby = vMinus * ((1 - u) * C1[0].getY() + u * C1[C1.length - 1].getY())
-                        + v * (uMinus * C2[0].getY() + u * C2[C2.length - 1].getY());
+                sbx = (float) (vMinus * (uMinus * C1[0].getX() + u * C1[C1.length - 1].getX())
+                        + v * (uMinus * C2[0].getX() + u * C2[C2.length - 1].getX()));
+                sby = (float) (vMinus * ((1 - u) * C1[0].getY() + u * C1[C1.length - 1].getY())
+                        + v * (uMinus * C2[0].getY() + u * C2[C2.length - 1].getY()));
 
-                double sx = scx + sdx - sbx;
-                double sy = scy + sdy - sby;
+                float sx = scx + sdx - sbx;
+                float sy = scy + sdy - sby;
 
-                xy[i][j] = new Point2D.Double(sx, sy);
+                xy[i][j] = new Point2D.Float(sx, sy);
 
                 int[] temp = new int[4];
                 for (int ci = 0; ci < 4; ci++) {
@@ -261,23 +211,23 @@ public class Shape67 {
         }
     }
 
-    public Color findPointColor(Point p, boolean isRecursive) {
+    public Color findPointColor(Point2D p, boolean isRecursive) {
 
         if (patches.isEmpty()) {
             generateBilinearMapping();
         }
         Color pColor = null;
-        if (lastFound != null && lastFound.getPath().contains(p)) {
-            Color[] colors = lastFound.getColors();
-            Point2D[] points = lastFound.getPoints();
+        if (lastFound != null && lastFound.path.contains(p)) {
+            Color[] colors = lastFound.colors;
+            Point2D[] points = lastFound.points;
             return recurseTrapezoidal(p, points, colors, isRecursive, 0);
         }
 
         for (TinyPatch patch : patches) {
-            if (patch.getPath().contains(p)) {
+            if (patch.path.contains(p)) {
                 lastFound = patch;
-                Color[] colors = patch.getColors();
-                Point2D[] points = patch.getPoints();
+                Color[] colors = patch.colors;
+                Point2D[] points = patch.points;
                 return recurseTrapezoidal(p, points, colors, isRecursive, 0);
             }
             lastFound = null;
@@ -285,16 +235,16 @@ public class Shape67 {
         return pColor;
     }
 
-    public Color recurseTrapezoidal(Point2D p, Point2D[] points, Color[] colors, boolean isRecursive, int depth) {
+    private static Color recurseTrapezoidal(Point2D p, Point2D[] points, Color[] colors, boolean isRecursive, int depth) {
 
-        if (depth > 2 || !isRecursive || points[0].distance(points[1]) < 4) {
+        if (depth > 2 || !isRecursive) {
             return colors[0];
         }
 
-        Point2D[] C1 = linePoints(points[0], points[3], 2);
-        Point2D[] C2 = linePoints(points[1], points[2], 2);
-        Point2D[] D1 = linePoints(points[0], points[1], 2);
-        Point2D[] D2 = linePoints(points[3], points[2], 2);
+        float[][] C1 = linePoints(points[0], points[3]);
+        float[][] C2 = linePoints(points[1], points[2]);
+        float[][] D1 = linePoints(points[0], points[1]);
+        float[][] D2 = linePoints(points[3], points[2]);
 
         final int szu = C1.length;
         final int szv = D1.length;
@@ -302,43 +252,41 @@ public class Shape67 {
         Point2D[][] xy = new Point2D[szv][szu];
         Color[][] cc = new Color[szv][szu];
 
-        double stepV = 1.0 / (szv - 1);
-        double stepU = 1.0 / (szu - 1);
-        double v = -stepV;
-        int[][] pointColors = new int[4][4];
+        float stepV = 1f / (szv - 1);
+        float stepU = 1f / (szu - 1);
+        float v = -stepV;
+        int[][] pColors = new int[4][4];
         for (int i = 0; i < 4; i++) {
-            pointColors[i] = new int[]{colors[i].getRed(), colors[i].getGreen(), colors[i].getBlue(), colors[i].getAlpha()};
+            pColors[i] = new int[]{colors[i].getRed(), colors[i].getGreen(), colors[i].getBlue(), colors[i].getAlpha()};
         }
 
-        double vMinus, uMinus, scx, scy, sdx, sdy, sbx, sby;
+        float vMinus, uMinus, scx, scy, sdx, sdy, sbx, sby, u, sx, sy;
 
         for (int i = 0; i < szv; i++) {
             v += stepV;
             vMinus = 1 - v;
-            double u = -stepU;
+            u = -stepU;
             for (int j = 0; j < szu; j++) {
                 u += stepU;
                 uMinus = 1 - u;
-                scx = vMinus * C1[j].getX() + v * C2[j].getX();
-                scy = vMinus * C1[j].getY() + v * C2[j].getY();
+                scx = vMinus * C1[j][0] + v * C2[j][0];
+                scy = vMinus * C1[j][1] + v * C2[j][1];
 
-                sdx = uMinus * D1[i].getX() + u * D2[i].getX();
-                sdy = uMinus * D1[i].getY() + u * D2[i].getY();
+                sdx = uMinus * D1[i][0] + u * D2[i][0];
+                sdy = uMinus * D1[i][1] + u * D2[i][1];
 
-                sbx = vMinus * (uMinus * C1[0].getX() + u * C1[C1.length - 1].getX())
-                        + v * (uMinus * C2[0].getX() + u * C2[C2.length - 1].getX());
-                sby = vMinus * ((1 - u) * C1[0].getY() + u * C1[C1.length - 1].getY())
-                        + v * (uMinus * C2[0].getY() + u * C2[C2.length - 1].getY());
+                sbx = vMinus * (uMinus * C1[0][0] + u * C1[2][0]) + v * (uMinus * C2[0][0] + u * C2[2][0]);
+                sby = vMinus * (uMinus * C1[0][1] + u * C1[2][1]) + v * (uMinus * C2[0][1] + u * C2[2][1]);
 
-                double sx = scx + sdx - sbx;
-                double sy = scy + sdy - sby;
+                sx = scx + sdx - sbx;
+                sy = scy + sdy - sby;
 
-                xy[i][j] = new Point2D.Double(sx, sy);
+                xy[i][j] = new Point2D.Float(sx, sy);
 
                 int[] temp = new int[4];
                 for (int ci = 0; ci < 4; ci++) {
-                    temp[ci] = (int) (vMinus * (uMinus * pointColors[0][ci] + u * pointColors[3][ci])
-                            + v * (uMinus * pointColors[1][ci] + u * pointColors[2][ci]));
+                    temp[ci] = (int) (vMinus * (uMinus * pColors[0][ci] + u * pColors[3][ci])
+                            + v * (uMinus * pColors[1][ci] + u * pColors[2][ci]));
                 }
                 cc[i][j] = new Color(temp[0], temp[1], temp[2], temp[3]);
 
@@ -352,7 +300,7 @@ public class Shape67 {
                 Point2D[] patchPoints = {xy[i][j], xy[i][j + 1], xy[i + 1][j + 1], xy[i + 1][j]};
                 Color[] patchColors = {cc[i][j], cc[i][j + 1], cc[i + 1][j + 1], cc[i + 1][j]};
                 TinyPatch tiny = new TinyPatch(patchPoints, patchColors);
-                if (tiny.getPath().contains(p)) {
+                if (tiny.path.contains(p)) {
                     depth++;
                     return recurseTrapezoidal(p, patchPoints, patchColors, isRecursive, depth);
                 }
@@ -363,16 +311,12 @@ public class Shape67 {
 
     }
 
-    private void determineSteps() {
-        int crossLen = (int) pointsArr[0].distance(pointsArr[6]);
-        nSteps = crossLen < 4 ? 4 : Math.min(10, crossLen);
-    }
 
-    public class TinyPatch {
+    private static class TinyPatch {
 
-        private final GeneralPath path;
-        private final Color[] colors;
-        private final Point2D[] points;
+        final GeneralPath path;
+        final Color[] colors;
+        final Point2D[] points;
 
         public TinyPatch(Point2D[] points, Color[] colors) {
 
@@ -387,22 +331,10 @@ public class Shape67 {
             path.closePath();
         }
 
-        public GeneralPath getPath() {
-            return path;
-        }
-
-        public Color[] getColors() {
-            return colors;
-        }
-
-        public Point2D[] getPoints() {
-            return points;
-        }
-
     }
-
-    protected Shape67 cloneShape() {
-        return new Shape67(pointsArr.clone(), colorsArr.clone());
+    
+    public void setSteps(int steps){
+        nSteps = steps;
     }
 
 }

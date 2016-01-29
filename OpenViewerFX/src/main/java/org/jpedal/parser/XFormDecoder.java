@@ -396,7 +396,7 @@ public class XFormDecoder {
 
         final boolean useTransparancy=newSMask!=null || blendMode!=PdfDictionary.Normal || pdfStreamDecoder.gs.getAlpha(GraphicsState.FILL)==1f;
 
-        MaskUtils.createMaskForm(XObject, name, newSMask, pdfStreamDecoder.gs, pdfStreamDecoder.current, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer, useTransparancy);
+        MaskUtils.createMaskForm(XObject, name, newSMask, pdfStreamDecoder.gs, pdfStreamDecoder.current, pdfStreamDecoder.currentPdfFile, pdfStreamDecoder.parserOptions, pdfStreamDecoder.formLevel, pdfStreamDecoder.multiplyer, useTransparancy,blendMode);
 
 if(newSMask==null && pdfStreamDecoder.current.getType()==DynamicVectorRenderer.CREATE_T3){ //needs to be normal for actual Mask
             pdfStreamDecoder.current.setGraphicsState(GraphicsState.STROKE, pdfStreamDecoder.gs.getAlpha(GraphicsState.STROKE), blendMode);

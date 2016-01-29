@@ -275,19 +275,19 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
                 break;
 
             case AXIAL:
-                if(cropH == 0){
-                    pt = new AxialShadeContext(xform, shadingColorSpace, background, Shading, matrix, function, textX, textY);
+                if(textX == 0 && textY==0){
+                    pt = new AxialShadeContext(xform, shadingColorSpace, background, Shading, matrix, function);
                 }else{
                     pt = new AxialContext(xform, renderingType, isPrinting, offX, offY, cropX, cropH, 1f / scaling, isExtended, domain, coords, shadingColorSpace, colorsReversed, background, function);
                 }
                 break;
 
             case RADIAL:
-                pt = new RadialContext(xform, isPrinting, shadingColorSpace, background, Shading, matrix, function);
+                pt = new RadialContext(xform, shadingColorSpace, background, Shading, matrix, function);
                 break;
 
             case FREEFORM:
-                pt = new FreeFormContext(shadingColorSpace, null, Shading, matrix, cropH, scaling, offX, offY);
+                pt = new FreeFormContext(shadingColorSpace, Shading, matrix, cropH, scaling, offX, offY);
                 break;
 
             case LATTICEFORM:
@@ -296,9 +296,9 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
 
             case COONS:
                 if (!shapesList.isEmpty()) {
-                    pt = new CoonsContext(xform, shapesList, background, cropH, 1f / scaling, offX, offY);
+                    pt = new CoonsContext(xform, shadingColorSpace, shapesList, background, matrix, function);
                 } else {
-                    CoonsContext ct = new CoonsContext(xform, shadingColorSpace, background, Shading, matrix, cropH, 1f / scaling, offX, offY, function);
+                    CoonsContext ct = new CoonsContext(xform, shadingColorSpace, background, Shading, matrix, function);
                     shapesList = ct.getShapes();
                     pt = ct;
                 }
@@ -308,9 +308,9 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
             //check store setup and try using cached context
 
                 if (!shapesList.isEmpty()) {
-                    pt = new TensorContext(xform, shapesList, background, cropH, 1f / scaling, offX, offY);
+                    pt = new TensorContext(xform, shadingColorSpace, shapesList, background, matrix, function);
                 } else {
-                    TensorContext tt = new TensorContext(xform, shadingColorSpace, background, Shading, matrix, cropH, 1f / scaling, offX, offY, function);
+                    TensorContext tt = new TensorContext(xform, shadingColorSpace, background, Shading, matrix, function);
                     shapesList = tt.getShapes();
                     pt = tt;
                 }

@@ -390,7 +390,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 	    } else {
             //Adjust line width to 1 if less than 1
             //ignore if using T3Display (such as ap image generation in html / svg conversion
-            if(enhanceFractionalLines && ((((BasicStroke)shapeStroke).getLineWidth()*scaling<1 && ((BasicStroke)shapeStroke).getLineWidth()!=0) &&
+            if(enhanceFractionalLines && ((((BasicStroke)shapeStroke).getLineWidth()*scaling<1) &&
                     !(this instanceof T3Display))){
                 g2.setStroke(new BasicStroke(1/scaling,((BasicStroke)shapeStroke).getEndCap(), ((BasicStroke)shapeStroke).getLineJoin(), ((BasicStroke)shapeStroke).getMiterLimit(), ((BasicStroke)shapeStroke).getDashArray(), ((BasicStroke)shapeStroke).getDashPhase()));
             }else{
@@ -728,6 +728,16 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     }
 
+    /**
+     * Screen drawing using hi res images and not down-sampled images but may be slower
+     * and use more memory
+     */
+    @Override
+    public boolean getHiResImageForDisplayMode() {
+	    return this.useHiResImageForDisplay;
+
+    }
+    
     @Override
     public void setScalingValues(final double cropX, final double cropH, final float scaling) {
 

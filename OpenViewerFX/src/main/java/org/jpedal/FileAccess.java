@@ -437,7 +437,12 @@ public class FileAccess {
         }
 
         if(type== PdfDictionary.Unknown) {
-            type= PdfDictionary.Pages;
+           
+            if(pdfObject.getKeyArray(PdfDictionary.Kids)!=null){
+                type= PdfDictionary.Pages;
+            }else{
+                 type= PdfDictionary.Page;
+            }
         }
 
 

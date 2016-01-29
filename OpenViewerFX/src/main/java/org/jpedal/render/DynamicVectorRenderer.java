@@ -61,7 +61,8 @@ public interface DynamicVectorRenderer  {
 
     FontHandler getFontHandler();
 
-    
+    boolean getHiResImageForDisplayMode();
+
     enum Mode{PDF,XFA,SMASK}
 
     int TEXT=1;

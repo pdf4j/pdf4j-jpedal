@@ -651,13 +651,13 @@ public String generateOpAsString(final int p, final boolean loseSlashPrefix) {
             
             count++;
             
-            values.add(Float.valueOf(NumberUtils.parseFloat(startPtr, endPtr - startPtr, characterStream)));
+            values.add(NumberUtils.parseFloat(startPtr, endPtr - startPtr, characterStream));
             
         }
         
         final float[] op = new float[count];
         for (int i = 0; i < count; i++) {
-            op[i] = ((Float) values.get(i)).floatValue();
+            op[i] = ((Float) values.get(i));
         }
         return op;
     }

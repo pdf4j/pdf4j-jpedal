@@ -285,7 +285,7 @@ public class JPEGDecoder {
                 
                 //switch order
                 byte r,g,b;
-                for(int i=0;i<db.length;i=i+3){
+                for(int i=0;i<db.length;i += 3){
                     b=db[i];
                     g=db[i+1];
                     r=db[i+2];

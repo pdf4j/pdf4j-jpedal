@@ -1004,4 +1004,8 @@ public class GraphicsState implements Cloneable
     public int getBMValue() {
         return BMvalue;
     }
+    
+    public void setBMValue(int bm){
+        BMvalue = bm;
+    }
 }

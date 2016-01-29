@@ -45,7 +45,7 @@ public class BlendContext implements CompositeContext {
 //    private final float alpha;
     private final int blendMode;
 
-    public BlendContext(int blendMode, float alpha) {
+    public BlendContext(int blendMode) {
         this.blendMode = blendMode;
     }
 
@@ -97,40 +97,7 @@ public class BlendContext implements CompositeContext {
 //                    }
                     switch (blendMode) {
                         case PdfDictionary.Normal:
-                            break;
-                        case PdfDictionary.Multiply:
-                            result = doMultiply(sp, dp);
-                            break;
-                        case PdfDictionary.Screen:
-                            result = doScreen(sp, dp);
-                            break;
-                        case PdfDictionary.Overlay:
-                            result = doOverlay(sp, dp);
-                            break;
-                        case PdfDictionary.Darken:
-                            result = doDarken(sp, dp);
-                            break;
-                        case PdfDictionary.Lighten:
-                            result = doLighten(sp, dp);
-                            break;
-                        case PdfDictionary.ColorDodge:
-                            result = doColorDodge(sp, dp);
-                            break;
-                        case PdfDictionary.ColorBurn:
-                            result = doColorBurn(sp, dp);
-                            break;
-                        case PdfDictionary.HardLight:
-                            result = doHardLight(sp, dp);
-                            break;
-                        case PdfDictionary.SoftLight:
-                            result = doSoftLight(sp, dp);
-                            break;
-                        case PdfDictionary.Difference:
-                            result = doDifference(sp, dp);
-                            break;
-                        case PdfDictionary.Exclusion:
-                            result = doExclusion(sp, dp);
-                            break;
+                            break;                        
                         case PdfDictionary.Hue:
                             result = doHue(sp, dp);
                             break;
@@ -180,171 +147,7 @@ public class BlendContext implements CompositeContext {
     private static int[] getRGBA(int argb) {
         return new int[]{(argb >> 16) & 0xff, (argb >> 8) & 0xff, argb & 0xff, (argb >> 24) & 0xff};
     }
-
-    private static int[] doMultiply(int[] src, int[] dst) {
-        return new int[]{(src[0] * dst[0]) >> 8, (src[1] * dst[1]) >> 8, (src[2] * dst[2]) >> 8};
-    }
-
-    private static int[] doScreen(int[] src, int[] dst) {
-        
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        
-        return new int[]{
-            255 - ((255 - src[0]) * (255 - dst[0]) >> 8),
-            255 - ((255 - src[1]) * (255 - dst[1]) >> 8),
-            255 - ((255 - src[2]) * (255 - dst[2]) >> 8)
-        };
-    }
-
-    private static int[] doOverlay(int[] src, int[] dst) {
-//        return doHardLight(src, dst);
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        
-        int[] result = new int[3];
-        for (int i = 0; i < 3; i++) {
-            double ss = dst[i] / 255.0;
-            double dd = src[i] / 255.0;
-
-            if (ss > 0.5) {
-                ss = 2.0 * ss - 1;
-                result[i] = (int) (255.0 * (ss + dd - (ss * dd)));
-
-            } else {
-                ss = 2 * ss;
-                result[i] = (int) (255.0 * (ss * dd));
-            }
-        }
-        return result;
-    }
-
-    private static int[] doHardLight(int[] src, int[] dst) {
-
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-
-        int[] result = new int[3];
-        for (int i = 0; i < 3; i++) {
-            double ss = src[i] / 255.0;
-            double dd = dst[i] / 255.0;
-
-            if (ss <= 0.5) {
-                ss = 2 * ss;
-                result[i] = (int) (255 * (ss * dd));
-
-            } else {
-                ss = 2 * ss - 1;
-                result[i] = (int) (255 * (ss + dd - (ss * dd)));
-            }
-        }
-        return result;
-    }
-
-    private static int[] doDarken(int[] src, int[] dst) {
-        
-        return new int[]{
-            Math.min(src[0], dst[0]),
-            Math.min(src[1], dst[1]),
-            Math.min(src[2], dst[2])
-        };
-    }
-
-    private static int[] doLighten(int[] src, int[] dst) {
-        
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        
-        return new int[]{
-            Math.max(src[0], dst[0]),
-            Math.max(src[1], dst[1]),
-            Math.max(src[2], dst[2])
-        };
-    }
-
-    private static int[] doColorDodge(int[] src, int[] dst) {
-                
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        
-        return new int[]{
-            src[0] == 255 ? 255
-            : Math.min((dst[0] << 8) / (255 - src[0]), 255),
-            src[1] == 255 ? 255
-            : Math.min((dst[1] << 8) / (255 - src[1]), 255),
-            src[2] == 255 ? 255
-            : Math.min((dst[2] << 8) / (255 - src[2]), 255)
-        };
-    }
-
-    private static int[] doColorBurn(int[] src, int[] dst) {
-                
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        
-        return new int[]{
-            src[0] == 0 ? 0
-            : Math.max(0, 255 - (((255 - dst[0]) << 8) / src[0])),
-            src[1] == 0 ? 0
-            : Math.max(0, 255 - (((255 - dst[1]) << 8) / src[1])),
-            src[2] == 0 ? 0
-            : Math.max(0, 255 - (((255 - dst[2]) << 8) / src[2]))
-        };
-    }
-
-    private static int[] doSoftLight(int[] src, int[] dst) {
-                
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        
-        int[] result = new int[3];
-        for (int i = 0; i < 3; i++) {
-            double ss = src[i] / 255.0;
-            double dd = dst[i] / 255.0;
-
-            if (ss <= 0.5) {
-                result[i] = (int) (255 * (dd - (1 - 2 * ss) * dd * (1 - dd)));
-            } else {
-                if (dd > 0.25) {
-                    result[i] = (int) (255 * (dd + (2 * ss - 1) * (Math.sqrt(dd) - dd)));
-                } else {
-                    result[i] = (int) (255 * (dd + (2 * ss - 1) * ((((16 * dd - 12) * dd + 4) * dd) - dd)));
-                }
-            }
-        }
-        return result;
-    }
-
-    private static int[] doDifference(int[] src, int[] dst) {
-        
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        return new int[]{
-            Math.abs(dst[0] - src[0]),
-            Math.abs(dst[1] - src[1]),
-            Math.abs(dst[2] - src[2])
-        };
-    }
-
-    private static int[] doExclusion(int[] src, int[] dst) {
-        
-        if (dst[0] == 255 && dst[1] == 255 && dst[2] == 255) {
-            return new int[]{src[0], src[1], src[2]};
-        }
-        return new int[]{
-            dst[0] + src[0] - (dst[0] * src[0] >> 7),
-            dst[1] + src[1] - (dst[1] * src[1] >> 7),
-            dst[2] + src[2] - (dst[2] * src[2] >> 7)
-        };
-    }
+   
 
     private static int[] doColor(int[] src, int[] dst) {
         
@@ -548,10 +351,4 @@ public class BlendContext implements CompositeContext {
         return v1;
     }
 
-//    private static double sat(double r, double g, double b) {
-//        return (Math.max(Math.max(r, g), b) - Math.min(Math.min(r, g), b));
-//    }    
-//    private static double setSat(double r, double g, double b, double s) {
-//
-//    }
 }

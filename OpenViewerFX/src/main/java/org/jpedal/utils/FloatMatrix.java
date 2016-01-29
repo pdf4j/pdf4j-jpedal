@@ -76,14 +76,14 @@ public class FloatMatrix {
     }
     
     public static AffineTransform toAffine(float[][] mm){
-       return new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
+       return new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[0][2], mm[1][2]);
     }
     
     public static float[][] toMatrix(AffineTransform at){
         return new float[][]{
-            {(float)at.getScaleX(),(float)at.getShearX(),0},
-            {(float)at.getShearY(),(float)at.getScaleY(),0},
-            {(float)at.getTranslateX(),(float)at.getTranslateY(),1}
+            {(float)at.getScaleX(),(float)at.getShearX(),(float)at.getTranslateX()},
+            {(float)at.getShearY(),(float)at.getScaleY(),(float)at.getTranslateY()},
+            {0,0,1}
         };
     }
     
@@ -96,8 +96,14 @@ public class FloatMatrix {
     }
     
     public static void main(String[] args) {
-        float[][] matrix = new float[][]{{100.775868f,0,0},{0,1,0},{0,0,1}};
-        show(matrix);
+        float[][] matrix1 = {{10,0,5},{0,10,5},{0,0,1}};
+        float[][] matrix2 = {{1,0,100},{0,1,150},{0,0,1}};
+        AffineTransform a1 = toAffine(matrix1);
+        AffineTransform a2 = toAffine(matrix2);
+        
+        a1.concatenate(a2);
+        System.out.println(a1);
+//        show(matrix);
     }
-
+    
 }

@@ -35,9 +35,7 @@ package com.idrsolutions.pdf.color.shading;
 import java.awt.Color;
 import java.awt.PaintContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -46,6 +44,7 @@ import org.jpedal.color.GenericColorSpace;
 import org.jpedal.function.PDFFunction;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 
 public class RadialContext implements PaintContext {
 
@@ -59,9 +58,9 @@ public class RadialContext implements PaintContext {
     private float t1 = 1.0f;
     private final float x0, y0, r0, x1, y1, r1, deltaX, deltaY, deltaR, deltaC, powerR0;
     private final Color colorT0, colorT1;
-    
+    AffineTransform inversed = new AffineTransform();
 
-    RadialContext(AffineTransform xForm, boolean isPrinting, GenericColorSpace shadingColorSpace, float[] background, PdfObject shading, float[][] matrix,PDFFunction[] function) {
+    RadialContext(AffineTransform xForm, GenericColorSpace shadingColorSpace, float[] background, PdfObject shading, float[][] mm, PDFFunction[] function) {
 
         this.shadingColorSpace = shadingColorSpace;
         this.background = background;
@@ -80,53 +79,32 @@ public class RadialContext implements PaintContext {
 
         coords = new float[src.length];
         System.arraycopy(src, 0, coords, 0, src.length);
-
-        //apply matrix and file values;
-        AffineTransform affine = new AffineTransform(matrix[0][0], matrix[0][1], matrix[1][0], matrix[1][1], matrix[2][0], matrix[2][1]);
-
-        PathIterator iter;
-        GeneralPath gp;//path for coords
-        double[] temp = new double[6];
-        Point2D pointXY0, pointXY1, temp0, temp1;
-
-        gp = new GeneralPath();
-        gp.moveTo(coords[0], coords[1]);
-        gp.lineTo(coords[0] + coords[2], coords[1]);
-        iter = gp.getPathIterator(affine);
-        iter.currentSegment(temp);
-        pointXY0 = new Point2D.Double(temp[0], temp[1]);
-        iter.next();
-        iter.currentSegment(temp);
-        temp0 = new Point2D.Double(temp[0],temp[1]);
-
-        gp = new GeneralPath();
-        gp.moveTo(coords[3], coords[4]);
-        gp.lineTo(coords[3] + coords[5], coords[4]);
-        iter = gp.getPathIterator(affine);
-        iter.currentSegment(temp);
-        pointXY1 = new Point2D.Double(temp[0], temp[1]);
-        iter.next();
-        iter.currentSegment(temp);
-        temp1 = new Point2D.Double(temp[0],temp[1]);
-                
-        Point2D[] points = new Point2D[4];
-        points[0] = pointXY0;
-        points[1] = pointXY1;
-        points[2] = temp0;
-        points[3] = temp1;
-        xForm.transform(points, 0,points, 0, 4);
         
-        x0 = (float) points[0].getX();
-        y0 = (float) points[0].getY();
-        x1 = (float) points[1].getX();
-        y1 = (float) points[1].getY();
+        AffineTransform shadeAffine = new AffineTransform();
+        if (mm != null) {
+            shadeAffine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
+        }
         
-        r0 = (float) points[0].distance(points[2]);
-        r1 = (float) points[1].distance(points[3]);
+        try {
+            AffineTransform invXF = xForm.createInverse();
+            AffineTransform invSH = shadeAffine.createInverse();
+            invSH.concatenate(invXF);
+            inversed = (AffineTransform)invSH.clone();
+        } catch (NoninvertibleTransformException ex) {
+            LogWriter.writeLog("Exception "+ex+ ' ');
+        }
+               
+        x0 = coords[0];
+        y0 = coords[1];
+        r0 = coords[2];
+        
+        x1 = coords[3];
+        y1 = coords[4];
+        r1 = coords[5];
         
         colorT0 = calculateColor(t0);
         colorT1 = calculateColor(t1);
-
+                
         //dont use Math.pow functions here;
         deltaX = x1 - x0;
         deltaY = y1 - y0;
@@ -157,11 +135,10 @@ public class RadialContext implements PaintContext {
         
         final int[] data = new int[w * h * 4];
         if (background != null) {
+            shadingColorSpace.setColor(background, shadingColorSpace.getColorComponentCount());
+            final Color c = (Color) shadingColorSpace.getColor();
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
-                    shadingColorSpace.setColor(background, shadingColorSpace.getColorComponentCount());
-                    final Color c = (Color) shadingColorSpace.getColor();
-                    //set color for the pixel with values
                     final int base = (y * w + x) * 4;
                     data[base] = c.getRed();
                     data[base + 1] = c.getGreen();
@@ -173,8 +150,8 @@ public class RadialContext implements PaintContext {
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-//                float[] xy = PixelFactory.convertPhysicalToPDF(isPrinting, x, y, offX, offY, (1f / scaling), startX, startY, cropX, pageHeight);
-                float[] xy = {x+startX,y+startY};//ShadingUtils.getPixelPDF(isPrinting, rotation, x, y, startX, startY, offX, offY, cropX, pageHeight, scaling);
+                float[] xy = { startX + x, startY + y};                 
+                inversed.transform(xy, 0, xy, 0, 1);
                 Color result = null;
 
                 float[] qr = quadraticEquate(xy[0], xy[1]);

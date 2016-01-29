@@ -111,6 +111,8 @@ public class Values {
     /**boolean lock to stop multiple access*/
     public static boolean isProcessing;
     
+    private boolean isSearching;
+    
     public Values(){
         
         String altSP=System.getProperty("org.jpedal.securityprovider");
@@ -147,6 +149,23 @@ public class Values {
     public static void setProcessing(final boolean isProcessing) {
         Values.isProcessing = isProcessing;
     }
+    
+    /**
+     * Set to show a search is being performed
+     * @param isSearching 
+     */
+    public void setIsSearching(boolean isSearching){
+        this.isSearching = isSearching;
+    }
+    
+    /**
+     * Flag to show if a search is currently being performed
+     * @return True is currently searching
+     */
+    public boolean isSearching(){
+        return isSearching;
+    }
+    
     
     public boolean isEncrypOnClasspath() {
         return isEncryptOnClasspath;

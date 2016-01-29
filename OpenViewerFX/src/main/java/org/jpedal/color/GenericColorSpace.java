@@ -149,8 +149,6 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     /**initialise all the colorspaces when first needed */
     protected static void initCMYKColorspace() throws PdfException {
         
-        try {
-            
             if(ICCProfileForRGB ==null){
                 rgbModel =
                         new ComponentColorModel(
@@ -176,19 +174,11 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                         DataBuffer.TYPE_BYTE);
             }
             
-            /**create CMYK colorspace using icm profile*/
-            final ICC_Profile p =ICC_Profile.getInstance(GenericColorSpace.class.getResourceAsStream(
-                    "/org/jpedal/res/cmm/cmyk.icm"));
-            final ICC_ColorSpace cmykCS = new ICC_ColorSpace(p);
+            final FastColorSpaceCMYK cmykCS = new FastColorSpaceCMYK();
             
             /**define the conversion. PdfColor.hints can be replaced with null or some hints*/
             CSToRGB = new ColorConvertOp(cmykCS, rgbCS, ColorSpaces.hints);
-        } catch (final Exception e) {
-            LogWriter.writeLog("Exception " + e.getMessage() + " initialising color components");
-            
-            throw new PdfException("[PDF] Unable to create CMYK colorspace. Check cmyk.icm in jar file");
-            
-        }
+       
     }
     
     

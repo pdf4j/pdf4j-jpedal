@@ -44,9 +44,7 @@ public class DevFlags {
     
     public static int currentPage;
     
-    /**
-     * Flag to indicate when a file has finished "being" open
-     */
+    /** Flag to indicate when a file has finished "being" open */
     public static boolean fileLoaded;
     
     public static boolean formsLoaded = true;

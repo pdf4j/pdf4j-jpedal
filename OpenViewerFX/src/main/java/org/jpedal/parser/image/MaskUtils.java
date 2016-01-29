@@ -45,6 +45,7 @@ import org.jpedal.render.*;
 import org.jpedal.utils.LogWriter;
 
 import java.awt.*;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 public class MaskUtils {
@@ -66,7 +67,7 @@ public class MaskUtils {
      */
     public static void createMaskForm(final PdfObject XObject, final String name, final PdfObject newSMask, final GraphicsState gs,
                                       final DynamicVectorRenderer current, final PdfObjectReader currentPdfFile,
-                                      final ParserOptions parserOptions, final int formLevel, final float multiplyer, final boolean useTransparancy) {
+                                      final ParserOptions parserOptions, final int formLevel, final float multiplyer, final boolean useTransparancy, int blendMode) {
 
         final float[] BBox= XObject.getFloatArray(PdfDictionary.BBox);
 
@@ -109,7 +110,7 @@ public class MaskUtils {
             gs1.setMaxAlpha(GraphicsState.STROKE, gs.getAlphaMax(GraphicsState.STROKE));
 
             current.setGraphicsState(GraphicsState.STROKE, gs.getAlpha(GraphicsState.STROKE), PdfDictionary.Normal);
-            current.setGraphicsState(GraphicsState.FILL, gs.getAlpha(GraphicsState.FILL), PdfDictionary.Normal);
+            current.setGraphicsState(GraphicsState.FILL, gs.getAlpha(GraphicsState.FILL), blendMode); //look at transparency design guide in pdf
 
         }else {
             if(formLevel==1){
@@ -118,9 +119,14 @@ public class MaskUtils {
                 gs1 = new GraphicsState(); //add in gs
             }
         }
-
+        
+        int prevBM = gs1.getBMValue();
+        if(formLevel==1){ //dont blend if it is not formlevel 1 
+            gs1.setBMValue(blendMode);
+        }
+        
         gs1.CTM=new float[][]{{iw,0,1},{0,ih,1},{0,0,0}};
-
+      
         //different formula needed if flattening forms
         if(parserOptions.isFlattenedForm()){
             gs1.x= parserOptions.getflattenX();
@@ -141,21 +147,40 @@ public class MaskUtils {
         gs1.CTM[2][1]= (gs1.y*gs.CTM[1][1])+gs.CTM[2][1];
         
         //factor in any scaling and invert
-        gs1.CTM[0][0]=gs1.CTM[0][0]*gs.CTM[0][0];
+        gs1.CTM[0][0] *= gs.CTM[0][0];
         gs1.CTM[1][1]=-gs1.CTM[1][1]*gs.CTM[1][1];
         
         gs1.CTM[2][1]-=gs1.CTM[1][1];
             
         //separate call needed to paint image on thumbnail or background image in HTML/SVG
-        if(current.isHTMLorSVG()){ 
+        if(current.isHTMLorSVG()){
+            
+            /**
+             * explicitly need clip passed through
+             */
+            Area clip= gs.getClippingShape();
+            if(clip!=null){
+                gs1.updateClip(clip);
+            }
+            
+            //we always use high res for these in html to give best quality results
+            //final boolean currentHiResSetting = current.getHiResImageForDisplayMode();
+            //current.setHiResImageForDisplayMode(true);
+            
             current.drawImage(parserOptions.getPageNumber(),image,gs1,false,name, -3);
             current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -2);
+            
+            //restore default
+            //current.setHiResImageForDisplayMode(currentHiResSetting);
+            
         }else{
             gs1.x = gs1.CTM[2][0];
             gs1.y = gs1.CTM[2][1];
             
             current.drawImage(parserOptions.getPageNumber(),image, gs1,false, name, -1);
         }
+        
+        gs1.setBMValue(prevBM);
 
         if(isChanged){
             current.setGraphicsState(GraphicsState.STROKE, gs.getAlpha(GraphicsState.STROKE),gs.getBMValue());

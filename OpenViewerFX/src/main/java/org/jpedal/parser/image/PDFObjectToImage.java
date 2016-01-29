@@ -97,7 +97,7 @@ public class PDFObjectToImage {
         int w=fw-fx;
         if(w<0){
             w=-w;
-            fx=fx-w;         
+            fx -= w;         
         }
         if(w==0) {
             w = 1;
@@ -106,7 +106,7 @@ public class PDFObjectToImage {
         int h=fh-fy;
         if(h<0){
             h=-h;
-            fy=fy-h;        
+            fy -= h;        
         }
         
         if(h==0) {

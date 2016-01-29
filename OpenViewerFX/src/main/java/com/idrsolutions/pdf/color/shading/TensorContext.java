@@ -34,11 +34,13 @@ package com.idrsolutions.pdf.color.shading;
 
 import java.awt.Color;
 import java.awt.PaintContext;
-import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferInt;
@@ -51,6 +53,7 @@ import org.jpedal.color.GenericColorSpace;
 import org.jpedal.function.PDFFunction;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 
 /**
  *
@@ -66,14 +69,13 @@ public class TensorContext implements PaintContext {
     private int colCompCount;
     private float[] decodeArr;
 //    private final float[][] CTM;
-    private float[][] matrix;
     private ArrayList<Point2D> pp; //patch points
     private ArrayList<Color> pc; // patch colors
     private final ArrayList<Shape67> shapes;
     private BitReader reader;
     private PDFFunction[] function;
-    private final Shape67[] duplicates;
     private final boolean isRecursive;
+    private AffineTransform invAffine = invAffine = new AffineTransform();
 
     /**
      * constructor uses cached shapes values to create a context
@@ -85,25 +87,31 @@ public class TensorContext implements PaintContext {
      * @param offX
      * @param offY
      */
-    TensorContext(final AffineTransform xform, final ArrayList<Shape67> shapes, final float[] background, int pageHeight, float scaling, int offX, int offY) {
+    TensorContext(final AffineTransform xform, final GenericColorSpace shadingColorSpace, final ArrayList<Shape67> shapes, final float[] background, float[][] mm, PDFFunction[] function) {
 
         this.shapes = shapes;
         this.background = background;
-        
-        duplicates = new Shape67[shapes.size()];
-        for (int i = 0; i < shapes.size(); i++) {
-            
-                Shape67 temp = shapes.get(i).cloneShape();
-                temp.applyTransformation(xform);
-                duplicates[i] = temp;
+        this.shadingColorSpace = shadingColorSpace;
+        isRecursive = shapes.size() < 50;
+
+        AffineTransform shadeAffine = new AffineTransform();
+        if (mm != null) {
+            shadeAffine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
         }
-        isRecursive = duplicates.length<50;
-     
+
+        try {
+            AffineTransform invXF = xform.createInverse();
+            AffineTransform invSH = shadeAffine.createInverse();
+            invSH.concatenate(invXF);
+            invAffine = (AffineTransform) invSH.clone();
+        } catch (NoninvertibleTransformException ex) {
+            LogWriter.writeLog("Exception " + ex + ' ');
+        }
+        this.function = function;
+
     }
 
-    TensorContext(AffineTransform xform, final GenericColorSpace shadingColorSpace,
-            final float[] background,
-            final PdfObject shadingObject, float[][] matrix, int pageHeight, float scaling, int offX, int offY, PDFFunction[] function) {
+    TensorContext(AffineTransform xform, final GenericColorSpace shadingColorSpace, final float[] background, final PdfObject shadingObject, float[][] mm, PDFFunction[] function) {
         this.shadingColorSpace = shadingColorSpace;
         this.background = background;
         bitsPerComponent = shadingObject.getInt(PdfDictionary.BitsPerComponent);
@@ -117,8 +125,21 @@ public class TensorContext implements PaintContext {
             colCompCount = (decodeArr.length - 4) / 2;
         }
 
+        AffineTransform shadeAffine = new AffineTransform();
+        if (mm != null) {
+            shadeAffine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
+        }
+
+        try {
+            AffineTransform invXF = xform.createInverse();
+            AffineTransform invSH = shadeAffine.createInverse();
+            invSH.concatenate(invXF);
+            invAffine = (AffineTransform) invSH.clone();
+        } catch (NoninvertibleTransformException ex) {
+            LogWriter.writeLog("Exception " + ex + ' ');
+        }
+
         this.function = function;
-        this.matrix = matrix;
 
         pp = new ArrayList<Point2D>();
         pc = new ArrayList<Color>();
@@ -127,13 +148,8 @@ public class TensorContext implements PaintContext {
         process();
         adjustPoints();
 
-        duplicates = new Shape67[shapes.size()];
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape67 temp = shapes.get(i).cloneShape();
-            temp.applyTransformation(xform);
-            duplicates[i] = temp;
-        }
-        isRecursive = duplicates.length<50;
+        isRecursive = shapes.size() < 50;
+
     }
 
     /**
@@ -270,11 +286,11 @@ public class TensorContext implements PaintContext {
 
             ArrayList<Point2D> tempPoints = new ArrayList<Point2D>();
             for (Point2D p : pp) {
-                double xx = p.getX();
-                double yy = p.getY();
+                float xx = (float) p.getX();
+                float yy = (float) p.getY();
                 xx = (xw * xx) + xMin;
                 yy = (yw * yy) + yMin;
-                tempPoints.add(new Point2D.Double(xx, yy));
+                tempPoints.add(new Point2D.Float(xx, yy));
             }
             pp.clear();
             for (Point2D t : tempPoints) {
@@ -288,14 +304,11 @@ public class TensorContext implements PaintContext {
         }
         int totalPatches = pp.size() / 12;
         int offset = 0;
-        double[] mm = {matrix[0][0], matrix[0][1], matrix[1][0], matrix[1][1], matrix[2][0], matrix[2][1]};
-        AffineTransform affine = new AffineTransform(mm);
         for (int i = 0; i < totalPatches; i++) {
             Point2D[] pointArr = new Point2D[12];
             Color[] colors = {pc.get(i * 4), pc.get(i * 4 + 1), pc.get(i * 4 + 2), pc.get(i * 4 + 3)};
             System.arraycopy(pArr, offset, pointArr, 0, 12);
             Shape67 sh = new Shape67(pointArr, colors);
-            sh.applyTransformation(affine);
             shapes.add(sh);
             offset += 12;
         }
@@ -303,8 +316,8 @@ public class TensorContext implements PaintContext {
     }
 
     private Point2D getPointCoords() {
-        double x = 0;
-        double y = 0;
+        float x = 0;
+        float y = 0;
 
         for (int z = 0; z < 2; z++) {
             switch (z) {
@@ -316,7 +329,7 @@ public class TensorContext implements PaintContext {
                     break;
             }
         }
-        return new Point2D.Double(x, y);
+        return new Point2D.Float(x, y);
     }
 
     @Override
@@ -347,27 +360,28 @@ public class TensorContext implements PaintContext {
         }
 
         Rectangle rect = new Rectangle(xStart, yStart, w, h);
+        Shape rr = invAffine.createTransformedShape(rect);
+        Rectangle2D rect2D = rr.getBounds2D();
 
         List<Shape67> foundList = new ArrayList<Shape67>();
-        for (Shape67 sh : duplicates) {
-            if (sh.getShape().intersects(rect)) {
+        for (Shape67 sh : shapes) {
+            if (sh.getShape().intersects(rect2D)) {
                 foundList.add(sh);
             }
         }
-
+        float xx, yy;
         for (Shape67 sh : foundList) {
-            GeneralPath path = sh.getShape();
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
-//                    float[] xy = PixelFactory.convertPhysicalToPDF(false, x, y, offX, offY, 1 / scaling, xStart, yStart, 0, pageHeight);
-//                    float[] xy = ShadingUtils.getPixelPDF(false, rotation, x, y, xStart,yStart, offX, offY, 0, pageHeight, scaling);
-//                    float[] xy = ShadingUtils.getPdfCoords(inversed, x, y, xStart, yStart);
-                    int xx = x+xStart;
-                    int yy = y+yStart;
+                    float[] src = {x + xStart, y + yStart};
+                    invAffine.transform(src, 0, src, 0, 1);
+                    xx = src[0];
+                    yy = src[1];
+                    GeneralPath path = sh.getShape();
                     // check with bounds first before going to shape to speedup execution
                     if (path.contains(xx, yy)) {
-                        Point p = new Point(xx, yy);
-                        Color result = sh.findPointColor(p,isRecursive);
+                        Point2D p = new Point2D.Float(xx, yy);
+                        Color result = sh.findPointColor(p, isRecursive);
                         if (result != null) {
                             final int base = (y * w + x);
                             data[base] = 255 << 24 | result.getRGB();
@@ -376,32 +390,6 @@ public class TensorContext implements PaintContext {
                 }
             }
         }
-
-//        if(pageHeight == 0){
-//            return null;
-//        }
-//
-//        for (Shape67 sh : shapes) {
-//            GeneralPath path = sh.getShape();
-//            Rectangle bounds = sh.getBoundingBox();
-//            for (int y = 0; y < h; y++) {
-//                for (int x = 0; x < w; x++) {
-////                    float[] xy = PixelFactory.convertPhysicalToPDF(false, x, y, offX, offY, 1 / scaling, xStart, yStart, 0, pageHeight);
-//                    float[] xy = ShadingUtils.getPixelPDF(false, rotation, x, y, xStart,yStart, offX, offY, 0, pageHeight, scaling);
-////                    float[] xy = ShadingUtils.getPdfCoords(inversed, x, y, xStart, yStart);
-//                    // check with bounds first before going to shape to speedup execution
-//                    if (bounds.contains(xy[0], xy[1]) && path.contains(xy[0], xy[1])) {
-//
-//                        Point2D p = new Point2D.Float(xy[0],xy[1]);
-//                        Color result = sh.findPointColor(p);
-//                        if (result != null) {
-//                            final int base = (y * w + x);
-//                            data[base] = 255<<24 | result.getRGB();
-//                        }
-//                    }
-//                }
-//            }
-//        }
         return raster;
     }
 

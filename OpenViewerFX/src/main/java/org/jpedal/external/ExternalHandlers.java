@@ -130,7 +130,7 @@ public class ExternalHandlers {
     
     private Object customPluginHandle;
     
-    private Object userExpressionEngine;
+    private ExpressionEngine userExpressionEngine;
     
     boolean useXFA;
      
@@ -214,13 +214,13 @@ public class ExternalHandlers {
                 
             case Options.USE_XFA_IN_LEGACY_MODE:
                 
-                alwaysUseXFA=((Boolean)newHandler).booleanValue();
+                alwaysUseXFA=((Boolean)newHandler);
                 
                 break;
 
             case Options.USE_XFA:
                 
-                useXFA=((Boolean)newHandler).booleanValue();
+                useXFA=((Boolean)newHandler);
                 
                 break;
             
@@ -238,7 +238,7 @@ public class ExternalHandlers {
                 break;
                     
             case Options.ExpressionEngine:
-                userExpressionEngine = newHandler;
+                userExpressionEngine = (ExpressionEngine) newHandler;
                 break;
                 
                 //            case Options.LinkHandler:

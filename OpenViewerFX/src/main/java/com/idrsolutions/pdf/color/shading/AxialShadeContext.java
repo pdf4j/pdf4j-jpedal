@@ -35,9 +35,7 @@ package com.idrsolutions.pdf.color.shading;
 import java.awt.Color;
 import java.awt.PaintContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -60,9 +58,7 @@ public class AxialShadeContext implements PaintContext {
     private final float[] background;
     private float[] domain = {0.0f, 1.0f};
     private boolean[] extension;
-//    private final int pageHeight;
-//    private final boolean isReversed;
-final float t0;
+    final float t0;
     final float t1;
     final double x0;
     final double y0;
@@ -70,22 +66,20 @@ final float t0;
     final double y1;
     final double deltaX;
     final double deltaY;
-    //final double deltaT;
     final double multiXY;
     //final double textX;
     //final double textY;
 
     private final AffineTransform shadeAffine;
-    private AffineTransform inversed;
+    private AffineTransform inversed = new AffineTransform();
 
-    public AxialShadeContext(AffineTransform xform, GenericColorSpace shadingColorSpace,float[] background, PdfObject shadingObject, float[][] mm, PDFFunction[] function, int textX,int textY) {
+    public AxialShadeContext(AffineTransform xform, GenericColorSpace shadingColorSpace, float[] background, PdfObject shadingObject, float[][] mm, PDFFunction[] function) {
         
         
         this.shadingColorSpace = shadingColorSpace;
         this.function = function;
         //this.textX = textX;
         //this.textY = textY;
-//        this.pageHeight = pageHeight;
 
         final float[] newDomain = shadingObject.getFloatArray(PdfDictionary.Domain);
         if (newDomain != null) {
@@ -99,8 +93,7 @@ final float t0;
 
         t0 = domain[0];
         t1 = domain[1];
-        //deltaT = Math.abs(t1 - t0);
-
+        
         if (mm == null) {
             shadeAffine = new AffineTransform();
         } else {
@@ -108,27 +101,20 @@ final float t0;
         }
         
         try {
-            inversed = xform.createInverse();
+            AffineTransform invXF = xform.createInverse();
+            AffineTransform invSH = shadeAffine.createInverse();
+            invSH.concatenate(invXF);
+            inversed = (AffineTransform)invSH.clone();
         } catch (NoninvertibleTransformException ex) {
-            
             LogWriter.writeLog("Exception "+ex+ ' ');
-            
-            if(inversed==null){
-                inversed = new AffineTransform();
-            }
         }
-
+        
         float[] coords = shadingObject.getFloatArray(PdfDictionary.Coords);
-        GeneralPath coordPath = ShadingUtils.getPathFromBBox(coords);
-        PathIterator iter = coordPath.getPathIterator(shadeAffine);
-        double temp[] = new double[6];
-        iter.currentSegment(temp);
-        x0 = temp[0];
-        y0 = temp[1];
-        iter.next();
-        iter.currentSegment(temp);
-        x1 = temp[0];
-        y1 = temp[1];
+       
+        x0 = coords[0];
+        y0 = coords[1];
+        x1 = coords[2];
+        y1 = coords[3];
        
         deltaX = (x1 - x0);
         deltaY = (y1 - y0);
@@ -165,21 +151,18 @@ final float t0;
                 }
             }
         }
-
+        
+        double x,y,xp;
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
-
                 boolean render = true;
-
                 double[] src = { startX + j, startY + i};
                 inversed.transform(src, 0, src, 0, 1);
                 
-                double x = src[0];
-                double y = src[1];
-
-                float t = 0;
-                
-                double xp = (deltaX*(x-x0)+ deltaY*(y-y0))/multiXY;
+                x = src[0];
+                y = src[1];
+                float t = 0;                
+                xp = (deltaX*(x-x0)+ deltaY*(y-y0))/multiXY;
                 
                 if (xp >= 0 && xp <= 1) {
                     t = (float) (t0 + (t1 - t0) * xp);
@@ -190,8 +173,7 @@ final float t0;
                 } else {
                     render = false;
                 }
-
-                if (render) {                           
+                if (render) {
                     Color c = calculateColor(t);
                     final int base = (i * w + j) * 4;
                     data[base] = c.getRed();
@@ -204,7 +186,6 @@ final float t0;
 
         final WritableRaster raster = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB).getRaster();
         raster.setPixels(0, 0, w, h, data);
-
         return raster;
 
     }

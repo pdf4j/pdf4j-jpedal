@@ -51,11 +51,12 @@ public class F {
     
     public static void execute(final int tokenNumber, final boolean isStar, final int formLevel, final PdfShape currentDrawShape, final GraphicsState gs,
             final PdfObjectCache cache, final PdfObjectReader currentPdfFile, final DynamicVectorRenderer current, final ParserOptions parserOptions, final float multiplyer) {
-        
+  
         //ignore transparent white if group set
-        if((formLevel>0 && cache.groupObj!=null && !cache.groupObj.getBoolean(PdfDictionary.K) && gs.getAlphaMax(GraphicsState.FILL)>0.84f && (gs.nonstrokeColorSpace.getID() == ColorSpaces.DeviceCMYK))
+        if((formLevel>0 && cache.groupObj!=null && !cache.groupObj.getBoolean(PdfDictionary.K) && gs.getAlphaMax(GraphicsState.FILL)>0.99f && (gs.nonstrokeColorSpace.getID() == ColorSpaces.DeviceCMYK))
             
             && (gs.nonstrokeColorSpace.getColor().getRGB()==-1)) {
+                currentDrawShape.resetPath();
                 return;
             }
         
@@ -68,6 +69,7 @@ public class F {
             
             final float[] BC=gs.SMask.getFloatArray(PdfDictionary.BC);
             if(gs.nonstrokeColorSpace.getColor().getRGB()==-16777216 && BC!=null && BC[0]==1.0f) {
+                currentDrawShape.resetPath();
                 return;
             }
         }
@@ -80,6 +82,7 @@ public class F {
             
             final float[] BC=gs.SMask.getFloatArray(PdfDictionary.BC);
             if(gs.nonstrokeColorSpace.getColor().getRGB()==-16777216 && BC!=null && BC[0]==0.0f) {
+                currentDrawShape.resetPath();
                 return;
             }
         }
@@ -89,21 +92,26 @@ public class F {
                 (gs.nonstrokeColorSpace.getID()==ColorSpaces.DeviceRGB || gs.nonstrokeColorSpace.getID()==ColorSpaces.DeviceCMYK)){
             
             if(gs.nonstrokeColorSpace.getColor().getRGB()==-1 && gs.getOPM()==1.0f) {
+                currentDrawShape.resetPath();
                 return;
             }
             
             final float[] BC=gs.SMask.getFloatArray(PdfDictionary.BC);
             
             if(gs.nonstrokeColorSpace.getColor().getRGB()==-16777216 && BC!=null && BC[0]==1.0f && BC[1]==1.0f && BC[2]==1.0f) {
+                currentDrawShape.resetPath();
                 return;
             }
             
             if(gs.nonstrokeColorSpace.getColor().getRGB()==-16777216 && BC!=null && BC[0]==0.0f && BC[1]==0.0f && BC[2]==0.0f && gs.getOPM()==0.0f) {
+                currentDrawShape.resetPath();
                 return;
             }
             
             createSMaskFill(gs,currentPdfFile, current, parserOptions,formLevel, multiplyer);
 
+            currentDrawShape.resetPath();
+            
             return;
         }
         
@@ -111,6 +119,7 @@ public class F {
 //if(gs.SMask!=null && (gs.SMask.getGeneralType(PdfDictionary.SMask)==PdfDictionary.None || gs.SMask.getGeneralType(PdfDictionary.SMask)==PdfDictionary.Multiply) && gs.nonstrokeColorSpace.getID() == ColorSpaces.DeviceRGB && gs.getOPM()==1.0f && gs.nonstrokeColorSpace.getColor().getRGB()==-16777216){
         
         if(gs.SMask!=null && gs.SMask.getGeneralType(PdfDictionary.SMask)!=PdfDictionary.None && gs.nonstrokeColorSpace.getID() == ColorSpaces.DeviceRGB && gs.getOPM()==1.0f && gs.nonstrokeColorSpace.getColor().getRGB()==-16777216){
+            currentDrawShape.resetPath();
             return;
         }
         

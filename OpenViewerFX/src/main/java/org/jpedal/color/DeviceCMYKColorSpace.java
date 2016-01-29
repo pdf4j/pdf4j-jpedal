@@ -149,9 +149,9 @@ public class DeviceCMYKColorSpace extends GenericColorSpace {
             int[] bb = JDeliHelper.convertCMYKtoRGB(cc, mm, yy, kk);
             if (bb == null) {
                 bb = new int[3];
-                bb[0] = 255 * (1 - cc) * (1 - kk);
-                bb[1] = 255 * (1 - mm) * (1 - kk);
-                bb[2] = 255 * (1 - yy) * (1 - kk);
+                bb[0] = (int) (255 * (1 - c) * (1 - k));
+                bb[1] = (int) (255 * (1 - m) * (1 - k));
+                bb[2] = (int) (255 * (1 - y) * (1 - k));
             }
             this.currentColor = new PdfColor(bb[0], bb[1], bb[2]);
 

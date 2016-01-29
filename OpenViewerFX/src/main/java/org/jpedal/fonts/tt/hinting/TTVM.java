@@ -1075,7 +1075,7 @@ public class TTVM implements Serializable {
                 case LOOPCALL: {
                     final int func = stack.pop();
                     final int count = stack.pop();
-                    final int[] function = functions.get(Integer.valueOf(func));
+                    final int[] function = functions.get(func);
 
                     //debug code
                     if (printGlyphInstructions && scalerRun) {
@@ -1094,7 +1094,7 @@ public class TTVM implements Serializable {
                 }
                 case CALL: {
                     final int func = stack.pop();
-                    final int[] function = functions.get(Integer.valueOf(func));
+                    final int[] function = functions.get(func);
 
                     //debug code
                     if (printGlyphInstructions && scalerRun) {
@@ -2443,11 +2443,11 @@ public class TTVM implements Serializable {
                             gs.rp0 = p;
                         }
 
-                    } else if (instructions.containsKey(Integer.valueOf(code))) {
+                    } else if (instructions.containsKey(code)) {
                         if (printOut) {
                             System.out.println("I 0x" + Integer.toHexString(code) + "    - Custom Instruction");
                         }
-                        execute(instructions.get(Integer.valueOf(code)), gs);
+                        execute(instructions.get(code), gs);
                         if (printOut) {
                             System.out.println("I 0x" + Integer.toHexString(code) + " finished");
                         }

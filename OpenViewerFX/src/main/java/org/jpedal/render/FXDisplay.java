@@ -362,7 +362,7 @@ public class FXDisplay extends GUIDisplay {
      @Override
     public void drawCustom(final Object value) {
 	 
-            addToScene((Shape) value);
+            addToScene((Node) value);
     }
     
     /**

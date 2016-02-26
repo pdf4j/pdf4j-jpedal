@@ -333,7 +333,7 @@ public class ObjectStore {
 
         //if(image.getType()==1)
         //image=stripAlpha(image);
-        final int type_id = image.getType();
+        //final int type_id = image.getType();
 
         //make sure temp directory exists
         final File checkDir = new File(temp_dir);
@@ -343,10 +343,6 @@ public class ObjectStore {
 
         //save image and id so we can reload
         if (type.contains("tif")) {
-
-            if (((type_id == 1 || type_id == 2))&&(!current_image.contains("HIRES_"))) {
-                image = ColorSpaceConvertor.convertColorspace(image, BufferedImage.TYPE_3BYTE_BGR);
-            }
 
             if (!file_name_is_path) {
                 image_type.put(current_image, "tif");

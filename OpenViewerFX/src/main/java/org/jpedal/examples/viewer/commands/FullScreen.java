@@ -33,7 +33,6 @@
 package org.jpedal.examples.viewer.commands;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
@@ -42,6 +41,7 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
@@ -97,7 +97,7 @@ public class FullScreen {
             win.add((JSplitPane)currentGUI.getDisplayPane(), BorderLayout.CENTER);
 
             // Create a button that leaves full-screen mode
-            final Button btn = new Button("Return");
+            final JButton btn = new JButton("Return");
             win.add(btn, BorderLayout.NORTH);
 
             btn.addActionListener(new ActionListener() {

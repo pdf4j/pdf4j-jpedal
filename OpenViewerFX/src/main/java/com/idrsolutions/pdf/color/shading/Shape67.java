@@ -75,11 +75,6 @@ public class Shape67 {
         return shape;
     }
 
-    public Point2D[] getPointsArray() {
-        return pointsArr;
-    }
-
-   
 
 //    private double getC1Length() {
 //        return curveLength(pointsArr[9], pointsArr[10], pointsArr[11], pointsArr[0], nSteps);
@@ -217,14 +212,14 @@ public class Shape67 {
             generateBilinearMapping();
         }
         Color pColor = null;
-        if (lastFound != null && lastFound.path.contains(p)) {
+        if (lastFound != null && isPointInPoly(lastFound.points, p)) {
             Color[] colors = lastFound.colors;
             Point2D[] points = lastFound.points;
             return recurseTrapezoidal(p, points, colors, isRecursive, 0);
         }
 
         for (TinyPatch patch : patches) {
-            if (patch.path.contains(p)) {
+            if (isPointInPoly(patch.points, p)) {
                 lastFound = patch;
                 Color[] colors = patch.colors;
                 Point2D[] points = patch.points;
@@ -300,7 +295,7 @@ public class Shape67 {
                 Point2D[] patchPoints = {xy[i][j], xy[i][j + 1], xy[i + 1][j + 1], xy[i + 1][j]};
                 Color[] patchColors = {cc[i][j], cc[i][j + 1], cc[i + 1][j + 1], cc[i + 1][j]};
                 TinyPatch tiny = new TinyPatch(patchPoints, patchColors);
-                if (tiny.path.contains(p)) {
+                if (isPointInPoly(tiny.points, p)) {
                     depth++;
                     return recurseTrapezoidal(p, patchPoints, patchColors, isRecursive, depth);
                 }
@@ -313,24 +308,32 @@ public class Shape67 {
 
 
     private static class TinyPatch {
-
-        final GeneralPath path;
+        
         final Color[] colors;
         final Point2D[] points;
 
         public TinyPatch(Point2D[] points, Color[] colors) {
-
             this.colors = colors;
             this.points = points;
-
-            this.path = new GeneralPath();
-            path.moveTo(points[0].getX(), points[0].getY());
-            path.lineTo(points[1].getX(), points[1].getY());
-            path.lineTo(points[2].getX(), points[2].getY());
-            path.lineTo(points[3].getX(), points[3].getY());
-            path.closePath();
         }
+    }
+    
+    private static boolean isPointInPoly(Point2D[] points,Point2D p){
+        boolean c = false;
+        int nvert = points.length;
+        double px = p.getX();
+        double py = p.getY();
+        Point2D pi, pj;
+        for (int i = 0, j = nvert - 1; i < nvert; j = i++) {
+            pi = points[i];
+            pj = points[j];
 
+            if (((pi.getY() > py) != (pj.getY() > py))
+                    && (px < (pj.getX() - pi.getX()) * (py - pi.getY()) / (pj.getY() - pi.getY()) + pi.getX())) {
+                c = !c;
+            }
+        }
+        return c;
     }
     
     public void setSteps(int steps){

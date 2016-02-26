@@ -39,8 +39,16 @@ public class CompositeUtil {
         return (1 - ratioA) * cB + ratioA * ((1 - aB) * cS + aB * blendRes);
     }
 
-    public static float blendNormal(float cS, float cB) {
-        return cS;
+    public static float unionBS(float s, float b) {
+        return b + s - (b * s);
+    }
+
+    public static float findFR(float fs, float fb) {
+        return unionBS(fs, fb);
+    }
+
+    public static float findQR(float fs, float fb, float qs, float qb) {
+        return unionBS(fb * qb, fs * qs) / unionBS(fs, fb);
     }
 
     public static float blendMultiply(float cS, float cB) {

@@ -404,7 +404,7 @@ public class CMAP extends Table {
                 }
 
             }
-           
+          
             //see 18113 fixes ligatures on page
             if(value==-1){
                 value = getFormat4Value(rawIndex+ 0xf000, value);
@@ -587,7 +587,7 @@ public class CMAP extends Table {
                         System.out.println("case4 fontMapping=" + fontMapping + " formatToUse=" + formatToUse+ ' ' +platformSpecificID[formatToUse]+ ' ' + platformID[formatToUse]+ ' ' +hasEncoding+ ' ' +fontEncoding);
                     }
                     
-                    if(platformSpecificID[formatToUse]==3 && platformID[formatToUse]==0 && (hasEncoding || fontEncoding==StandardFonts.STD)){
+                    if(platformSpecificID[formatToUse]==3 && platformID[formatToUse]==0 && count>1 && (hasEncoding || fontEncoding==StandardFonts.STD)){
                         remapType4=true;
                       // System.out.println("a "+wasCase2);
                     }else if(platformSpecificID[formatToUse]==1 && platformID[formatToUse]==0 && hasEncoding && fontEncoding==StandardFonts.WIN){

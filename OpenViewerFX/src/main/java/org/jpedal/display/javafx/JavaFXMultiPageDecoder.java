@@ -39,7 +39,6 @@ import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.MultiDisplayOptions;
 import org.jpedal.display.MultiPagesDisplay;
 import org.jpedal.display.MultiPageDecoder;
-import org.jpedal.gui.GUIFactory;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.AcroRenderer;
@@ -54,8 +53,8 @@ import org.jpedal.utils.LogWriter;
  */
 class JavaFXMultiPageDecoder extends MultiPageDecoder {
     
-    JavaFXMultiPageDecoder(final GUIFactory gui,PdfDecoderInt pdf, PdfPageData pageData, MultiPagesDisplay display, MultiDisplayOptions multiDisplayOptions, DynamicVectorRenderer currentDisplay, int pageNumber, FileAccess fileAccess, PdfObjectReader io, AcroRenderer formRenderer, DecoderOptions options) {
-        super(gui, pdf, pageData, display, multiDisplayOptions, currentDisplay, pageNumber, fileAccess, io, formRenderer, options);
+    JavaFXMultiPageDecoder(PdfDecoderInt pdf, PdfPageData pageData, MultiPagesDisplay display, MultiDisplayOptions multiDisplayOptions, DynamicVectorRenderer currentDisplay, int pageNumber, FileAccess fileAccess, PdfObjectReader io, AcroRenderer formRenderer, DecoderOptions options) {
+        super(pdf, pageData, display, multiDisplayOptions, currentDisplay, pageNumber, fileAccess, io, formRenderer, options);
     }
     
     @Override

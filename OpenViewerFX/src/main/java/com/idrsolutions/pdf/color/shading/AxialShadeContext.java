@@ -35,7 +35,6 @@ package com.idrsolutions.pdf.color.shading;
 import java.awt.Color;
 import java.awt.PaintContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -44,7 +43,7 @@ import org.jpedal.color.GenericColorSpace;
 import org.jpedal.function.PDFFunction;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.Matrix;
 
 /**
  *
@@ -58,28 +57,17 @@ public class AxialShadeContext implements PaintContext {
     private final float[] background;
     private float[] domain = {0.0f, 1.0f};
     private boolean[] extension;
-    final float t0;
-    final float t1;
-    final double x0;
-    final double y0;
-    final double x1;
-    final double y1;
-    final double deltaX;
-    final double deltaY;
-    final double multiXY;
+    final float t0, t1, x0, y0, x1, y1, deltaX, deltaY, multiXY;
     //final double textX;
     //final double textY;
 
-    private final AffineTransform shadeAffine;
-    private AffineTransform inversed = new AffineTransform();
+    private final float[][] toUserSpace;
+    private final float[][] toShadeSpace;
 
     public AxialShadeContext(AffineTransform xform, GenericColorSpace shadingColorSpace, float[] background, PdfObject shadingObject, float[][] mm, PDFFunction[] function) {
-        
-        
+
         this.shadingColorSpace = shadingColorSpace;
         this.function = function;
-        //this.textX = textX;
-        //this.textY = textY;
 
         final float[] newDomain = shadingObject.getFloatArray(PdfDictionary.Domain);
         if (newDomain != null) {
@@ -93,29 +81,27 @@ public class AxialShadeContext implements PaintContext {
 
         t0 = domain[0];
         t1 = domain[1];
-        
-        if (mm == null) {
-            shadeAffine = new AffineTransform();
-        } else {
-            shadeAffine = new AffineTransform(mm[0][0], mm[0][1], mm[1][0], mm[1][1], mm[2][0], mm[2][1]);
+
+        float[][] shadeMatrix = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        if (mm != null) {
+            shadeMatrix = mm;
         }
-        
-        try {
-            AffineTransform invXF = xform.createInverse();
-            AffineTransform invSH = shadeAffine.createInverse();
-            invSH.concatenate(invXF);
-            inversed = (AffineTransform)invSH.clone();
-        } catch (NoninvertibleTransformException ex) {
-            LogWriter.writeLog("Exception "+ex+ ' ');
-        }
-        
+
+        float[][] xformMatrix = {
+            {(float) xform.getScaleX(), (float) xform.getShearX(), 0},
+            {(float) xform.getShearY(), (float) xform.getScaleY(), 0},
+            {(float) xform.getTranslateX(), (float) xform.getTranslateY(), 1}
+        };
+        toUserSpace = Matrix.inverse(xformMatrix);
+        toShadeSpace = Matrix.inverse(shadeMatrix);
+
         float[] coords = shadingObject.getFloatArray(PdfDictionary.Coords);
-       
+
         x0 = coords[0];
         y0 = coords[1];
         x1 = coords[2];
         y1 = coords[3];
-       
+
         deltaX = (x1 - x0);
         deltaY = (y1 - y0);
         multiXY = deltaX * deltaX + deltaY * deltaY;
@@ -151,21 +137,22 @@ public class AxialShadeContext implements PaintContext {
                 }
             }
         }
-        
-        double x,y,xp;
+
+        float x, y, xp;
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                 boolean render = true;
-                double[] src = { startX + j, startY + i};
-                inversed.transform(src, 0, src, 0, 1);
-                
+                float[] src = {startX + j, startY + i};
+                src = Matrix.transformPoint(toUserSpace, src[0], src[1]);
+                src = Matrix.transformPoint(toShadeSpace, src[0], src[1]);
+
                 x = src[0];
                 y = src[1];
-                float t = 0;                
-                xp = (deltaX*(x-x0)+ deltaY*(y-y0))/multiXY;
-                
+                float t = 0;
+                xp = (deltaX * (x - x0) + deltaY * (y - y0)) / multiXY;
+
                 if (xp >= 0 && xp <= 1) {
-                    t = (float) (t0 + (t1 - t0) * xp);
+                    t = t0 + (t1 - t0) * xp;
                 } else if (xp < 0 && extension[0]) {
                     t = t0;
                 } else if (xp > 1 && extension[1]) {
@@ -198,5 +185,4 @@ public class AxialShadeContext implements PaintContext {
         return col;
     }
 
-    
 }

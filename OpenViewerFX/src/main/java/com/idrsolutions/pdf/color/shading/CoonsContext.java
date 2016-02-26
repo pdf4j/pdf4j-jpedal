@@ -73,7 +73,7 @@ public class CoonsContext implements PaintContext {
     private ArrayList<Color> pc; // patch colors
     private final ArrayList<Shape67> shapes;
     private BitReader reader;
-    private PDFFunction[] function;
+    private final PDFFunction[] function;
     private final boolean isRecursive;
     private AffineTransform invAffine = invAffine = new AffineTransform();
 

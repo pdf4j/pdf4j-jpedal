@@ -280,7 +280,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
         //use CMAP if not CID
         int idx=rawInt;
 
-        float width=0;
+        float width;
 
         try{
             if((!TTstreamisCID)) {
@@ -296,6 +296,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
             width=currentHmtx.getUnscaledWidth(idx);
 
         }catch(final Exception e){
+            width=1000;
             LogWriter.writeLog("Attempting to read width " + e);
         }
 

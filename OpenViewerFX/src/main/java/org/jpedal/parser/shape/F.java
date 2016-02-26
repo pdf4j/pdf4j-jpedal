@@ -34,7 +34,6 @@ package org.jpedal.parser.shape;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.external.ShapeTracker;
 import org.jpedal.io.PdfObjectReader;
@@ -53,7 +52,7 @@ public class F {
             final PdfObjectCache cache, final PdfObjectReader currentPdfFile, final DynamicVectorRenderer current, final ParserOptions parserOptions, final float multiplyer) {
   
         //ignore transparent white if group set
-        if((formLevel>0 && cache.groupObj!=null && !cache.groupObj.getBoolean(PdfDictionary.K) && gs.getAlphaMax(GraphicsState.FILL)>0.99f && (gs.nonstrokeColorSpace.getID() == ColorSpaces.DeviceCMYK))
+        if((formLevel>1 && cache.groupObj!=null && !cache.groupObj.getBoolean(PdfDictionary.K) && gs.getAlphaMax(GraphicsState.FILL)>0.99f && (gs.nonstrokeColorSpace.getID() == ColorSpaces.DeviceCMYK))
             
             && (gs.nonstrokeColorSpace.getColor().getRGB()==-1)) {
                 currentDrawShape.resetPath();
@@ -90,24 +89,7 @@ public class F {
         //replace F with image if soft mask set (see randomHouse/9781609050917_DistX.pdf)
         if(gs.SMask!=null && gs.SMask.getDictionary(PdfDictionary.G)!=null && 
                 (gs.nonstrokeColorSpace.getID()==ColorSpaces.DeviceRGB || gs.nonstrokeColorSpace.getID()==ColorSpaces.DeviceCMYK)){
-            
-            if(gs.nonstrokeColorSpace.getColor().getRGB()==-1 && gs.getOPM()==1.0f) {
-                currentDrawShape.resetPath();
-                return;
-            }
-            
-            final float[] BC=gs.SMask.getFloatArray(PdfDictionary.BC);
-            
-            if(gs.nonstrokeColorSpace.getColor().getRGB()==-16777216 && BC!=null && BC[0]==1.0f && BC[1]==1.0f && BC[2]==1.0f) {
-                currentDrawShape.resetPath();
-                return;
-            }
-            
-            if(gs.nonstrokeColorSpace.getColor().getRGB()==-16777216 && BC!=null && BC[0]==0.0f && BC[1]==0.0f && BC[2]==0.0f && gs.getOPM()==0.0f) {
-                currentDrawShape.resetPath();
-                return;
-            }
-            
+                      
             createSMaskFill(gs,currentPdfFile, current, parserOptions,formLevel, multiplyer);
 
             currentDrawShape.resetPath();
@@ -239,57 +221,14 @@ public class F {
          * get the SMAsk
          */
         final BufferedImage smaskImage = PDFObjectToImage.getImageFromPdfObject(maskObj, fx, fw, fy, fh, currentPdfFile, parserOptions,formLevel, multiplyer,false,1f);
-        
-        final WritableRaster ras=smaskImage.getRaster();
-        
-        final int w=ras.getWidth();
-        final int h=ras.getHeight();
-        
-        /**
-         * and colour in
-         */
-        boolean transparent;
-        final int[] values=new int[4];
-        
-        //get fill colour
-        final int fillColor=gs.nonstrokeColorSpace.getColor().getRGB();
-        values[0]=(byte) ((fillColor>>16) & 0xFF);
-        values[1]=(byte) ((fillColor>>8) & 0xFF);
-        values[2]=(byte) ((fillColor) & 0xFF);
-        
-        final int[] transparentPixel={0,0,0,0};
-        for(int y=0;y<h;y++){
-            for(int x=0;x<w;x++){
-                
-                //get raw color data
-                ras.getPixels(x,y,1,1,values);
-                
-                //see if transparent
-               // transparent=(values[0]==0 && values[1]==0 && values[2]==0 && values[3]==255);
-                transparent=(values[3]==255);
-               
-                //if it matched replace and move on
-                if(transparent) {
-                    ras.setPixels(x, y, 1, 1, transparentPixel);
-                }else{
-                    
-                    final int[] newPixel=new int[4];
-                    
-                    newPixel[3]= (int) (255*0.75f);
-                    newPixel[0]=values[0];
-                    newPixel[1]=values[1];
-                    newPixel[2]=values[2];
-                    
-                    ras.setPixels(x,y,1,1,newPixel);
-                }
-            }
-        }
-        
+   
+
         /**
          * draw the shape as image
          */
-        final GraphicsState gs1 =new GraphicsState();
+        final GraphicsState gs1 = (GraphicsState)gs.clone();
         gs1.CTM=new float[][]{{smaskImage.getWidth(),0,1},{0,-smaskImage.getHeight(),1},{0,0,0}};
+        gs1.setBMValue(PdfDictionary.SMask);
         
         gs1.x=fx;
         gs1.y=fy;

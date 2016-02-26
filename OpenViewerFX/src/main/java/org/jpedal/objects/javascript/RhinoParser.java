@@ -83,7 +83,9 @@ public class RhinoParser extends DefaultParser implements ExpressionEngine{
     public void flush() {
 
         if(acro!=null && acro.getFormFactory()!=null){
-            if (SwingUtilities.isEventDispatchThread()){
+            if(acro.getCompData().formsRasterizedForDisplay()){
+                flushJS();
+            }else if (SwingUtilities.isEventDispatchThread()){
                 flushJS();
             }else {
                 final Runnable doPaintComponent = new Runnable() {

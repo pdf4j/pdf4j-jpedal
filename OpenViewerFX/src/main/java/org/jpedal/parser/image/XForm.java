@@ -34,8 +34,8 @@ package org.jpedal.parser.image;
 
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
@@ -94,91 +94,29 @@ public class XForm {
 
     
     public static Area setClip(final Shape defaultClip, final float[] BBox, final GraphicsState gs, final DynamicVectorRenderer current) {
-        final Area clip;
-        float scalingW= gs.CTM[0][0];
-        if(scalingW==0) {
-            scalingW= gs.CTM[0][1];
-        }
-        	
-        float scalingH=gs.CTM[1][1];
-        if(scalingH==0) {
-            scalingH=gs.CTM[1][0];
-        }
-        if(scalingH<0) {
-            scalingH = -scalingH;
-        }
-        	
-        int x,y,w,h;
-       
-        //case 17909 - make live to fix and see if can replace other version underneath
-        if((gs.CTM[0][0]!=0 && gs.CTM[0][1]!=0 && gs.CTM[1][0]!=0 && gs.CTM[1][1]!=0) ||
-                (gs.CTM[0][1]>0 && gs.CTM[1][0]<0)){
-            
-            //factor in scaling
-            float[][] rect= {{BBox[2],0,0},{0,BBox[3],0},{BBox[0] ,BBox[1],1}};
-
-            //Matrix.show(rect);
-            //System.out.println("");
-
-            //Matrix.show(gs.CTM);
-            rect=Matrix.multiply(rect,gs.CTM);
-
-            x=(int)(rect[2][0]);
-            y=(int)(rect[2][1]);
-            w=(int)(rect[0][0]+Math.abs(rect[1][0]));
-            h=(int)(rect[1][1]+Math.abs(rect[0][1]));
-            
-            if(rect[1][0]<0) {
-                x = (int) (x + rect[1][0]);
-            }
-            
-            //System.out.println("shape="+x+" "+y+" "+w+" "+h);
-            //Matrix.show(rect);
         
-        }else if(gs.CTM[0][1]<0 && gs.CTM[1][0]>0){
-
-            x=(int)(gs.CTM[2][0]+(BBox[1]*scalingW));
-            y=(int)(gs.CTM[2][1]-(BBox[2]*scalingH));
-            w=(int)((BBox[3]-BBox[1])*-scalingW);
-            h=(int)Math.abs((BBox[2]-BBox[0])*-scalingH);
-
-        }else{  //note we adjust size using CTM to factor in scaling
-            
-            if(1==1){
-                int px,py,pw,ph; //proper rectangle coords;
-                pw = (int) Math.abs(BBox[2]-BBox[0]);
-                ph = (int) Math.abs(BBox[3]-BBox[1]);
-                px = (int) Math.min(BBox[0],BBox[2]);
-                py = (int) Math.min(BBox[1],BBox[3]);
-
-                Rectangle properRect = new Rectangle(px, py, pw, ph);
-                Area properArea = new Area(properRect);
-                AffineTransform affine = new AffineTransform(gs.CTM[0][0], gs.CTM[0][1], gs.CTM[1][0],gs.CTM[1][1],gs.CTM[2][0],gs.CTM[2][1]);
-                properArea = properArea.createTransformedArea(affine);
-                properRect = properArea.getBounds();
-                x = (int) properRect.getX();
-                y = (int) properRect.getY();
-                w = (int) properRect.getWidth();
-                h = (int) properRect.getHeight();
-            }else{ // old code keep temporarily
-                x=(int)((gs.CTM[2][0]+(BBox[0]*scalingW)));
-                y=(int)((gs.CTM[2][1]+(BBox[1]*scalingH)-1));
-                w=(int)(1+(BBox[2]-BBox[0])*scalingW);
-                h=(int)(2+(BBox[3]-BBox[1])*scalingH);
-
-                if(gs.CTM[2][1]<0){
-                    h= (int) (h-(gs.CTM[2][1]*scalingH));
-                }
-                if(gs.CTM[2][0]<0){
-                    w= (int) (w-(gs.CTM[2][0]*scalingH));
-                }
-
-                //allow for inverted
-                if(gs.CTM[1][1]<0){
-                    y -= h;
-                }
-            } 
-        }
+        Rectangle rect = new Rectangle();
+        rect.setFrameFromDiagonal(BBox[0],BBox[1],BBox[2],BBox[3]);
+        
+        float minX = (float)rect.getMinX();
+        float minY = (float)rect.getMinY();
+        
+        float maxX = (float)rect.getMaxX();
+        float maxY = (float)rect.getMaxY();
+        
+        float[] p1 = Matrix.transformPoint(gs.CTM, minX, minY);
+        float[] p2 = Matrix.transformPoint(gs.CTM, maxX, minY);
+        float[] p3 = Matrix.transformPoint(gs.CTM, maxX, maxY);
+        float[] p4 = Matrix.transformPoint(gs.CTM, minX, maxY);
+        
+        GeneralPath gp = new GeneralPath();
+        gp.moveTo(p1[0], p1[1]);
+        gp.lineTo(p2[0], p2[1]);
+        gp.lineTo(p3[0], p3[1]);
+        gp.lineTo(p4[0], p4[1]);
+        gp.closePath();
+        
+        final Area clip;
 
         if(gs.getClippingShape()==null) {
             clip=null;
@@ -187,9 +125,7 @@ public class XForm {
             clip= (Area) gs.getClippingShape().clone();
         }
         
-        final Area newClip=new Area(new Rectangle(x,y,w,h));
-        
-        gs.updateClip(new Area(newClip));
+        gs.updateClip(new Area(gp));
         current.drawClip(gs, defaultClip,false) ;
 
         return clip;

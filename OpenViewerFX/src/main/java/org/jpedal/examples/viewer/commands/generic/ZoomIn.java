@@ -35,6 +35,7 @@ package org.jpedal.examples.viewer.commands.generic;
 
 import org.jpedal.*;
 import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.gui.GUIFactory;
 
 /**
@@ -42,7 +43,7 @@ import org.jpedal.gui.GUIFactory;
  */
 public class ZoomIn {
     
-    private static float[] scalingValues = {25f, 50f, 75f, 100f, 125f, 150f, 200f, 250f, 500f, 750f, 1000f};
+    private static int[] scalingValues = {25, 50, 75, 100, 125, 150, 200, 250, 500, 750, 1000};
     public static boolean execute(final Object[] args, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf) {
         
         if (args == null) {
@@ -50,7 +51,7 @@ public class ZoomIn {
             scaling = (int)(decode_pdf.getDPIFactory().removeScaling(scaling)+0.5f);
             
             if (scaling < scalingValues[0]) {
-                currentGUI.getCombo(Commands.SCALING).setSelectedItem(String.valueOf(scalingValues[0]));
+                ((GUI)currentGUI).setSelectedComboItem(Commands.SCALING, String.valueOf(scalingValues[0]));
             } else {
                 int scalingToUse = -1;
                 for (int i = 0; i != scalingValues.length - 1; i++) {
@@ -60,7 +61,7 @@ public class ZoomIn {
                     }
                 }
                 if (scalingToUse != -1) {
-                    currentGUI.getCombo(Commands.SCALING).setSelectedItem(String.valueOf(scalingValues[scalingToUse]));
+                    ((GUI)currentGUI).setSelectedComboItem(Commands.SCALING, String.valueOf(scalingValues[scalingToUse]));
                 }
             }
         }

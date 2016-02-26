@@ -807,6 +807,7 @@ public class AcroRenderer{
 //            case PdfDictionary.Movie :
             case PdfDictionary.Widget :
             case PdfDictionary.Screen :
+            case PdfDictionary.RichMedia:
 //            case PdfDictionary.PrinterMark :
 //            case PdfDictionary.TrapNet :
 //            case PdfDictionary.Watermark :

@@ -32,6 +32,8 @@
  */
 package org.jpedal.utils;
 
+import java.awt.geom.AffineTransform;
+
 /**
 provide matrix functionality used in PDF to calculate co-ords
  */
@@ -89,15 +91,43 @@ public class Matrix {
         return output_matrix;
     }
     
+    public static final float[][] concatenate(float[][] m1, float [][] m2){
+        return multiply(m2, m1);
+    }
+    
+    /**
+     * please call this function only on device bound transformation not good
+     * for general use cases;
+     * @param xform
+     * @return 
+     */
+    public static float[][] toMatrix(AffineTransform xform){
+        return new float[][]{{(float)xform.getScaleX(),(float)xform.getShearX(),0},
+            {(float)xform.getShearY(),(float)xform.getScaleY(),0},
+            {(float)xform.getTranslateX(),(float)xform.getTranslateY(),1}};
+    }
+    
+    /**
+     * transform a point i.e:(x,y) based on given matrix 
+     * @param mm
+     * @param x
+     * @param y
+     * @return 
+     */
+    public static float[] transformPoint(float[][] mm, float x, float y) {
+        float x_ = mm[0][0] * x + mm[1][0] * y + mm[2][0];
+        float y_ = mm[0][1] * x + mm[1][1] * y + mm[2][1];
+        return new float[]{x_, y_};
+    }
+    
     //////////////////////////////////////////////////////////////////////////
     
     /**show matrix (used to debug)*/
-    public static final void show(final float[][] matrix1) {
-        
+    public static final void show(final float[][] matrix1) {        
         //show lines
         for (int row = 0; row < 3; row++) {
             LogWriter.writeLog(row + "((" + matrix1[row][0] + " , " + matrix1[row][1] + " , " + matrix1[row][2] + " ))");
-//            System.out.println( row + "(" + matrix1[row][0] + " , " + matrix1[row][1] + " , " + matrix1[row][2] + " )" );
+           // System.out.println( row + "(" + matrix1[row][0] + " , " + matrix1[row][1] + " , " + matrix1[row][2] + " )" );
         }
     }
     

@@ -345,7 +345,7 @@ public class PatternColorSpace extends GenericColorSpace{
         } else {
             mm = new float[][]{{1f, 0f, 0f}, {0f, 1f, 0f}, {0f, 0f, 1f}};
         }
-    
+                
         final ObjectStore localStore = new ObjectStore();
         BufferedImage image;
         DynamicVectorRenderer glyphDisplay;
@@ -376,9 +376,9 @@ public class PatternColorSpace extends GenericColorSpace{
         Rectangle2D rawRect = rawShape.getBounds2D();
 
         float rawXStep = PatternObj.getFloatNumber(PdfDictionary.XStep);
-        rawXStep = (30000 > Short.MAX_VALUE || rawXStep < -30000) ? 0f : rawXStep;
+        rawXStep = (30000 < rawXStep || rawXStep < -30000) ? 0f : rawXStep;
         float rawYStep = PatternObj.getFloatNumber(PdfDictionary.YStep);
-        rawYStep = (30000 > Short.MAX_VALUE || rawYStep < -30000) ? 0f : rawYStep;
+        rawYStep = (30000 < rawYStep || rawYStep < -30000) ? 0f : rawYStep;
 
         float[] bbox = new float[4];
 
@@ -539,4 +539,10 @@ public class PatternColorSpace extends GenericColorSpace{
         return new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,matrix,colorsReversed);
         
     }
+
+    public PatternObject getPatternObj() {
+        currentPdfFile.checkResolved(PatternObj);
+        return PatternObj;
+    }
+    
 }

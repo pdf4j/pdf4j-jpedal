@@ -147,7 +147,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     }
     
     /**initialise all the colorspaces when first needed */
-    protected static void initCMYKColorspace() throws PdfException {
+    protected static void initCMYKColorspace() {
         
             if(ICCProfileForRGB ==null){
                 rgbModel =

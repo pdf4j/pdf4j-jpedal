@@ -643,7 +643,7 @@ public class GraphicsState implements Cloneable
 
         /**set to defaults*/
         //strokeAlpha=1.0f;
-        nonstrokeAlpha=1.0f;
+        //nonstrokeAlpha=1.0f;
         op=false;
         OP=false;
 
@@ -1008,4 +1008,13 @@ public class GraphicsState implements Cloneable
     public void setBMValue(int bm){
         BMvalue = bm;
     }
+
+    @Override
+    public String toString() {
+        String str = "GraphicsState : BM:" + BMvalue + " op:" + op + " OP:" + OP
+                + " opm:" + OPM + " sAlpha:" + strokeAlpha + " nsAlpha:" + nonstrokeAlpha
+                + " msAlpha:" + maxStrokeAlpha + " mnsAlpha:"+maxNonstrokeAlpha+" smask:"+SMask;
+        return str;
+    }    
+    
 }

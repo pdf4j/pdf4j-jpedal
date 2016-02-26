@@ -412,7 +412,7 @@ public class PdfLayerList {
                     }
 
                     refTolayerName.put(ref,layerName);
-
+                    
                     //and write back name value
                     layer[ii]=layerName;
 
@@ -565,7 +565,7 @@ public class PdfLayerList {
             } else {
                 nextObject.setStatus(PdfObject.UNDECODED_REF);
             }
-
+            
             //must be done AFTER setStatus()
             nextObject.setUnresolvedData(A, PdfDictionary.AS);
             currentPdfFile.checkResolved(nextObject);
@@ -594,6 +594,10 @@ public class PdfLayerList {
 
                             layerName = nextObject.getTextStreamValue(PdfDictionary.Name);
                             name = (String) refToPropertyID.get(ref);
+                            
+                            if(name==null && refToPropertyID.isEmpty()){ //23911 - include implicit value if Properties not set
+                                name="MC0";
+                            }
 
                             streamToName.put(name, layerName);
 

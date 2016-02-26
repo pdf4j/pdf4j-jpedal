@@ -182,7 +182,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     			g2.setColor(backgroundColor);
 
     			if (dirtyRegion == null) {
-    				g2.fill(new Rectangle(xx, yy, (int) (w * scaling), (int) (h * scaling)));
+    				g2.fill(new Rectangle(0, 0, (int) (w * scaling), (int) (h * scaling)));
     			} else {
     				g2.fill(dirtyRegion);
     			}

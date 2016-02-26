@@ -102,7 +102,7 @@ class JavaTextRenderer {
                     dY=-1f;
                 }
                 
-                if (isSTD) {
+                if (isSTD || glyphs.isCIDFont) {
                     
                     glyph = glyphs.getGlyph(glyphData.getDisplayValue() , currentWidth);
                     

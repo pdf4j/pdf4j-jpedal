@@ -41,6 +41,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import org.jpedal.color.ColorSpaces;
+import org.jpedal.display.swing.SwingHelper;
 import org.jpedal.exception.PdfException;
 import org.jpedal.render.*;
 import org.jpedal.io.ObjectStore;
@@ -182,7 +183,13 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
         currentImageDecoder.setObjectValue(ValueTypes.DirectRendering, g2);//(Graphics2D) graphics);
         imageDisplay.setG2(g2);
         currentImageDecoder.decodePageContent(pdfObject);
-
+        
+        AffineTransform old = g2.getTransform();
+        g2.scale(1, -1);
+        g2.translate(0, -((cry/scaling)+(crh/scaling)));
+        SwingHelper.scaleDisplay(g2, 0, 0, (int)(crw/scaling), (int)(crh/scaling));
+        g2.setTransform(old);
+        
         g2.setClip(null);
         
         return image;

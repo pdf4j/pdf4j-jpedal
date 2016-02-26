@@ -57,6 +57,8 @@ public class BlendMode implements Composite {
 
 //        return ContextFactory.getBlendContext(blendMode,alpha);
         switch (blendMode) {
+            case PdfDictionary.SMask:
+                return new SMaskComposite(srcColorModel, dstColorModel, alpha);
             case PdfDictionary.Hue:
             case PdfDictionary.Saturation:
             case PdfDictionary.Color:

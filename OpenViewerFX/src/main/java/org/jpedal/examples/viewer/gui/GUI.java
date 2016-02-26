@@ -701,7 +701,7 @@ public abstract class GUI implements GUIFactory {
         if(getSelectedComboIndex(Commands.ROTATION)!=(rotation/90)){
             setSelectedComboIndex(Commands.ROTATION, (rotation/90));
         }else if(!Values.isProcessing() && !SharedViewer.isFX()){
-            decode_pdf.repaint();
+//            decode_pdf.repaint();
         }
     }
 

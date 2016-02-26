@@ -119,15 +119,14 @@ public class PDFStitching extends PDFGenericFunction implements PDFFunction {
 
         if (range!=null){
             for(int i=0; i!=range.length/2;i++) {
-                result[i] = min(max(output[i], range[0 * 2]), range[0 * 2 + 1]);
+                result[i] = min(max(output[i], range[i * 2]), range[i * 2 + 1]);
             }
         }else{
             for(int i=0; i!=output.length;i++) {
                 result[i] = output[i];
             }
         }
-
-
+                
 		return result;
 	}
 	

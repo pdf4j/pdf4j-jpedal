@@ -1058,8 +1058,21 @@ public class PdfObject implements Cloneable{
     
     //return as constant we can check
     public int getNameAsConstant(final int id) {
-        //return PdfDictionary.generateChecksum(0,raw.length,raw);
-        return PdfDictionary.Unknown;
+        
+        switch(id){
+           
+            case PdfDictionary.S:
+                
+                if(rawS!=null){
+                    return  PdfDictionary.generateChecksum(0,rawS.length,rawS);
+                }else{
+                    return PdfDictionary.Unknown;
+                }
+            default:
+                
+                return PdfDictionary.Unknown;
+        }
+        
     }
     
     public String getName(final int id) {

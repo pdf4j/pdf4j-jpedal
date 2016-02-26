@@ -353,6 +353,11 @@ public class Tj extends BaseDecoder {
         temp[2][2] =1;
         Trm = Matrix.multiply(temp, Trm);
         
+        if(currentFontData.isFontVertical()){
+            Trm[2][0] -= (Trm[0][0]/2);
+            Trm[2][1] -= (Trm[1][1]);
+        }
+        
         //check for leading before text and adjust position to include
         if(isMultiple && stream[startCommand]!=60 && stream[startCommand]!=40 && stream[startCommand]!=93){
             
@@ -489,7 +494,7 @@ public class Tj extends BaseDecoder {
                 temp[1][2] = 0;
                 
                 if(currentFontData.isFontVertical()){
-                    temp[2][1] = -(currentWidth + glyphData.getLeading()); //tx;
+                    temp[2][1] = -(currentWidth - glyphData.getLeading()); //tx;
                     temp[2][0] = 0; //ty;
                 }else{
                     temp[2][0] = (currentWidth +  glyphData.getLeading()); //tx;
@@ -639,7 +644,11 @@ public class Tj extends BaseDecoder {
                 }
                 
                 /**now we have plotted it we update pointers and extract the text*/
-                currentWidth += charSpacing;
+                if(currentFontData.isFontVertical()){
+                    currentWidth -= charSpacing;
+                }else{
+                    currentWidth += charSpacing;
+                }
                 
                 if (glyphData.getRawChar() == ' '){ //add word spacing if
                     currentWidth += wordSpacing;
@@ -757,7 +766,7 @@ public class Tj extends BaseDecoder {
         /**
          * if we have an /ActualText use that instead with the width data at start of original
          */
-        if(textData!=null && actualText!=null){
+        if(textData!=null && actualText!=null && !actualText.isEmpty()){
             int startValue= textData.indexOf(PdfData.marker,2);
             if(startValue>0) {
                 startValue = textData.indexOf(PdfData.marker, startValue + 1);

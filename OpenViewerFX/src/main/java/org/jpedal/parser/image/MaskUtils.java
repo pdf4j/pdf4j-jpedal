@@ -74,10 +74,17 @@ public class MaskUtils {
         //System.out.println("x,y="+gs.CTM[2][0]+" "+gs.CTM[2][1]+" "+BBox[0]+" "+BBox[1]+" "+BBox[2]+" "+BBox[3]+" "+newSMask);
         
         /**get form as an image*/
-        final int fx=(int)BBox[0];
-        final int fw=(int)BBox[2];
-        final int fy=(int)BBox[1];
-        final int fh=(int)BBox[3];
+        int fx=(int)BBox[0];
+        int fw=(int)BBox[2];
+        int fy=(int)BBox[1];
+        int fh=(int)BBox[3];
+        
+        if(fw == 32768 || fh == 32768){ //means we should ignore bbox
+            fx = 0;
+            fy = 0;
+            fw = 1;
+            fh = 1;
+        }
         
         final int iw,ih;
         final float scaling=4f;
@@ -88,8 +95,11 @@ public class MaskUtils {
             
             final BufferedImage smaskImage = PDFObjectToImage.getImageFromPdfObject(newSMask, fx, fw, fy, fh, currentPdfFile, parserOptions, formLevel, multiplyer,false,scaling);
 
-            image= SMask.applySmask(image, smaskImage,true);
-
+            if(gs.SMask.getNameAsConstant(PdfDictionary.S) == PdfDictionary.Luminosity){
+                image= SMask.applyLuminosityMask(image, smaskImage);
+            }else{
+                image= SMask.applyAlphaMask(image, smaskImage);
+            }
             if(smaskImage!=null){
                 smaskImage.flush();
             }

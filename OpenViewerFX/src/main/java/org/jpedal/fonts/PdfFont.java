@@ -439,7 +439,8 @@ public class PdfFont implements Serializable {
     
     /**return unicode value for this index value */
     public final String getUnicodeMapping(final int char_int){
-        if(unicodeMappings==null) {
+        //@sam - fixes case 23962 but is this real problem
+        if(unicodeMappings==null){// || char_int>=unicodeMappings.length) {
             return null;
         } else {
             return  unicodeMappings[char_int];

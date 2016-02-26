@@ -108,11 +108,16 @@ public abstract class MultiPageDecoder {
     
     final DisplayOffsets offsets;
     
-    public MultiPageDecoder(final GUIFactory gui,final PdfDecoderInt pdf,final PdfPageData pageData,final MultiPagesDisplay display, final MultiDisplayOptions multiDisplayOptions, 
+    public MultiPageDecoder(final PdfDecoderInt pdf,final PdfPageData pageData,final MultiPagesDisplay display, final MultiDisplayOptions multiDisplayOptions, 
             final DynamicVectorRenderer currentDisplay, final int pageNumber,final FileAccess fileAccess, 
             final PdfObjectReader io, final AcroRenderer formRenderer,final DecoderOptions options) {
        
-        this.gui=gui;
+        //Precaution incase incorrect PdfDecoderInt implementation is used
+        if(pdf.getExternalHandler()==null){
+            this.gui=null;
+        }else{
+            this.gui=(GUIFactory)pdf.getExternalHandler().getExternalHandler(Options.GUIContainer);
+        }
         this.pdf=pdf;
         this.pageData=pageData;
        
@@ -133,12 +138,6 @@ public abstract class MultiPageDecoder {
     
     /**used to decode multiple pages on views*/
     public void decodeOtherPages(int pageNumber, final int pageCount, int displayView) {
-        
-        try {
-            semaphore.acquire();
-        } catch (InterruptedException ex) {
-            LogWriter.writeLog("Exception: " + ex.getMessage());
-        }
         
         this.displayView=displayView;
         
@@ -209,8 +208,15 @@ public abstract class MultiPageDecoder {
                 public void run(){
 
                     try {
+                        semaphore.acquire();
+                    } catch (InterruptedException ex) {
+                        LogWriter.writeLog("Exception: " + ex.getMessage());
+                    }
 
-                        if(debugLayout) {
+                    try {
+
+                        
+                        if (debugLayout) {
                             System.out.println("START=========================Started decoding pages "
                                     + multiDisplayOptions.getStartViewPage() + ' ' + multiDisplayOptions.getEndViewPage());
                         }

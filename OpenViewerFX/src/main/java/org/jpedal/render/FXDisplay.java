@@ -524,14 +524,15 @@ public class FXDisplay extends GUIDisplay {
                  * PDFdata\test_data\Hand_Test\jj.PDF
                  * PDFdata\test_data\sample_pdfs\CIDs\Article7.pdf
                 * */
-              
-                boolean applyClip = clip.getBoundsInLocal().getMinX()>baseNode.getBoundsInLocal().getMinX() && 
-                        baseNode.getBoundsInLocal().getMaxY() > clip.getBoundsInLocal().getMaxY();
-              
-                if (applyClip) {  
+                
+                //remove hacky fix with clip to make 23700 work correctly
+//               boolean applyClip = clip.getBoundsInLocal().getMinX()>baseNode.getBoundsInLocal().getMinX() && 
+//                        baseNode.getBoundsInLocal().getMaxY() > clip.getBoundsInLocal().getMaxY();
+//              
+//                if (applyClip) {  
                  
                     baseNode.setClip(clip);
-                }
+//                }
                   
 
 

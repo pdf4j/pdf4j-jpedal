@@ -91,6 +91,9 @@ public class B {
                 final Area a=gs.getClippingShape();
                 a.subtract(new Area(currentShape));
                 currentShape=a;
+               
+                //temp hack to make new code work as old
+                currentDrawShape.setShape(currentShape);
 
             }
 
@@ -109,7 +112,7 @@ public class B {
                 if(useJavaFX){
                     current.drawShape(fxPath,gs);
                 }else{
-                    current.drawShape(currentShape,gs, Cmd.B);
+                    current.drawShape(currentDrawShape, gs, Cmd.B);
                     if (current.isHTMLorSVG()) {
                         current.eliminateHiddenText(currentShape,gs,currentDrawShape.getSegmentCount(), false);
                     }

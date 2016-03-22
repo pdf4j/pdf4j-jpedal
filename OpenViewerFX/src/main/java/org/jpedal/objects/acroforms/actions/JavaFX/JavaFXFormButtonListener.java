@@ -43,7 +43,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
 
     private static final boolean showMethods = false;
 
-    private Map captionChanger;
+    private Map<String, String> captionChanger;
     
     public JavaFXFormButtonListener(final String normalCaption, final String rolloverCaption, final String downCaption){
        if(showMethods) {
@@ -51,7 +51,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
        }
        int captions = 0;
        
-       captionChanger = new HashMap();
+       captionChanger = new HashMap<String, String>();
        if (rolloverCaption != null && !rolloverCaption.isEmpty()){
             captionChanger.put("rollover", rolloverCaption);
             captions++;
@@ -76,7 +76,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
         }
         if((captionChanger != null && e.getSource() instanceof ButtonBase) && 
             (captionChanger.containsKey(("rollover")))){
-                ((ButtonBase)e.getSource()).setText((String) captionChanger.get("rollover"));
+                ((ButtonBase)e.getSource()).setText(captionChanger.get("rollover"));
             }
         }
     
@@ -87,7 +87,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
         }
         if ((captionChanger != null && e.getSource() instanceof ButtonBase) &&
             (captionChanger.containsKey("normal"))) {
-                ((ButtonBase) e.getSource()).setText((String) captionChanger.get("normal"));
+                ((ButtonBase) e.getSource()).setText(captionChanger.get("normal"));
             }
         }
     
@@ -104,7 +104,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
         }
         if ((captionChanger != null && e.getSource() instanceof ButtonBase) &&
              (captionChanger.containsKey("down"))) {
-               ((ButtonBase) e.getSource()).setText((String) captionChanger.get("down"));
+               ((ButtonBase) e.getSource()).setText(captionChanger.get("down"));
             }
         }
     
@@ -115,9 +115,9 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
          }
          if (captionChanger != null && e.getSource() instanceof ButtonBase){
              if (captionChanger.containsKey("rollover")) {
-               ((ButtonBase) e.getSource()).setText((String) captionChanger.get("rollover")); 
+               ((ButtonBase) e.getSource()).setText(captionChanger.get("rollover"));
              }else if(captionChanger.containsKey("normal")){
-                 ((ButtonBase)e.getSource()).setText((String) captionChanger.get("rollover")); 
+                 ((ButtonBase)e.getSource()).setText(captionChanger.get("rollover"));
              }
          } 
     }

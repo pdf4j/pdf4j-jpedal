@@ -53,6 +53,7 @@ import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.PdfShape;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
@@ -114,8 +115,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     public int rawPageNumber;
 
-    int xx, yy;
-
     public static boolean invertHighlight;
 
     boolean isPrinting;
@@ -131,7 +130,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     /**initial Q & D object to hold data*/
     protected Vector_Object pageObjects;
 
-    protected final Map imageIDtoName=new HashMap(10);
+    protected final Map<Integer, String> imageIDtoName=new HashMap<Integer, String>(10);
 
     protected boolean needsHorizontalInvert;
 
@@ -154,12 +153,8 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     private Mode mode = Mode.PDF;//declared in DynamicVectorRenderer
 
     @Override
-    public void setInset(final int x, final int y) {
-	xx = x;
-	yy = y;
-
-    }
-
+    public void setInset(final int x, final int y) {}
+	
     @Override
     public void setG2(final Graphics2D g2) {
     	this.g2 = g2;
@@ -763,7 +758,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void resetOnColorspaceChange() {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -775,7 +769,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void drawAffine(final double[] afValues) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -783,7 +776,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void drawFontSize(final int fontSize) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -791,7 +783,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void setLineWidth(final int lineWidth) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -801,7 +792,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void stopClearOnNextRepaint(final boolean flag) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -879,17 +869,14 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void flagDecodingFinished() {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void flagImageDeleted(final int i) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void setOCR(final boolean isOCR) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -910,7 +897,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void checkFontSaved(final Object glyph, final String name, final PdfFont currentFontData) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -923,7 +909,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     @Deprecated
     @Override
     public Rectangle getArea(final int i) {
-	return null;  //To change body of implemented methods use File | Settings | File Templates.
+	return null;  
     }
 
     @Override
@@ -976,7 +962,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     @Override
     public void saveImage(final int id, final String des, final String type) {
-        final String name = (String)imageIDtoName.get(id);
+        final String name = imageIDtoName.get(id);
         BufferedImage image;
         if(useHiResImageForDisplay){
             image=objectStoreRef.loadStoredImage(name);
@@ -1077,16 +1063,14 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void stopG2HintSetting(final boolean isSet) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void setPrintPage(final int currentPrintPage) {
-	//To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void drawShape(final Shape currentShape, final GraphicsState currentGraphicsState, final int cmd) {
+    public void drawShape(final PdfShape pdfShape, final GraphicsState currentGraphicsState, final int cmd) {
 	//    throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -1225,7 +1209,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public BufferedImage getSingleImagePattern() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;  
     }
 
     /**used by JavaFX and HTML5 conversion to override scaling*/

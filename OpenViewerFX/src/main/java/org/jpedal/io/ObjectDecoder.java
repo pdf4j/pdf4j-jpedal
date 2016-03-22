@@ -590,6 +590,12 @@ public class ObjectDecoder implements Serializable {
                     i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
                     break;
                 }
+            case PdfDictionary.IC:
+                {
+                    final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_FLOAT_ARRAY);
+                    i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                    break;
+                }
             case PdfDictionary.OCGs:
                 {
                     final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_KEY_ARRAY);

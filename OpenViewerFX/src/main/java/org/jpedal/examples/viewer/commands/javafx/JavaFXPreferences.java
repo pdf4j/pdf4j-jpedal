@@ -113,7 +113,7 @@ import org.w3c.dom.NodeList;
  */
 public class JavaFXPreferences {
 
-    private static final Map reverseMessage = new HashMap();
+    private static final Map<String, String> reverseMessage = new HashMap<String, String>();
     private static final String[] menuTabs = {"ShowMenubar", "ShowButtons", "ShowDisplayoptions", "ShowNavigationbar", "ShowSidetabbar"};
     private static FXDialog preferenceDialog;
     private static final int contentGap = 10; //The vertical & padding space between objects
@@ -157,7 +157,7 @@ public class JavaFXPreferences {
     private static CheckBox enhancedFractionalLinesCB;
     private static CheckBox showBorderCB;
     private static TextField pageInsetsTF;
-    private static ComboBox displayCombo;
+    private static ComboBox<String> displayCombo;
     private static CheckBox enablePageFlipCB;
     private static CheckBox scrollableThumbsCB;
 
@@ -166,15 +166,15 @@ public class JavaFXPreferences {
      */
     private static TextField winTitleTF;
     private static TextField iconLocTF;
-    private static ComboBox searchStyle;
+    private static ComboBox<String> searchStyle;
     private static TextField maxViewerTF;
     private static TextField sideTabTF;
     private static CheckBox consistentSideTabCB;
     private static CheckBox rightClickCB;
     private static CheckBox wheelZoomCB;
     private static CheckBox mouseSelectCB;
-    private static ComboBox voiceSelect;
-    private static ComboBox transitionSelect;
+    private static ComboBox<String> voiceSelect;
+    private static ComboBox<String> transitionSelect;
     
     /**
      * Declare Objects for Color Menu.
@@ -193,8 +193,8 @@ public class JavaFXPreferences {
      * Declare Objects for Printing Menu.
      */
     private static CheckBox hiResPrintingCB;
-    private static ComboBox printerCombo=new ComboBox();
-    private static ComboBox paperSizesCombo=new ComboBox();
+    private static ComboBox<String> printerCombo=new ComboBox<String>();
+    private static ComboBox<String> paperSizesCombo=new ComboBox<String>();
     private static TextField defaultDPITF;
     private static TextField blackListTF;
     private static TabPane tabs;
@@ -237,7 +237,7 @@ public class JavaFXPreferences {
                         Messages.getMessage("PageLayoutViewMenu.ContinousFacing"),
                         Messages.getMessage("PageLayoutViewMenu.PageFlow")
                 );
-        displayCombo = new ComboBox(pageOptions);
+        displayCombo = new ComboBox<String>(pageOptions);
         enablePageFlipCB = new CheckBox(Messages.getMessage("PdfCustomGui.enhancedFacing"));
         scrollableThumbsCB = new CheckBox(Messages.getMessage("PdfCustomGui.thumbnailScroll"));
 
@@ -259,7 +259,7 @@ public class JavaFXPreferences {
                     Messages.getMessage("PageLayoutViewMenu.TabbedSearch")
             );
         }
-        searchStyle = new ComboBox(layoutOptions);
+        searchStyle = new ComboBox<String>(layoutOptions);
         maxViewerTF = new TextField();
         sideTabTF = new TextField();
         consistentSideTabCB = new CheckBox(Messages.getMessage("PdfCustomGui.consistentTabs"));
@@ -269,10 +269,10 @@ public class JavaFXPreferences {
         if (speech!=null) {
             final List<String> availableVoices = new ArrayList<String>(Arrays.asList(speech.listVoices()));
             final ObservableList<String> speechOptions = FXCollections.observableList(availableVoices);
-            voiceSelect = new ComboBox(speechOptions);
+            voiceSelect = new ComboBox<String>(speechOptions);
         } else {
             final ObservableList<String> speechOptions = FXCollections.observableArrayList("No Voice Options Detected");
-            voiceSelect = new ComboBox(speechOptions);
+            voiceSelect = new ComboBox<String>(speechOptions);
         }
         
         // Set up transition list
@@ -281,7 +281,7 @@ public class JavaFXPreferences {
             transitions.add(s.name().replace("_", " "));
         }
         final ObservableList<String> transitionOptions = FXCollections.observableArrayList(transitions);
-        transitionSelect = new ComboBox(transitionOptions);
+        transitionSelect = new ComboBox<String>(transitionOptions);
         transitionSelect.getSelectionModel().select(0);
         
         /**
@@ -307,10 +307,10 @@ public class JavaFXPreferences {
                 availablePrinters.add(Messages.getMessage("PdfPreferences.systemDefault.text"));
             }
             final ObservableList<String> printerOptions = FXCollections.observableList(availablePrinters);
-            printerCombo = new ComboBox(printerOptions);
+            printerCombo = new ComboBox<String>(printerOptions);
 
             final ObservableList<String> pageSizeOptions = FXCollections.observableList(Arrays.asList(currentGUI.getPaperSizes().getPaperSizes()));
-            paperSizesCombo = new ComboBox(pageSizeOptions);
+            paperSizesCombo = new ComboBox<String>(pageSizeOptions);
             paperSizesCombo.setValue(pageSizeOptions.get(currentGUI.getPaperSizes().getDefaultPageIndex()));
 
         }
@@ -897,7 +897,7 @@ public class JavaFXPreferences {
         return (r << 16) + (g << 8) + b;
     }
 
-    private static void addMenuToTree(final NodeList nodes, final CheckBoxTreeItem top, final List previous) {
+    private static void addMenuToTree(final NodeList nodes, final CheckBoxTreeItem<String> top, final List<CheckBoxTreeItem<String>> previous) {
 
         for (int i = 0; i != nodes.getLength(); i++) {
 
@@ -969,7 +969,7 @@ public class JavaFXPreferences {
             final CheckBoxTreeItem<String> top = new CheckBoxTreeItem<String>(Messages.getMessage("PdfCustomGui." + menuTabs[t]));
             top.setSelected(true);
 
-            final ArrayList last = new ArrayList();
+            final ArrayList<CheckBoxTreeItem<String>> last = new ArrayList<CheckBoxTreeItem<String>>();
             last.add(top);
 
             final NodeList nodes = properties.getChildren(Messages.getMessage("PdfCustomGui." + menuTabs[t]) + "Menu");
@@ -1292,7 +1292,7 @@ public class JavaFXPreferences {
         properties.setValue("allowRightClick", String.valueOf(rightClickCB.isSelected()));
         properties.setValue("allowScrollwheelZoom", String.valueOf(wheelZoomCB.isSelected()));
         properties.setValue("showMouseSelectionBox", String.valueOf(mouseSelectCB.isSelected()));
-        properties.setValue("transitionType", transitionSelect.getSelectionModel().getSelectedItem().toString());
+        properties.setValue("transitionType", transitionSelect.getSelectionModel().getSelectedItem());
         ((JavaFxGUI)currentGUI).updateTransitionType();
         if (speech!=null) {
             properties.setValue("voice", String.valueOf(voiceSelect.getValue()));
@@ -1330,7 +1330,7 @@ public class JavaFXPreferences {
          */
         properties.setValue("useHiResPrinting", String.valueOf(hiResPrintingCB.isSelected()));
 
-        if (((String) printerCombo.getValue()).startsWith("System Default")) {
+        if ((printerCombo.getValue()).startsWith("System Default")) {
             properties.setValue("defaultPrinter", "");
         } else {
             properties.setValue("defaultPrinter", String.valueOf(printerCombo.getValue()));
@@ -1348,7 +1348,7 @@ public class JavaFXPreferences {
     private static void saveMenuPreferencesChildren(final CheckBoxTreeItem<String> root, final GUIFactory gui){
         for(int i=0; i!=root.getChildren().size(); i++){
             final CheckBoxTreeItem<String> node = (CheckBoxTreeItem<String>)root.getChildren().get(i);
-            final String value = ((String)reverseMessage.get(node.getValue()));
+            final String value = (reverseMessage.get(node.getValue()));
             if(node.isSelected()){
                 properties.setValue(value, "true");
                 gui.alterProperty(value, true);

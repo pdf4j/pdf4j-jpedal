@@ -62,7 +62,7 @@ class JavaFXDetails {
 //                new Model(md5Digest)
 //        );
 
-        final TableColumn mainCol = new TableColumn("");
+        final TableColumn<Model, String> mainCol = new TableColumn<Model, String>("");
         mainCol.setCellValueFactory(
                 new PropertyValueFactory<Model, String>(""));
 

@@ -86,7 +86,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
     private JButton createAnntoationHighlight(final FormObject form) {
         JButton but = setupAnnotationButton(form);
         but.setBackground(new Color(0, 0, 0, 0));
-        but.setIcon(new FixImageIcon(form, PopupFactory.getIcon(form), 0));
+        but.setIcon(new FixImageIcon(form, AnnotationFactory.getIcon(form), 0));
         return but;
     }
     
@@ -123,7 +123,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
 
         final int rot = pageData.getRotation(form.getPageNumber());
 
-        final BufferedImage commentIcon = PopupFactory.getIcon(form);
+        final BufferedImage commentIcon = AnnotationFactory.getIcon(form);
 
         if (commentIcon != null) {
             //Ensure sized correctly
@@ -141,7 +141,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
     
     private JComponent createAnnotationPopup(final FormObject form) {
     
-        JComponent comp = (JComponent) getPopupComponent(form, pageData.getCropBoxWidth(form.getPageNumber()));
+        JComponent comp = getPopupComponent(form, pageData.getCropBoxWidth(form.getPageNumber()));
         form.setGUIComponent(comp, FormFactory.SWING);
         //set visibility
         comp.setVisible(form.getBoolean(PdfDictionary.Open));
@@ -252,6 +252,14 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         return but;
     }
     
+    private JButton createAnnotationSquare(final FormObject form) {
+        JButton but = setupAnnotationButton(form);
+        but.setBackground(new Color(0, 0, 0, 0));
+        but.setIcon(new FixImageIcon(form, AnnotationFactory.getIcon(form), 0));
+        
+        return but;
+    }
+    
     private static Color getAnnotationColor(final FormObject form){
         final float[] formColor = form.getFloatArray(PdfDictionary.C);
         Color color = new Color(0);
@@ -324,6 +332,8 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
                     return createAnnotationInk(form);
                 case PdfDictionary.StrickOut :
                     return createAnnotationStrikeOut(form);
+                case PdfDictionary.Square :
+                    return createAnnotationSquare(form);
             }
         }
         
@@ -709,12 +719,12 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         
         //populate items array with list from Opt
         final String[] items = form.getItemsList();
-        final JComboBox comboBox;
+        final JComboBox<String> comboBox;
         if (items == null) {
-            comboBox = new JComboBox();
+            comboBox = new JComboBox<String>();
         } else{
             
-            comboBox = new JComboBox(items);
+            comboBox = new JComboBox<String>(items);
             
             /**
              * allow background colour in cells
@@ -802,11 +812,11 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         final String[] items = form.getItemsList();
         
         //create list (note we catch null value)
-        final JList list;
+        final JList<String> list;
         if (items != null) {
-            list = new JList(items);
+            list = new JList<String>(items);
         } else {
-            list = new JList();
+            list = new JList<String>();
         }
         
         if (!form.getFieldFlags()[FormObject.MULTISELECT_ID])//mulitselect
@@ -825,7 +835,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         
         
         //sync to FormObject
-        form.setSelection(list.getSelectedValues(), (String) list.getSelectedValue(), list.getSelectedIndices(),list.getSelectedIndex());
+        form.setSelection(list.getSelectedValues(), list.getSelectedValue(), list.getSelectedIndices(),list.getSelectedIndex());
         
         setupUniversalFeatures(list, form);
         
@@ -1294,9 +1304,9 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
      * and adds it to the relevant icon for the AbstractButton <b>comp</b>
      * showImages is to display the appearance images for that FormObject
      */
-    private void setAPImages(final FormObject form, final Object rawComp) {
+    private void setAPImages(final FormObject form, final AbstractButton rawComp) {
         
-        final AbstractButton comp=(AbstractButton)rawComp;
+        final AbstractButton comp= rawComp;
         
         final PdfObject APobjN = form.getDictionary(PdfDictionary.AP).getDictionary(PdfDictionary.N);
         final PdfObject APobjD = form.getDictionary(PdfDictionary.AP).getDictionary(PdfDictionary.D);
@@ -1489,7 +1499,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         }
         comp.setForeground(form.getTextColor());
         
-        final Border newBorder = (Border)SwingData.generateBorderfromForm(form,1);
+        final Border newBorder = SwingData.generateBorderfromForm(form,1);
         
         comp.setBorder(newBorder);
         
@@ -1592,7 +1602,6 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
      */
     @Override
     public void setAnnotOrder(final Map<String, String> annotOrder) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
     
     /**
@@ -1601,7 +1610,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
      * @return Swing component to use as popup (see org.jpedal.objects.acroforms.overridingImplementations.PdfSwingPopup)
      */
     @SuppressWarnings("MethodMayBeStatic")
-    public Object getPopupComponent(final FormObject form, final int cropBoxWith) {
+    public PdfSwingPopup getPopupComponent(final FormObject form, final int cropBoxWith) {
         return new PdfSwingPopup(form,cropBoxWith);
     }
     

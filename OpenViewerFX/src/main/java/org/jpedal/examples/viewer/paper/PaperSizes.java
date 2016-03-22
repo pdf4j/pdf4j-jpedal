@@ -46,12 +46,12 @@ import java.util.*;
 
 public class PaperSizes {
 
-    Map paperDefinitions=new HashMap();
-    ArrayList paperList = new ArrayList();
+    Map<String, MarginPaper> paperDefinitions=new HashMap<String, MarginPaper>();
+    ArrayList<String> paperList = new ArrayList<String>();
 
     private static final double mmToSubInch = 72 / 25.4;
 
-    final Map paperNames=new HashMap();
+    final Map<String, String> paperNames=new HashMap<String, String>();
 
     /**default for paper selection*/
     private int defaultPageIndex;
@@ -84,7 +84,7 @@ public class PaperSizes {
 
     /**return selected Paper*/
     public MarginPaper getSelectedPaper(final Object id) {
-        return (MarginPaper) paperDefinitions.get(id);
+        return paperDefinitions.get(id);
     }
 
     /**
@@ -223,8 +223,8 @@ public class PaperSizes {
      */
     public synchronized void setPrintService(final PrintService p) {
         this.printService = p;
-        paperDefinitions=new HashMap();
-        paperList=new ArrayList();
+        paperDefinitions=new HashMap<String, MarginPaper>();
+        paperList=new ArrayList<String>();
 
         checkAndAddSize(MediaSizeName.ISO_A4);
         checkAndAddSize(MediaSizeName.NA_LETTER);
@@ -308,79 +308,79 @@ public class PaperSizes {
     public String[] getPaperSizes() {
 
         return new String[]{
-        (String)paperNames.get(MediaSizeName.ISO_A4.toString()),
-        (String)paperNames.get(MediaSizeName.NA_LETTER.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A0.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A1.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A2.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A3.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A5.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A6.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A7.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A8.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A9.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_A10.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B0.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B1.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B2.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B3.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B4.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B5.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B6.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B7.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B8.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B9.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_B10.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B0.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B1.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B2.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B3.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B4.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B5.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B6.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B7.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B8.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B9.toString()),
-        (String)paperNames.get(MediaSizeName.JIS_B10.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C0.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C1.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C2.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C3.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C4.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C5.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_C6.toString()),
-        (String)paperNames.get(MediaSizeName.NA_LEGAL.toString()),
-        (String)paperNames.get(MediaSizeName.EXECUTIVE.toString()),
-        (String)paperNames.get(MediaSizeName.LEDGER.toString()),
-        (String)paperNames.get(MediaSizeName.TABLOID.toString()),
-        (String)paperNames.get(MediaSizeName.INVOICE.toString()),
-        (String)paperNames.get(MediaSizeName.FOLIO.toString()),
-        (String)paperNames.get(MediaSizeName.QUARTO.toString()),
-        (String)paperNames.get(MediaSizeName.JAPANESE_POSTCARD.toString()),
-        (String)paperNames.get(MediaSizeName.JAPANESE_DOUBLE_POSTCARD.toString()),
-        (String)paperNames.get(MediaSizeName.A.toString()),
-        (String)paperNames.get(MediaSizeName.B.toString()),
-        (String)paperNames.get(MediaSizeName.C.toString()),
-        (String)paperNames.get(MediaSizeName.D.toString()),
-        (String)paperNames.get(MediaSizeName.E.toString()),
-        (String)paperNames.get(MediaSizeName.ISO_DESIGNATED_LONG.toString()),
-        (String)paperNames.get(MediaSizeName.ITALY_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.MONARCH_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.PERSONAL_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_NUMBER_9_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_NUMBER_10_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_NUMBER_11_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_NUMBER_12_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_NUMBER_14_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_6X9_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_7X9_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_9X11_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_9X12_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_10X13_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_10X14_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_10X15_ENVELOPE.toString()),
-        (String)paperNames.get(MediaSizeName.NA_5X7.toString()),
-        (String)paperNames.get(MediaSizeName.NA_8X10.toString())};
+                paperNames.get(MediaSizeName.ISO_A4.toString()),
+                paperNames.get(MediaSizeName.NA_LETTER.toString()),
+                paperNames.get(MediaSizeName.ISO_A0.toString()),
+                paperNames.get(MediaSizeName.ISO_A1.toString()),
+                paperNames.get(MediaSizeName.ISO_A2.toString()),
+                paperNames.get(MediaSizeName.ISO_A3.toString()),
+                paperNames.get(MediaSizeName.ISO_A5.toString()),
+                paperNames.get(MediaSizeName.ISO_A6.toString()),
+                paperNames.get(MediaSizeName.ISO_A7.toString()),
+                paperNames.get(MediaSizeName.ISO_A8.toString()),
+                paperNames.get(MediaSizeName.ISO_A9.toString()),
+                paperNames.get(MediaSizeName.ISO_A10.toString()),
+                paperNames.get(MediaSizeName.ISO_B0.toString()),
+                paperNames.get(MediaSizeName.ISO_B1.toString()),
+                paperNames.get(MediaSizeName.ISO_B2.toString()),
+                paperNames.get(MediaSizeName.ISO_B3.toString()),
+                paperNames.get(MediaSizeName.ISO_B4.toString()),
+                paperNames.get(MediaSizeName.ISO_B5.toString()),
+                paperNames.get(MediaSizeName.ISO_B6.toString()),
+                paperNames.get(MediaSizeName.ISO_B7.toString()),
+                paperNames.get(MediaSizeName.ISO_B8.toString()),
+                paperNames.get(MediaSizeName.ISO_B9.toString()),
+                paperNames.get(MediaSizeName.ISO_B10.toString()),
+                paperNames.get(MediaSizeName.JIS_B0.toString()),
+                paperNames.get(MediaSizeName.JIS_B1.toString()),
+                paperNames.get(MediaSizeName.JIS_B2.toString()),
+                paperNames.get(MediaSizeName.JIS_B3.toString()),
+                paperNames.get(MediaSizeName.JIS_B4.toString()),
+                paperNames.get(MediaSizeName.JIS_B5.toString()),
+                paperNames.get(MediaSizeName.JIS_B6.toString()),
+                paperNames.get(MediaSizeName.JIS_B7.toString()),
+                paperNames.get(MediaSizeName.JIS_B8.toString()),
+                paperNames.get(MediaSizeName.JIS_B9.toString()),
+                paperNames.get(MediaSizeName.JIS_B10.toString()),
+                paperNames.get(MediaSizeName.ISO_C0.toString()),
+                paperNames.get(MediaSizeName.ISO_C1.toString()),
+                paperNames.get(MediaSizeName.ISO_C2.toString()),
+                paperNames.get(MediaSizeName.ISO_C3.toString()),
+                paperNames.get(MediaSizeName.ISO_C4.toString()),
+                paperNames.get(MediaSizeName.ISO_C5.toString()),
+                paperNames.get(MediaSizeName.ISO_C6.toString()),
+                paperNames.get(MediaSizeName.NA_LEGAL.toString()),
+                paperNames.get(MediaSizeName.EXECUTIVE.toString()),
+                paperNames.get(MediaSizeName.LEDGER.toString()),
+                paperNames.get(MediaSizeName.TABLOID.toString()),
+                paperNames.get(MediaSizeName.INVOICE.toString()),
+                paperNames.get(MediaSizeName.FOLIO.toString()),
+                paperNames.get(MediaSizeName.QUARTO.toString()),
+                paperNames.get(MediaSizeName.JAPANESE_POSTCARD.toString()),
+                paperNames.get(MediaSizeName.JAPANESE_DOUBLE_POSTCARD.toString()),
+                paperNames.get(MediaSizeName.A.toString()),
+                paperNames.get(MediaSizeName.B.toString()),
+                paperNames.get(MediaSizeName.C.toString()),
+                paperNames.get(MediaSizeName.D.toString()),
+                paperNames.get(MediaSizeName.E.toString()),
+                paperNames.get(MediaSizeName.ISO_DESIGNATED_LONG.toString()),
+                paperNames.get(MediaSizeName.ITALY_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.MONARCH_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.PERSONAL_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_NUMBER_9_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_NUMBER_10_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_NUMBER_11_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_NUMBER_12_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_NUMBER_14_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_6X9_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_7X9_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_9X11_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_9X12_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_10X13_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_10X14_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_10X15_ENVELOPE.toString()),
+                paperNames.get(MediaSizeName.NA_5X7.toString()),
+                paperNames.get(MediaSizeName.NA_8X10.toString())};
     }
 
     /**
@@ -397,10 +397,10 @@ public class PaperSizes {
 
 
         //Get name and lookup in our name map
-        final Object o = paperNames.get(name.toString());
+        final String o = paperNames.get(name.toString());
         final String printDescription;
         if (o != null) {
-            printDescription = o.toString();
+            printDescription = o;
         } else {
             printDescription = name.toString();
         }

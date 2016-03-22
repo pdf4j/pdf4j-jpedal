@@ -48,7 +48,7 @@ public class SwingFormButtonListener implements MouseListener {
 
     private static final boolean showMethods = false;
 
-    private Map captionChanger;
+    private Map<String, String> captionChanger;
 
     /**
      * sets up the captions to change when needed
@@ -60,7 +60,7 @@ public class SwingFormButtonListener implements MouseListener {
     	
     	int captions = 0;
         //set up the captions to work for rollover and down presses of the mouse
-        captionChanger = new HashMap();
+        captionChanger = new HashMap<String, String>();
         if (rolloverCaption != null && !rolloverCaption.isEmpty()){
             captionChanger.put("rollover", rolloverCaption);
             captions++;
@@ -88,7 +88,7 @@ public class SwingFormButtonListener implements MouseListener {
 
         if ((captionChanger != null && e.getSource() instanceof AbstractButton) &&
              (captionChanger.containsKey("rollover"))) {
-                ((AbstractButton) e.getSource()).setText((String) captionChanger.get("rollover"));
+                ((AbstractButton) e.getSource()).setText(captionChanger.get("rollover"));
             }
         }
     
@@ -102,7 +102,7 @@ public class SwingFormButtonListener implements MouseListener {
 
         if ((captionChanger != null && e.getSource() instanceof AbstractButton) &&
              (captionChanger.containsKey("normal"))) {
-                ((AbstractButton) e.getSource()).setText((String) captionChanger.get("normal"));
+                ((AbstractButton) e.getSource()).setText(captionChanger.get("normal"));
             }
         }
     
@@ -124,7 +124,7 @@ public class SwingFormButtonListener implements MouseListener {
 
         if ((captionChanger != null && e.getSource() instanceof AbstractButton) &&
              (captionChanger.containsKey("down"))) {
-                ((AbstractButton) e.getSource()).setText((String) captionChanger.get("down"));
+                ((AbstractButton) e.getSource()).setText(captionChanger.get("down"));
             }
         }
     
@@ -138,9 +138,9 @@ public class SwingFormButtonListener implements MouseListener {
 
         if (captionChanger != null && e.getSource() instanceof AbstractButton) {
             if (captionChanger.containsKey("rollover")) {
-                ((AbstractButton) e.getSource()).setText((String) captionChanger.get("rollover"));
+                ((AbstractButton) e.getSource()).setText(captionChanger.get("rollover"));
             } else if (captionChanger.containsKey("normal")){
-                ((AbstractButton) e.getSource()).setText((String) captionChanger.get("normal"));
+                ((AbstractButton) e.getSource()).setText(captionChanger.get("normal"));
             }
         }
     }

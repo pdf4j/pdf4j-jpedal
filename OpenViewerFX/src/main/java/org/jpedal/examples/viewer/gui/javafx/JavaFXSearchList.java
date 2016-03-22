@@ -43,8 +43,8 @@ import org.jpedal.examples.viewer.gui.generic.GUISearchList;
 /**used by search function ro provide page number as tooltip*/
 public class JavaFXSearchList extends javafx.scene.control.ListView implements GUISearchList {
 
-	private final Map textPages;
-	private final Map textAreas;
+	private final Map<Integer, Integer> textPages;
+	private final Map<Integer, Object> textAreas;
 //	private String pageStr="Page";
 	//private int Length = 0;
     
@@ -59,7 +59,7 @@ public class JavaFXSearchList extends javafx.scene.control.ListView implements G
 	 * @param textPages :: Map of key to page of result
 	 * @param textAreas :: Map of key to highlight area
 	 */
-	public JavaFXSearchList(final ObservableList listModel, final Map textPages, final Map textAreas) {
+	public JavaFXSearchList(final ObservableList<String> listModel, final Map<Integer, Integer> textPages, final Map<Integer, Object> textAreas) {
 		super(listModel);
 		
 		//Length = listModel.capacity();

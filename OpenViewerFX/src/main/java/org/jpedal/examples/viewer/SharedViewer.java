@@ -736,7 +736,7 @@ public abstract class SharedViewer implements ViewerInt{
         try{
             final boolean fileCanBeOpened=OpenFile.openUpFile(file.getCanonicalPath(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
-            Object bookmarkPage=null;
+            String bookmarkPage=null;
 
             int page=-1;
 
@@ -748,7 +748,7 @@ public abstract class SharedViewer implements ViewerInt{
                 }
 
                 if(bookmarkPage!=null) {
-                    page = Integer.parseInt((String) bookmarkPage);
+                    page = Integer.parseInt(bookmarkPage);
                 }
             }
 
@@ -759,7 +759,7 @@ public abstract class SharedViewer implements ViewerInt{
                 if(bookmarkPage!=null){
 
                     //read the object
-                    final PdfObject namedDest=new OutlineObject((String)bookmarkPage);
+                    final PdfObject namedDest=new OutlineObject(bookmarkPage);
                     decode_pdf.getIO().readObject(namedDest);
 
                     //still needed to init viewer
@@ -865,7 +865,7 @@ public abstract class SharedViewer implements ViewerInt{
      * @param type Defined value into org.jpedal.external.Options class
      */
     @Override
-    public void addExternalHandler(final Object newHandler, final int type) {
+    public void addExternalHandler(final java.util.Map<Integer, Object> newHandler, final int type) {
         decode_pdf.addExternalHandler(newHandler, type);
     }
 

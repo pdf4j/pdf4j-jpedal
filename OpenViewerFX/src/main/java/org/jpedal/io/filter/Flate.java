@@ -85,7 +85,10 @@ public class Flate extends BaseFilter implements PdfFilter{
      */
     @Override
     public byte[] decode(byte[] data) throws Exception {
-
+        
+        if(data[0] ==0 && data[1] == 0 && data[2]==0){ //no flate flags found so return the raw data : case 24436
+            return data;
+        }
 
         int bufSize = 512000;
         FastByteArrayOutputStream bos=null;

@@ -449,11 +449,11 @@ public class RhinoParser extends DefaultParser implements ExpressionEngine{
         // app added so that methods difined within adobes javascript can be implemented
         org.mozilla.javascript.ScriptableObject.putProperty( scope, "app", objToJS );
 
-        final Object globalObj = cx.newObject(scope);
+        final org.mozilla.javascript.Scriptable globalObj = cx.newObject(scope);
         //global is added to allow javascript to define and create its own variables
         org.mozilla.javascript.ScriptableObject.putProperty( scope, "global", globalObj );
 
-        final Object ADBE = cx.newObject(scope);
+        final org.mozilla.javascript.Scriptable ADBE = cx.newObject(scope);
         //global is added to allow javascript to define and create its own variables
         org.mozilla.javascript.ScriptableObject.putProperty( scope, "ADBE", ADBE );
 
@@ -491,7 +491,7 @@ public class RhinoParser extends DefaultParser implements ExpressionEngine{
      * 1 = Double,
      * -1 = guess
      */
-    public Object generateJStype(final String textString, final boolean returnAsString){
+    public org.mozilla.javascript.Scriptable generateJStype(final String textString, final boolean returnAsString){
         if(returnAsString){
             return cx.newObject(scope, "String", new Object[] { textString });
         }else {
@@ -509,11 +509,11 @@ public class RhinoParser extends DefaultParser implements ExpressionEngine{
      * execute javascript and reset forms values
      */
     @Override
-    public int execute(final FormObject form, final int type, final Object code, final int eventType, final char keyPressed) {
+    public int execute(final FormObject form, final int type, final String code, final int eventType, final char keyPressed) {
 
         int messageCode;
 
-        final String js = (String) code;
+        final String js = code;
 
         //convert into args array
         final String[] args= JSFunction.convertToArray(js);
@@ -543,7 +543,7 @@ public class RhinoParser extends DefaultParser implements ExpressionEngine{
 			final FormObject formObject = (FormObject) o;
 			final String ref = formObject.getObjectRefAsString();
 			final String name = formObject.getTextStreamValue(PdfDictionary.T);
-			final String command = (String) JSObj.getJavascriptCommand( (name != null ? name : ref), PdfDictionary.C2);
+			final String command = JSObj.getJavascriptCommand( (name != null ? name : ref), PdfDictionary.C2);
 
 			if(command != null) {
 //				System.out.println(command);

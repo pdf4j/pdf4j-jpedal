@@ -759,7 +759,7 @@ public class OpenFile {
                             //System.out.println("open via decode_pdf.openPdfArray(bytes)");
 
                         } catch (final Exception e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            e.printStackTrace();  
                         } finally {
                             if(fis!=null){
                                 try {

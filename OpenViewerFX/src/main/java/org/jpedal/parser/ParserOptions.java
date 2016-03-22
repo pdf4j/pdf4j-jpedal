@@ -52,7 +52,7 @@ public class ParserOptions {
 
     private int layerLevel;
 
-    private Set<Integer> layerVisibility=new HashSet(50);
+    private Set<Integer> layerVisibility=new HashSet<Integer>(50);
 
     public final Set<Integer> layerClips=new HashSet<Integer>(50);
 

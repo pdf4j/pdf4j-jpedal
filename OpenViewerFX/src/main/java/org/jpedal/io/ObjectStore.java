@@ -58,7 +58,7 @@ public class ObjectStore {
     private static final boolean debugAdobe=false;
     
     /**list of files to delete*/
-    private static final Map undeletedFiles=new HashMap();
+    private static final Map<String, String> undeletedFiles=new HashMap<String, String>();
 
     /**do not set unless you know what you are doing*/
     @SuppressWarnings({"WeakerAccess"})
@@ -90,12 +90,12 @@ public class ObjectStore {
     private String key = "jpedal"+Math.random()+ '_';
 
     /** track whether image saved as tif or jpg*/
-    private final Map image_type = new HashMap();
+    private final Map<String, String> image_type = new HashMap<String, String>();
 
     /**
      * map to hold file names
      */
-    private final Map tempFileNames = new HashMap();
+    private final Map<String,String> tempFileNames = new HashMap<String,String>();
 
     /**parameter stored on cached images*/
     public static final Integer IMAGE_WIDTH= 1;
@@ -123,18 +123,18 @@ public class ObjectStore {
     public String fullFileName;
 
     //list of cached pages
-    private static final Map pagesOnDisk=new HashMap();
-    private static final Map pagesOnDiskAsBytes=new HashMap();
+    private static final Map<String, String> pagesOnDisk=new HashMap<String, String>();
+    private static final Map<String, String> pagesOnDiskAsBytes=new HashMap<String, String>();
 
     //list of images on disk
-    private final Map imagesOnDiskAsBytes=new HashMap();
+    private final Map<Integer,String> imagesOnDiskAsBytes=new HashMap<Integer,String>();
 
-    private final Map imagesOnDiskAsBytesW=new HashMap();
-    private final Map imagesOnDiskAsBytesH=new HashMap();
-    private final Map imagesOnDiskAsBytespX=new HashMap();
-    private final Map imagesOnDiskAsBytespY=new HashMap();
-    private final Map imagesOnDiskMask=new HashMap();
-    private final Map imagesOnDiskColSpaceID=new HashMap();
+    private final Map<Integer,Integer> imagesOnDiskAsBytesW=new HashMap<Integer,Integer>();
+    private final Map<Integer,Integer> imagesOnDiskAsBytesH=new HashMap<Integer,Integer>();
+    private final Map<Integer,Integer> imagesOnDiskAsBytespX=new HashMap<Integer,Integer>();
+    private final Map<Integer,Integer> imagesOnDiskAsBytespY=new HashMap<Integer,Integer>();
+    private final Map<Integer, byte[]> imagesOnDiskMask= new HashMap<Integer, byte[]>();
+    private final Map<Integer,Integer> imagesOnDiskColSpaceID=new HashMap<Integer,Integer>();
 
     /**
      * ObjectStore -
@@ -374,7 +374,7 @@ public class ObjectStore {
      * @return String
      */
     public final String getImageType(final String current_image) {
-        return (String) image_type.get(current_image);
+        return image_type.get(current_image);
     }
 
     /**
@@ -409,7 +409,7 @@ public class ObjectStore {
         current_image = removeIllegalFileNameCharacters(current_image);
 
         //see if jpg
-        final String flag = (String) image_type.get(current_image);
+        final String flag = image_type.get(current_image);
         BufferedImage image = null;
         if (flag == null) {
             return null;
@@ -443,7 +443,7 @@ public class ObjectStore {
             final Object file = filesTodelete.next();
 
             if(file!=null){
-                final File delete_file = new File((String)imagesOnDiskAsBytes.get(file));
+                final File delete_file = new File(imagesOnDiskAsBytes.get(file));
                 if(delete_file.exists()) {
                     delete_file.delete();
                 }
@@ -901,12 +901,12 @@ public class ObjectStore {
 
         try{
 
-            Iterator filesTodelete = pagesOnDisk.keySet().iterator();
+            Iterator<String> filesTodelete = pagesOnDisk.keySet().iterator();
             while(filesTodelete.hasNext()) {
-                final Object file = filesTodelete.next();
+                final String file = filesTodelete.next();
 
                 if(file!=null){
-                    final File delete_file = new File((String)pagesOnDisk.get(file));
+                    final File delete_file = new File(pagesOnDisk.get(file));
                     if(delete_file.exists()) {
                         delete_file.delete();
                     }
@@ -924,10 +924,10 @@ public class ObjectStore {
 
             filesTodelete = pagesOnDiskAsBytes.keySet().iterator();
             while(filesTodelete.hasNext()) {
-                final Object file = filesTodelete.next();
+                final String file = filesTodelete.next();
 
                 if(file!=null){
-                    final File delete_file = new File((String)pagesOnDiskAsBytes.get(file));
+                    final File delete_file = new File(pagesOnDiskAsBytes.get(file));
                     if(delete_file.exists()) {
                         delete_file.delete();
                     }
@@ -959,8 +959,8 @@ public class ObjectStore {
         /**
          * try to redelete files again
          */
-        for (final Object o : undeletedFiles.keySet()) {
-            final String file = ((String) o);
+        for (final String o : undeletedFiles.keySet()) {
+            final String file = (o);
 
             final File delete_file = new File(file);
 
@@ -975,12 +975,12 @@ public class ObjectStore {
 
         byte[] data=null;
 
-        final Object cachedFile= pagesOnDiskAsBytes.get(key);
+        final String cachedFile= pagesOnDiskAsBytes.get(key);
 
         if(cachedFile!=null){
             final BufferedInputStream from;
             try {
-                final File fis=new File((String)cachedFile);
+                final File fis=new File(cachedFile);
                 from = new BufferedInputStream(new FileInputStream(fis));
 
                 data=new byte[(int)fis.length()];
@@ -1002,7 +1002,7 @@ public class ObjectStore {
             //if you already use key, delete it first now
             //as will not be removed otherwise
             if(pagesOnDiskAsBytes.containsKey(key)){
-                final File delete_file = new File((String)pagesOnDiskAsBytes.get(key));
+                final File delete_file = new File(pagesOnDiskAsBytes.get(key));
                 if(delete_file.exists()){
                     delete_file.delete();
 

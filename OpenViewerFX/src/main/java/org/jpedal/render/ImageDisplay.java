@@ -42,6 +42,7 @@ import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.PdfShape;
 import org.jpedal.parser.Cmd;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
@@ -211,9 +212,10 @@ public class ImageDisplay extends BaseDisplay implements DynamicVectorRenderer {
 
     /*save shape in array to draw*/
     @Override
-    public final void drawShape(final Shape currentShape, final GraphicsState gs, final int cmd) {
+    public final void drawShape(final PdfShape pdfShape, final GraphicsState gs, final int cmd) {
 
-
+        final Shape currentShape = pdfShape.getShape();
+        
         if((cmd==Cmd.F || cmd==Cmd.B) && gs.CTM[0][1]==0 && gs.CTM[1][0]==0){
             final int x = currentShape.getBounds().x;
             final int y = currentShape.getBounds().y;

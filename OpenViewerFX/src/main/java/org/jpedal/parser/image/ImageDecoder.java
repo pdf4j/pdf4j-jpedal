@@ -274,6 +274,8 @@ public class ImageDecoder extends BaseDecoder{
                         objectData=SMaskDecoder.applySMask(maskData,imageData,decodeColorData, newSMask,XObject);
                     }
                     
+                    XObject.setConvertedData(objectData);              
+                    
                 }else{ //mask
                     
                    byte[] index=decodeColorData.getIndexedMap();

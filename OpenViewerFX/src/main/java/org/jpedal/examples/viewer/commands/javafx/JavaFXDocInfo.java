@@ -523,7 +523,7 @@ public class JavaFXDocInfo {
          */
         final Text aliasesContent = new Text();
         aliasesContent.setFont(textFont);
-        for (final Object nextFont : FontMappings.fontSubstitutionAliasTable.keySet()) {
+        for (final String nextFont : FontMappings.fontSubstitutionAliasTable.keySet()) {
             aliasesContent.setText(aliasesContent.getText() + nextFont + " ==> " + FontMappings.fontSubstitutionAliasTable.get(nextFont) + lb);
         }
 
@@ -557,7 +557,7 @@ public class JavaFXDocInfo {
         final TextField filterField = new TextField();
         filterField.setMaxSize(150, 0);
         filterField.setFont(textFont);
-
+        
         final RadioButton sortFolder = new RadioButton("Sort By Folder ");
         sortFolder.setFont(textFont);
 
@@ -588,8 +588,8 @@ public class JavaFXDocInfo {
         };
 
         docInfoGroup.selectedToggleProperty().addListener(updateSelectionListener);
-
-        filterText.setOnKeyReleased(new EventHandler<KeyEvent>() {
+        
+        filterField.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(final KeyEvent t) {
                 getAvailableFonts(filterField,sortFolder.isSelected());
@@ -605,92 +605,75 @@ public class JavaFXDocInfo {
     /**
      * list of all fonts properties in sorted order
      */
-    private static TreeItem populateAvailableFonts(final TreeItem top, final String filter, final boolean sortFontsByDir) {
+    private static TreeItem<String> populateAvailableFonts(final TreeItem<String> top, String filter, final boolean sortFontsByDir) {
 
         //get list
         if (FontMappings.fontSubstitutionTable != null) {
-            final Set fonts = FontMappings.fontSubstitutionTable.keySet();
-            final Iterator fontList = FontMappings.fontSubstitutionTable.keySet().iterator();
+            final Set<String> fonts = FontMappings.fontSubstitutionTable.keySet();
+            final Iterator<String> fontList = FontMappings.fontSubstitutionTable.keySet().iterator();
 
             final int fontCount = fonts.size();
-            final ArrayList fontNames = new ArrayList(fontCount);
+            final ArrayList<String> fontNames = new ArrayList<String>(fontCount);
 
             while (fontList.hasNext()) {
-                fontNames.add(fontList.next().toString());
+                fontNames.add(fontList.next());
             }
 
             //sort
             Collections.sort(fontNames);
 
-            //Sort and Display Fonts by Directory
-            if (sortFontsByDir) {
+            final java.util.List<String> location = new ArrayList<String>();
+            final java.util.List<TreeItem<String>> locationNode = new ArrayList<TreeItem<String>>();
 
-                final java.util.List location = new ArrayList();
-                final java.util.List locationNode = new ArrayList();
+            String current;
+            
+            String lowerCaseFilter="";
+            if(filter!=null){
+                lowerCaseFilter=filter.toLowerCase();
+            }
+            
+            //build display
+            for (String nextFont :fontNames) {
+                
+                current = (FontMappings.fontSubstitutionLocation.get(nextFont));
 
-                //build display
-                for (int ii = 0; ii < fontCount; ii++) {
-                    final Object nextFont = fontNames.get(ii);
-
-                    String current = ((String) FontMappings.fontSubstitutionLocation.get(nextFont));
-
-                    int ptr = current.lastIndexOf(System.getProperty("file.separator"));
-                    if (ptr == -1 && current.indexOf('/') != -1) {
-                        ptr = current.lastIndexOf('/');
-                    }
-
-                    if (ptr != -1) {
-                        current = current.substring(0, ptr);
-                    }
-
-                    if (filter == null || ((String) nextFont).toLowerCase().contains(filter.toLowerCase())) {
-                        if (!location.contains(current)) {
-                            location.add(current);
-                            final TreeItem loc = new TreeItem(new TreeItem(current));
-                            top.getChildren().add(loc);
-                            locationNode.add(loc);
-                        }
-
-                        final TreeItem FontTop = new TreeItem(nextFont + " = " + FontMappings.fontSubstitutionLocation.get(nextFont));
-                        final int pos = location.indexOf(current);
-                        ((TreeItem) locationNode.get(pos)).getChildren().add(FontTop);
-
-                        //add details
-                        final String loc = (String) FontMappings.fontPropertiesTable.get(nextFont + "_path");
-                        final Integer type = (Integer) FontMappings.fontPropertiesTable.get(nextFont + "_type");
-
-                        final Map properties = StandardFonts.getFontDetails(type, loc);
-                        if (properties != null) {
-
-                            for (final Object key : properties.keySet()) {
-                                final Object value = properties.get(key);
-                                final TreeItem fontDetails = new TreeItem(key + " = " + value);
-                                FontTop.getChildren().add(fontDetails);
-
-                            }
-                        }
-                    }
+                int ptr = current.lastIndexOf(System.getProperty("file.separator"));
+                if (ptr == -1 && current.indexOf('/') != -1) {
+                    ptr = current.lastIndexOf('/');
                 }
-            } else {//Show all fonts in one list
 
-                //build display
-                for (int ii = 0; ii < fontCount; ii++) {
-                    final Object nextFont = fontNames.get(ii);
+                if (ptr != -1) {
+                    current = current.substring(0, ptr);
+                }
+                
+                if (filter == null || nextFont.toLowerCase().contains(lowerCaseFilter)) {
+                    if (sortFontsByDir && !location.contains(current)) {
+                        location.add(current);
+                        final TreeItem<String> loc = new TreeItem<String>(current);
+                        top.getChildren().add(loc);
+                        locationNode.add(loc);
+                    }
 
-                    if (filter == null || ((String) nextFont).toLowerCase().contains(filter.toLowerCase())) {
-                        final TreeItem fontTop = new TreeItem(nextFont + " = " + FontMappings.fontSubstitutionLocation.get(nextFont));
-                        top.getChildren().add(fontTop);
+                    final TreeItem<String> currentFontNode = new TreeItem<String>(nextFont + " = " + FontMappings.fontSubstitutionLocation.get(nextFont));
 
-                        //add details
-                        final Map properties = (Map) FontMappings.fontPropertiesTable.get(nextFont);
-                        if (properties != null) {
+                    if (sortFontsByDir) {
+                        final int pos = location.indexOf(current);
+                        locationNode.get(pos).getChildren().add(currentFontNode);
+                    } else {
+                        top.getChildren().add(currentFontNode);
+                    }
 
-                            for (final Object key : properties.keySet()) {
-                                final Object value = properties.get(key);
-                                final TreeItem fontDetails = new TreeItem(key + " = " + value);
-                                fontTop.getChildren().add(fontDetails);
+                    //add details
+                    final String loc = FontMappings.fontPropertiesTablePath.get(nextFont);
+                    final Integer type = FontMappings.fontPropertiesTableType.get(nextFont);
 
-                            }
+                    final Map<String, String> properties = StandardFonts.getFontDetails(type, loc);
+                    if (properties != null) {
+
+                        for (final String key : properties.keySet()) {
+                            final Object value = properties.get(key);
+                            final TreeItem<String> fontDetails = new TreeItem<String>(key + " = " + value);
+                            currentFontNode.getChildren().add(fontDetails);
                         }
                     }
                 }
@@ -700,10 +683,10 @@ public class JavaFXDocInfo {
     }
 
     private static void getAvailableFonts(final TextField filterText, final boolean sortFontsByDir){
-        TreeItem fontlist = new TreeItem("Fonts");
+        TreeItem<String> fontlist = new TreeItem<String>("Fonts");
         fontlist = populateAvailableFonts(fontlist, filterText.getText(),sortFontsByDir);
         treeContainer.getChildren().clear();
-        treeContainer.getChildren().add(new TreeView(fontlist));
+        treeContainer.getChildren().add(new TreeView<String>(fontlist));
     }
     
 }

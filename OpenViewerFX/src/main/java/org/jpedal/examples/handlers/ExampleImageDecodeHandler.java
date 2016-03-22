@@ -61,7 +61,7 @@ public class ExampleImageDecodeHandler implements ImageHandler {
 
     @Override
     public boolean drawImageOnscreen(final BufferedImage image, final int optionsApplied, final AffineTransform upside_down, final String currentImageFile, final Graphics2D g2, final boolean renderDirect, final ObjectStore objectStore, final boolean isPrinting) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;  
     }
 
     //pass in raw data for image handling - if valid image returned it will be used.

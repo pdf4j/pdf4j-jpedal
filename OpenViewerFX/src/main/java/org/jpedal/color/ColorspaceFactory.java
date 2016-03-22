@@ -54,7 +54,7 @@ public class ColorspaceFactory {
     /**
      * used by commands which implicitly set colorspace
      */
-    public static final GenericColorSpace getColorSpaceInstance(final PdfObjectReader currentPdfFile, final PdfObject colorSpace, final Map colorspacesObjects) {
+    public static final GenericColorSpace getColorSpaceInstance(final PdfObjectReader currentPdfFile, final PdfObject colorSpace, final Map<String, GenericColorSpace> colorspacesObjects) {
         
         //see if we already have it
         final String key;

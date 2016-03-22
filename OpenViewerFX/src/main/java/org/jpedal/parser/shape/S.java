@@ -67,12 +67,8 @@ public class S {
             }else {
                 currentShape = currentDrawShape.generateShapeFromPath(gs.CTM, gs.getLineWidth(), Cmd.S);
                 
-                if (currentDrawShape.adjustLineWidth()) {
-                    gs.setLineWidth(0.6f);//0.6f because the scaling will multiply by 1.527 (we want the final value < 1)
-                }
-                
                 if (currentShape != null) {
-                    
+                    /**
                     Rectangle bounds;//=currentShape.getBounds();
                     
                     // System.out.println("S bounds="+bounds+" "+" "+gs.CTM[0][0]+" "+gs.CTM[0][1]+" "+gs.CTM[1][0]+" "+gs.CTM[1][1]);
@@ -88,11 +84,14 @@ public class S {
                         
                         currentShape=new Area(current_path);
                         
+                         //temp code so we do not break current code functions
+                    currentDrawShape.setShape(currentShape);
+                    
                         // System.out.println("use "+current_path+" "+bounds.width+" "+realLineWidth);
                         
                         gs.setLineWidth(1f);
                         
-                    }
+                    }/**/
                 }
             }
             
@@ -105,6 +104,9 @@ public class S {
                     currentShape=null;
                     fxPath=null;
                     hasShape=false;
+                    
+                     //temp code so we do not break current code functions
+                    currentDrawShape.setShape(currentShape);
                 }
             }
             
@@ -114,6 +116,9 @@ public class S {
                 //Alter to only check bounds <1 instead of <=1 for fedexLabelAM.pdf
                 if(currentShape!=null && currentShape.getBounds().getWidth()<1 && !current.isHTMLorSVG()) {// && currentGraphicsState.getLineWidth()<=1.0f){
                     currentShape=currentShape.getBounds2D();
+                    
+                    //temp code so we do not break current code functions
+                    currentDrawShape.setShape(currentShape);
                 }
                 
                 //save for later
@@ -126,7 +131,7 @@ public class S {
                     if(useJavaFX){
                         current.drawShape(fxPath,gs);
                     }else{
-                        current.drawShape(currentShape,gs, Cmd.S);
+                        current.drawShape(currentDrawShape,gs, Cmd.S);
                     }
                     
                     if(realLineWidth!=-1){

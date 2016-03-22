@@ -163,7 +163,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
     
     private Pane createAnnotationPopup(final FormObject form) {
         
-        Pane comp = (Pane) getPopupComponent(form, pageData.getCropBoxWidth(form.getPageNumber()));
+        Pane comp = getPopupComponent(form, pageData.getCropBoxWidth(form.getPageNumber()));
         form.setGUIComponent(comp, FormFactory.JAVAFX);
         comp.setVisible(form.getBoolean(PdfDictionary.Open));
         
@@ -743,7 +743,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
         //populate items array with list from Opt
         final ObservableList<String> itemsNew = form.getItemsList() == null ? null : FXCollections.observableArrayList(form.getItemsList());
         final StringBuilder styleBuilder = new StringBuilder(200);
-        final ComboBox combo = itemsNew == null ? new ComboBox() : new ComboBox(itemsNew);
+        final ComboBox<String> combo = itemsNew == null ? new ComboBox<String>() : new ComboBox<String>(itemsNew);
         boolean readonly=false;
         final JavaFXControlListener controlListener = new JavaFXControlListener(combo);
 
@@ -857,7 +857,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
         //Listener needs to be implemented
         //populate the items array with list from Opt
         final ObservableList<String> items =  FXCollections.observableArrayList(form.getItemsList());
-        final ListView lists = items == null ? new ListView() : new ListView(items);
+        final ListView<String> lists = items == null ? new ListView<String>() : new ListView<String>(items);
         final JavaFXControlListener controlListener = new JavaFXControlListener(lists);
         final StringBuilder styleBuilder = new StringBuilder(200);
         
@@ -871,14 +871,14 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
            lists.getSelectionModel().selectFirst();
            
         } else  if (form.getValuesMap(true) != null) {
-            lists.getSelectionModel().select(form.getValuesMap(true).get(form.getSelectedItem()));
+           lists.getSelectionModel().select(form.getValuesMap(true).get(form.getSelectedItem()));
             
         } else {
            lists.getSelectionModel().select(form.getSelectedItem());
         }
         //sync to FormObject
         final int selectionIndex = lists.getSelectionModel().getSelectedIndex();
-        form.setSelection(new Object[]{lists.getSelectionModel().getSelectedItem()},lists.getSelectionModel().getSelectedItem().toString(), new int[]{selectionIndex}, selectionIndex);
+        form.setSelection(new Object[]{lists.getSelectionModel().getSelectedItem()},lists.getSelectionModel().getSelectedItem(), new int[]{selectionIndex}, selectionIndex);
         
         setupUniversalFeatures(lists, form,styleBuilder, controlListener);
         setBorder(form, styleBuilder);
@@ -1250,7 +1250,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
             }
         }
         
-        controlListener.addMouseListener((EventHandler)formsActionHandler.setHoverCursor());
+        controlListener.addMouseListener((EventHandler<MouseEvent>)formsActionHandler.setHoverCursor());
     }
     
     /**
@@ -1685,7 +1685,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
      */
     @Override
     public void setAnnotOrder(final Map<String, String> annotOrder) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        //Not overriden
     }
     
     /**
@@ -1694,7 +1694,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
      * @return Swing component to use as popup (see org.jpedal.objects.acroforms.overridingImplementations.PdfSwingPopup)
      */
     @SuppressWarnings("MethodMayBeStatic")
-    public Object getPopupComponent(final FormObject form, @SuppressWarnings("UnusedParameters") final int cropBoxWith) {
+    public PdfJavaFXPopup getPopupComponent(final FormObject form, @SuppressWarnings("UnusedParameters") final int cropBoxWith) {
         return new PdfJavaFXPopup(form);
     }
     

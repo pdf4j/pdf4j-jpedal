@@ -87,7 +87,7 @@ public class FormObject extends PdfObject{
      */
     private boolean show;
 
-    private Map OptValues; // values from Opt
+    private Map<String, String> OptValues; // values from Opt
 
     private String validValue;
     
@@ -201,7 +201,7 @@ public class FormObject extends PdfObject{
     
     protected Rectangle BBox;
 
-    protected float[] C,QuadPoints,RD,Rect;
+    protected float[] C,IC,QuadPoints,RD,Rect;
 
 	protected boolean[] flags;
 
@@ -1037,25 +1037,6 @@ public class FormObject extends PdfObject{
     }
 
     @Override
-    public int getParameterConstant(final int key) {
-
-    	//System.out.println("Get constant for "+key +" "+this);
-        switch(key){
-
-
-            case PdfDictionary.Subtype:
-                if(FT!=PdfDictionary.Unknown) {
-                    return FT;
-                } else {
-                    return super.getParameterConstant(key);
-                }
-        default:
-        	return super.getParameterConstant(key);
-
-        }
-    }
-
-    @Override
     public PdfArrayIterator getMixedArray(final int id) {
 
     	switch(id){
@@ -1211,7 +1192,10 @@ public class FormObject extends PdfObject{
 
         case PdfDictionary.C:
         	return C;
-
+            
+        case PdfDictionary.IC:
+        	return IC;
+            
         case PdfDictionary.QuadPoints:
         	return QuadPoints;	
 
@@ -1235,6 +1219,10 @@ public class FormObject extends PdfObject{
         	case PdfDictionary.C:
 	            C=value;
     	        break;
+
+            case PdfDictionary.IC:
+                IC = value;
+                break;
 
         	case PdfDictionary.QuadPoints:
 	            QuadPoints=value;
@@ -3009,7 +2997,7 @@ public class FormObject extends PdfObject{
 	 * @return the values map for this field,
 	 * map that references the display value from the export values
 	 */
-	public Map getValuesMap(final boolean keyFirst) {
+	public Map<String, String> getValuesMap(final boolean keyFirst) {
 		
 		
 		if(Opt!=null && OptValues==null){
@@ -3035,7 +3023,7 @@ public class FormObject extends PdfObject{
                         }
 
                         if (OptValues == null) {
-                            OptValues = new HashMap();
+                            OptValues = new HashMap<String, String>();
                         }
 
                         OptValues.put(key, value);
@@ -3402,9 +3390,9 @@ public class FormObject extends PdfObject{
 	 */
 	public String getValue(){
 
-        final int subtype=getParameterConstant(PdfDictionary.Subtype);
+        final int formType=FT;
 
-        switch(subtype){
+        switch(formType){
 		case PdfDictionary.Tx:
 			return getTextString();
 			
@@ -3438,13 +3426,13 @@ public class FormObject extends PdfObject{
 
             final String CA;
             
-            final int subtype=getParameterConstant(PdfDictionary.Subtype);
+            final int formType=FT;
             
             //        if(isReadOnly()){
             //            return;
             //        }
             
-            switch(subtype){
+            switch(formType){
                 case PdfDictionary.Tx:
                     
                     final String curVal = getTextStreamValue(PdfDictionary.V);

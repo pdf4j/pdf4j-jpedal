@@ -60,7 +60,7 @@ import org.jpedal.utils.LogWriter;
 
 public class TipOfTheDay extends JDialog {
 	
-	private final List tipPaths = new ArrayList();
+	private final List<String> tipPaths = new ArrayList<String>();
 	
 	private boolean tipLoadingFailed;
 
@@ -228,7 +228,7 @@ public class TipOfTheDay extends JDialog {
 		
 		if(!tipLoadingFailed) {
 			try {
-				tipPane.setPage(getClass().getResource((String) tipPaths.get(currentTip)));
+				tipPane.setPage(getClass().getResource(tipPaths.get(currentTip)));
 			} catch (final IOException e) {
 				tipLoadingFailed = true;
 				LogWriter.writeLog("Exception "+e.getMessage());
@@ -240,7 +240,7 @@ public class TipOfTheDay extends JDialog {
 		}
 	}
 
-	private void populateTipsList(final String tipRoot, final List items) throws IOException {
+	private void populateTipsList(final String tipRoot, final List<String> items) throws IOException {
 		try {
 			final URL url = getClass().getResource(tipRoot); //"/org/jpedal/examples/viewer/res/tips"
 			
@@ -251,8 +251,8 @@ public class TipOfTheDay extends JDialog {
 				final JarURLConnection conn = (JarURLConnection) url.openConnection();
 				final JarFile jar = conn.getJarFile();
 	
-				for (final Enumeration e = jar.entries(); e.hasMoreElements();) {
-					final JarEntry entry = (JarEntry) e.nextElement();
+				for (final Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements();) {
+					final JarEntry entry = e.nextElement();
 					final String name=entry.getName();
 					
 					if ((!entry.isDirectory()) && name.contains("/res/tips/") && name.endsWith(".html")) { // this

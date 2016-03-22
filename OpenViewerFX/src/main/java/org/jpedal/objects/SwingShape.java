@@ -87,13 +87,20 @@ public class SwingShape implements Serializable, PdfShape
     private static final int M = 1;
     private static final int Y = 4;
     private static final int C = 5;
-
+    
+    ShapeMetrics metrics = new ShapeMetrics();
 
     /**flag to show if image is for clip*/
     private boolean isClip;
 
     /**flag to show if S.java needs to adjust lineWidth because we have modified the shape*/
-    private boolean adjustLineWidth;
+    private Shape currentShape;
+
+    public SwingShape(Shape currentShape) {
+        this.currentShape=currentShape;
+    }
+
+    public SwingShape() {}
 
     @Override
     public boolean isClosed() {
@@ -203,9 +210,8 @@ public class SwingShape implements Serializable, PdfShape
         //to initialise the shape
         GeneralPath current_path = null;
         Area current_area = null;
-        final Shape current_shape;
-        adjustLineWidth = false;
-
+        currentShape=null;
+       
         //init points
         final float[] x = shape_primitive_x.get();
         final float[] y = shape_primitive_y.get();
@@ -353,26 +359,6 @@ public class SwingShape implements Serializable, PdfShape
             }
         }
 
-         
-        //second part hack for artus file with thin line
-        if((current_path!=null)&&(current_path.getBounds().getHeight()==0 || (thickness>0.8 && thickness<0.9 && current_path.getBounds2D().getHeight()<0.1f))){
-
-
-            if(current_path.getBounds2D().getWidth()==0 && current_path.getBounds2D().getHeight()==0){
-                //ignore this case
-            }else if(thickness>1 && current_path.getBounds2D().getWidth()<=1){ //make <1 into <=1
-                current_path.moveTo(0,-thickness/2);
-                current_path.lineTo(0,thickness/2);
-                adjustLineWidth = true;//If we are doing this, then we need to remove the large lineWidth that's set. (In S.java)
-            }else {
-                current_path.moveTo(0, 1);//@Mark 13908
-            }
-        }
-
-        if((current_path!=null)&&(current_path.getBounds().getWidth()==0)) {
-            current_path.moveTo(1, 0);//@Mark 13908
-        }
-
         //transform matrix only if needed
         if((CTM[0][0] == (float)1.0)&&(CTM[1][0] == (float)0.0)&&
                 (CTM[2][0] == (float)0.0)&&(CTM[0][1] == (float)0.0)&&
@@ -413,12 +399,12 @@ public class SwingShape implements Serializable, PdfShape
         //set to current or clip
         if(!is_clip){
             if( current_area == null ) {
-                current_shape = current_path;
+                currentShape = current_path;
             } else {
-                current_shape = current_area;
+                currentShape = current_area;
             }
         }else {
-            current_shape = current_area;
+            currentShape = current_area;
         }
 
 
@@ -427,7 +413,7 @@ public class SwingShape implements Serializable, PdfShape
             complexClipCount++;
         }
 
-        return current_shape;
+        return currentShape;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -443,6 +429,8 @@ public class SwingShape implements Serializable, PdfShape
         lineTo( x, y + h );
         lineTo( x, y );
         closeShape();
+        
+        metrics.incrementRectangleCount();
     }
     
     /**
@@ -499,6 +487,8 @@ public class SwingShape implements Serializable, PdfShape
 
         //and reset winding rule
         winding_rule = GeneralPath.WIND_NON_ZERO;
+        
+         this.metrics.setRectangleCount(0);
     }
     ///////////////////////////////////////////////////////////////////////////
     /**
@@ -573,17 +563,22 @@ public class SwingShape implements Serializable, PdfShape
         return complexClipCount;
     }
 
-    /**
-     * Allow S.java to detect that we have modified the shape, and therefore the lineWidth needs to be adjusted.
-     * @return
-     */
-    @Override
-    public boolean adjustLineWidth() {
-        return adjustLineWidth;
-    }
-
     @Override
     public Object getPath() {
         return null;
+    }
+
+    @Override
+    public void setShape(Shape currentShape) {
+        this.currentShape=currentShape;
+    }
+    
+    @Override
+    public Shape getShape() {
+        return currentShape;
+    }
+    
+    public ShapeMetrics getMetrics() {
+        return metrics;
     }
 }

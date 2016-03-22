@@ -50,18 +50,18 @@ public class ExampleImageDrawOnScreenHandler implements org.jpedal.external.Imag
     //tell JPedal if it ignores its own Image code or not
     @Override
     public boolean alwaysIgnoreGenericHandler() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;  
     }//pass in raw data for image handling - if valid image returned it will be used.
     //if alwaysIgnoreGenericHandler() is true JPedal code always ignored. If false, JPedal code used if null
 
     @Override
     public BufferedImage processImageData(final GraphicsState gs, final PdfObject XObject) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;  
     }
 
     @Override
     public boolean imageHasBeenScaled() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;  
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ExampleImageDrawOnScreenHandler implements org.jpedal.external.Imag
 				
         }
 
-        return true;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;  
     }
 
 }

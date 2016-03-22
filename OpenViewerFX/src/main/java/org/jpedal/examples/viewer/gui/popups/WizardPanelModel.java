@@ -89,7 +89,7 @@ public interface WizardPanelModel
 	 * 
 	 * @return A mapping of ID Strings to JPanels. 
 	 */
-	Map getJPanels();
+	Map<String, javax.swing.JPanel> getJPanels();
 	
 	/**
 	 * A component that is registered will alert the Wizard

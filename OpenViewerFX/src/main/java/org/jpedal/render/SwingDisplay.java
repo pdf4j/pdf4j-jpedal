@@ -48,6 +48,7 @@ import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.glyph.*;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.PdfShape;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
@@ -82,9 +83,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     /**hint for conversion ops*/
     private static final RenderingHints hints;
     
-    private final Map cachedWidths=new HashMap(10);
+    private final Map<String, Integer> cachedWidths=new HashMap<String, Integer>(10);
     
-    private final Map cachedHeights=new HashMap(10);
+    private final Map<String, Integer> cachedHeights=new HashMap<String, Integer>(10);
     
     private Map fonts=new HashMap(50);
     
@@ -94,9 +95,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     private PdfGlyphs glyphs;
     
-    private Map imageID=new HashMap(10);
+    private Map<String, Integer> imageID=new HashMap<String, Integer>(10);
     
-    private Map storedImageValues=new HashMap(10);
+    private Map<String, double[]> storedImageValues=new HashMap<String, double[]>(10);
     
     /**text highlights if needed*/
     private int[] textHighlightsX;
@@ -113,10 +114,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     /**store y*/
     float[] y_coord;
-    
-    /**cache for images*/
-    private Map largeImages=new WeakHashMap(10);
-    
+
     private Vector_Object text_color;
     private Vector_Object stroke_color;
     private Vector_Object fill_color;
@@ -275,10 +273,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     private void renderHighlight(final Rectangle highlight, final Graphics2D g2){
         
         if(highlight!=null && !ignoreHighlight){
-            final Shape currentClip = g2.getClip();
-            
-            g2.setClip(null);
-            
             //Backup current g2 paint and composite
             final Composite comp = g2.getComposite();
             final Paint p = g2.getPaint();
@@ -301,8 +295,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             g2.setPaint(p);
             
             needsHighlights = false;
-            
-            g2.setClip(currentClip);
         }
     }
     
@@ -369,12 +361,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             
             lastStrokeOpacity=-1;
             lastFillOpacity=-1;
-            
-            if(isPrinting) {
-                largeImages.clear();
-            }
-            
-            
+
             endItem=-1;
         }
         
@@ -445,9 +432,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         opacity=null;
         
         BMvalues=null;
-        
-        largeImages=null;
-        
+
         lastClip=null;
         
         lastStroke=null;
@@ -1676,22 +1661,14 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         return image;
     }
     
-    private BufferedImage reloadCachedImage(final int imageUsed, final int i,
-            BufferedImage img) {
-        Object currentObject;
+    private BufferedImage reloadCachedImage(final int imageUsed, final int i,BufferedImage img) {
+
+        Object currentObject=null;
         try{
             
             //cache single images in memory for speed
             if(singleImage!=null){
                 currentObject=singleImage.getSubimage(0,0,singleImage.getWidth(),singleImage.getHeight());
-                
-                /**
-                 * load from memory or disk
-                 */
-            }else if(rawKey==null) {
-                currentObject = largeImages.get("HIRES_" + i);
-            } else {
-                currentObject = largeImages.get("HIRES_" + i + '_' + rawKey);
             }
             
             if(currentObject==null){
@@ -1710,16 +1687,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 //flag if problem
                 if(currentObject==null) {
                     renderFailed = true;
-                }
-                
-                //recache
-                if(!isPrinting){
-                    
-                    if(rawKey==null) {
-                        largeImages.put("HIRES_" + i, currentObject);
-                    } else {
-                        largeImages.put("HIRES_" + i, currentObject + "_" + rawKey);
-                    }
                 }
             }
             
@@ -1921,19 +1888,14 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 w = image.getWidth();
                 h = image.getHeight();
             }else{
-                w= (Integer) cachedWidths.get(key);
-                h= (Integer) cachedHeights.get(key);
+                w= cachedWidths.get(key);
+                h= cachedHeights.get(key);
             }
             
             if(!alreadyCached && !cacheInMemory){
                 
                 if(!isPrinting){
-                    if(rawKey==null){
-                        largeImages.put("HIRES_"+currentItem,image);
-                    }else {
-                        largeImages.put("HIRES_" + currentItem + '_' + rawKey, image);
-                    }
-                    
+
                     //cache PDF with single image for speed
                     if(imageCount==0){
                         singleImage=image.getSubimage(0,0,image.getWidth(),image.getHeight());
@@ -2045,7 +2007,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         
         if(useHiResImageForDisplay){
             
-            final double[] nextAf=( double[])storedImageValues.get("imageAff-"+previousUse);
+            final double[] nextAf= storedImageValues.get("imageAff-"+previousUse);
             this.drawAffine(nextAf);
             
             lastAf[0]=nextAf[0];
@@ -2127,7 +2089,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     /*save shape in array to draw*/
     @Override
-    public void drawShape(Shape currentShape, final GraphicsState currentGraphicsState, final int cmd) {
+    public void drawShape(final PdfShape pdfShape, final GraphicsState currentGraphicsState, final int cmd) {
+        
+        Shape currentShape=pdfShape.getShape();
         
         final int fillType=currentGraphicsState.getFillType();
         PdfPaint currentCol;
@@ -2982,9 +2946,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 
                 final PdfJavaGlyphs updatedFont=(PdfJavaGlyphs) fonts.get(key);
                 
-                updatedFont.setDisplayValues((Map) RenderUtils.restoreFromStream(bis));
-                updatedFont.setCharGlyphs((Map) RenderUtils.restoreFromStream(bis));
-                updatedFont.setEmbeddedEncs((Map) RenderUtils.restoreFromStream(bis));
+                updatedFont.setDisplayValues((Map<Integer, String>) RenderUtils.restoreFromStream(bis));
+                updatedFont.setCharGlyphs((Map<Integer, String>) RenderUtils.restoreFromStream(bis));
+                updatedFont.setEmbeddedEncs((Map<Integer, String>) RenderUtils.restoreFromStream(bis));
                 
             }
             

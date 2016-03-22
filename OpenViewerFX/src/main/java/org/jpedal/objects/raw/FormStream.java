@@ -894,7 +894,7 @@ public class FormStream {
                 
                 String fontName=StandardFonts.expandName(font);
                 
-                final String altName=(String) FontMappings.fontSubstitutionAliasTable.get(fontName.toLowerCase());
+                final String altName= FontMappings.fontSubstitutionAliasTable.get(fontName.toLowerCase());
                 if(altName!=null) {
                     fontName = altName;
                 }

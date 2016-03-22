@@ -71,7 +71,7 @@ import java.util.Map;
  */
 public class DecryptionFactory {
 
-    private Map cachedObjects=new HashMap();
+    private Map<String, String> cachedObjects=new HashMap<String, String>();
 
     /**flag to show if extraction allowed*/
     private boolean extractionIsAllowed = true;
@@ -1082,8 +1082,8 @@ public class DecryptionFactory {
     public void flush() {
 
         if(cachedObjects!=null){
-            for (final Object o : cachedObjects.keySet()) {
-                final String fileName = (String) o;
+            for (final String o : cachedObjects.keySet()) {
+                final String fileName = o;
                 final File file = new File(fileName);
                 //System.out.println("PdfFileReader - deleting file "+fileName);
                 file.delete();

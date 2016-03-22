@@ -39,10 +39,6 @@ import org.jpedal.external.CustomFormPrint;
 import org.jpedal.external.ExternalHandlers;
 
 import org.jpedal.objects.PdfPageData;
-import static org.jpedal.objects.acroforms.ReturnValues.FORMOBJECTS_FROM_NAME;
-import static org.jpedal.objects.acroforms.ReturnValues.FORMOBJECTS_FROM_REF;
-import static org.jpedal.objects.acroforms.ReturnValues.FORM_NAMES;
-import static org.jpedal.objects.acroforms.ReturnValues.GUI_FORMS_FROM_NAME;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.layers.PdfLayerList;
@@ -67,7 +63,7 @@ public class GUIData {
     
     public float dpi=72.0f;
 
-    protected final Map rawFormData=new HashMap();
+    protected final Map<String, FormObject> rawFormData=new HashMap<String, FormObject>();
     
     /**allow user to set Forms to ignore*/
     protected Map componentsToIgnore=new HashMap();
@@ -152,91 +148,24 @@ public class GUIData {
     
     protected Object resolveGUIComponent(final FormObject formObject) {
 
-        @SuppressWarnings("UnusedAssignment") Object retComponent=null;
+        Object retComponent=null;
 
-        final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);//FT
+        final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);
+        final int formType=formObject.getNameAsConstant(PdfDictionary.FT);//FT
 
         final int formFactoryType=formFactory.getType();
-        
-        final boolean[] flags = formObject.getFieldFlags();//Ff
 
 		//ExternalHandlers.isXFAPresent() will only be true in forms version of PDF2HTML
-        if(!ExternalHandlers.isXFAPresent() && (formFactory.getType()==FormFactory.HTML || formFactoryType==FormFactory.SVG)){
+        if(!ExternalHandlers.isXFAPresent() && (formFactoryType==FormFactory.HTML || formFactoryType==FormFactory.SVG)){
                 
             if((formObject.getDictionary(PdfDictionary.RichMediaContent)!=null || subtype==PdfDictionary.Link)){
                 retComponent = formFactory.annotationButton(formObject);
             }
-
-        /** setup field */
-        }else if (subtype == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
-
-            boolean isPushButton = false, isRadio = false;// hasNoToggleToOff = false, radioinUnison = false;
-            if (flags != null) {
-                isPushButton = flags[FormObject.PUSHBUTTON_ID];
-                isRadio = flags[FormObject.RADIO_ID];
-            }
-
-            if (isPushButton) {
-
-                retComponent = formFactory.pushBut(formObject);
-
-            }else if(isRadio){
-                retComponent = formFactory.radioBut(formObject);
-            }else {
-                retComponent = formFactory.checkBoxBut(formObject);
-            }
-
+            
+        }else if(formType==-1){
+            retComponent = formFactory.annotationButton(formObject);
         } else {
-            switch (subtype) {
-                case PdfDictionary.Tx:
-                    boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
-                    if (flags != null) {
-                        isMultiline = flags[FormObject.MULTILINE_ID] || (formObject.getTextString()!=null && formObject.getTextString().indexOf('\n')!=-1);
-                        hasPassword = flags[FormObject.PASSWORD_ID];
-                    }   if (isMultiline) {
-                        
-                        if (hasPassword) {
-                            
-                            retComponent = formFactory.multiLinePassword(formObject);
-                            
-                        } else {
-                            
-                            retComponent = formFactory.multiLineText(formObject);
-                            
-                        }
-                    } else {//singleLine
-                        
-                        if (hasPassword) {
-                            
-                            retComponent = formFactory.singleLinePassword(formObject);
-                            
-                        } else {
-                            
-                            retComponent = formFactory.singleLineText(formObject);
-                            
-                        }
-                    }   break;
-                case PdfDictionary.Ch:
-                    //----------------------------------------- CHOICE ----------------------------------------------
-                    
-                    boolean isCombo = false;// multiSelect = false, sort = false, isEditable = false, doNotSpellCheck = false, comminOnSelChange = false;
-                    if (flags != null) {
-                        isCombo = flags[FormObject.COMBO_ID];
-                    }   if (isCombo) {// || (type==XFAFORM && ((XFAFormObject)formObject).choiceShown!=XFAFormObject.CHOICE_ALWAYS)){
-                        
-                        retComponent = formFactory.comboBox(formObject);
-                        
-                    } else {//it is a list
-                        
-                        retComponent = formFactory.listField(formObject);
-                    }   break;
-                case PdfDictionary.Sig:
-                    retComponent = formFactory.signature(formObject);
-                    break;
-                default:
-                    retComponent = formFactory.annotationButton(formObject);
-                    break;
-            }
+            retComponent = getFormComponent(formObject, formType, retComponent);
         }
 		
         if (retComponent != null) {
@@ -246,6 +175,70 @@ public class GUIData {
 
         return retComponent;
 
+    }
+
+    private Object getFormComponent(final FormObject formObject, final int formType, Object retComponent) {
+        
+        final boolean[] flags = formObject.getFieldFlags();//Ff
+        
+        switch (formType) {
+            case PdfDictionary.Btn:
+                boolean isPushButton = false, isRadio = false;// hasNoToggleToOff = false, radioinUnison = false;
+                if (flags != null) {
+                    isPushButton = flags[FormObject.PUSHBUTTON_ID];
+                    isRadio = flags[FormObject.RADIO_ID];
+                }
+                
+                if (isPushButton) {
+                    retComponent = formFactory.pushBut(formObject);
+                    
+                }else if(isRadio){
+                    retComponent = formFactory.radioBut(formObject);
+                }else {
+                    retComponent = formFactory.checkBoxBut(formObject);
+                }
+                break;
+                
+            case PdfDictionary.Tx:
+                boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
+                if (flags != null) {
+                    isMultiline = flags[FormObject.MULTILINE_ID] || (formObject.getTextString()!=null && formObject.getTextString().indexOf('\n')!=-1);
+                    hasPassword = flags[FormObject.PASSWORD_ID];
+                }   
+                
+                if (isMultiline) {
+                    if (hasPassword) {
+                        retComponent = formFactory.multiLinePassword(formObject);
+                    } else {
+                        retComponent = formFactory.multiLineText(formObject);
+                    }
+                } else {//singleLine
+                    if (hasPassword) {
+                        retComponent = formFactory.singleLinePassword(formObject);
+                    } else {
+                        retComponent = formFactory.singleLineText(formObject);
+                    }
+                }   
+                break;
+                
+            case PdfDictionary.Ch: 
+                boolean isCombo = false;// multiSelect = false, sort = false, isEditable = false, doNotSpellCheck = false, comminOnSelChange = false;
+                if (flags != null) {
+                    isCombo = flags[FormObject.COMBO_ID];
+                }   
+                
+                if (isCombo) {// || (type==XFAFORM && ((XFAFormObject)formObject).choiceShown!=XFAFormObject.CHOICE_ALWAYS)){
+                    retComponent = formFactory.comboBox(formObject);
+                } else {//it is a list                   
+                    retComponent = formFactory.listField(formObject);
+                }   
+                break;
+                
+            case PdfDictionary.Sig:
+                retComponent = formFactory.signature(formObject);
+                break;
+        }
+        return retComponent;
     }
 
     public void dispose(){
@@ -292,11 +285,11 @@ public class GUIData {
             //get unsorted components and iterate over forms
             if(formsOrdered[page]!=null){
                 
-                for (final Object o : formsOrdered[page]) {
+                for (final FormObject o : formsOrdered[page]) {
                     
                     if (o != null) {
                         
-                        formObject = (FormObject) o;
+                        formObject = o;
                         
                         comp= checkGUIObjectResolved(formObject);
                         
@@ -463,7 +456,7 @@ public class GUIData {
     /**
      * returns the raw formdata so that DefaultAcroRender can access
      */
-    protected Map getRawFormData() {
+    protected Map<String, FormObject> getRawFormData() {
 	return Collections.unmodifiableMap(rawFormData);
     }
    
@@ -486,14 +479,14 @@ public class GUIData {
      */
     public List getFormComponents(final String key, final ReturnValues value, final int pageNumber) {
 	
-	final Iterator i=rawFormData.keySet().iterator();
-	final ArrayList selectedForms=new ArrayList();
+	final Iterator<String> i=rawFormData.keySet().iterator();
+	final ArrayList<Object> selectedForms=new ArrayList();
 	FormObject form;
 	boolean isPageSelected;
 	String name;
 	while(i.hasNext()){
 	  
-	    form= (FormObject) rawFormData.get(i.next());
+	    form= rawFormData.get(i.next());
 	    isPageSelected=pageNumber==-1 || form.getPageNumber()==pageNumber;
 	    name=form.getTextStreamValue(PdfDictionary.T);
 	    

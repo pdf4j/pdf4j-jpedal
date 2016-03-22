@@ -74,9 +74,9 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
     //some fonts need to be remapped (ie Arial-BoldMT to Arial,Bold)
     public String logicalfontName="default";
 
-    Map chars=new HashMap();
-    Map displayValues=new HashMap();
-    Map embeddedChars=new HashMap();
+    Map<Integer, String> chars=new HashMap<Integer, String>();
+    Map<Integer, String> displayValues=new HashMap<Integer, String>();
+    Map<Integer, String> embeddedChars=new HashMap<Integer, String>();
 
     /**flag is CID font is identity matrix*/
     private boolean isIdentity;
@@ -396,7 +396,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
         if (pointer != -1) {
 
             //see if present with ,
-            mappedName=(String) FontMappings.fontSubstitutionAliasTable.get(testFont);
+            mappedName= FontMappings.fontSubstitutionAliasTable.get(testFont);
 
 
             weight =testFont.substring(pointer + 1, testFont.length());
@@ -415,7 +415,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
         //remap if not type 3 match
         if(mappedName==null) {
-            mappedName = (String) FontMappings.fontSubstitutionAliasTable.get(testFont);
+            mappedName = FontMappings.fontSubstitutionAliasTable.get(testFont);
         }
 
         if((mappedName!=null)&&(mappedName.equals("arialbd"))) {
@@ -648,42 +648,42 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
     @Override
     public String getDisplayValue(final Integer key) {
-        return (String) displayValues.get(key);
+        return displayValues.get(key);
     }
 
     @Override
     public String getCharGlyph(final Integer key) {
-        return (String) chars.get(key);
+        return chars.get(key);
     }
 
     @Override
     public String getEmbeddedEnc(final Integer key) {
 
-        return (String) embeddedChars.get(key);
+        return embeddedChars.get(key);
     }
 
-    public Map getDisplayValues() {
+    public Map<Integer, String> getDisplayValues() {
         return Collections.unmodifiableMap(displayValues);
     }
 
-    public Map getCharGlyphs() {
+    public Map<Integer, String> getCharGlyphs() {
         return Collections.unmodifiableMap(chars);
     }
 
-    public Map getEmbeddedEncs() {
+    public Map<Integer, String> getEmbeddedEncs() {
 
         return  Collections.unmodifiableMap(embeddedChars);
     }
 
-    public void setDisplayValues(final Map displayValues) {
+    public void setDisplayValues(final Map<Integer, String> displayValues) {
         this.displayValues=displayValues;
     }
 
-    public void setCharGlyphs(final Map chars) {
+    public void setCharGlyphs(final Map<Integer, String> chars) {
         this.chars=chars;
     }
 
-    public void setEmbeddedEncs(final Map embeddedChars) {
+    public void setEmbeddedEncs(final Map<Integer, String> embeddedChars) {
 
         this.embeddedChars=embeddedChars;
     }
@@ -744,7 +744,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
     }
 
     public int getType() {
-        return 0;  //To change body of created methods use File | Settings | File Templates.
+        return 0;  
     }
 
     public void setHasWidths(final boolean hasWidths) {

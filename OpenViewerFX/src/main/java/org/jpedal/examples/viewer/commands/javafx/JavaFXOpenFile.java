@@ -330,7 +330,7 @@ public class JavaFXOpenFile {
                                 try {
                                     Thread.sleep(100);
                                 } catch (final InterruptedException e) {
-                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                    e.printStackTrace(); 
                                     
                                     
                                 }

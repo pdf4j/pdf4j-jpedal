@@ -600,14 +600,13 @@ public class PrintfFormat {
    * @return  The formatted String.
    */
   public String sprintf(final Object[] o) {
-      final Iterator e = vFmt.iterator();
+      final Iterator<ConversionSpecification> e = vFmt.iterator();
       ConversionSpecification cs;
     char c;
     int i=0;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -675,13 +674,12 @@ public class PrintfFormat {
    * @return  the formatted String.
    */
   public String sprintf() {
-    final Iterator e = vFmt.iterator();
+    final Iterator<ConversionSpecification> e = vFmt.iterator();
     ConversionSpecification cs;
     char c;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -701,13 +699,12 @@ public class PrintfFormat {
    */
   public String sprintf(final int x)
       throws IllegalArgumentException {
-    final Iterator e = vFmt.iterator();
+    final Iterator<ConversionSpecification> e = vFmt.iterator();
     ConversionSpecification cs;
     char c;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -729,13 +726,12 @@ public class PrintfFormat {
    */
   public String sprintf(final long x)
       throws IllegalArgumentException {
-      final Iterator e = vFmt.iterator();
+      final Iterator<ConversionSpecification> e = vFmt.iterator();
     ConversionSpecification cs;
     char c;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -757,13 +753,12 @@ public class PrintfFormat {
    */
   public String sprintf(final double x)
       throws IllegalArgumentException {
-    final Iterator e =vFmt.iterator();
+    final Iterator<ConversionSpecification> e =vFmt.iterator();
     ConversionSpecification cs;
     char c;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -785,13 +780,12 @@ public class PrintfFormat {
   public String sprintf(final String x)
       throws IllegalArgumentException {
 
-      final Iterator e = vFmt.iterator();
+      final Iterator<ConversionSpecification> e = vFmt.iterator();
     ConversionSpecification cs;
     char c;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -819,13 +813,12 @@ public class PrintfFormat {
   public String sprintf(final Object x)
       throws IllegalArgumentException {
 
-      final Iterator e = vFmt.iterator();
+      final Iterator<ConversionSpecification> e = vFmt.iterator();
     ConversionSpecification cs;
     char c;
     final StringBuilder sb=new StringBuilder();
     while (e.hasNext()) {
-      cs = (ConversionSpecification)
-        e.next();
+      cs = e.next();
       c = cs.getConversionCharacter();
       if (c=='\0') {
           sb.append(cs.getLiteral());
@@ -3483,7 +3476,7 @@ public class PrintfFormat {
     private String fmt;
   }
   /** Vector of control strings and format literals. */
-  private final ArrayList vFmt = new ArrayList();
+  private final ArrayList<ConversionSpecification> vFmt = new ArrayList<ConversionSpecification>();
 
   /** Character position.  Used by the constructor. */
   private int cPos;

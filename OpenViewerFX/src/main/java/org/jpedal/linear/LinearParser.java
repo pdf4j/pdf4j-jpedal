@@ -57,7 +57,7 @@ public class LinearParser {
     
     private PageObject linObject;
     
-    private final Map linObjects=new HashMap();
+    private final Map<Integer, PageObject> linObjects=new HashMap<Integer, PageObject>();
     
     private int linearPageCount=-1;
     
@@ -145,7 +145,7 @@ public class LinearParser {
                 
                 //cached data
                 if(linObjects.containsKey(key)){
-                    linObject=(PageObject)linObjects.get(key);
+                    linObject= linObjects.get(key);
                     
                     return true;
                 }

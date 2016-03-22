@@ -356,12 +356,12 @@ public class SeparationColorSpace extends GenericColorSpace {
 //iir = (ImageReader)ImageIO.getImageReadersByFormatName("JPEG").next();
             
             //suggestion from Carol
-            final Iterator iterator = ImageIO.getImageReadersByFormatName("JPEG");
+            final Iterator<ImageReader> iterator = ImageIO.getImageReadersByFormatName("JPEG");
             
             while (iterator.hasNext())
             {
-                final Object o = iterator.next();
-                iir = (ImageReader) o;
+                final ImageReader o = iterator.next();
+                iir = o;
                 if (iir.canReadRaster()) {
                     break;
                 }

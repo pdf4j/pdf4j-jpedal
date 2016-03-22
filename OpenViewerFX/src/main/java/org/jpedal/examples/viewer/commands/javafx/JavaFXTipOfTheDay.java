@@ -71,7 +71,7 @@ import org.jpedal.examples.viewer.utils.PropertiesFile;
 public class JavaFXTipOfTheDay {
     
     private static FXDialog tipOfDayPopup;
-    private static final List urls = new ArrayList();
+    private static final List<String> urls = new ArrayList<String>();
     private static final BorderPane border = new BorderPane();
     private static  WebEngine webEngine;
     private static int currentTip;
@@ -167,7 +167,7 @@ public class JavaFXTipOfTheDay {
                 else{
                     currentTip = 0;
                 }
-                final URL urlNext = JavaFXTipOfTheDay.class.getResource(urls.get(currentTip).toString());
+                final URL urlNext = JavaFXTipOfTheDay.class.getResource(urls.get(currentTip));
                 webEngine.load(urlNext.toExternalForm());
                 
             }
@@ -186,7 +186,7 @@ public class JavaFXTipOfTheDay {
                 else{
                     currentTip = urls.size() -1;
                 }
-                final URL urlPrev = JavaFXTipOfTheDay.class.getResource(urls.get(currentTip).toString());
+                final URL urlPrev = JavaFXTipOfTheDay.class.getResource(urls.get(currentTip));
                 webEngine.load(urlPrev.toExternalForm());
                 
             }
@@ -218,8 +218,8 @@ public class JavaFXTipOfTheDay {
 				final JarURLConnection conn = (JarURLConnection) url.openConnection();
 				final JarFile jar = conn.getJarFile();
 	
-				for (final Enumeration e = jar.entries(); e.hasMoreElements();) {
-					final JarEntry entry = (JarEntry) e.nextElement();
+				for (final Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements();) {
+					final JarEntry entry = e.nextElement();
 					final String name=entry.getName();
 					
 					if ((!entry.isDirectory()) && name.contains("/res/tips/") && name.endsWith(".html")) { // this

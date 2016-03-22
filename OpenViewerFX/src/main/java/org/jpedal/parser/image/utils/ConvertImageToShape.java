@@ -38,6 +38,7 @@ import org.jpedal.parser.ParserOptions;
 import org.jpedal.render.DynamicVectorRenderer;
 
 import java.awt.geom.GeneralPath;
+import org.jpedal.objects.SwingShape;
 
 public class ConvertImageToShape {
 
@@ -99,7 +100,7 @@ public class ConvertImageToShape {
                         gs.setNonstrokeColor(gs.nonstrokeColorSpace.getColor());
                         gs.setFillType(GraphicsState.FILL);
 
-                        current.drawShape(currentShape, gs, Cmd.F);
+                        current.drawShape(new SwingShape(currentShape), gs, Cmd.F);
 
                     }
                 }

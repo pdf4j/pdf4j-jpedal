@@ -55,7 +55,7 @@ public class PdfDictionary {
     /**
      * all key values as hashed values
      */
-
+    
     public static final int A=17;
 
     public static final int AA=4369;
@@ -171,6 +171,8 @@ public class PdfDictionary {
     public static final int Calculate = 1835890573;
 
     public static final int CapHeight=1786204300;
+    
+    public static final int Caret=826422615;
 
     public static final int Category=1248888446;
 
@@ -197,6 +199,8 @@ public class PdfDictionary {
     public static final int CIDFontType0C=-1752352082;
 
     public static final int CIDToGIDMap=946823533;
+    
+    public static final int Circle=1110658926;
 
     public static final int ClassMap=1448698499;
 
@@ -449,6 +453,8 @@ public class PdfDictionary {
     public static final int hival=960901492;
 
     public static final int I=25;
+    
+    public static final int IC=6419;
 
     public static final int ID=6420;
 
@@ -538,6 +544,8 @@ public class PdfDictionary {
     public static final int Lighten=945843829;
     
     public static final int Limits=1027170428;
+    
+    public static final int Line=473513525;
 
     public static final int Linearized=2004845231;
 
@@ -604,6 +612,8 @@ public class PdfDictionary {
     public static final int MouseExit = 1418558614;
 
     public static final int MouseUp = 1129473157;
+    
+    public static final int Movie=1061566802;
 
     public static final int Multiply=1451587725;
 
@@ -709,6 +719,10 @@ public class PdfDictionary {
     public static final int PieceInfo=1383295380;
 
     public static final int PO=8223;
+    
+    public static final int Polygon=1230470778;
+    
+    public static final int PolyLine=1014528638;
 
     public static final int Popup=1061176672;
 
@@ -720,6 +734,8 @@ public class PdfDictionary {
 
     public static final int Print=1111047780;
 
+    public static final int PrinterMark=1536539062;
+    
     public static final int PrintState=2104469658;
 
     public static final int Process=861242754;
@@ -727,6 +743,8 @@ public class PdfDictionary {
     public static final int ProcSet=860059523;
 
     public static final int Producer=1702196342;
+    
+    public static final int Projection=-2089577293;
 
     public static final int Properties=-2089186617;
 
@@ -795,8 +813,6 @@ public class PdfDictionary {
 
     public static final int SetOCGState=1667731612;
 
-    public static final int Square=1160865142;
-
     public static final int Shading=878474856;
 
     public static final int ShadingType=1487255197;
@@ -816,6 +832,10 @@ public class PdfDictionary {
     public static final int SoftLight=2020441219;
 
     public static final int Sound=1061502534;
+    
+    public static final int Square=1160865142;
+    
+    public static final int Squiggly=1517846914;
 
     public static final int Stamp=1144077667;
 
@@ -865,6 +885,8 @@ public class PdfDictionary {
     public static final int TagSuspect=2002295992;
 
     public static final int Text=607471684;
+    
+    public static final int THREE_D=788;
 
     public static final int TI=9241;
 
@@ -885,6 +907,8 @@ public class PdfDictionary {
     public static final int TP=9248;
 
     public static final int TR=9250;
+    
+    public static final int TrapNet=1078097781;
 
     public static final int Trapped=1080325989;
 
@@ -927,6 +951,8 @@ public class PdfDictionary {
     public static final int W=39;
 
     public static final int W2=9986;
+    
+    public static final int Watermark=1853192100;
 
     public static final int WhitePoint=2021497500;
     
@@ -1355,7 +1381,8 @@ public class PdfDictionary {
                 } else {
                     return VALUE_IS_FLOAT_ARRAY;
                 }
-
+            case IC:
+                return VALUE_IS_FLOAT_ARRAY;
             case C0:
                 return VALUE_IS_FLOAT_ARRAY;
 

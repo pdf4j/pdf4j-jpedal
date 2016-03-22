@@ -103,7 +103,7 @@ public class FontFile2 implements Serializable{
     
     private boolean useArray=true;
     
-    protected ArrayList tableList=new ArrayList(32);
+    protected ArrayList<String> tableList=new ArrayList<String>(32);
     
     /**current location in fontDataArray*/
     private int pointer;

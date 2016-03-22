@@ -32,12 +32,10 @@
  */
 package org.jpedal.examples.viewer.commands.javafx;
 
-import org.jpedal.FileAccess;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
 
 /**
@@ -61,10 +59,7 @@ public class JavaFXScaling {
                 currentGUI.setDisplayView(mode,alignment);
                 //if the mode is not single page then set display needs to be called twice 
                 //this is a hack fix need to be fixed properly
-                if(mode==Display.SINGLE_PAGE){
-                    FileAccess  fa = (FileAccess)decode_pdf.getExternalHandler(Options.FileAccess);
-                    fa.setLastPageDecoded(-1);
-                }else{
+                if(mode!=Display.SINGLE_PAGE){
                     currentGUI.setDisplayView(mode,alignment);
                 }
 //                currentGUI.scrollToPage(pageNumber);
@@ -79,7 +74,7 @@ public class JavaFXScaling {
                 try {
                     Thread.sleep(100);
                 } catch (final InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();  
                 }
             }
         }

@@ -35,7 +35,7 @@ package org.jpedal.parser;
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.TextState;
-import org.jpedal.objects.acroforms.creation.PopupFactory;
+import org.jpedal.objects.acroforms.creation.AnnotationFactory;
 import org.jpedal.objects.acroforms.overridingImplementations.ReadOnlyTextIcon;
 import org.jpedal.objects.raw.*;
 import org.jpedal.parser.image.MaskUtils;
@@ -72,7 +72,7 @@ public class FormFlattener {
         //    return;
         final int type = form.getParameterConstant(PdfDictionary.Subtype);
         if (type == PdfDictionary.Highlight) {
-            PopupFactory.renderFlattenedAnnotation(form, pdfStreamDecoder.current, pdfStreamDecoder.parserOptions.getPageNumber(), pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber()));
+            AnnotationFactory.renderFlattenedAnnotation(form, pdfStreamDecoder.current, pdfStreamDecoder.parserOptions.getPageNumber(), pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber()));
             return;
         }
 
@@ -204,7 +204,7 @@ public class FormFlattener {
                 //add in Popup Icon for text Annotation
 //                int type = form.getParameterConstant(PdfDictionary.Subtype);
                 if (type == PdfDictionary.Text) {
-                    PopupFactory.renderFlattenedAnnotation(form, pdfStreamDecoder.current, pdfStreamDecoder.parserOptions.getPageNumber(), pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber()));
+                    AnnotationFactory.renderFlattenedAnnotation(form, pdfStreamDecoder.current, pdfStreamDecoder.parserOptions.getPageNumber(), pdfStreamDecoder.pageData.getRotation(pdfStreamDecoder.parserOptions.getPageNumber()));
                 }
 
                 return;

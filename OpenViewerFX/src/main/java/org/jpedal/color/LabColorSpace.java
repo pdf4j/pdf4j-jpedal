@@ -54,7 +54,7 @@ public class LabColorSpace extends GenericColorSpace {
     private float lastL = -1, lastA=65536, lastBstar;
     
     /**holds values we have already calculated to speed-up*/
-    private final Map cache = new HashMap();
+    private final Map<Integer, Integer> cache = new HashMap<Integer, Integer>();
     
     private static final float C1 = 108f / 841f;
     
@@ -262,11 +262,11 @@ public class LabColorSpace extends GenericColorSpace {
             
             final Integer key = (indexL << 16) + (indexA << 8) + indexB;
             
-            final Object value = cache.get(key);
+            final Integer value = cache.get(key);
             /**used cache value or recalulate*/
             if (value != null) {
                 
-                final int raw = (Integer) value;
+                final int raw = value;
                 r = ((raw >> 16) & 255);
                 g = ((raw >> 8) & 255);
                 b = ((raw) & 255);

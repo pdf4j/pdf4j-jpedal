@@ -46,7 +46,7 @@ public class SetDisplayBackground {
     public static void execute(final Object[] args, final PdfDecoderInt decode_pdf) {
 
         try {
-            final Map map = new HashMap();
+            final Map<Integer, Object> map = new HashMap<Integer, Object>();
             map.put(JPedalSettings.DISPLAY_BACKGROUND, args[0]);
             decode_pdf.modifyNonstaticJPedalParameters(map);
         } catch (final PdfException e2) {

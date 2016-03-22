@@ -45,6 +45,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Set;
 import org.jpedal.external.FontHandler;
+import org.jpedal.objects.PdfShape;
 
 
 
@@ -188,7 +189,7 @@ public interface DynamicVectorRenderer  {
 	Rectangle getOccupiedArea();
 
 	/*save shape in array to draw cmd is Cmd.F or Cmd.S */
-	void drawShape(Shape currentShape, GraphicsState currentGraphicsState, int cmd);
+	void drawShape(PdfShape currentShape, GraphicsState currentGraphicsState, int cmd);
 
         /*save shape in array to draw cmd is Cmd.F or Cmd.S */
 		void drawShape(Object currentShape, GraphicsState currentGraphicsState);

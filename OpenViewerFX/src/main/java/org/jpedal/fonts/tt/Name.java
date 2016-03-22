@@ -45,7 +45,7 @@ public class Name extends Table {
 	/**max number of glyphs*/
 	private int encoding;
 
-    private final Map strings=new HashMap();
+    private final Map<Integer, String> strings=new HashMap<Integer, String>();
 
     public static final Integer COPYRIGHT_NOTICE= 0;
     public static final Integer FONT_FAMILY_NAME= 1;
@@ -150,7 +150,7 @@ public class Name extends Table {
     /**
      * get Map of Strings - key is Integer key and String value is in 
      */
-    public Map getStrings(){
+    public Map<Integer, String> getStrings(){
 		return Collections.unmodifiableMap(strings);
 	}
     
@@ -164,6 +164,6 @@ public class Name extends Table {
      * not all encodings or ID 20 handled at present
      */
     public String getString(final Integer id) {
-        return (String) strings.get(id);
+        return strings.get(id);
     }
 }

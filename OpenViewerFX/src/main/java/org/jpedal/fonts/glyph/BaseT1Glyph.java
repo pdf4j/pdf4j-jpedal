@@ -50,7 +50,7 @@ public abstract class BaseT1Glyph extends PdfGlyph implements Serializable
 
     protected boolean isStroked;
 
-    protected final Map strokedPositions=new HashMap();
+    protected final Map<String, String> strokedPositions=new HashMap<String, String>();
 
     public BaseT1Glyph(){}
     

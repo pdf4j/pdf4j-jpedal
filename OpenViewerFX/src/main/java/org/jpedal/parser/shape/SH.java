@@ -46,15 +46,16 @@ import org.jpedal.utils.LogWriter;
 
 import java.awt.*;
 import java.util.Map;
+import org.jpedal.objects.SwingShape;
 import org.jpedal.parser.Cmd;
 import org.jpedal.parser.PdfObjectCache;
 
 public class SH {
 
     public static void execute(final String shadingObject, final PdfObjectCache cache, final GraphicsState gs,
-                          final boolean isPrinting, final Map shadingColorspacesObjects, final int pageNum,
-                          final PdfObjectReader currentPdfFile,
-                          final PdfPageData pageData, final DynamicVectorRenderer current) {
+                               final boolean isPrinting, final Map<String, GenericColorSpace> shadingColorspacesObjects, final int pageNum,
+                               final PdfObjectReader currentPdfFile,
+                               final PdfPageData pageData, final DynamicVectorRenderer current) {
         
         PdfObject Shading= (PdfObject) cache.get(PdfObjectCache.LocalShadings, shadingObject);
         if(Shading==null){
@@ -129,7 +130,7 @@ public class SH {
             //track colorspace use
             cache.put(PdfObjectCache.ColorspacesUsed, newColorSpace.getID(), "x");
 
-            current.drawShape(shadeShape, gs, Cmd.F);
+            current.drawShape(new SwingShape(shadeShape), gs, Cmd.F);
 
         }catch(final Exception e){
             LogWriter.writeLog("Exception: " + e.getMessage());

@@ -51,7 +51,7 @@ public class OutlineData {
 
 	private Document OutlineDataXML;
 
-    private final Map DestObjs=new HashMap();
+    private final Map<String, PdfObject> DestObjs=new HashMap<String, PdfObject>();
 
 	/**create list when object initialised*/
 	public OutlineData(){
@@ -280,6 +280,6 @@ public class OutlineData {
      * @return Aobj
      */
     public PdfObject getAobj(final String ref) {
-        return (PdfObject) DestObjs.get(ref);
+        return DestObjs.get(ref);
     }
 }

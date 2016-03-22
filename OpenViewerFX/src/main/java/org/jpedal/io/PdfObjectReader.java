@@ -57,7 +57,7 @@ public class PdfObjectReader {
     /**
      * holds pdf id (ie 4 0 R) which stores each object
      */
-    final Map pagesReferences = new HashMap();
+    final Map<Integer, String> pagesReferences = new HashMap<Integer, String>();
     
     /**
      * page lookup table using objects as key
@@ -100,7 +100,7 @@ public class PdfObjectReader {
      * currentPdfFile.readObject(pdfObject);
      */
     public String getReferenceforPage(final int page){
-        return (String) pagesReferences.get(page);
+        return pagesReferences.get(page);
     }
     
     /**

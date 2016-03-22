@@ -66,7 +66,7 @@ public class NextResults {
             }
 
             //				Object currPage = results.getTextPages().get(new Integer(index));
-            final Object currPage = commonValues.getCurrentPage();
+            final Integer currPage = commonValues.getCurrentPage();
 
             if (index == results.getResultCount() - 1
                     || results.getResultCount() == 0) {
@@ -123,10 +123,10 @@ public class NextResults {
 
                 if (id != -1) {
                     final Integer key = id;
-                    final Object newPage = results.getTextPages().get(key);
+                    final Integer newPage = results.getTextPages().get(key);
 
                     if (newPage != null) {
-                        final int nextPage = (Integer) newPage;
+                        final int nextPage = newPage;
                         // move to new page
                         if (commonValues.getCurrentPage() != nextPage) {
                             commonValues.setCurrentPage(nextPage);
@@ -147,14 +147,14 @@ public class NextResults {
                             try {
                                 Thread.sleep(500);
                             } catch (final InterruptedException e) {
-                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                e.printStackTrace();  
                             }
                             //Ensure page has been processed else highlight may be incorrect
                         }
 
                                 //int pageOfHighlight = ((Integer) results.getTextPages().get(key)).intValue();
                         
-                        if ((currPage != null && (Integer) currPage != nextPage) && (commonValues.getAllHighlightsShown())){
+                        if ((currPage != null && currPage != nextPage) && (commonValues.getAllHighlightsShown())){
                                 final Vector_Rectangle_Int storageVector = new Vector_Rectangle_Int();
 
                                 //Integer allKeys = new Integer(id)
@@ -163,7 +163,7 @@ public class NextResults {
 
                                     kInteger = k;
                                     //int currentPage = ((Integer)newPage).intValue();
-                                    if ((Integer) results.getTextPages().get(kInteger) == nextPage) {
+                                    if (results.getTextPages().get(kInteger) == nextPage) {
 
                                         final Object h = searchFrame.getTextRectangles().get(kInteger);
 

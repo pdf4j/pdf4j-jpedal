@@ -32,6 +32,7 @@
  */
 package org.jpedal.objects;
 
+import java.awt.Shape;
 import java.io.Serializable;
 import javafx.collections.ObservableList;
 
@@ -326,13 +327,18 @@ public class JavaFXShape implements Serializable, PdfShape
     }
 
     @Override
-    public boolean adjustLineWidth() {
-        throw new RuntimeException("JavaFX should not call JavaFXShape.adjustLineWidth()");//Not required in JavaFXShape (SwingShape only)
+    public boolean isClosed() {
+        return isClosed;
     }
 
     @Override
-    public boolean isClosed() {
-        return isClosed;
+    public void setShape(Shape currentShape) {
+        throw new UnsupportedOperationException("setShape Not supported yet."); 
+    }
+
+    @Override
+    public Shape getShape() {
+        throw new UnsupportedOperationException("getShape Not supported yet.");
     }
 
     /**

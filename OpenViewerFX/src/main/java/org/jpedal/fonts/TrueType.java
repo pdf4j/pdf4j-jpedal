@@ -58,12 +58,12 @@ import org.jpedal.objects.raw.PdfObject;
 public class  TrueType extends PdfFont {
     
     private boolean subfontAlreadyLoaded;
-    private Map fontsLoaded;
+    private Map<String, PdfJavaGlyphs> fontsLoaded;
     
     private Rectangle BBox;
     
     public TrueType(){
-        fontsLoaded=new HashMap();
+        fontsLoaded=new HashMap<String, PdfJavaGlyphs>();
         
         init(null);
         
@@ -72,7 +72,7 @@ public class  TrueType extends PdfFont {
     private void readFontData(final byte[] fontDataAsArray, final FontData fontData){
         
         if(subfontAlreadyLoaded){
-            glyphs= (PdfJavaGlyphs) fontsLoaded.get(substituteFont+'_'+glyphs.getBaseFontName()+' '+fontDataAsArray.length);
+            glyphs= fontsLoaded.get(substituteFont+'_'+glyphs.getBaseFontName()+' '+fontDataAsArray.length);
             
             fontTypes=glyphs.getType();
         }else{
@@ -157,7 +157,7 @@ public class  TrueType extends PdfFont {
     
     /**read in a font and its details from the pdf file*/
     @Override
-    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map substitutedFonts) throws Exception{
+    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map<String, PdfJavaGlyphs> substitutedFonts) throws Exception{
         
         fontTypes=StandardFonts.TRUETYPE;
         
@@ -316,7 +316,7 @@ public class  TrueType extends PdfFont {
         
         if(BBox==null){
             if(isFontEmbedded && !isFontSubstituted) {
-                BBox=new Rectangle((int)FontBBox[0], (int)FontBBox[1], (int)(FontBBox[2]-FontBBox[0]), (int)(FontBBox[3]-FontBBox[1]));  //To change body of created methods use File | Settings | File Templates.
+                BBox=new Rectangle((int)FontBBox[0], (int)FontBBox[1], (int)(FontBBox[2]-FontBBox[0]), (int)(FontBBox[3]-FontBBox[1])); 
             } else {
                 BBox=super.getBoundingBox();
             }

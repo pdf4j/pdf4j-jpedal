@@ -51,12 +51,12 @@ public class DefaultParser implements ExpressionEngine
      * execute javascript and reset forms values
      */
     @Override
-    public int execute(final FormObject form, final int type, final Object code, final int eventType, final char keyPressed) {
+    public int execute(final FormObject form, final int type, final String code, final int eventType, final char keyPressed) {
 
         int messageCode=ActionHandler.NOMESSAGE;
 
         if(code instanceof String){
-            final String js = (String) code;
+            final String js = code;
 
             //convert into args array
             final String[] args=JSFunction.convertToArray(js);

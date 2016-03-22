@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
 public class StructuredContentHandler {
 
     /**store entries from BMC*/
-    private final Map markedContentProperties;
+    private final Map<Integer, String> markedContentProperties;
 
     /**handle nested levels of marked content*/
     int markedContentLevel;
@@ -63,8 +63,9 @@ public class StructuredContentHandler {
 
     private String currentKey;
 
-    final Map keys, dictionaries;
-    Map values;
+    final Map<Integer, String> keys;
+    final Map<String, PdfObject> dictionaries;
+    Map<String,String> values;
 
     final boolean buildDirectly;
     
@@ -82,7 +83,7 @@ public class StructuredContentHandler {
         //build either tree of lookuptable
         if(markedContent instanceof Map){
         	buildDirectly=false;
-            values=(Map)markedContent;
+            values=(Map<String, String>)markedContent;
         }else{
             buildDirectly=true;
             doc=(Document)markedContent;
@@ -96,7 +97,7 @@ public class StructuredContentHandler {
 
         //this.currentPdfFile=currentPdfFile;
 
-        markedContentProperties=new HashMap();
+        markedContentProperties=new HashMap<Integer, String>();
         markedContentLevel = 0;
 
         markedContentSequence = new StringBuffer();
@@ -104,9 +105,9 @@ public class StructuredContentHandler {
         currentKey="";
 
         
-        keys=new HashMap();
+        keys=new HashMap<Integer, String>();
         
-        dictionaries=new HashMap();
+        dictionaries=new HashMap<String, PdfObject>();
 
     }
 
@@ -211,7 +212,7 @@ public class StructuredContentHandler {
         
         if(buildDirectly){
 
-			final PdfObject BDCobj=(PdfObject) dictionaries.get(currentKey);
+			final PdfObject BDCobj= dictionaries.get(currentKey);
 			
 			final boolean isBMC=(BDCobj==null);
 			
@@ -286,7 +287,7 @@ public class StructuredContentHandler {
                 System.out.println("write out " + currentKey + " text=" + markedContentSequence + '<');
             }
             
-            final PdfObject BDCobj=(PdfObject) (dictionaries.get(String.valueOf(markedContentLevel)));
+            final PdfObject BDCobj= (dictionaries.get(String.valueOf(markedContentLevel)));
             
            // System.out.println("BDCobj="+BDCobj+" currentKey="+currentKey);
             
@@ -327,7 +328,7 @@ public class StructuredContentHandler {
         /**
          * add current structure to tree
          **/
-        currentKey=(String)keys.get(markedContentLevel);
+        currentKey= keys.get(markedContentLevel);
         
         //if no MCID use current level as key
         if(currentKey==null) {
@@ -382,10 +383,10 @@ public class StructuredContentHandler {
     
     
     //delete escape chars such as \( but allow for \\
-	private static String stripEscapeChars(final Object dict) {
+	private static String stripEscapeChars(final String dict) {
 		char c,lastC=' ';
 		
-		final StringBuilder str=new StringBuilder((String) dict);
+		final StringBuilder str=new StringBuilder(dict);
 		int length=str.length();
 		for(int ii=0;ii<length;ii++){
 			c=str.charAt(ii);

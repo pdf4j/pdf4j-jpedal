@@ -50,7 +50,7 @@ public class DeviceNColorSpace extends SeparationColorSpace {
     
     private static final long serialVersionUID = -1372268945371555187L;
     
-    private final Map cache=new HashMap();
+    private final Map<Integer, Integer> cache=new HashMap<Integer, Integer>();
     
     public DeviceNColorSpace(final PdfObjectReader currentPdfFile, final PdfObject colorSpace) {
         
@@ -99,8 +99,8 @@ public class DeviceNColorSpace extends SeparationColorSpace {
             
             isCached=true;
             
-            final Object val=cache.get((lookup[0] << 16) + (lookup[1] << 8) + lookup[2]);
-            final int rawValue = (Integer) val;
+            final Integer val=cache.get((lookup[0] << 16) + (lookup[1] << 8) + lookup[2]);
+            final int rawValue = val;
             final int r = ((rawValue >> 16) & 255);
             final int g = ((rawValue >> 8) & 255);
             final int b = ((rawValue) & 255);

@@ -42,7 +42,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jpedal.examples.viewer.gui.*;
 import org.jpedal.examples.viewer.gui.javafx.*;
-import org.jpedal.examples.viewer.utils.*;
 import org.jpedal.examples.viewer.objects.FXClientExternalHandler;
 import org.jpedal.external.Options;
 import org.jpedal.objects.acroforms.actions.JavaFXDefaultActionHandler;
@@ -170,10 +169,6 @@ public class OpenViewerFX extends SharedViewer implements ViewerInt{
             LogWriter.writeLog("Exception " + e + " loading resource bundle.\n"
                     + "Also check you have a file in org.jpedal.international.messages to support Locale=" + java.util.Locale.getDefault());
         }
-         
-        if(!OpenViewerFX.isOpenFX){
-            currentPrinter=new FXPrinter();
-        }
 
         decode_pdf = new PdfDecoderFX();
 
@@ -191,7 +186,7 @@ public class OpenViewerFX extends SharedViewer implements ViewerInt{
         searchFrame = new JavaFXSearchWindow(currentGUI);
 
         currentCommands = new JavaFXCommands(commonValues, currentGUI, decode_pdf,
-                thumbnails, properties, searchFrame, currentPrinter);
+                thumbnails, properties, searchFrame);
         
                 
 		//enable error messages which are OFF by default

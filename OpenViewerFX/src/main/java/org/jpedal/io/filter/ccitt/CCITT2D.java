@@ -46,7 +46,6 @@ public class CCITT2D extends CCITT1D implements CCITTDecoder {
     }
 
     CCITT2D() {
-        //To change body of created methods use File | Settings | File Templates.
     }
 
     @Override

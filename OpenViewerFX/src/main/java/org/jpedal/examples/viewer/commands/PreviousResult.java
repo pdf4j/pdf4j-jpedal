@@ -67,7 +67,7 @@ public class PreviousResult {
             }
 
             //				Object currPage = results.getTextPages().get(new Integer(index));
-            final Object currPage = commonValues.getCurrentPage();
+            final Integer currPage = commonValues.getCurrentPage();
 
             if (index == 0
                     || results.getResultCount() == 0) {
@@ -119,10 +119,10 @@ public class PreviousResult {
                 if (id != -1) {
 
                     final Integer key = id;
-                    final Object newPage = results.getTextPages().get(key);
+                    final Integer newPage = results.getTextPages().get(key);
 
                     if (newPage != null) {
-                        final int nextPage = (Integer) newPage;
+                        final int nextPage = newPage;
 
                         //move to new page
                         if (commonValues.getCurrentPage() != nextPage) {
@@ -149,7 +149,7 @@ public class PreviousResult {
                             }
                         }
 
-                        if (((Integer) currPage != nextPage) && (commonValues.getAllHighlightsShown())){
+                        if ((currPage != nextPage) && (commonValues.getAllHighlightsShown())){
                                 final Vector_Rectangle_Int storageVector = new Vector_Rectangle_Int();
 
                                 Integer kInteger;
@@ -159,7 +159,7 @@ public class PreviousResult {
 
                                     kInteger = k;
                                     //int currentPage = ((Integer)newPage).intValue();
-                                    if ((Integer) results.getTextPages().get(kInteger) == nextPage) {
+                                    if (results.getTextPages().get(kInteger) == nextPage) {
 
                                         final Object h = searchFrame.getTextRectangles().get(kInteger);
 

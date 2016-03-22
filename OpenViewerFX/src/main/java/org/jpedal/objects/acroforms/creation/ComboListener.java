@@ -43,10 +43,10 @@ import org.jpedal.objects.raw.FormObject;
  */
 public class ComboListener implements ItemListener {
 
-    final JComboBox comp;
+    final JComboBox<String> comp;
     final FormObject form;
 
-    ComboListener(final JComboBox comboBox, final FormObject form) {
+    ComboListener(final JComboBox<String> comboBox, final FormObject form) {
 	this.comp = comboBox;
 	this.form = form;
     }

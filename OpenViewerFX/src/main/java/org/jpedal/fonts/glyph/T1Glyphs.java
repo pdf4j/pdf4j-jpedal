@@ -859,7 +859,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
          * Save glyph number into object
          */
         //Try fetching number using glyph
-        Object num = glyphNumbers.get(glyph);
+        Integer num = glyphNumbers.get(glyph);
         
         //Failing that, use rawInt
         if (num == null) {
@@ -873,7 +873,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
         
         //If the glyph number has been found, store it in the glyph
         if (num != null) {
-            transformedGlyph2.setGlyphNumber((Integer) num);
+            transformedGlyph2.setGlyphNumber(num);
         }
         
         return transformedGlyph2;
@@ -1394,7 +1394,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
      * @return
      */
     @Override
-    public Map getCharStrings() {
+    public Map<String, byte[]> getCharStrings() {
         return Collections.unmodifiableMap(charStrings);
     }
 

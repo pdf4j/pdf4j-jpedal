@@ -133,7 +133,7 @@ public class GenericParser implements ExpressionEngine {
     }
 
     @Override
-    public int execute(final FormObject ref, final int type, Object js, final int eventType, final char keyPressed) {
+    public int execute(final FormObject ref, final int type, String js, final int eventType, final char keyPressed) {
 
         // ignore unknown keypresses
         if (keyPressed == 65535) {
@@ -146,7 +146,7 @@ public class GenericParser implements ExpressionEngine {
         }
 
         if (js instanceof String) {
-            js = preParseJS((String) js, false);
+            js = preParseJS(js, false);
             try {
                 // The following line causes issues in Java 8, It was not needed anyway as we change what "event" refers to which should tell the gc to delete the object.
 //			context.removeAttribute("event", ScriptContext.ENGINE_SCOPE); // remove the event
@@ -167,7 +167,7 @@ public class GenericParser implements ExpressionEngine {
 //				engine.eval("app.alert(\"This is a test\");"); // basic alert test, works!
 //				engine.eval("app.alert(\"This is a test\", 1, 0);"); // advanced alert test, works!
 //				engine.eval("var a = new Array(\"RGB\", 0.5, 0.5, 1); console.log(a); var s = ColorConvert(a, \"CMYK\"); console.log(s);"); // Colorspace test, works!
-                returnObject = engine.eval((String) js, context);
+                returnObject = engine.eval(js, context);
                 final Object eventTarget = engine.eval("event.target");
                 final Object eventValue = engine.eval("event.value");
                 if (eventTarget != null && eventType == ActionHandler.FOCUS_EVENT) {
@@ -227,7 +227,7 @@ public class GenericParser implements ExpressionEngine {
                     engine.eval(finalValue, context); // attempt to evaluate given code
                 } catch (final ScriptException e) {
 //					debugLog("addCode Code: " + finalValue + "\r\n" + e.getMessage() + "\r\n");
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();  
                 }
             }
         };
@@ -271,7 +271,7 @@ public class GenericParser implements ExpressionEngine {
         for (final FormObject formObject : formObjects) {
             final String ref = formObject.getObjectRefAsString();
             final String name = formObject.getTextStreamValue(PdfDictionary.T);
-            String command = (String) jsObject.getJavascriptCommand((name != null ? name : ref), PdfDictionary.C2);
+            String command = jsObject.getJavascriptCommand((name != null ? name : ref), PdfDictionary.C2);
 //            System.out.println(command);
             if (command != null) {
                 command = preParseJS(command, false);
@@ -300,7 +300,7 @@ public class GenericParser implements ExpressionEngine {
                     }
                 } catch (final ScriptException e) {
 //					debugLog("Calculate Code: " + command + "\r\n" + e.getMessage() + "\r\n");
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();  
                 }
 
             }
@@ -364,7 +364,7 @@ public class GenericParser implements ExpressionEngine {
 //			}
 //			"this.\\w+\\s?=\\s?"
 //		}
-//		return js;  //To change body of created methods use File | Settings | File Templates.
+//		return js;  
 //	}
 
     /**

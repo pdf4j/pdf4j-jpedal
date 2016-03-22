@@ -47,7 +47,6 @@ import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.commands.generic.ZoomIn;
 import org.jpedal.examples.viewer.commands.generic.ZoomOut;
-import org.jpedal.examples.viewer.utils.PrinterInt;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.JPedalActionHandler;
@@ -60,8 +59,8 @@ import org.jpedal.gui.GUIFactory;
  */
 public class JavaFXCommands extends Commands {
 
-    public JavaFXCommands(final Values commonValues, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final GUIThumbnailPanel thumbnails, final PropertiesFile properties, final GUISearchWindow searchFrame, final PrinterInt currentPrinter) {
-        super(commonValues, currentGUI, decode_pdf, thumbnails, properties, searchFrame, currentPrinter);
+    public JavaFXCommands(final Values commonValues, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final GUIThumbnailPanel thumbnails, final PropertiesFile properties, final GUISearchWindow searchFrame) {
+        super(commonValues, currentGUI, decode_pdf, thumbnails, properties, searchFrame, null);
     }
 
     @Override
@@ -248,9 +247,6 @@ public class JavaFXCommands extends Commands {
                 case EXIT:
                     JavaFXExit.execute(args, thumbnails, currentGUI, commonValues, decode_pdf, properties);
                     break;
-                case PRINT:
-                    JavaFXPrint.execute(args, currentGUI, commonValues, properties, currentPrinter, decode_pdf);
-                    break;
                 case SETPAGECOLOR:
                     SetPageColor.execute(args, decode_pdf);
                     break;
@@ -265,6 +261,12 @@ public class JavaFXCommands extends Commands {
                     break;
                 case SETENHANCEFRACTIONALLINES: //Used for JavaFX Netbeans PDF Viewer Plugin.
                     SetEnhanceFractionalLines.execute(args, decode_pdf);
+                    break;
+                case PAGECOUNT:
+                    status = PageCount.execute(decode_pdf);
+                    break;
+                case CURRENTPAGE:
+                    status = CurrentPage.execute(decode_pdf, currentGUI);
                     break;
                 default:
                     if(GUI.debugFX) {

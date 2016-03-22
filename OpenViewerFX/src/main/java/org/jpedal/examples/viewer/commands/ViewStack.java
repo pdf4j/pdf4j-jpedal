@@ -43,7 +43,7 @@ import java.util.ArrayList;
  */
 public class ViewStack {
 
-    private final ArrayList ourStack = new ArrayList();
+    private final ArrayList<Viewable> ourStack = new ArrayList<Viewable>();
     private int index = -1;
     private int length;
 
@@ -51,7 +51,7 @@ public class ViewStack {
 
         if (index - 1 > -1 && index - 1 < length) {
             index--;
-            return (Viewable) ourStack.get(index);
+            return ourStack.get(index);
         } else {
             return null;
         }
@@ -61,7 +61,7 @@ public class ViewStack {
 
         if (index + 1 > -1 && index + 1 < length) {
             index++;
-            return (Viewable) ourStack.get(index);
+            return ourStack.get(index);
         } else {
             return null;
         }

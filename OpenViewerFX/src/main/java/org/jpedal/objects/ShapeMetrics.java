@@ -27,30 +27,25 @@
 
  *
  * ---------------
- * SetUndrawnPageColor.java
+ * ShapeMetrics.java
  * ---------------
  */
-package org.jpedal.examples.viewer.commands;
+package org.jpedal.objects;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.jpedal.PdfDecoderInt;
-import org.jpedal.constants.JPedalSettings;
-import org.jpedal.exception.PdfException;
+public class ShapeMetrics {
 
-/**
- * Sets the Color of pages that havn't been drawn yet
- */
-public class SetUndrawnPageColor {
+    private int rectangleCount;
 
-    public static void execute(final Object[] args, final PdfDecoderInt decode_pdf) {
-
-        try {
-            final Map<Integer, Object> map = new HashMap<Integer, Object>();
-            map.put(JPedalSettings.UNDRAWN_PAGE_COLOR, args[0]);
-            decode_pdf.modifyNonstaticJPedalParameters(map);
-        } catch (final PdfException e2) {
-            e2.printStackTrace();
-        }
+    public int getRectangleCount() {
+        return rectangleCount;
     }
+
+    public void setRectangleCount(int rectangleCount) {
+        this.rectangleCount = rectangleCount;
+    }
+    
+    void incrementRectangleCount() {
+        rectangleCount++;
+    }
+    
 }

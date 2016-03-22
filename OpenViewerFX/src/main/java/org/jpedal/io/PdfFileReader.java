@@ -68,7 +68,8 @@ public class PdfFileReader
     private byte[] lastCompressedStream;
 
     /**used to cache last compressed object*/
-    private Map lastOffsetStart,lastOffsetEnd;
+    private Map<String, String> lastOffsetStart;
+    private Map<String, String> lastOffsetEnd;
 
     private PdfObject compressedObj;
 
@@ -229,13 +230,13 @@ public class PdfFileReader
 
         //see if we already have values
         byte[] compressedStream=lastCompressedStream;
-        Map offsetStart=lastOffsetStart;
-        Map offsetEnd=lastOffsetEnd;
+        Map<String, String> offsetStart=lastOffsetStart;
+        Map<String, String> offsetEnd=lastOffsetEnd;
 
         PdfObject Extends=null;
 
         if(lastOffsetStart!=null && compressedID==lastCompressedID) {
-            startID = (String) lastOffsetStart.get(String.valueOf(objectID));
+            startID = lastOffsetStart.get(String.valueOf(objectID));
         }
 
         //read 1 or more streams
@@ -258,15 +259,15 @@ public class PdfFileReader
             }
 
             /**get offsets table see if in this stream*/
-            offsetStart=new HashMap();
-            offsetEnd=new HashMap();
+            offsetStart=new HashMap<String, String>();
+            offsetEnd=new HashMap<String, String>();
             First=compressedObj.getInt(PdfDictionary.First);
 
             compressedStream=compressedObj.getDecodedStream();
 
             CompressedObjects.extractCompressedObjectOffset(offsetStart, offsetEnd, First, compressedStream, compressedID,offset);
 
-            startID=(String) offsetStart.get(String.valueOf(objectID));
+            startID= offsetStart.get(String.valueOf(objectID));
 
             Extends=compressedObj.getDictionary(PdfDictionary.Extends);
             if(Extends==null) {
@@ -287,7 +288,7 @@ public class PdfFileReader
         final int start=First+Integer.parseInt(startID);
         int end=compressedStream.length;
 
-        final String endID=(String) offsetEnd.get(String.valueOf(objectID));
+        final String endID= offsetEnd.get(String.valueOf(objectID));
         if(endID!=null) {
             end = First + Integer.parseInt(endID);
         }
@@ -1083,13 +1084,13 @@ public class PdfFileReader
 
         //see if we already have values
         byte[] compressedStream=lastCompressedStream;
-        Map offsetStart=lastOffsetStart;
-        Map offsetEnd=lastOffsetEnd;
+        Map<String, String> offsetStart=lastOffsetStart;
+        Map<String, String> offsetEnd=lastOffsetEnd;
 
         PdfObject Extends=null;
 
         if(lastOffsetStart!=null) {
-            startID = (String) lastOffsetStart.get(String.valueOf(objectID));
+            startID = lastOffsetStart.get(String.valueOf(objectID));
         }
 
         //read 1 or more streams
@@ -1112,15 +1113,15 @@ public class PdfFileReader
             }
 
             /**get offsets table see if in this stream*/
-            offsetStart=new HashMap();
-            offsetEnd=new HashMap();
+            offsetStart=new HashMap<String, String>();
+            offsetEnd=new HashMap<String, String>();
             First=compressedObj.getInt(PdfDictionary.First);
 
             compressedStream=compressedObj.getDecodedStream();
 
             CompressedObjects.extractCompressedObjectOffset(offsetStart, offsetEnd, First, compressedStream, compressedID,offset);
 
-            startID=(String) offsetStart.get(String.valueOf(objectID));
+            startID= offsetStart.get(String.valueOf(objectID));
 
             Extends=compressedObj.getDictionary(PdfDictionary.Extends);
             if(Extends==null) {
@@ -1141,7 +1142,7 @@ public class PdfFileReader
         final int start=First+Integer.parseInt(startID);
         int end=compressedStream.length;
 
-        final String endID=(String) offsetEnd.get(String.valueOf(objectID));
+        final String endID= offsetEnd.get(String.valueOf(objectID));
         if(endID!=null) {
             end = First + Integer.parseInt(endID);
         }
@@ -1226,7 +1227,7 @@ public class PdfFileReader
         byte[] raw;
         int compressedID=offset.elementAt(objectID);
         String startID=null,compressedRef;
-        Map offsetStart=lastOffsetStart,offsetEnd=lastOffsetEnd;
+        Map<String, String> offsetStart=lastOffsetStart;Map<String, String> offsetEnd=lastOffsetEnd;
         int First=lastFirst;
         byte[] compressedStream;
         boolean isCached=true; //assume cached
@@ -1236,7 +1237,7 @@ public class PdfFileReader
         //see if we already have values
         compressedStream=lastCompressedStream;
         if(lastOffsetStart!=null) {
-            startID = (String) lastOffsetStart.get(String.valueOf(objectID));
+            startID = lastOffsetStart.get(String.valueOf(objectID));
         }
 
         int lastCompressedID=-1;
@@ -1266,8 +1267,8 @@ public class PdfFileReader
             objDecoder.readDictionaryAsObject(compressedObj,0,raw);
 
             /**get offsets table see if in this stream*/
-            offsetStart=new HashMap();
-            offsetEnd=new HashMap();
+            offsetStart=new HashMap<String, String>();
+            offsetEnd=new HashMap<String, String>();
 
             First=compressedObj.getInt(PdfDictionary.First);
 
@@ -1276,7 +1277,7 @@ public class PdfFileReader
 
             CompressedObjects.extractCompressedObjectOffset(offsetStart, offsetEnd, First, compressedStream, compressedID,offset);
 
-            startID=(String) offsetStart.get(String.valueOf(objectID));
+            startID= offsetStart.get(String.valueOf(objectID));
 
             Extends=compressedObj.getDictionary(PdfDictionary.Extends);
             if(Extends==null) {
@@ -1301,7 +1302,7 @@ public class PdfFileReader
         /**put bytes in stream*/
         final int start=First+Integer.parseInt(startID);
         int end=compressedStream.length;
-        final String endID=(String) offsetEnd.get(String.valueOf(objectID));
+        final String endID= offsetEnd.get(String.valueOf(objectID));
         if(endID!=null) {
             end = First + Integer.parseInt(endID);
         }

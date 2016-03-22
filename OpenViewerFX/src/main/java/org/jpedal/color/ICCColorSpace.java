@@ -59,7 +59,7 @@ extends GenericColorSpace {
     //cache values to speed up translation
     private final int[] a1,b1,c1;
     
-    private final Map cache=new HashMap();
+    private final Map<Integer, Integer> cache=new HashMap<Integer, Integer>();
     private float[] prevFloat;
     
     /**
@@ -217,8 +217,8 @@ extends GenericColorSpace {
             
         }else if(size==4 && cache.get((lookup[0] << 24) + (lookup[1] << 16) + (lookup[2] << 8) + lookup[3])!=null){
             
-            final Object val=cache.get((lookup[0] << 24) + (lookup[1] << 16) + (lookup[2] << 8) + lookup[3]);
-            final int raw = (Integer) val;
+            final Integer val=cache.get((lookup[0] << 24) + (lookup[1] << 16) + (lookup[2] << 8) + lookup[3]);
+            final int raw = val;
             final int rr = ((raw >> 16) & 255);
             final int gg = ((raw >> 8) & 255);
             final int bb = ((raw) & 255);
@@ -336,12 +336,12 @@ extends GenericColorSpace {
         try{
             
             //suggestion from Carol
-            final Iterator iterator = ImageIO.getImageReadersByFormatName("JPEG");
+            final Iterator<ImageReader> iterator = ImageIO.getImageReadersByFormatName("JPEG");
             
             while (iterator.hasNext())
             {
-                final Object o = iterator.next();
-                iir = (ImageReader) o;
+                final ImageReader o = iterator.next();
+                iir = o;
                 if (iir.canReadRaster()) {
                     break;
                 }

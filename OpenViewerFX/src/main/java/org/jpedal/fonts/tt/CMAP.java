@@ -102,12 +102,12 @@ public class CMAP extends Table {
     /**shows which encoding used*/
     protected int[] platformID;
 
-    private static final Map exceptions;
+    private static final Map<String, Integer> exceptions;
 
     /**set up differences from Mac Roman*/
     static {
 
-        exceptions=new HashMap();
+        exceptions=new HashMap<String, Integer>();
 
         final String[] keys={"notequal","infinity","lessequal","greaterequal",
                 "partialdiff","summation","product","pi",
@@ -367,7 +367,7 @@ public class CMAP extends Table {
                 index = StandardFonts.getAdobeMap(glyph);
 
             } else if (exceptions.containsKey(glyph)) {
-                index = (Integer) exceptions.get(glyph);
+                index = exceptions.get(glyph);
             }
         }
 
@@ -668,9 +668,9 @@ public class CMAP extends Table {
     }
 
     /**turn type 0 table into a list of glyph*/
-    public Map buildCharStringTable() {
+    public Map<Integer, Integer> buildCharStringTable() {
 
-        final Map glyfValues=new HashMap();
+        final Map<Integer, Integer> glyfValues=new HashMap<Integer, Integer>();
 //      for(int i : glyphToIndex){
 
 //      if(i>0){

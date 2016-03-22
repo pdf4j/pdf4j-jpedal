@@ -46,7 +46,7 @@ public class TextLines {
 
     /**stores area of arrays in which text should be highlighted*/
     private Map lineAreas = new HashMap();
-    private Map lineWritingMode = new HashMap();
+    private Map<Integer, int[]> lineWritingMode = new HashMap<Integer, int[]>();
 
     /**Highlight Areas stored here*/
     public Map areas = new HashMap();
@@ -308,12 +308,12 @@ public class TextLines {
             lineAreas.put(page, new Rectangle[]{area});
 
             //Set writing direction
-            lineWritingMode = new HashMap();
+            lineWritingMode = new HashMap<Integer, int[]>();
             lineWritingMode.put(page, new int[]{writingMode});
 
         }else{
             final Rectangle[] lastAreas = ((Rectangle[])lineAreas.get(page));
-            final int[] lastWritingMode = ((int[])lineWritingMode.get(page));
+            final int[] lastWritingMode = (lineWritingMode.get(page));
 
             //Check for objects close to or intersecting each other
             if(area!=null){ //Ensure actual area is selected
@@ -479,12 +479,12 @@ public class TextLines {
             lineAreas.put(page, new int[][]{area});
 
             //Set writing direction
-            lineWritingMode = new HashMap();
+            lineWritingMode = new HashMap<Integer, int[]>();
             lineWritingMode.put(page, new int[]{writingMode});
 
         }else{
             final int[][] lastAreas = ((int[][])lineAreas.get(page));
-            final int[] lastWritingMode = ((int[])lineWritingMode.get(page));
+            final int[] lastWritingMode = (lineWritingMode.get(page));
 
             //Check for objects close to or intersecting each other
             if(area!=null){ //Ensure actual area is selected
@@ -1463,7 +1463,7 @@ public class TextLines {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public void setLineWritingMode(final Map lineOrientation) {
+    public void setLineWritingMode(final Map<Integer, int[]> lineOrientation) {
         lineWritingMode = lineOrientation;
     }
 
@@ -1546,7 +1546,7 @@ public class TextLines {
         if(lineWritingMode==null) {
             return null;
         } else{
-            final int[] lineWritingMode = ((int[])this.lineWritingMode.get(page));
+            final int[] lineWritingMode = (this.lineWritingMode.get(page));
 
             if(lineWritingMode==null) {
                 return null;

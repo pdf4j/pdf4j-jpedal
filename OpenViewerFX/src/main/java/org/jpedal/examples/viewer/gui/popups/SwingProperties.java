@@ -162,7 +162,7 @@ public class SwingProperties extends JPanel {
     //Text to Speech external handler
     final Speech speech;
             
-    final Map reverseMessage =new HashMap();
+    final Map<String, String> reverseMessage =new HashMap<String, String>();
     
     //Array of menu tabs.
     final String[] menuTabs = {"ShowMenubar","ShowButtons","ShowDisplayoptions", "ShowNavigationbar", "ShowSidetabbar"};
@@ -186,7 +186,7 @@ public class SwingProperties extends JPanel {
     JTextField resolution;
     
     //Search window display style
-    JComboBox searchStyle;
+    JComboBox<String> searchStyle;
     
     //Update search results during search
     JCheckBox liveSearchResuts;
@@ -241,11 +241,11 @@ public class SwingProperties extends JPanel {
     JLabel printerBlacklistText;
     
     //Default printer
-    JComboBox defaultPrinter;
+    JComboBox<String> defaultPrinter;
     JLabel defaultPrinterText;
     
     //Default pagesize
-    JComboBox defaultPagesize;
+    JComboBox<String> defaultPagesize;
     JLabel defaultPagesizeText;
     
     //Default resolution
@@ -268,10 +268,10 @@ public class SwingProperties extends JPanel {
     JCheckBox openLastDoc;
     
     //Set default page layout
-    JComboBox pageLayout = new JComboBox(new String[]{"Single Page","Continuous","Continuous Facing", "Facing", "PageFlow"});
+    JComboBox<String> pageLayout = new JComboBox<String>(new String[]{"Single Page","Continuous","Continuous Facing", "Facing", "PageFlow"});
     
     //Speech Options
-    JComboBox voiceSelect;
+    JComboBox<String> voiceSelect;
     
     
     final JPanel highlightBoxColor = new JPanel();
@@ -391,7 +391,7 @@ final JPanel viewBGColor = new JPanel();
                     }
                     if(panelComponets[j] instanceof JButton){
                         final JButton tempButton = ((JButton)panelComponets[j]);
-                        final String value = ((String)reverseMessage.get(tempButton.getText().substring((Messages.getMessage("PdfCustomGui.HideGuiSection")+ ' ').length())));
+                        final String value = (reverseMessage.get(tempButton.getText().substring((Messages.getMessage("PdfCustomGui.HideGuiSection")+ ' ').length())));
                         if(tempButton.getText().startsWith(Messages.getMessage("PdfCustomGui.HideGuiSection")+ ' ')){
                             properties.setValue(value, "true");
                             gui.alterProperty(value, true);
@@ -408,7 +408,7 @@ final JPanel viewBGColor = new JPanel();
     private void saveMenuPreferencesChildren(final CheckNode root, final GUIFactory gui){
         for(int i=0; i!=root.getChildCount(); i++){
             final CheckNode node = (CheckNode)root.getChildAt(i);
-            final String value = ((String)reverseMessage.get(node.getText()));
+            final String value = (reverseMessage.get(node.getText()));
             if(node.isSelected()){
                 properties.setValue(value, "true");
                 gui.alterProperty(value, true);
@@ -459,13 +459,13 @@ final JPanel viewBGColor = new JPanel();
         
         
         if(gui.isSingle()) {
-            searchStyle = new JComboBox(
+            searchStyle = new JComboBox<String>(
                     new String[]{Messages.getMessage("PageLayoutViewMenu.WindowSearch"),
                             Messages.getMessage("PageLayoutViewMenu.TabbedSearch"),
                             Messages.getMessage("PageLayoutViewMenu.MenuSearch")
                     });
         } else {
-            searchStyle = new JComboBox(
+            searchStyle = new JComboBox<String>(
                     new String[]{Messages.getMessage("PageLayoutViewMenu.WindowSearch"),
                             Messages.getMessage("PageLayoutViewMenu.TabbedSearch")
                     });
@@ -475,7 +475,7 @@ final JPanel viewBGColor = new JPanel();
         liveSearchResuts = new JCheckBox(Messages.getMessage("PageLayoutViewMenu.LiveSearchResults"));
         liveSearchResuts.setToolTipText(Messages.getMessage("PdfPreferences.LiveSearchResults.toolTip"));
         
-        pageLayout = new JComboBox(
+        pageLayout = new JComboBox<String>(
                 new String[]{Messages.getMessage("PageLayoutViewMenu.SinglePage"),
                     Messages.getMessage("PageLayoutViewMenu.Continuous"),
                     Messages.getMessage("PageLayoutViewMenu.ContinousFacing"),
@@ -502,7 +502,7 @@ final JPanel viewBGColor = new JPanel();
         
         defaultPrinterText = new JLabel(Messages.getMessage("PdfViewerPrint.defaultPrinter"));
         
-        defaultPrinter = new JComboBox(Printer.getAvailablePrinters(properties.getValue("printerBlacklist")));
+        defaultPrinter = new JComboBox<String>(Printer.getAvailablePrinters(properties.getValue("printerBlacklist")));
         
         final PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
         if (defaultPrintService!=null) {
@@ -513,8 +513,8 @@ final JPanel viewBGColor = new JPanel();
         defaultPrinter.setToolTipText(Messages.getMessage("PdfPreferences.defaultPrinter.toolTip"));
         
         defaultPagesizeText = new JLabel(Messages.getMessage("PdfViewerPrint.defaultPagesize"));
-        defaultPagesize = new JComboBox();
-        defaultPagesize.setModel(new javax.swing.DefaultComboBoxModel(gui.getPaperSizes().getPaperSizes()));
+        defaultPagesize = new JComboBox<String>();
+        defaultPagesize.setModel(new javax.swing.DefaultComboBoxModel<String>(gui.getPaperSizes().getPaperSizes()));
         defaultPagesize.setSelectedIndex(gui.getPaperSizes().getDefaultPageIndex());
         defaultPagesize.setToolTipText(Messages.getMessage("PdfPreferences.defaultPageSize.toolTip"));
         
@@ -1349,7 +1349,7 @@ final JPanel viewBGColor = new JPanel();
             contentPane.add(label6, c);
             
             gridY++;
-            voiceSelect = new JComboBox(speech.listVoices());
+            voiceSelect = new JComboBox<String>(speech.listVoices());
             setLayoutConstraints(c, new Insets(5, 0, 0, 5), 0, gridY, 1, 1, 0, 0);
             final JLabel label7 = new JLabel(Messages.getMessage("PdfPreferences.Voice"));
             label7.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -1806,7 +1806,7 @@ final JPanel viewBGColor = new JPanel();
             c.weighty = 0;
             c.weightx = 0;
             c.gridx = 0;
-            final JLabel label3 = new JLabel("Dispaly Colors");
+            final JLabel label3 = new JLabel("Display Colors");
             label3.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
             label3.setFont(label3.getFont().deriveFont(Font.BOLD));
             pane.add(label3, c);
@@ -1916,7 +1916,7 @@ final JPanel viewBGColor = new JPanel();
                 top.setEnabled(true);
                 top.setSelected(true);
                 
-                final ArrayList last = new ArrayList();
+                final ArrayList<CheckNode> last = new ArrayList<CheckNode>();
                 last.add(top);
                 
                 final NodeList nodes = properties.getChildren(Messages.getMessage("PdfCustomGui."+menuTabs[t])+"Menu");
@@ -2026,7 +2026,7 @@ final JPanel viewBGColor = new JPanel();
             return panel;
         }
         
-        private void  addMenuToTree(final int tab, final NodeList nodes, final CheckNode top, final java.util.List previous){
+        private void  addMenuToTree(final int tab, final NodeList nodes, final CheckNode top, final java.util.List<CheckNode> previous){
             
             for(int i=0; i!=nodes.getLength(); i++){
                 

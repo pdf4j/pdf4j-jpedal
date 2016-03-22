@@ -78,10 +78,10 @@ public class StampTextToPDFPages extends Save
 	
 	final JSpinner rotationBox = new JSpinner(new SpinnerNumberModel(0, 0, 360, 1));
 	
-	final JComboBox placementBox = new JComboBox(new String[] {Messages.getMessage("PdfViewerLabel.Overlay"),
+	final JComboBox<String> placementBox = new JComboBox<String>(new String[] {Messages.getMessage("PdfViewerLabel.Overlay"),
 			Messages.getMessage("PdfViewerLabel.Underlay")});
 	
-	final JComboBox fontsList = new JComboBox(new String[] { "Courier",
+	final JComboBox<String> fontsList = new JComboBox<String>(new String[] { "Courier",
 			"Courier-Bold", "Courier-Oblique", "Courier-BoldOblique",
 			"Helvetica", "Helvetica-Bold", "Helvetica-BoldOblique",
 			"Helvetica-Oblique", "Times-Roman", "Times-Bold", "Times-Italic",
@@ -92,11 +92,11 @@ public class StampTextToPDFPages extends Save
 	
 	final JLabel colorBox = new JLabel();
 	
-	final JComboBox horizontalBox = new JComboBox(new String[]{Messages.getMessage("PdfViewerLabel.FromLeft"),
+	final JComboBox<String> horizontalBox = new JComboBox<String>(new String[]{Messages.getMessage("PdfViewerLabel.FromLeft"),
 			Messages.getMessage("PdfViewerLabel.Centered"),Messages.getMessage("PdfViewerLabel.FromRight")
 	});
 	
-	final JComboBox verticalBox = new JComboBox(new String[]{Messages.getMessage("PdfViewerLabel.FromTop"),
+	final JComboBox<String> verticalBox = new JComboBox<String>(new String[]{Messages.getMessage("PdfViewerLabel.FromTop"),
 			Messages.getMessage("PdfViewerLabel.Centered"),Messages.getMessage("PdfViewerLabel.FromBottom")
 	});
 	

@@ -93,9 +93,9 @@ public class JavaFXLayersPanel extends Tab implements GUILayersPanel {
         metaDataRoot.getChildren().clear();
         layersTree.setRoot(null);
         
-        final Map metaData = layersObject.getMetaData();
+        final Map<String, String> metaData = layersObject.getMetaData();
         
-        final Iterator metaDataKeys=metaData.keySet().iterator();
+        final Iterator<String> metaDataKeys=metaData.keySet().iterator();
         Object nextKey, value;
         while(metaDataKeys.hasNext()){
 
@@ -120,7 +120,7 @@ public class JavaFXLayersPanel extends Tab implements GUILayersPanel {
                     
                     StringBuilder rawName = new StringBuilder(node.getValue());
                     
-                    TreeItem parent = node.getParent();
+                    TreeItem<String> parent = node.getParent();
                     
                     while(parent.getParent() != null){
                         rawName.append(PdfLayerList.deliminator).append(parent.getValue());

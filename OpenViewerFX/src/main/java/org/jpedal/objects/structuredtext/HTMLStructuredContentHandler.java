@@ -70,7 +70,7 @@ public class HTMLStructuredContentHandler extends StructuredContentHandler {
 
         final int MCID=BDCobj.getInt(PdfDictionary.MCID);
         
-        String param=(String) values.get(String.valueOf(MCID));
+        String param=values.get(String.valueOf(MCID));
         
         if(isOpenTag){
             current.writeCustom(DynamicVectorRenderer.TEXT_STRUCTURE_OPEN, param);
@@ -108,7 +108,7 @@ public class HTMLStructuredContentHandler extends StructuredContentHandler {
 
         setBMCvalues(op);
 
-        PdfObject BDCobj=(PdfObject) dictionaries.get(String.valueOf(markedContentLevel));
+        PdfObject BDCobj= dictionaries.get(String.valueOf(markedContentLevel));
     	
         if(BDCobj!=null){
             setHTMLTag(BDCobj,true);
@@ -120,7 +120,7 @@ public class HTMLStructuredContentHandler extends StructuredContentHandler {
 
         setEMCValues();
         
-    	PdfObject BDCobj=(PdfObject) dictionaries.get(String.valueOf(markedContentLevel));
+    	PdfObject BDCobj= dictionaries.get(String.valueOf(markedContentLevel));
     	
         if(BDCobj!=null){
             setHTMLTag(BDCobj,false);

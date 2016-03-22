@@ -101,9 +101,9 @@ public class Glyf extends Table {
     }
 
     /**assume identify and build data needed for our OTF converter*/
-    public Map buildCharStringTable() {
+    public Map<Integer, Integer> buildCharStringTable() {
 
-        final Map returnStrings=new HashMap();
+        final Map<Integer, Integer> returnStrings=new HashMap<Integer, Integer>();
 
         for(int key=0;key<glyfCount;key++)
         {

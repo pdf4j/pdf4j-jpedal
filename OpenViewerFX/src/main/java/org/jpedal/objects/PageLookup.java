@@ -41,19 +41,19 @@ import java.util.Map;
 public class PageLookup {
 	
 	/**holds pdf id (ie 4 0 R) which stores each object in reverse so we can lookup*/
-	private Map pageLookup = new HashMap();
+	private Map<String, Integer> pageLookup = new HashMap<String, Integer>();
 	
 	/**
 	 * used to work out page id for the object (returns -1 if no value found)
 	 */
 	public int convertObjectToPageNumber(final String offset){
 		
-		final Object value=pageLookup.get(offset);
+		final Integer value=pageLookup.get(offset);
 		
 		if(value==null) {
             return -1;
         } else{
-			return (Integer) value;
+			return value;
 		}
 		
 		

@@ -172,10 +172,10 @@ public class Messages {
                         }
 	
 			
-			final Enumeration keys = bundle.getKeys();
+			final Enumeration<String> keys = bundle.getKeys();
 
 			while(keys.hasMoreElements()){
-				final String element = (String) keys.nextElement();
+				final String element = keys.nextElement();
 				
 				//read in lines and place in map for fast lookup
 				//			while (true) {

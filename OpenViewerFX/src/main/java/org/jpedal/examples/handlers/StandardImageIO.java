@@ -129,12 +129,12 @@ public class StandardImageIO implements ImageHelper {
 
         //suggestion from Carol
         try{
-            final Iterator iterator = ImageIO.getImageReadersByFormatName("JPEG");
+            final Iterator<ImageReader> iterator = ImageIO.getImageReadersByFormatName("JPEG");
 
             while (iterator.hasNext()){
 
-                final Object o = iterator.next();
-                iir = (ImageReader) o;
+                final ImageReader o = iterator.next();
+                iir = o;
                 if (iir.canReadRaster()) {
                     break;
                 }

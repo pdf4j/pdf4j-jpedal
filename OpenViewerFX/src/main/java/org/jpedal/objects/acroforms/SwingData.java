@@ -549,11 +549,11 @@ public class SwingData extends GUIData {
         g2.setTransform(aff);
 
         //get unsorted components and iterate over forms
-        for (final Object nextVal : formsOrdered[pageIndex]) {
+        for (final FormObject nextVal : formsOrdered[pageIndex]) {
             
             if (nextVal !=null) {
                 
-                formObject=(FormObject) nextVal;
+                formObject= nextVal;
 
                 //is this form allowed to be printed
                 final boolean[] flags = formObject.getCharacteristics();
@@ -590,11 +590,11 @@ public class SwingData extends GUIData {
             maxLengthForTextOnPage=0;
             
             //get unsorted components and iterate over forms
-            for (final Object o : formsOrdered[pageIndex]) {
+            for (final FormObject o : formsOrdered[pageIndex]) {
                 
                 if (o!=null) {
                     
-                    formObject = (FormObject) o;
+                    formObject = o;
                     
                     comp = (Component) checkGUIObjectResolved(formObject);
                     
@@ -627,11 +627,11 @@ public class SwingData extends GUIData {
         	dummyPanel.pack();
         }
         //get unsorted components and iterate over forms
-        for (final Object nextVal : formsOrdered[pageIndex]) {
+        for (final FormObject nextVal : formsOrdered[pageIndex]) {
             
             if (nextVal !=null) {
                 
-                formObject=(FormObject) nextVal;
+                formObject= nextVal;
                 
                 
                 //is this form allowed to be printed
@@ -759,11 +759,11 @@ public class SwingData extends GUIData {
         FormObject formObject;
         
         //get unsorted components and iterate over forms
-        for (final Object nextVal : formsOrdered[pageIndex]) {
+        for (final FormObject nextVal : formsOrdered[pageIndex]) {
             
             if (nextVal !=null) {
                 
-                formObject=(FormObject) nextVal;
+                formObject= nextVal;
                 
                 checkGUIObjectResolved(formObject);
                 
@@ -829,7 +829,7 @@ public class SwingData extends GUIData {
         //scale border if needed
         if((curComp instanceof JComponent && ((JComponent)curComp).getBorder()!=null) &&
             (formObject!=null) ){
-                ((JComponent) curComp).setBorder((Border) generateBorderfromForm(formObject, scale));
+                ((JComponent) curComp).setBorder(generateBorderfromForm(formObject, scale));
             }
         
         // factor in offset if multiple pages displayed
@@ -927,7 +927,7 @@ public class SwingData extends GUIData {
     }
     
     /** returns Border as is swing specific class */
-    public static Object generateBorderfromForm(final FormObject form, final float scaling) {
+    public static Border generateBorderfromForm(final FormObject form, final float scaling) {
         float[] BC = form.getDictionary(PdfDictionary.MK).getFloatArray(PdfDictionary.BC);
         if(BC==null && form.getParameterConstant(PdfDictionary.Subtype) == PdfDictionary.Screen) {
             BC = form.getFloatArray(PdfDictionary.C);
@@ -1224,11 +1224,11 @@ public class SwingData extends GUIData {
             //get unsorted components and iterate over forms
             if(formsOrdered[page]!=null){
                 
-                for (final Object o : formsOrdered[page]) {
+                for (final FormObject o : formsOrdered[page]) {
                     
                     if (o != null) {
                         
-                        formObject = (FormObject) o;
+                        formObject = o;
                         
                         comp= formObject.getGUIComponent();
                         

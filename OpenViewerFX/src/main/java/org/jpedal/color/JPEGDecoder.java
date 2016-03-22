@@ -189,11 +189,11 @@ public class JPEGDecoder {
             in = new ByteArrayInputStream(data);
             
             //suggestion from Carol
-            final Iterator iterator = ImageIO.getImageReadersByFormatName(type);
+            final Iterator<ImageReader> iterator = ImageIO.getImageReadersByFormatName(type);
             
             while (iterator.hasNext()){
-                final Object o = iterator.next();
-                iir = (ImageReader) o;
+                final ImageReader o = iterator.next();
+                iir = o;
                 if (iir.canReadRaster()) {
                     break;
                 }

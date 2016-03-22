@@ -42,10 +42,9 @@ import org.jpedal.examples.viewer.gui.generic.GUICombo;
 /**
  *
  */
-public class JavaFXCombo extends ComboBox implements GUICombo{
+public class JavaFXCombo extends ComboBox<String> implements GUICombo{
 
     private int ID;
-    
 	
 	public JavaFXCombo(final String[] qualityValues) {
         final ObservableList<String> options =  FXCollections.observableArrayList(qualityValues);
@@ -56,7 +55,6 @@ public class JavaFXCombo extends ComboBox implements GUICombo{
     public void setName(final String name){
         this.setId(name);
     }
-    
     
 	/**
 	 * @return the iD
@@ -73,7 +71,6 @@ public class JavaFXCombo extends ComboBox implements GUICombo{
     public void setID(final int id) {
 		ID = id;
 	}
-    
     
     @Override
     public void setSelectedIndex(final int defaultSelection) {
@@ -96,17 +93,20 @@ public class JavaFXCombo extends ComboBox implements GUICombo{
     }
 
     @Override
-    public void setSelectedItem(final Object index) {
-        getSelectionModel().select(index);
+    public void setSelectedItem(Object index) {
     }
 
+    public void setSelectedItem(String index) {
+        getSelectionModel().select(index);
+    }
+    
     @Override
     public int getSelectedIndex() {
         return getSelectionModel().getSelectedIndex();
     }
 
     @Override
-    public Object getSelectedItem() {
+    public String getSelectedItem() {
         return getSelectionModel().getSelectedItem();
     }
 
@@ -115,5 +115,4 @@ public class JavaFXCombo extends ComboBox implements GUICombo{
         
         setVisible(set);
     }
-    
 }

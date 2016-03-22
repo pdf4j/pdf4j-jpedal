@@ -38,13 +38,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class CheckNode extends DefaultMutableTreeNode {
 
     protected boolean isSelected, isEnabled;
-    private final Object text;
+    private final String text;
 
-    public CheckNode(final Object userObject) {
+    public CheckNode(final String userObject) {
         this(userObject, true, false);
     }
 
-    public CheckNode(final Object userObject, final boolean allowsChildren
+    public CheckNode(final String userObject, final boolean allowsChildren
             , final boolean isSelected) {
         super(userObject, allowsChildren);
         this.isSelected = isSelected;
@@ -52,7 +52,7 @@ public class CheckNode extends DefaultMutableTreeNode {
         text=userObject;
     }
 
-    public Object getText() {
+    public String getText() {
         return text;
     }
 

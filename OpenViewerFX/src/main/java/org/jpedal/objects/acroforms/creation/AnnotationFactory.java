@@ -27,19 +27,21 @@
 
  *
  * ---------------
- * PopupFactory.java
+ * AnnotationFactory.java
  * ---------------
  */
 package org.jpedal.objects.acroforms.creation;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.jpedal.color.DeviceCMYKColorSpace;
 import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.acroforms.FormRenderUtilsG2;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
@@ -49,7 +51,7 @@ import org.jpedal.utils.LogWriter;
 /**
  *
  */
-public class PopupFactory {
+public class AnnotationFactory {
 
     /**
      * Determine the type of annotation from the sub type value and call appropriate method
@@ -66,11 +68,98 @@ public class PopupFactory {
             case PdfDictionary.Highlight :
                 commentIcon = getHightlightIcon(form);
                 break;
+            case PdfDictionary.Square :
+                commentIcon = getSquareIcon(form);
+                break;
         }
         
         return commentIcon;
     }
+    
+    private static Color convertFloatArrayToColor(float[] values){
+        Color c = new Color(0,0,0,0);
+        if (values != null) {
+            switch (values.length) {
+                case 0:
+                    //Should not happen. Do nothing. Annotation is transparent
+                    break;
+                case 1:
+                    //DeviceGrey colorspace
+                    c = new Color(values[0], values[0], values[0]);
+                    break;
+                case 3:
+                    //DeviceRGB colorspace
+                    c = new Color(values[0], values[1], values[2]);
+                    break;
+                case 4:
+                    //DeviceCMYK colorspace
+                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
+                    cmyk.setColor(values, 4);
+                    c = new Color(cmyk.getColor().getRGB());
+                    c = new Color(c.getRed(), c.getGreen(), c.getBlue());
 
+                    break;
+                default:
+                    break;
+            }
+        }
+        return c;
+    }
+    
+    private static BufferedImage getSquareIcon(final PdfObject form){
+        final float[] external = form.getFloatArray(PdfDictionary.C);
+        final float[] internal = form.getFloatArray(PdfDictionary.IC);
+        Color c = new Color(0,0,0,0);
+        Color ic = new Color(0,0,0,0);
+        
+        if (external != null) {
+            c = convertFloatArrayToColor(external);
+        }
+        
+        if (internal != null) {
+            ic = convertFloatArrayToColor(internal);
+        }
+        
+        float[] quad = form.getFloatArray(PdfDictionary.Rect);
+        if (quad != null) {
+            
+            Rectangle bounds = ((FormObject)form).getBoundingRectangle();
+            
+            //Bounds is 0 so calculate based on quad areas
+            if(bounds.getWidth()==0 && bounds.getHeight()==0){
+                for(int i=0; i!=quad.length; i++){
+                    if(i%2==0){
+                        if(bounds.x>quad[i]){
+                            bounds.x = (int)quad[i];
+                        }
+                        if(bounds.x+bounds.width<quad[i]){
+                            bounds.width = (int)(quad[i]-bounds.x);
+                        }
+                    }else{
+                        if(bounds.y>quad[i]){
+                            bounds.y = (int)quad[i];
+                        }
+                        if(bounds.y+bounds.height<quad[i]){
+                            bounds.height = (int)(quad[i]-bounds.y);
+                        }
+                    }
+                    
+                }
+            }
+            
+            final BufferedImage icon = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+            final Graphics2D g = (Graphics2D)icon.getGraphics();
+            g.setColor(ic);
+            g.fillRect(0, 0, bounds.width, bounds.height);
+            g.setColor(c);
+            FormRenderUtilsG2.renderBorder(g, (FormObject)form, 0,0,icon.getWidth(), icon.getHeight());
+            
+            return icon;
+        }
+        //Return a small empty image as no highlight to make.
+        return null;
+    }
+    
     private static BufferedImage getHightlightIcon(final PdfObject form){
         final float[] f = form.getFloatArray(PdfDictionary.C);
         Color c = new Color(0);
@@ -199,7 +288,7 @@ public class PopupFactory {
         
         BufferedImage commentIcon = null;
         try {
-            commentIcon = ImageIO.read(PopupFactory.class.getResource(iconFile));
+            commentIcon = ImageIO.read(AnnotationFactory.class.getResource(iconFile));
         } catch (final IOException e){
             LogWriter.writeLog("Exception: " + e.getMessage());
         }
@@ -237,7 +326,7 @@ public class PopupFactory {
      */
     public static void renderFlattenedAnnotation(final PdfObject form, final DynamicVectorRenderer current, final int pageNumber, final int rotation) {
 
-        final BufferedImage image=PopupFactory.getIcon(form);
+        final BufferedImage image=AnnotationFactory.getIcon(form);
 
         if (image != null) {
             final GraphicsState gs = new GraphicsState();

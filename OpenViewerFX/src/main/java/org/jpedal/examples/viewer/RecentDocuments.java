@@ -54,8 +54,8 @@ public class RecentDocuments implements RecentDocumentsFactory {
 	
     public final int noOfRecentDocs;
     
-	private final Stack previousFiles = new Stack();
-	private final Stack nextFiles = new Stack();
+	private final Stack<String> previousFiles = new Stack<String>();
+	private final Stack<String> nextFiles = new Stack<String>();
 
     public final JMenuItem[] recentDocuments;
    
@@ -117,7 +117,7 @@ public class RecentDocuments implements RecentDocumentsFactory {
 		
 		if(previousFiles.size() > 1){
 			nextFiles.push(previousFiles.pop());
-			fileToOpen = (String)previousFiles.pop();	
+			fileToOpen = previousFiles.pop();
 		}
 		
 		return fileToOpen;
@@ -129,7 +129,7 @@ public class RecentDocuments implements RecentDocumentsFactory {
 		String fileToOpen =null;
 		
 		if(!nextFiles.isEmpty()) {
-            fileToOpen = (String) nextFiles.pop();
+            fileToOpen = nextFiles.pop();
         }
 		
 		return fileToOpen;

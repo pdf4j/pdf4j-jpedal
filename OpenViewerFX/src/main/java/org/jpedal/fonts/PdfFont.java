@@ -52,6 +52,7 @@ import java.io.*;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.HashMap;
+import org.jpedal.parser.PdfFontFactory;
 
 /**
  * contains all generic pdf font data for fonts.<P>
@@ -102,7 +103,7 @@ public class PdfFont implements Serializable {
     private String rawFontName;
     
     //used by HTML to translate non-standard glyfs to correct values
-    final Map nonStandardMappings=new HashMap(256);
+    final Map<String, Integer> nonStandardMappings=new HashMap<String, Integer>(256);
     
     public boolean hasDoubleBytes;
     
@@ -189,7 +190,7 @@ public class PdfFont implements Serializable {
     /**holds lookup to map char differences*/
     String[] diffTable;
     
-    protected final Map rawDiffKeys=new HashMap();
+    protected final Map<String, Integer> rawDiffKeys=new HashMap<String, Integer>();
     
     private int[] diffCharTable;
     
@@ -1308,7 +1309,7 @@ public class PdfFont implements Serializable {
     }
     
     /**read in a font and its details from the pdf file*/
-    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map substitutedFonts) throws Exception{
+    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map<String, PdfJavaGlyphs> substitutedFonts) throws Exception{
         
         //generic setup
         init(fontID, renderPage);
@@ -1450,8 +1451,8 @@ public class PdfFont implements Serializable {
     private int  handleNoEncoding(int encValue, final PdfObject pdfObject) {
         
         final int enc=pdfObject.getGeneralType(PdfDictionary.Encoding);
-        
-        if(enc==StandardFonts.ZAPF){
+               
+        if(enc==StandardFonts.ZAPF || (!PdfFontFactory.isFontEmbedded(pdfObject) && getFontName().equals("Wingdings"))){
             putFontEncoding(StandardFonts.ZAPF);
             glyphs.defaultFont="Zapf Dingbats"; //replace with single default
             StandardFonts.checkLoaded(StandardFonts.ZAPF);
@@ -1586,11 +1587,6 @@ public class PdfFont implements Serializable {
                     putMappedChar( pointer,Diffs.getNextValueAsFontChar(pointer, containsHexNumbers, allNumbers));
                     pointer++;
                 }
-                
-                //allow for spurious values added which should not be there
-                if(pointer==256) {
-                    break;
-                }
             }
             
             //get flag
@@ -1634,9 +1630,9 @@ public class PdfFont implements Serializable {
             }
             
         }
-        
+       
         putFontEncoding(EncodingType);
-        
+       
     }
     
     /**
@@ -1649,7 +1645,7 @@ public class PdfFont implements Serializable {
         
         int value=-1;
         
-        final Integer newVal= (Integer) nonStandardMappings.get(glypName);
+        final Integer newVal= nonStandardMappings.get(glypName);
         if(newVal!=null){
             value=newVal;
         }

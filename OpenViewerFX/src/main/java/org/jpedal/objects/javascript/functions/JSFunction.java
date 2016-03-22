@@ -279,7 +279,7 @@ public class JSFunction {
         final String[] values;
         String finalValue="";
 
-        final List rawValues=new ArrayList();
+        final List<String> rawValues=new ArrayList<String>();
 
         /**
          * first value is command
@@ -352,7 +352,7 @@ public class JSFunction {
         //(could be rewritten later to be cleaner if time/performance issue)
         values=new String[items];
         for(int ii=0;ii<items;ii++){
-            values[ii]=((String)rawValues.get(ii)).trim();
+            values[ii]=(rawValues.get(ii)).trim();
             //System.out.println(ii+" >"+values[ii]+"<");
             }
 

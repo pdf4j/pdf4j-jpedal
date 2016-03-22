@@ -49,8 +49,8 @@ public class LinearizedHintTable {
     //private PdfObject linearObj;
     //private PdfObject hintObj;
 
-    private final Map startRefs=new HashMap();
-    private final Map endRefs=new HashMap();
+    private final Map<Integer, Integer> startRefs=new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> endRefs=new HashMap<Integer, Integer>();
 
     private static final int[] mask={255,127,63,31,15,7,3,1};
     private static final int[] shift={0,8,16,24};
@@ -487,8 +487,8 @@ public class LinearizedHintTable {
             return null;
         }
 
-        final int start= (Integer) startRefs.get(key);
-        final int end= (Integer) endRefs.get(key);
+        final int start= startRefs.get(key);
+        final int end= endRefs.get(key);
         final int bufSize= end-start+1;
 
         long size= 0;

@@ -81,10 +81,10 @@ public class ObjectCloneFactory {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
     
-    public static Map cloneMap(final Map optValues) {
+    public static Map<String, String> cloneMap(final Map<String, String> optValues) {
         if(optValues!=null){
             try {
-                final Map tmpMap = optValues.getClass().newInstance();
+                final Map<String, String> tmpMap = optValues.getClass().newInstance();
                 tmpMap.putAll(optValues);
                 return tmpMap;
             } catch (final Exception e) {

@@ -51,7 +51,7 @@ public interface ExpressionEngine {
      * @return return code (ActionHandler.STOPPROCESSING to ignore JPedal handling)
      */
 	//NOTE type is used externally so needs to be kept
-    int execute(FormObject ref, int type, Object js,int eventType,char keyPressed);
+    int execute(FormObject ref, int type, String js, int eventType, char keyPressed);
 
     /**
      * called on close to do any cleanup

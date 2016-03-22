@@ -117,7 +117,7 @@ public class PDFtoImageConvertorFX extends PDFtoImageConvertor{
             }
         }/**/
         
-        final SimpleObjectProperty<BufferedImage> imageProperty = new SimpleObjectProperty();
+        final SimpleObjectProperty<BufferedImage> imageProperty = new SimpleObjectProperty<BufferedImage>();
         // Locks the Thread until the image is generated
         final CountDownLatch latch = new CountDownLatch(1);
         

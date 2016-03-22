@@ -232,7 +232,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
      * @return
      */
     @Override
-    public Map getCharStrings() {
+    public Map<Integer, Integer> getCharStrings() {
 
         if(currentCMAP!=null){
             return currentCMAP.buildCharStringTable();
@@ -372,7 +372,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
     /**
      * Add font details to Map so we can access later
      */
-    public static void addStringValues(final FontData fontData, final Map fontDetails) {
+    public static void addStringValues(final FontData fontData, final Map<String, String> fontDetails) {
 
         /**setup read the table locations*/
         final FontFile2 currentFontFile=new FontFile2(fontData);
@@ -389,12 +389,12 @@ public class TTGlyphs extends PdfJavaGlyphs {
 
             final Name currentName=new Name(currentFontFile);
 
-            final Map stringValues= currentName.getStrings();
+            final Map<Integer, String> stringValues= currentName.getStrings();
 
 
             if(stringValues!=null){
-                for (final Object o : stringValues.keySet()) {
-                    final Integer currentKey = (Integer) o;
+                for (final Integer o : stringValues.keySet()) {
+                    final Integer currentKey = o;
 
                     final int keyInt = currentKey;
                     if (keyInt < Name.stringNames.length) {
@@ -428,7 +428,7 @@ public class TTGlyphs extends PdfJavaGlyphs {
         if(FontMappings.fontSubstitutionFontID==null){
             currentFontFile.setPointer(0);
         }else{
-            final Integer fontID= (Integer) FontMappings.fontSubstitutionFontID.get(fontName.toLowerCase());
+            final Integer fontID= FontMappings.fontSubstitutionFontID.get(fontName.toLowerCase());
 
             if(fontID!=null) {
                 currentFontFile.setPointer(fontID);

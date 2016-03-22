@@ -71,11 +71,14 @@ import javafx.scene.paint.ImagePattern;
 
 public class FXDisplay extends GUIDisplay {
     
+    
+    private int xx, yy;
+
     final Group pdfContent = new Group();
 
    // private final ObservableList children=pdfContent.getChildren();
 
-    private final java.util.List collection=new ArrayList(2000);
+    private final java.util.List<Node> collection=new ArrayList<Node>(2000);
     
     public FXDisplay(final int pageNumber, final boolean addBackground, final int defaultSize, final ObjectStore newObjectRef) {
 
@@ -84,6 +87,13 @@ public class FXDisplay extends GUIDisplay {
         this.addBackground=addBackground;
         
         setupArrays(defaultSize);
+
+    }
+    
+    @Override
+    public void setInset(final int x, final int y) {
+        xx = x;
+        yy = y;
 
     }
     

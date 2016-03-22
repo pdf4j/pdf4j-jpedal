@@ -100,7 +100,7 @@ public class JpedalDefaultJavascript{
 	 * 
 	 * <br>returns a javascript string.
 	 */
-	public Object printd(final String format, final org.mozilla.javascript.Scriptable obj) {
+	public Scriptable printd(final String format, final org.mozilla.javascript.Scriptable obj) {
 		if(DebugDefaultJavascript) {
             System.out.println("JpedalDefaultJavascript.printd(String,Scriptable)");
         }
@@ -193,7 +193,7 @@ public class JpedalDefaultJavascript{
 	 * if this method was commented in, it would be called, even for calls to printd(String,Scritable)
 	 * <br>returns a javascript string.
 	 */
-	public Object printd(final int index, final org.mozilla.javascript.Scriptable obj) {
+	public Scriptable printd(final int index, final org.mozilla.javascript.Scriptable obj) {
 		if(DebugDefaultJavascript) {
             System.out.println("JpedalDefaultJavascript.printd(int,Scriptable)");
         }
@@ -237,7 +237,7 @@ public class JpedalDefaultJavascript{
 	 * 
 	 * see page 720 of 'Javascript for Acrobat API reference'
 	 */
-	public Object printf(final String cFormat, final String[] args){
+	public Scriptable printf(final String cFormat, final String[] args){
 		/*
 		cFormat - The format string to use.
 	 	arguments - The optional arguments(s) that contain the data to be inserted in place of the % tags 
@@ -482,12 +482,12 @@ public class JpedalDefaultJavascript{
 	/** Breaks a URL into its component parts.
 	 * Javascript for Acrobat API Reference version 8.1 p716
 	 */
-	public static Map crackURL(final String cURL){
+	public static Map<String, String> crackURL(final String cURL){
 		if(!cURL.startsWith("file") && !cURL.startsWith("http") && !cURL.startsWith("https")){
 			return null;
 		}
 		
-		final Map propertiesMap = new HashMap();
+		final Map<String, String> propertiesMap = new HashMap<String, String>();
 		final int index1 = cURL.indexOf("://");
 		propertiesMap.put("cScheme", cURL.substring(0,index1));
 		

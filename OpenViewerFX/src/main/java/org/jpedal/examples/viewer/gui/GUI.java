@@ -164,7 +164,7 @@ public abstract class GUI implements GUIFactory {
     protected boolean hiResPrinting;
 
     //@annot - table of objects we wish to track
-    protected Map objs;
+    protected Map<org.jpedal.objects.raw.FormObject, String> objs;
 
     //flag if generated so we setup once for each file
     protected boolean bookmarksGenerated;
@@ -426,7 +426,7 @@ public abstract class GUI implements GUIFactory {
         //and place to store so we can test later
         //flush list if needed
         if(objs==null) {
-            objs = new HashMap();
+            objs = new HashMap<org.jpedal.objects.raw.FormObject, String>();
         } else {
             objs.clear();
         }
@@ -655,7 +655,7 @@ public abstract class GUI implements GUIFactory {
         executingCommand = b;
     }
 
-    protected static void getFlattenedTreeNodes(final TreeNode theNode, final java.util.List items) {
+    protected static void getFlattenedTreeNodes(final TreeNode theNode, final List<TreeNode> items) {
         // add the item
         items.add(theNode);
 

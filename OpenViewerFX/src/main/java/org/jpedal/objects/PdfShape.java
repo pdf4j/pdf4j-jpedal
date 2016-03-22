@@ -71,7 +71,9 @@ public interface PdfShape {
 
     Object getPath();
 
-    boolean adjustLineWidth();
-
     boolean isClosed();
+
+    void setShape(Shape currentShape);
+    
+    Shape getShape();
 }

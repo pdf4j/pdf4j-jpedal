@@ -113,7 +113,7 @@ public class FXStartup extends Application {
         
         if(showSplashScreen){
             System.out.println("Starting the SplashScreen");
-            final Task<ObservableList<String>> loadModsTask = new Task() {
+            final Task<ObservableList<String>> loadModsTask = new Task<ObservableList<String>>() {
                 @Override
                 protected ObservableList<String> call() throws InterruptedException {
                     final ObservableList<String> loadMods
@@ -161,7 +161,7 @@ public class FXStartup extends Application {
         viewer.setupViewer();
     }
     //Starting the splash screen
-    private void showSplash(final Task task){
+    private void showSplash(final Task<ObservableList<String>> task){
         progressText.textProperty().bind(task.messageProperty());
         loadProgress.progressProperty().bind(task.progressProperty());
         task.stateProperty().addListener(new ChangeListener<Worker.State>()

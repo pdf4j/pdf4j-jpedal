@@ -135,7 +135,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                 // [AWI]: Create a new list model to append the search results to
                 // NOTE: This was added to prevent a deadlock issue that occurred on the
                 // EDT when the search resulted in a large number of hits
-                final ObservableList resultListModel;
+                final ObservableList<String> resultListModel;
                 
                 if(updateListDuringSearch) {
                     resultListModel = listModel;
@@ -313,10 +313,10 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
     
     private final VBox nav=new VBox();
     private VBox advancedPanel;
-    private ComboBox searchType;
+    private ComboBox<String> searchType;
     private CheckBox wholeWordsOnlyBox, caseSensitiveBox, multiLineBox, highlightAll, searchAll, useRegEx, searchHighlightedOnly;
     Button searchButton;
-    ObservableList listModel;
+    ObservableList<String> listModel;
     
     /**Search this page only*/
     boolean singlePageSearch;
@@ -327,8 +327,8 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
     /**number fo search items*/
     private int itemFoundCount;
     
-    final Map textPages=new HashMap();
-    final Map textRectangles=new HashMap();
+    final Map<Integer, Integer> textPages=new HashMap<Integer, Integer>();
+    final Map<Integer, Object> textRectangles=new HashMap<Integer, Object>();
     
     public JavaFXSearchWindow(final GUIFactory currentGUI) {
         
@@ -445,7 +445,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                             Messages.getMessage("PdfViewerSearch.MatchAny")
                     );
             
-            searchType = new ComboBox(searchOptions);
+            searchType = new ComboBox<String>(searchOptions);
             searchType.setValue(searchType.getItems().get(0));
             
             wholeWordsOnlyBox = new CheckBox(Messages.getMessage("PdfViewerSearch.WholeWords"));
@@ -575,10 +575,10 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                         if (id != -1) {
                             
                             final Integer key = id;
-                            final Object newPage = textPages.get(key);
+                            final Integer newPage = textPages.get(key);
                             
                             if (newPage != null) {
-                                final int nextPage = (Integer) newPage;
+                                final int nextPage = newPage;
                                 
                                 //move to new page
                                 if (commonValues.getCurrentPage() != nextPage) {
@@ -601,7 +601,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                                     try {
                                         Thread.sleep(500);
                                     } catch (final InterruptedException ee) {
-                                        ee.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                        ee.printStackTrace();  
                                     }
                                 }
                                 
@@ -615,11 +615,11 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                                     Vector_Rectangle_Int storageVector = new Vector_Rectangle_Int();
                                     int lastPage = -1;
                                     for (int k = 0; k != resultsList.getItems().size(); k++) {
-                                        final Object page = textPages.get(k);
+                                        final Integer page = textPages.get(k);
                                         
                                         if (page != null) {
                                             
-                                            final int currentPage = (Integer) page;
+                                            final int currentPage = page;
                                             if (currentPage != lastPage) {
                                                 storageVector.trim();
                                                 showAllOnPage = storageVector.get();
@@ -654,8 +654,8 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                                     decode_pdf.getTextLines().addHighlights(showAllOnPage, true, lastPage);
                                 } else {
                                     //										PdfHighlights.clearAllHighlights(decode_pdf);
-                                    final Object page = textPages.get(key);
-                                    final int currentPage = (Integer) page;
+                                    final Integer page = textPages.get(key);
+                                    final int currentPage = page;
                                     
                                     final Vector_Rectangle_Int storageVector = new Vector_Rectangle_Int();
                                     // int[] scroll = null;
@@ -743,7 +743,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                             
                             final String textToFind = searchText.getText().trim();
                             
-                            if (searchType.getValue() == searchType.getItems().get(0)) { // find exact word or phrase
+                            if (searchType.getValue().equals(searchType.getItems().get(0))) { // find exact word or phrase
                                 searchTerms = new String[]{textToFind};
                             } else { // match any of the words
                                 searchTerms = textToFind.split(" ");
@@ -813,7 +813,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
                                 }
                                 
                                 final String textToFind = searchText.getText().trim();
-                                if (searchType.getValue() == searchType.getItems().get(0)) { // find exact word or phrase
+                                if (searchType.getValue() .equals( searchType.getItems().get(0))) { // find exact word or phrase
                                     searchTerms = new String[]{textToFind};
                                 } else { // match any of the words
                                     searchTerms = textToFind.split(" ");
@@ -1078,7 +1078,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
      * update when search ends
      * @return True if search routine should continue
      */
-    private boolean searchPage(final int page, final int currentKey, final ObservableList resultListModel) throws Exception{
+    private boolean searchPage(final int page, final int currentKey, final ObservableList<String> resultListModel) throws Exception{
         final PdfPageData currentPageData = decode_pdf.getPdfPageData();
         final int x1 = currentPageData.getMediaBoxX(page);
         final int x2 = currentPageData.getMediaBoxWidth(page) + x1;
@@ -1097,7 +1097,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
      * @param model :: [AWI] The list model to append the search results to
      * @return True if search routine should continue
      */
-    private boolean searchPage(final int page, final int x1, final int y1, final int x2, final int y2, final int currentKey, final ObservableList resultListModel) throws Exception {
+    private boolean searchPage(final int page, final int x1, final int y1, final int x2, final int y2, final int currentKey, final ObservableList<String> resultListModel) throws Exception {
         
         final PdfGroupingAlgorithms grouping;
         

@@ -103,10 +103,13 @@ public class TTVM implements Serializable {
     private JComponent stateDisplay,debugGlyphDisplay;
     private JCheckBox showInterpolatedShadow;
     private boolean stepInto, debuggerRunningInBackground;
-    private static JList currentInstructionList,stackList,cvtList,storageList;
+    private static JList<String> currentInstructionList;
+    private static JList<String> stackList;
+    private static JList<String> cvtList;
+    private static JList<String> storageList;
     private JLabel currentCode, debugXLabel, debugYLabel;
-    private final java.util.Stack<int[]> codeStack = new java.util.Stack();
-    private final java.util.Stack<Integer> numberStack = new java.util.Stack();
+    private final java.util.Stack<int[]> codeStack = new java.util.Stack<int[]>();
+    private final java.util.Stack<Integer> numberStack = new java.util.Stack<Integer>();
 
     /**
      * Prints the name and a brief description of an instruction when it is executed.
@@ -476,8 +479,8 @@ public class TTVM implements Serializable {
         fontProgram= readProgramTable(currentFontFile, FontFile2.FPGM);
 
         storage = new int[maxp.getMaxStorage()];
-        functions = new HashMap();
-        instructions = new HashMap();
+        functions = new HashMap<Integer, int[]>();
+        instructions = new HashMap<Integer, int[]>();
 
         this.maxp = maxp;
 
@@ -2890,7 +2893,7 @@ public class TTVM implements Serializable {
         instructionPanel.setBorder(new javax.swing.border.LineBorder(Color.BLACK));
 
         //Code list
-        currentInstructionList = new JList();
+        currentInstructionList = new JList<String>();
         final JScrollPane codePane = new JScrollPane(currentInstructionList) {
             @Override
             public Dimension getPreferredSize() {
@@ -3190,21 +3193,21 @@ public class TTVM implements Serializable {
 
         //Stack
         final JPanel stackPanel = new JPanel(new BorderLayout());
-        stackList = new JList();
+        stackList = new JList<String>();
         final JScrollPane stackScroll = new JScrollPane(stackList);
         stackPanel.add(BorderLayout.NORTH, new JLabel("Stack:"));
         stackPanel.add(BorderLayout.CENTER, stackScroll);
 
         //CVT
         final JPanel cvtPanel = new JPanel(new BorderLayout());
-        cvtList = new JList(cvt.getCVTForDebug());
+        cvtList = new JList<String>(cvt.getCVTForDebug());
         final JScrollPane cvtScroll = new JScrollPane(cvtList);
         cvtPanel.add(BorderLayout.NORTH, new JLabel("CVT:"));
         cvtPanel.add(BorderLayout.CENTER, cvtScroll);
 
         //Storage
         final JPanel storagePanel = new JPanel(new BorderLayout());
-        storageList = new JList(getStorageAsArray());
+        storageList = new JList<String>(getStorageAsArray());
         final JScrollPane storageScroll = new JScrollPane(storageList);
         storagePanel.add(BorderLayout.NORTH, new JLabel("Storage:"));
         storagePanel.add(BorderLayout.CENTER, storageScroll);

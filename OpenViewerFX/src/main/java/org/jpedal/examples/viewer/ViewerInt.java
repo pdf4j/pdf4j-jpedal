@@ -135,7 +135,7 @@ public interface ViewerInt {
      * @param newHandler Implementation of interface provided by IDR solutions
      * @param type Defined value into org.jpedal.external.Options class
      */
-    void addExternalHandler(Object newHandler, int type);
+    void addExternalHandler(java.util.Map<Integer, Object> newHandler, int type);
 
     /**
      * run with caution and only at end of usage if you really need

@@ -36,11 +36,12 @@ import org.jpedal.io.PdfObjectReader;
 
 import java.util.Map;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.objects.raw.FormObject;
 
 public interface AnnotationHandler {
 
     /**called when each page created*/
-    void handleAnnotations(PdfDecoderInt decode_pdf, Map objs, int p);
+    void handleAnnotations(PdfDecoderInt decode_pdf, Map<FormObject, String>  objs, int p);
 
     /**called when mouse moves so you can react to context*/
     void checkLinks(Map objs, boolean mouseClicked, PdfObjectReader pdfObjectReader, int x, int y, org.jpedal.gui.GUIFactory currentGUI, org.jpedal.examples.viewer.Values commonValues);

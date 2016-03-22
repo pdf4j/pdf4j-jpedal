@@ -154,15 +154,6 @@ public class PropertiesFile {
         "ENDCHILDREN",
       "Shows the Bitmap menuitem on the Export menu","Bitmap", "true",
         "ENDCHILDREN",
-      "Shows the Page Tools menu on the menu bar","PagetoolsMenu", "false",
-      "Shows the Rotate Page menuitem on the Page Tools menu","Rotatepages", "true",
-      "Shows the Delete Page menuitem on the Page Tools menu","Deletepages", "true",
-      "Shows the Add Page menuitem on the Page Tools menu","Addpage", "true",
-      "Shows the Add header and footer menuitem on the Page Tools menu","Addheaderfooter", "true",
-      "Shows the stamp text menuitem on the Page Tools menu","Stamptext", "true",
-      "Shows the stamp image menuitem on the Page Tools menu","Stampimage", "false",
-      "Shows the crop menuitem on the Page Tools menu","Crop", "true",
-        "ENDCHILDREN",
       "Shows the Help menu on the menu bar","HelpMenu", "true",
       "Shows the Visit website menuitem on the help menu","Visitwebsite", "true",
       "Shows the tip of the day menuitem on the help menu","Tipoftheday", "true",
@@ -437,7 +428,7 @@ public class PropertiesFile {
         
         try{
             final NodeList nl =doc.getElementsByTagName("recentfiles");
-            final List fileNames = new ArrayList();
+            final List<String> fileNames = new ArrayList<String>();
             
             if(nl != null && nl.getLength() > 0) {
                 final NodeList allRecentDocs = ((Element) nl.item(0)).getElementsByTagName("*");
@@ -456,7 +447,7 @@ public class PropertiesFile {
             
             Collections.reverse(fileNames);
             
-            recentDocuments = (String[]) fileNames.toArray(new String[noOfRecentDocs]);
+            recentDocuments = fileNames.toArray(new String[noOfRecentDocs]);
         }catch(final Exception e){
             LogWriter.writeLog("Exception " + e + " getting recent documents");
             return null;
@@ -586,7 +577,7 @@ public class PropertiesFile {
         position = 0;
 
         NodeList allElements = doc.getElementsByTagName("*");
-        final List elementsInTree=new ArrayList(allElements.getLength());
+        final List<String> elementsInTree=new ArrayList<String>(allElements.getLength());
 
         for(int i=0;i<allElements.getLength();i++) {
             elementsInTree.add(allElements.item(i).getNodeName());
@@ -734,7 +725,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.10.26")){
+                        if(properties[position+1].equals("6.11.22")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

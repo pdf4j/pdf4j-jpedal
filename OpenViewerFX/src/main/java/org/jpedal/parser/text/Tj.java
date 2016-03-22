@@ -1141,7 +1141,9 @@ public class Tj extends BaseDecoder {
                     textData.append("fl");
                 } else if (next > 31) {
                     textData.append(next);
-                } else {
+                } else if(next==13 || next==10){
+                    textData.append(' ');
+                } else{
                     textData.append(hex[next]);
                 }
             }

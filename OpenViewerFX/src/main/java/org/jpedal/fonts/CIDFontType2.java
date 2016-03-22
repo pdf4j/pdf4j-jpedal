@@ -75,7 +75,7 @@ public class CIDFontType2 extends TrueType {
     
     /**read in a font and its details from the pdf file*/
     @Override
-    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map substitutedFonts) throws Exception{
+    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map<String, org.jpedal.fonts.glyph.PdfJavaGlyphs> substitutedFonts) throws Exception{
         
         fontTypes=StandardFonts.CIDTYPE2;
         this.fontID=fontID;

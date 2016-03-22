@@ -58,8 +58,8 @@ public class Save extends JComponent{
 	protected final JTextField endPage = new JTextField();
 	protected final JTextField rootDir = new JTextField();
 	
-	protected final Object[] scales={"10","25","50","75","100"};
-	protected final JComboBox scaling = new JComboBox(scales);
+	private static final String[] scales={"10","25","50","75","100"};
+	protected final JComboBox<String> scaling = new JComboBox<String>(scales);
 	
 	protected final JLabel scalingLabel = new JLabel();
 	protected final JLabel rootFilesLabel = new JLabel();

@@ -36,6 +36,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.constants.PageInfo;
 import org.jpedal.exception.PdfException;
@@ -92,7 +93,7 @@ public class PdfStreamDecoder extends BaseDecoder{
     
     protected boolean getSamplingOnly;
     
-    private final Map shadingColorspacesObjects=new HashMap(50);
+    private final Map<String, GenericColorSpace> shadingColorspacesObjects=new HashMap<String, GenericColorSpace>(50);
     
     private boolean isTTHintingRequired;
     
@@ -953,7 +954,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 
             case Cmd.gs :
                 if(!getSamplingOnly){
-                    final PdfObject GS=(PdfObject) cache.GraphicsStates.get(parser.generateOpAsString(0, true));
+                    final PdfObject GS= cache.GraphicsStates.get(parser.generateOpAsString(0, true));
                     
                     currentPdfFile.checkResolved(GS);
                     

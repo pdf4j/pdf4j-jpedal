@@ -77,7 +77,7 @@ public abstract class MultiPageDecoder {
     //used to redraw multiple pages
     private Thread worker;
      
-    public final Map currentPageViews=new HashMap();
+    public final Map<Integer, DynamicVectorRenderer> currentPageViews=new HashMap<Integer, DynamicVectorRenderer>();
     
     private final FileAccess fileAccess;
 
@@ -87,7 +87,7 @@ public abstract class MultiPageDecoder {
 
     private int displayView;
     
-    private Map cachedPageViews=new WeakHashMap();
+    private Map<Integer, DynamicVectorRenderer> cachedPageViews=new WeakHashMap<Integer, DynamicVectorRenderer>();
 
     private final MultiPagesDisplay display;
     
@@ -572,7 +572,7 @@ public abstract class MultiPageDecoder {
             final Integer currentKey = (Integer) o;
             final int keyValue = currentKey;
             if ((keyValue >= startPage) && (keyValue <= endPage)) {
-                final Object obj = cachedPageViews.get(currentKey);
+                final DynamicVectorRenderer obj = cachedPageViews.get(currentKey);
                 if (obj != null) {
                     this.currentPageViews.put(currentKey, obj);
                 }
@@ -585,13 +585,13 @@ public abstract class MultiPageDecoder {
             //synchronized (currentPageViews) {
             Iterator keys = this.currentPageViews.keySet().iterator();
 
-            final Map keysToTrash = new HashMap();
+            final Map<Integer, String> keysToTrash = new HashMap<Integer, String>();
 
             while (keys.hasNext()) {
                 final Integer currentKey = (Integer) keys.next();
                 final int keyValue = currentKey;
                 if ((keyValue < startPage) || (keyValue > endPage)) {
-                    final Object obj = currentPageViews.get(currentKey);
+                    final DynamicVectorRenderer obj = currentPageViews.get(currentKey);
                     if (obj != null) {
                         this.cachedPageViews.put(currentKey, obj);
                     }
@@ -673,7 +673,7 @@ public abstract class MultiPageDecoder {
     }
 
     public DynamicVectorRenderer getCurrentPageView(int i) {
-        return (DynamicVectorRenderer) currentPageViews.get(i);
+        return currentPageViews.get(i);
     }
 
     public void dispose() {

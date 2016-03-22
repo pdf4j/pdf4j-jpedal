@@ -66,7 +66,7 @@ public class EncryptPDFDocument extends Save
 			"40-bit RC4 (Acrobat 3.x, 4.x)"
 	};
 	
-	final JComboBox encryptionLevel = new JComboBox(securityItems);
+	final JComboBox<String> encryptionLevel = new JComboBox<String>(securityItems);
 	
 	public EncryptPDFDocument( final String root_dir, final int end_page, final int currentPage )
 	{

@@ -1165,7 +1165,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         if(!isPageAvailable){
             return;
         }else if(isPageAvailable && pdfObject!=null){
-            fileAccess.readAllPageReferences(true, pdfObject, new HashMap(1000), new HashMap(1000),rawPage, getFormRenderer(),res, options.getInsetW(), options.getInsetH());
+            fileAccess.readAllPageReferences(true, pdfObject, new HashMap<String, Integer>(1000), new HashMap<String, String>(1000),rawPage, getFormRenderer(),res, options.getInsetW(), options.getInsetH());
         }
         
         parser.setStatusBar(statusBar);

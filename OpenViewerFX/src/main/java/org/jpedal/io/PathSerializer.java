@@ -59,7 +59,7 @@ public class PathSerializer {
 		
 		os.writeObject(pi.getWindingRule());
 				
-		final List list = new ArrayList();
+		final List<java.io.Serializable> list = new ArrayList<java.io.Serializable>();
 		
 		while(!pi.isDone()){
 			final float[] array = new float[6];

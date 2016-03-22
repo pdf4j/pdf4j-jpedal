@@ -628,7 +628,7 @@ public String generateOpAsString(final int p, final boolean loseSlashPrefix) {
         final int end = this.opEnd[0];
         int count = 0;
         int startPtr, endPtr;
-        ArrayList values = new ArrayList();
+        ArrayList<Float> values = new ArrayList<Float>();
         for (int chars = start + 1; chars < end; chars++) {
             
             char c = (char) characterStream[chars];
@@ -657,7 +657,7 @@ public String generateOpAsString(final int p, final boolean loseSlashPrefix) {
         
         final float[] op = new float[count];
         for (int i = 0; i < count; i++) {
-            op[i] = ((Float) values.get(i));
+            op[i] = (values.get(i));
         }
         return op;
     }

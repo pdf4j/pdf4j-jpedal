@@ -65,18 +65,18 @@ public class TextTokens {
     /**
      * read the next double char
      */
-    public char nextUnicodeToken() {
+    public char nextUnicodeToken(boolean keepReturns) {
 
         int first,second=0;
 
         first=nextToken();
-        if(first==13 && this.hasMoreTokens()) {
+        if(first==13 && keepReturns && this.hasMoreTokens()) {
             first = nextToken();
         }
 
         if(this.hasMoreTokens()){
             second=nextToken();
-            if(second==13 && this.hasMoreTokens()) {
+            if(second==13 && keepReturns && this.hasMoreTokens()) {
                 second = nextToken();
             }
         }

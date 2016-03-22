@@ -48,7 +48,7 @@ public class CompressedObjects {
      * @param First
      * @param compressedStream
      */
-     public static void extractCompressedObjectOffset(final Map offsetStart, final Map offsetEnd, final int First, final byte[] compressedStream,
+     public static void extractCompressedObjectOffset(final Map<String, String> offsetStart, final Map<String, String> offsetEnd, final int First, final byte[] compressedStream,
                                                       final int compressedID, final Offsets offset) {
 
         String lastKey=null,key,offsetRef ;

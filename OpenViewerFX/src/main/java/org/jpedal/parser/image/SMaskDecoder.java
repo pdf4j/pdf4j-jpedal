@@ -86,7 +86,9 @@ class SMaskDecoder {
        
         if(index!=null){
             index=colorSpace.convertIndexToRGB(index);
-            objectData=ColorSpaceConvertor.convertIndexToRGBByte(index, iw, ih, imageData.getCompCount(), id, objectData, false, false);
+            int nComp = imageData.getCompCount();
+            nComp = colorSpace.getID()==ColorSpaces.DeviceGray ? 3 : nComp;            
+            objectData=ColorSpaceConvertor.convertIndexToRGBByte(index, iw, ih, nComp, id, objectData, false, false);
         } else if (imageData.isDCT() || imageData.isJPX() || imageData.isJBIG()) {      
          
         } else if(colorSpace.getID()==ColorSpaces.DeviceGray){

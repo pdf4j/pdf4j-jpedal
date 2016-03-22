@@ -78,7 +78,6 @@ public class JavaFXButtons implements GUIButtons{
 
     //Buttons on the function bar
     private GUIButton openButton;
-    private GUIButton printButton;
 
     private GUIButton docPropButton;
     private GUIButton infoButton;
@@ -128,7 +127,6 @@ public class JavaFXButtons implements GUIButtons{
         pageFlowButton = new JavaFXButton();
 
         openButton = new JavaFXButton();
-        printButton = new JavaFXButton();
         docPropButton = new JavaFXButton();
         infoButton = new JavaFXButton();
         mouseMode = new JavaFXButton();
@@ -159,8 +157,6 @@ public class JavaFXButtons implements GUIButtons{
                 return infoButton;
             case Commands.DOCINFO:
                 return docPropButton;
-            case Commands.PRINT:
-                return printButton;
             case Commands.OPENFILE:
                 return openButton;
             case Commands.CONTINUOUS_FACING:
@@ -485,10 +481,6 @@ public class JavaFXButtons implements GUIButtons{
                 newButton = getButton(Commands.OPENFILE);
                 newButton.setName("open");
                 break;
-            case Commands.PRINT:
-                newButton = getButton(Commands.PRINT);
-                newButton.setName("print");
-                break;
             case Commands.FIND:
                 newButton = getButton(Commands.FIND);
                 newButton.setName("search");
@@ -537,7 +529,7 @@ public class JavaFXButtons implements GUIButtons{
         newButton.init(currentGUI.getGUICursor().getURLForImage(path), ID, toolTip);
 
         //add listener
-        ((JavaFXButton) newButton).setOnAction((EventHandler) currentCommandListener.getCommandListener());
+        ((JavaFXButton) newButton).setOnAction((EventHandler<ActionEvent>) currentCommandListener.getCommandListener());
 
         final int mode = currentGUI.getValues().getModeOfOperation();
 
@@ -652,9 +644,6 @@ public class JavaFXButtons implements GUIButtons{
         
         if(ID!=ALL){
             switch(ID){
-                case Commands.PRINT:
-                    printButton.setEnabled(debug);
-                    break;
 //                case Commands.SNAPSHOT:
 //                    snapshotButton.setEnabled(debug);
 //                    break;
@@ -676,7 +665,6 @@ public class JavaFXButtons implements GUIButtons{
                     break;
             }
         }else{
-            printButton.setEnabled(debug);
             //snapshotButton.setEnabled(debug);
             continuousFacingButton.setEnabled(debug);
             facingButton.setEnabled(debug);

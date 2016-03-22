@@ -64,6 +64,6 @@ public class JavaFXCheckBoxMenuItem extends CheckMenuItem implements JavaFXID {
 
     @Override
     public void setToolTipText(final String text) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); 
     }
 }

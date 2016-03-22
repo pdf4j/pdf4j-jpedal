@@ -74,7 +74,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
     private MenuItem find;
     private MenuItem documentProperties;
     private MenuItem signPDF;
-    private MenuItem print;
     //private MenuItem recentDocuments;
     private MenuItem exit;
     private Menu editMenu;
@@ -175,8 +174,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
                 return documentProperties;
             case Commands.SIGN:
                 return signPDF;
-            case Commands.PRINT:
-                return print;
             case Commands.EXIT:
                 return exit;
             case Commands.EDITMENU:
@@ -355,7 +352,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
         setKeyAccelerators(ID, (MenuItem) menuItem);
 
 		//add listener
-		menuItem.setOnAction((EventHandler) currentCommandListener.getCommandListener());
+		menuItem.setOnAction((EventHandler<ActionEvent>) currentCommandListener.getCommandListener());
 
                     switch(ID){
                         case Commands.OPENFILE :
@@ -380,9 +377,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
                                 break;
                         case Commands.SIGN :
                                 signPDF = (MenuItem)menuItem;
-                                break;
-                        case Commands.PRINT :
-                                print = (MenuItem)menuItem;
                                 break;
                         case Commands.EXIT :
                                 exit = (MenuItem)menuItem;
@@ -680,14 +674,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
                     Messages.getMessage("PdfViewerFileMenuSignPDF.NotPath"),Commands.SIGN);
         }
 
-
-		addSeparator = properties.getValue("Print");
-		if(!addSeparator.isEmpty() && addSeparator.equalsIgnoreCase("true")){
-			fileMenu.getItems().add(new SeparatorMenuItem());
-		}
-		addMenuItem(fileMenu,Messages.getMessage("PdfViewerFileMenuPrint.text"),
-				Messages.getMessage("PdfViewerFileMenuTooltip.print"),Commands.PRINT);
-
 		addSeparator = properties.getValue("Recentdocuments");
 		if(!addSeparator.isEmpty() && addSeparator.equalsIgnoreCase("true")){
 			fileMenu.getItems().add(new SeparatorMenuItem());
@@ -915,9 +901,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
             case Commands.SAVE:
                 menuItem.setAccelerator(KeyCombination.keyCombination("Shortcut+S"));
                 break;
-            case Commands.PRINT:
-                menuItem.setAccelerator(KeyCombination.keyCombination("Shortcut+P"));
-                break;
             case Commands.EXIT:
                 menuItem.setAccelerator(KeyCombination.keyCombination("Shortcut+Q"));
                 break;
@@ -1046,9 +1029,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
                     case Commands.SIGN:
                         signPDF.setDisable(debug);
                         break;
-                    case Commands.PRINT:
-                        print.setDisable(debug);
-                        break;
 
                 }
             }else{
@@ -1066,7 +1046,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
             separateCover.setDisable(debug);
             reSaveAsForms.setDisable(debug);
             signPDF.setDisable(debug);
-            print.setDisable(debug);
         }
     }   
     

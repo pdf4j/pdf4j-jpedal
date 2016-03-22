@@ -43,10 +43,10 @@ import org.jpedal.objects.raw.FormObject;
  */
 public class ListListener implements ListSelectionListener {
 
-    final JList comp;
+    final JList<String> comp;
     final FormObject form;
 
-    ListListener(final JList list, final FormObject form) {
+    ListListener(final JList<String> list, final FormObject form) {
 	this.comp = list;
 	this.form = form;
     }
@@ -59,6 +59,6 @@ public class ListListener implements ListSelectionListener {
     @Override
     public void valueChanged(final ListSelectionEvent e) {
 	//System.out.println("Set to "+comp.getSelectedIndex());
-	form.setSelection(comp.getSelectedValues(), (String) comp.getSelectedValue(), comp.getSelectedIndices(),comp.getSelectedIndex());
+	form.setSelection(comp.getSelectedValues(), comp.getSelectedValue(), comp.getSelectedIndices(),comp.getSelectedIndex());
     }
 }

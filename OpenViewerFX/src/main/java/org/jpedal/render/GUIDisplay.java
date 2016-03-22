@@ -38,6 +38,7 @@ import java.awt.Shape;
 import org.jpedal.color.PdfColor;
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.SwingShape;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.parser.Cmd;
 
@@ -72,7 +73,7 @@ abstract class GUIDisplay extends BaseDisplay implements DynamicVectorRenderer{
                 case DynamicVectorRenderer.STROKEDSHAPE:
                     gs=new GraphicsState();
                     gs.setFillType(GraphicsState.STROKE);
-                    drawShape((Shape) obj[i],gs, Cmd.S);
+                    drawShape(new SwingShape((Shape) obj[i]),gs, Cmd.S);
                                         
                     break;
                     
@@ -80,7 +81,7 @@ abstract class GUIDisplay extends BaseDisplay implements DynamicVectorRenderer{
                     gs=new GraphicsState();
                     gs.setFillType(GraphicsState.FILL);
                     gs.setNonstrokeColor(new PdfColor(colors[i].getRed(),colors[i].getGreen(),colors[i].getBlue()));
-                    drawShape((Shape) obj[i],gs, Cmd.F);
+                    drawShape(new SwingShape((Shape) obj[i]),gs, Cmd.F);
                      
                     break;
                     

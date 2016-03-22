@@ -41,7 +41,7 @@ public interface GUISearchList {
     int SEARCH_INCOMPLETE = 4;
     int SEARCH_PRODUCED_ERROR = 8;
     
-	Map getTextPages();
+	Map<Integer, Integer> getTextPages();
 
 	Map textAreas();
 	

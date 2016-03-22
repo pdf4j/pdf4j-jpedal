@@ -87,7 +87,7 @@ public class MarkedContentGenerator {
     //used to indent debug output
     static String indent="";
     
-    final Map reverseLookup=new HashMap();
+    final Map<String, String> reverseLookup=new HashMap<String, String>();
     
     boolean isHTML;
     

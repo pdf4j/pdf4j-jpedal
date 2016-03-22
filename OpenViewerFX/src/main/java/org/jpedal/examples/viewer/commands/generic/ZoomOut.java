@@ -43,7 +43,8 @@ import org.jpedal.gui.GUIFactory;
  */
 public class ZoomOut {
     
-    private static int[] scalingValues = {25, 50, 75, 100, 125, 150, 200, 250, 500, 750, 1000};
+    private static final int[] scalingValues = {25, 50, 75, 100, 125, 150, 200, 250, 500, 750, 1000};
+    
     public static boolean execute(final Object[] args, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf) {
         
         if (args == null) {

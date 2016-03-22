@@ -100,10 +100,10 @@ public class Javascript {
 
     }
 
-    private final Map javascriptCommands=new HashMap();
-    private final Map javascriptTypesUsed=new HashMap();
-    private final Map linkedjavascriptCommands=new HashMap();
-    private final Map javascriptNamesObjects = new HashMap();
+    private final Map<String, String> javascriptCommands=new HashMap<String, String>();
+    private final Map<Integer, String> javascriptTypesUsed=new HashMap<Integer, String>();
+    private final Map<String, Vector_String> linkedjavascriptCommands=new HashMap<String, Vector_String>();
+    private final Map<String, String> javascriptNamesObjects = new HashMap<String, String>();
 
     /**
      * called to execute various action commands such as page opened
@@ -137,7 +137,7 @@ public class Javascript {
         	final String refName = ref.getTextStreamValue(PdfDictionary.T);
         	
             //C action requires us to execute other objects code
-        	final Vector_String linkedObj= (Vector_String) linkedjavascriptCommands.get(refName);
+        	final Vector_String linkedObj= linkedjavascriptCommands.get(refName);
         	
             if(linkedObj!=null){
             	linkedObj.trim();
@@ -170,7 +170,7 @@ public class Javascript {
         return returnCode;
     }
     
-    public Object getJavascriptCommand(final String ref, final int type){
+    public String getJavascriptCommand(final String ref, final int type){
     	//get javascript
     	return javascriptCommands.get(ref+ '-' +type);
         
@@ -190,7 +190,7 @@ public class Javascript {
         
         //get javascript
         //we read the ref first,
-        Object js= javascriptCommands.get(ref.getObjectRefAsString()+'-'+type);
+        String js= javascriptCommands.get(ref.getObjectRefAsString()+'-'+type);
         if(js==null){
         	//if this is null then the name is read to get JS for parent objects.
         	js= javascriptCommands.get(ref.getTextStreamValue(PdfDictionary.T)+'-'+type);
@@ -230,10 +230,10 @@ public class Javascript {
     public String getJavaScript(final String key) {
     	String str;
     	if(key == null) {
-	        final Collection c = javascriptNamesObjects.values();
+	        final Collection<String> c = javascriptNamesObjects.values();
 	        
 	        //obtain an Iterator for Collection
-	        final Iterator itr = c.iterator();
+	        final Iterator<String> itr = c.iterator();
 	       
 	        //iterate through HashMap values iterator
             StringBuilder s=new StringBuilder();
@@ -243,7 +243,7 @@ public class Javascript {
             str=s.toString();
     	}
     	else {
-    		str = (String) javascriptNamesObjects.get(key);
+    		str = javascriptNamesObjects.get(key);
     	}
           return str;
     }
@@ -311,7 +311,7 @@ public class Javascript {
                 final String obj=script.substring(start,ptr);
 
                 if(obj!=null){
-                	Vector_String existingList=(Vector_String) linkedjavascriptCommands.get(obj);
+                	Vector_String existingList= linkedjavascriptCommands.get(obj);
 
                     if(existingList==null){
                         existingList=new Vector_String();

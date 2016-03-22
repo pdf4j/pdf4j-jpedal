@@ -46,7 +46,7 @@ public class NameLookup extends HashMap {
 
     private final PdfFileReader objectReader;
 
-    private final HashMap embeddedFiles=new HashMap();
+    private final HashMap<String, String> embeddedFiles=new HashMap<String, String>();
 
     /**
      *
@@ -228,14 +228,14 @@ public class NameLookup extends HashMap {
         int ptr=0;
 
         String name, value;
-        Iterator embeddedFileNames=embeddedFiles.keySet().iterator();
+        Iterator<String> embeddedFileNames=embeddedFiles.keySet().iterator();
 
         final ObjectDecoder objectDecoder=new ObjectDecoder(objectReader);
 
         while(embeddedFileNames.hasNext()){
-            name= (String) embeddedFileNames.next();
+            name= embeddedFileNames.next();
             returnValues[ptr++]=name;
-            value= (String) embeddedFiles.get(name);
+            value= embeddedFiles.get(name);
 
             final PdfObject embeddedObj =new FSObject(value);
             final byte[] jsData=StringUtils.toBytes(value);

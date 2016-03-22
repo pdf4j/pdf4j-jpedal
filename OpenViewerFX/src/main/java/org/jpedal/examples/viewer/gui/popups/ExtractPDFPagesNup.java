@@ -70,8 +70,8 @@ public class ExtractPDFPagesNup extends Save
 	
 	final JTextField pagesBox=new JTextField();
 	
-    ArrayList papers;
-    ArrayList paperDimensions;
+    ArrayList<String> papers;
+    ArrayList<Dimension> paperDimensions;
     
 	private javax.swing.JSpinner horizontalSpacing;
     private javax.swing.JLabel jLabel1;
@@ -87,23 +87,23 @@ public class ExtractPDFPagesNup extends Save
     private javax.swing.JLabel jLabel4;
     private javax.swing.JSpinner layoutColumns;
     private javax.swing.JSpinner layoutRows;
-    private javax.swing.JComboBox layouts;
+    private JComboBox<String> layouts;
     private javax.swing.JSpinner leftRightMargins;
     private javax.swing.JSpinner scaleHeight;
     private javax.swing.JCheckBox pageProportionally;
-    private javax.swing.JComboBox pageScalings;
+    private JComboBox<String> pageScalings;
     private javax.swing.JSpinner scaleWidth;
     private javax.swing.JSpinner paperHeight;
-    private javax.swing.JComboBox paperOrientation;
-    private javax.swing.JComboBox paperSizes;
+    private JComboBox<String> paperOrientation;
+    private JComboBox<String> paperSizes;
     private javax.swing.JSpinner paperWidth;
     private javax.swing.JSpinner topBottomMargins;
     private javax.swing.JSpinner verticalSpacing;
     
-	private final JComboBox repeat = new JComboBox();
+	private final JComboBox<String> repeat = new JComboBox<String>();
 	private final JSpinner copies = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-	private final JComboBox ordering = new JComboBox();
-	private final JComboBox doubleSided = new JComboBox();
+	private final JComboBox<String> ordering = new JComboBox<String>();
+	private final JComboBox<String> doubleSided = new JComboBox<String>();
 	
 	public ExtractPDFPagesNup( final String root_dir, final int end_page, final int currentPage )
 	{
@@ -294,15 +294,15 @@ public class ExtractPDFPagesNup extends Save
 		pageSettings.setDisplayedMnemonic( '0' );
 		pageSettings.setBounds( new Rectangle( 13, 400, 220, 26 ) );
 		
-		layouts = new javax.swing.JComboBox();
-		paperOrientation = new javax.swing.JComboBox();
-		pageScalings = new javax.swing.JComboBox();
+		layouts = new javax.swing.JComboBox<String>();
+		paperOrientation = new javax.swing.JComboBox<String>();
+		pageScalings = new javax.swing.JComboBox<String>();
 		jLabel1 = new javax.swing.JLabel();
 		jLabel2 = new javax.swing.JLabel();
 		topBottomMargins = new javax.swing.JSpinner(new SpinnerNumberModel(18.00, -720.00, 720.00, 1.00));
 		leftRightMargins = new javax.swing.JSpinner(new SpinnerNumberModel(18.00, -720.00, 720.00, 1.00));
 		pageProportionally = new javax.swing.JCheckBox();
-		paperSizes = new javax.swing.JComboBox();
+		paperSizes = new javax.swing.JComboBox<String>();
 		jLabel11 = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
@@ -321,7 +321,7 @@ public class ExtractPDFPagesNup extends Save
 		jLabel15 = new javax.swing.JLabel();
 		jLabel17 = new javax.swing.JLabel();
 		
-		layouts.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2 Up", "4 Up", "8 Up", Messages.getMessage("PdfViewerNUPOption.Custom")}));
+		layouts.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "2 Up", "4 Up", "8 Up", Messages.getMessage("PdfViewerNUPOption.Custom")}));
 		layouts.setSelectedIndex(0);
 		layouts.addItemListener(new java.awt.event.ItemListener() {
 			@Override
@@ -332,7 +332,7 @@ public class ExtractPDFPagesNup extends Save
 		
 		copies.setEnabled(false);
 		
-		repeat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { Messages.getMessage("PdfViewerNUPOption.None"), Messages.getMessage("PdfViewerNUPOption.Auto"), Messages.getMessage("PdfViewerNUPOption.Specified")}));
+		repeat.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { Messages.getMessage("PdfViewerNUPOption.None"), Messages.getMessage("PdfViewerNUPOption.Auto"), Messages.getMessage("PdfViewerNUPOption.Specified")}));
 		repeat.addItemListener(new java.awt.event.ItemListener() {
 			@Override
             public void itemStateChanged(final java.awt.event.ItemEvent evt) {
@@ -351,17 +351,17 @@ public class ExtractPDFPagesNup extends Save
 			}
 		});
 		
-		ordering.setModel(new javax.swing.DefaultComboBoxModel(new String[] { Messages.getMessage("PdfViewerNUPOption.Across"), Messages.getMessage("PdfViewerNUPOption.Down") }));
+		ordering.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { Messages.getMessage("PdfViewerNUPOption.Across"), Messages.getMessage("PdfViewerNUPOption.Down") }));
 		
 		
-		doubleSided.setModel(new javax.swing.DefaultComboBoxModel(new String[] { Messages.getMessage("PdfViewerNUPOption.None"), Messages.getMessage("PdfViewerNUPOption.Front&Back"), Messages.getMessage("PdfViewerNUPOption.Gutter")}));
+		doubleSided.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { Messages.getMessage("PdfViewerNUPOption.None"), Messages.getMessage("PdfViewerNUPOption.Front&Back"), Messages.getMessage("PdfViewerNUPOption.Gutter")}));
 		
 		layouts.setBounds(20, 240, 110, 23);
 		
-		paperOrientation.setModel(new javax.swing.DefaultComboBoxModel(new String[] { Messages.getMessage("PdfViewerNUPOption.Auto"), Messages.getMessage("PdfViewerNUPOption.Portrait"), Messages.getMessage("PdfViewerNUPOption.Landscape") }));
+		paperOrientation.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { Messages.getMessage("PdfViewerNUPOption.Auto"), Messages.getMessage("PdfViewerNUPOption.Portrait"), Messages.getMessage("PdfViewerNUPOption.Landscape") }));
 		paperOrientation.setBounds(510, 100, 90, 23);
 		
-		pageScalings.setModel(new javax.swing.DefaultComboBoxModel(new String[] { Messages.getMessage("PdfViewerNUPOption.OriginalSize"), Messages.getMessage("PdfViewerNUPOption.Auto"), Messages.getMessage("PdfViewerNUPOption.Specified") }));
+		pageScalings.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { Messages.getMessage("PdfViewerNUPOption.OriginalSize"), Messages.getMessage("PdfViewerNUPOption.Auto"), Messages.getMessage("PdfViewerNUPOption.Specified") }));
 		pageScalings.setSelectedIndex(1);
 		pageScalings.addItemListener(new java.awt.event.ItemListener() {
 			@Override
@@ -384,7 +384,7 @@ public class ExtractPDFPagesNup extends Save
 		pageProportionally.setMargin(new java.awt.Insets(0, 0, 0, 0));
 		pageProportionally.setBounds(240, 170, 120, 15);
 		
-		paperSizes.setModel(new javax.swing.DefaultComboBoxModel(getPaperSizes()));
+		paperSizes.setModel(new javax.swing.DefaultComboBoxModel<String>(getPaperSizes()));
 		paperSizes.addItemListener(new java.awt.event.ItemListener() {
 			@Override
             public void itemStateChanged(final java.awt.event.ItemEvent evt) {
@@ -629,8 +629,8 @@ public class ExtractPDFPagesNup extends Save
     }
     
     private void genertatePaperSizes(){
-    	papers = new ArrayList();
-    	paperDimensions = new ArrayList();
+    	papers = new ArrayList<String>();
+    	paperDimensions = new ArrayList<Dimension>();
     	
     	papers.add(Messages.getMessage("PdfViewerNUPComboBoxOption.Letter"));
     	papers.add(Messages.getMessage("PdfViewerNUPComboBoxOption.Legal"));
@@ -667,7 +667,7 @@ public class ExtractPDFPagesNup extends Save
     }
     
     private String[] getPaperSizes(){
-        return (String[]) papers.toArray(new String[papers.size()]);
+        return papers.toArray(new String[papers.size()]);
     }
     
     private Dimension getPaperDimension(final String paper){
@@ -675,7 +675,7 @@ public class ExtractPDFPagesNup extends Save
             return null;
         }
     	
-    	return (Dimension) paperDimensions.get(papers.indexOf(paper));
+    	return paperDimensions.get(papers.indexOf(paper));
     }
 	
 	@Override

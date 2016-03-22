@@ -141,9 +141,9 @@ public class ExtractText extends GUIExtractText {
         final Runnable r = new Runnable() {
             @Override
             public void run() {
-                final Enumeration en = group.getElements();
+                final Enumeration<AbstractButton> en = group.getElements();
                 while (en.hasMoreElements()) { //First find which button has been changed
-                    final AbstractButton button = (AbstractButton) en.nextElement();
+                    final AbstractButton button = en.nextElement();
                     if (button.isSelected()) {
                         final Component[] com = display_value.getComponents();
                         for (int i = 0; i != com.length; i++) {

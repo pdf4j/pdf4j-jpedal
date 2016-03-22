@@ -52,26 +52,29 @@ public class PdfLayerList {
     //used in tree as unique separator
     public static final char deliminator=(char)65535;
 
-    private final Map layerNames=new LinkedHashMap();
+    private final Map<String, Integer> layerNames=new LinkedHashMap<String, Integer>();
 
-    private final Map streamToName=new HashMap();
+    private final Map<String, String> streamToName=new HashMap<String, String>();
 
-    private final Map layersEnabled=new HashMap();
+    private final Map<String, String> layersEnabled=new HashMap<String, String>();
 
-    private Map jsCommands;
+    private Map<String, String> jsCommands;
 
-    private final Map metaData=new HashMap();
+    private final Map<String, String> metaData=new HashMap<String, String>();
     
-    private final Map layersTested=new HashMap();
+    private final Map<String, String> layersTested=new HashMap<String, String>();
 
-    private final Map layerLocks=new HashMap();
+    private final Map<String, String> layerLocks=new HashMap<String, String>();
 
     private boolean changesMade;
 
-    private Map propertyMap, refToPropertyID,refTolayerName,RBconstraints;
+    private Map<String, PdfObject> propertyMap;
+    private Map<String, String> refToPropertyID;
+    private Map<String, String> refTolayerName;
+    private Map<String, String> RBconstraints;
 
-    private final Map minScale=new HashMap();
-    private final Map maxScale=new HashMap();
+    private final Map<String, Float> minScale=new HashMap<String, Float>();
+    private final Map<String, Float> maxScale=new HashMap<String, Float>();
 
     //private float scaling=1f;
     
@@ -94,10 +97,10 @@ public class PdfLayerList {
 
         OCpageNumber=pageNumber;
 
-        propertyMap=new HashMap();
-        refToPropertyID =new HashMap();
-        refTolayerName=new HashMap();
-        RBconstraints=new HashMap();
+        propertyMap=new HashMap<String, PdfObject>();
+        refToPropertyID =new HashMap<String, String>();
+        refTolayerName=new HashMap<String, String>();
+        RBconstraints=new HashMap<String, String>();
         
         this.currentPdfFile=currentPdfFile;
 
@@ -162,8 +165,8 @@ public class PdfLayerList {
          * handle case where layers not explicitly switched on
          */
         if(OCBaseState==PdfDictionary.ON){// && layerDict.getKeyArray(PdfDictionary.OFF)==null){
-            final Iterator keys=refToPropertyID.keySet().iterator();
-            Object ref,layerName;
+            final Iterator<String> keys=refToPropertyID.keySet().iterator();
+            String ref;String layerName;
             while(keys.hasNext()){
                 ref = keys.next();
                 layerName=refToPropertyID.get(ref);
@@ -255,7 +258,7 @@ public class PdfLayerList {
         for(int ii=0;ii< layerCount;ii++){
 
             final String ref=new String(layer[ii]);
-            layers[ii]=(String)this.refTolayerName.get(ref);
+            layers[ii]= this.refTolayerName.get(ref);
         }
 
         for(int ii=0;ii< layerCount;ii++){
@@ -306,7 +309,7 @@ public class PdfLayerList {
             } else{
                 propertyMap.put(ref,glyphObj);
 
-                final String currentNames=(String) refToPropertyID.get(ref);
+                final String currentNames= refToPropertyID.get(ref);
                 if(currentNames==null) {
                     refToPropertyID.put(ref, glyphKey);
                 } else {
@@ -342,7 +345,7 @@ public class PdfLayerList {
             } else {
 
                 propertyMap.put(ref, glyphObj);
-                final String currentNames = (String) refToPropertyID.get(ref);
+                final String currentNames = refToPropertyID.get(ref);
                 if (currentNames == null) {
                     refToPropertyID.put(ref, glyphKey);
                 } else {
@@ -377,9 +380,9 @@ public class PdfLayerList {
 
                 final byte[] rawRef=(byte[])layer[ii];
                 ref =new String(rawRef);
-                name=(String) refToPropertyID.get(ref);
+                name= refToPropertyID.get(ref);
 
-                nextObject=(PdfObject)propertyMap.get(ref);
+                nextObject= propertyMap.get(ref);
 
                 if(nextObject==null){
 
@@ -418,7 +421,7 @@ public class PdfLayerList {
 
                     layerNames.put(layerName, status);
                     if(name.indexOf(',')==-1){
-                        final String oldValue=(String)streamToName.get(name);
+                        final String oldValue= streamToName.get(name);
                         if(oldValue==null) {
                             streamToName.put(name, layerName);
                         } else {
@@ -428,7 +431,7 @@ public class PdfLayerList {
                         final StringTokenizer names=new StringTokenizer(name,",");
                         while(names.hasMoreTokens()){
                             name=names.nextToken();
-                            final String oldValue=(String)streamToName.get(name);
+                            final String oldValue= streamToName.get(name);
                             if(oldValue==null) {
                                 streamToName.put(name, layerName);
                             } else {
@@ -471,8 +474,8 @@ public class PdfLayerList {
         for (final byte[] aLayer : layer) {
 
             ref = new String(aLayer);
-            name = (String) refToPropertyID.get(ref);
-            nextObject = (PdfObject) propertyMap.get(ref);
+            name = refToPropertyID.get(ref);
+            nextObject = propertyMap.get(ref);
 
             if (nextObject != null) {
 
@@ -486,7 +489,7 @@ public class PdfLayerList {
 
                 //pick up full name set by Order
                 if (status == PdfDictionary.ON || status == PdfDictionary.OFF) {
-                    final String possName = (String) refTolayerName.get(ref);
+                    final String possName = refTolayerName.get(ref);
                     if (possName != null) {
                         layerName = possName;
                     }
@@ -505,7 +508,7 @@ public class PdfLayerList {
 
                 if (streamToName.get(name) != null) {//ignore if done
                 } else if (name.indexOf(',') == -1) {
-                    final String oldValue = (String) streamToName.get(name);
+                    final String oldValue = streamToName.get(name);
                     if (oldValue == null) {
                         streamToName.put(name, layerName);
                     } else {
@@ -515,7 +518,7 @@ public class PdfLayerList {
                     final StringTokenizer names = new StringTokenizer(name, ",");
                     while (names.hasMoreTokens()) {
                         name = names.nextToken();
-                        final String oldValue = (String) streamToName.get(name);
+                        final String oldValue = streamToName.get(name);
                         if (oldValue == null) {
                             streamToName.put(name, layerName);
                         } else {
@@ -593,7 +596,7 @@ public class PdfLayerList {
                             currentPdfFile.checkResolved(nextObject);
 
                             layerName = nextObject.getTextStreamValue(PdfDictionary.Name);
-                            name = (String) refToPropertyID.get(ref);
+                            name = refToPropertyID.get(ref);
                             
                             if(name==null && refToPropertyID.isEmpty()){ //23911 - include implicit value if Properties not set
                                 name="MC0";
@@ -679,7 +682,7 @@ public class PdfLayerList {
         }
     }
 
-    public Map getMetaData() {
+    public Map<String, String> getMetaData() {
         return Collections.unmodifiableMap(metaData);
     }
 
@@ -700,11 +703,11 @@ public class PdfLayerList {
         final int count=layerNames.size();
         final String[] nameList=new String[count];
 
-        final Iterator names=layerNames.keySet().iterator();
+        final Iterator<String> names=layerNames.keySet().iterator();
 
         int jj=0;
         while(names.hasNext()){
-            nameList[jj]=names.next().toString();
+            nameList[jj]=names.next();
             jj++;
         }
 
@@ -755,7 +758,7 @@ public class PdfLayerList {
 
         //see if match found otherwise assume name
         if(isID){
-            final String mappedName=(String)streamToName.get(name);
+            final String mappedName= streamToName.get(name);
 
             if(mappedName!=null) {
                 layerName = mappedName;
@@ -835,11 +838,11 @@ public class PdfLayerList {
     public boolean setZoom(final float scaling) {
 
         String layerName;
-        final Iterator minZoomLayers=minScale.keySet().iterator();
+        final Iterator<String> minZoomLayers=minScale.keySet().iterator();
         while(minZoomLayers.hasNext()){
 
-            layerName=(String) minZoomLayers.next();
-            final Float minScalingValue= (Float) minScale.get(layerName);
+            layerName= minZoomLayers.next();
+            final Float minScalingValue= minScale.get(layerName);
 
             //Zoom off
             if(minScalingValue!=null){
@@ -857,11 +860,11 @@ public class PdfLayerList {
         }
 
 
-        final Iterator maxZoomLayers=maxScale.keySet().iterator();
+        final Iterator<String> maxZoomLayers=maxScale.keySet().iterator();
         while(maxZoomLayers.hasNext()){
 
-            layerName=(String) minZoomLayers.next();
-            final Float maxScalingValue= (Float) maxScale.get(layerName);
+            layerName= minZoomLayers.next();
+            final Float maxScalingValue= maxScale.get(layerName);
             if(maxScalingValue!=null){
                 if(scaling> maxScalingValue){
                     layersEnabled.remove(layerName);
@@ -891,7 +894,7 @@ public class PdfLayerList {
             layersEnabled.put(layerName,"x");
 
             //disable any other layers
-            final String layersToDisable=(String)RBconstraints.get(layerName);
+            final String layersToDisable= RBconstraints.get(layerName);
             if(layersToDisable!=null){
                 final StringTokenizer layers=new StringTokenizer(layersToDisable,",");
                 while(layers.hasMoreTokens()) {
@@ -959,7 +962,7 @@ public class PdfLayerList {
 
     public boolean isLocked(final String layerName) {
         
-        return layerLocks.containsKey(layerName);  //To change body of created methods use File | Settings | File Templates.
+        return layerLocks.containsKey(layerName);  
     }
 
     /**
@@ -992,7 +995,7 @@ public class PdfLayerList {
     }
 
     public String getNameFromRef(final String ref) {
-        return (String) refTolayerName.get(ref);
+        return refTolayerName.get(ref);
     }
 
 //    public void setScaling(float scaling) {
@@ -1016,11 +1019,11 @@ public class PdfLayerList {
         //create array of values with access to this so we can reset
         final Layer[] layers=new Layer[count];
 
-        final Iterator layersIt=layerNames.keySet().iterator();
+        final Iterator<String> layersIt=layerNames.keySet().iterator();
         int ii=0;
         String name;
         while(layersIt.hasNext()){
-            name=(String)layersIt.next();
+            name= layersIt.next();
             
             layers[ii]=new Layer(name,this);
             ii++;
@@ -1033,21 +1036,21 @@ public class PdfLayerList {
     public void addJScommand(final String name, final String js) {
 
         if(jsCommands==null) {
-            jsCommands = new HashMap();
+            jsCommands = new HashMap<String, String>();
         }
                 
         //add to list to execute
         jsCommands.put(name,js);
     }
 
-    public Iterator getJSCommands() {
+    public Iterator<String> getJSCommands() {
 
         if(jsCommands!=null){
-            final Iterator names= this.jsCommands.keySet().iterator();
-            final Map visibleJSCommands=new HashMap();
+            final Iterator<String> names= this.jsCommands.keySet().iterator();
+            final Map<String, String> visibleJSCommands=new HashMap<String, String>();
         	
             while(names.hasNext()){
-            	final String name=(String) names.next();
+            	final String name= names.next();
             	if(this.isVisible(name)){
             		visibleJSCommands.put(jsCommands.get(name), "x");
             	}

@@ -180,7 +180,7 @@ public class F {
                 if(parserOptions.useJavaFX()){
                     current.drawShape(fxPath,gs);
                 }else{
-                    current.drawShape(currentShape,gs, Cmd.F);
+                    current.drawShape(currentDrawShape,gs, Cmd.F);
 
                     if (current.isHTMLorSVG() && cache.groupObj==null) {
                         current.eliminateHiddenText(currentShape, gs, currentDrawShape.getSegmentCount(),false);
@@ -228,7 +228,13 @@ public class F {
          */
         final GraphicsState gs1 = (GraphicsState)gs.clone();
         gs1.CTM=new float[][]{{smaskImage.getWidth(),0,1},{0,-smaskImage.getHeight(),1},{0,0,0}};
-        gs1.setBMValue(PdfDictionary.SMask);
+       
+        /**
+         * interim solution as throws exception in HTML due to unknown type
+         */
+        if(!current.isHTMLorSVG()){
+            gs1.setBMValue(PdfDictionary.SMask);
+        }
         
         gs1.x=fx;
         gs1.y=fy;

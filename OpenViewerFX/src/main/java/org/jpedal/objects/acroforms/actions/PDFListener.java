@@ -49,7 +49,7 @@ public class PDFListener {
         handler = formsHandler;
     }
 
-    public void mouseReleased(final Object e) {
+    public void mouseReleased(final java.util.EventObject e) {
     	if(debugMouseActions) {
             System.out.println("PDFListener.mouseReleased() "+formObject.getObjectRefAsString());
         }
@@ -60,7 +60,7 @@ public class PDFListener {
 	}
     }
 
-    public void mouseClicked(final Object e) {
+    public void mouseClicked(final java.util.EventObject e) {
     	if(debugMouseActions) {
             System.out.println("PDFListener.mouseClicked() "+formObject.getObjectRefAsString());
         }
@@ -70,7 +70,7 @@ public class PDFListener {
 	}
     }
 
-    public void mousePressed(final Object e) {
+    public void mousePressed(final java.util.EventObject e) {
     	if(debugMouseActions) {
             System.out.println("PDFListener.mousePressed() "+formObject.getObjectRefAsString());
         }
@@ -81,7 +81,7 @@ public class PDFListener {
 	}
     }
 
-    public void keyReleased(final Object e) {
+    public void keyReleased(final java.util.EventObject e) {
     	if(debugMouseActions) {
             System.out.println("PDFListener.keyReleased(" + e + ") "+formObject.getObjectRefAsString());
         }
@@ -92,7 +92,7 @@ public class PDFListener {
 	}
     }
 
-    public void focusLost(final Object e) {
+    public void focusLost(final java.util.EventObject e) {
     	if(debugMouseActions) {
             System.out.println("PDFListener.focusLost() "+formObject.getObjectRefAsString());
         }
@@ -110,7 +110,7 @@ public class PDFListener {
 //        acrorend.getCompData().loseFocus();
     }
 
-    public void focusGained(final Object e) {
+    public void focusGained(final java.util.EventObject e) {
     	if(debugMouseActions) {
             System.out.println("PDFListener.focusGained() "+formObject.getObjectRefAsString());
         }

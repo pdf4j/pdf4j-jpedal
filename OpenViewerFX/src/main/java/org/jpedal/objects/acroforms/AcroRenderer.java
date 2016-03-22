@@ -101,7 +101,11 @@ public class AcroRenderer{
     private int[] AfieldCount;
     
     private int ATotalCount,FfieldCount;
-    
+
+    private int additionalOBjectRef;
+
+    private boolean addedMissingPopup;
+
     /**
      * number of pages in current PDF document
      */
@@ -139,7 +143,7 @@ public class AcroRenderer{
     /**
      * allow us to differentiate underlying PDF form type
      */
-    Enum PDFformType;
+    Enum<FormTypes> PDFformType;
     
     private SwingFormCreator formCreator;
 
@@ -406,7 +410,6 @@ public class AcroRenderer{
         }
     }
 
-    private boolean addedMissingPopup;
     /**
      * build forms display using standard swing components
      */
@@ -540,10 +543,12 @@ public class AcroRenderer{
                             continue;
                         }
                         
-                        if(formObject.getParameterConstant(PdfDictionary.Subtype)==PdfDictionary.Text &&
-                        	formObject.getDictionary(PdfDictionary.Popup)==null){
+                        if(allowsPopup(formObject) && formObject.getDictionary(PdfDictionary.Popup)==null){
                         		
                         		final FormObject po = new FormObject(PdfDictionary.Annot);
+                                additionalOBjectRef++;
+                                
+                                po.setRef((-additionalOBjectRef)+" 0 X");
                         		po.setIntNumber(PdfDictionary.F, 24); //Bit Flag for bits 4+5 (No Zoom, No Rotate)
                         		po.setBoolean(PdfDictionary.Open, formObject.getBoolean(PdfDictionary.Open));
                         		po.setConstant(PdfDictionary.Subtype, PdfDictionary.Popup);
@@ -698,13 +703,14 @@ public class AcroRenderer{
 
                     if (formObject != null && (formsCreated.get(formObject.getObjectRefAsString())==null) && page==formObject.getPageNumber()){// && !formObject.getObjectRefAsString().equals("216 0 R")){
                         //String OEPROPval=formObject.getTextStreamValue(PdfDictionary.EOPROPtype);
+                        final int type=formFactory.getType();
+                                
                         //NOTE: if this custom form needs redrawing more change ReadOnlyTextIcon.MAXSCALEFACTOR to 1;
-                        if(formsRasterizedForDisplay() && current!=null){// || OEPROPval!=null){
+                        if((formsRasterizedForDisplay() && current!=null) || (type == FormFactory.SVG)){// || OEPROPval!=null){
                             
                             //rasterize any flattened PDF forms here
                             try {
                                // current.drawFlattenedForm(formObject,false);
-                                final int type=formFactory.getType();
                                 getFormFlattener().drawFlattenedForm(current, formObject, type == FormFactory.HTML || type == FormFactory.SVG, (PdfObject) this.getFormResources()[0]);
                             
                             }catch( final PdfException e ){
@@ -779,16 +785,10 @@ public class AcroRenderer{
      * @param form FormObject to check
      * @return True if annotation
      */
-    private boolean isAnnotation(FormObject formObject){
-        
-        if(formObject.getParameterConstant(PdfDictionary.Type)==PdfDictionary.Annot){
-            return true;
-        }
+    static boolean allowsPopup(FormObject formObject){
         
         switch(formObject.getParameterConstant(PdfDictionary.Subtype)){
             case PdfDictionary.Text :
-            case PdfDictionary.Link :
-            case PdfDictionary.FreeText :
 //            case PdfDictionary.Line :
             case PdfDictionary.Square :
 //            case PdfDictionary.Circle :
@@ -800,14 +800,13 @@ public class AcroRenderer{
             case PdfDictionary.StrickOut :
             case PdfDictionary.Stamp :
 //            case PdfDictionary.Caret :
-            case PdfDictionary.Ink :
-            case PdfDictionary.Popup :
-            case PdfDictionary.FileAttachment :
-            case PdfDictionary.Sound :
+//            case PdfDictionary.Ink :
+//            case PdfDictionary.FileAttachment :
+//            case PdfDictionary.Sound :
 //            case PdfDictionary.Movie :
-            case PdfDictionary.Widget :
-            case PdfDictionary.Screen :
-            case PdfDictionary.RichMedia:
+//            case PdfDictionary.Widget :
+//            case PdfDictionary.Screen :
+//            case PdfDictionary.RichMedia:
 //            case PdfDictionary.PrinterMark :
 //            case PdfDictionary.TrapNet :
 //            case PdfDictionary.Watermark :
@@ -818,10 +817,58 @@ public class AcroRenderer{
         }
     }
     
-    private void storeSignatures(final FormObject formObject, final int subtype) {
+    /**
+     * Utility method to ensure formObject is actually an annotation before we continue
+     * @param form FormObject to check
+     * @return True if annotation
+     */
+    static boolean isAnnotation(FormObject formObject){
+        
+        if(formObject.getParameterConstant(PdfDictionary.Type)==PdfDictionary.Annot){
+            return true;
+        }
+        
+        switch(formObject.getParameterConstant(PdfDictionary.Subtype)){
+            case PdfDictionary.Text :
+            case PdfDictionary.Link :
+            case PdfDictionary.FreeText :
+            case PdfDictionary.Line :
+            case PdfDictionary.Square :
+            case PdfDictionary.Circle :
+            case PdfDictionary.Polygon :
+            case PdfDictionary.PolyLine :
+            case PdfDictionary.Highlight :
+            case PdfDictionary.Underline :
+            case PdfDictionary.Squiggly :
+            case PdfDictionary.StrickOut :
+            case PdfDictionary.Stamp :
+            case PdfDictionary.Caret :
+            case PdfDictionary.Ink :
+            case PdfDictionary.Popup :
+            case PdfDictionary.FileAttachment :
+            case PdfDictionary.Sound :
+            case PdfDictionary.Movie :
+            case PdfDictionary.Widget :
+            case PdfDictionary.Screen :
+            case PdfDictionary.PrinterMark :
+            case PdfDictionary.TrapNet :
+            case PdfDictionary.Watermark :
+            case PdfDictionary.THREE_D :
+
+             // From the Supplement to the PDF spec
+            case PdfDictionary.RichMedia:
+            case PdfDictionary.Projection :
+
+                return true;
+            default :
+                return false;
+        }
+    }
+    
+    private void storeSignatures(final FormObject formObject, final int formType) {
 
         //if sig object set global sig object so we can access later
-        if(subtype == PdfDictionary.Sig){
+        if(formType == PdfDictionary.Sig){
 
             if(sigObject==null){ //ensure initialised
                 sigObject = new HashSet<FormObject>();
@@ -926,7 +973,7 @@ public class AcroRenderer{
                     for(int jj=0;jj<kidCount;jj++){
                         final String key=new String(kidList[jj]);
                         
-                        kidObject= (FormObject) compData.getRawFormData().get(key);
+                        kidObject= compData.getRawFormData().get(key);
                         
                         if(kidObject==null){
                             kidObject = new FormObject(key);
@@ -1007,7 +1054,7 @@ public class AcroRenderer{
     
     private FormObject getParent(final String parent) {
         
-        FormObject parentObj=(FormObject)compData.getRawFormData().get(parent);
+        FormObject parentObj= compData.getRawFormData().get(parent);
         
         if(parentObj==null && parent!=null){ //not yet read so read and cache
             parentObj = new FormObject(parent);
@@ -1024,8 +1071,8 @@ public class AcroRenderer{
     
     private byte[][] getKid(final FormObject formObject, final boolean ignoreParent) {
         
-        final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);
-        if(subtype==PdfDictionary.Tx || subtype==PdfDictionary.Btn) {
+        final int formType=formObject.getNameAsConstant(PdfDictionary.FT);
+        if(formType==PdfDictionary.Tx || formType==PdfDictionary.Btn) {
             return null;
         }
         
@@ -1102,12 +1149,13 @@ public class AcroRenderer{
         
         final Object retComponent=null;
         
-        final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);//FT
+      //  final int subtype=formObject.getParameterConstant(PdfDictionary.Subtype);//FT
+        final int formType=formObject.getNameAsConstant(PdfDictionary.FT); //FT
         
         final int formFactoryType=formFactory.getType();
         
         //if sig object set global sig object so we can access later
-        storeSignatures(formObject, subtype);
+        storeSignatures(formObject, formType);
 
         //check if a popup is associated
         if(formObject.getDictionary(PdfDictionary.Popup)!=null){
@@ -1152,7 +1200,7 @@ public class AcroRenderer{
         if(!ExternalHandlers.isXFAPresent() && (formFactoryType==FormFactory.HTML || formFactoryType==FormFactory.SVG)){
             widgetType=FormFactory.ANNOTATION;
            
-        }else if (subtype == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
+        }else if (formType == PdfDictionary.Btn) {//----------------------------------- BUTTON  ----------------------------------------
             
             //flags used for button types
             //20100212 (ms) Unused ones commented out
@@ -1174,7 +1222,7 @@ public class AcroRenderer{
             }
             
         } else {
-            switch (subtype) {
+            switch (formType) {
                 case PdfDictionary.Tx:
                     boolean isMultiline = false, hasPassword = false;// doNotScroll = false, richtext = false, fileSelect = false, doNotSpellCheck = false;
                     if (flags != null) {
@@ -1425,14 +1473,14 @@ public class AcroRenderer{
      */
     public FormObject getFormObject(final String ref) {
         
-        FormObject obj = (FormObject) compData.getRawFormData().get(ref);
+        FormObject obj = compData.getRawFormData().get(ref);
         
         //if not found now decode all page and retry
         if (obj == null && formFactory.getType()!=FormFactory.HTML && formFactory.getType()!=FormFactory.SVG) {
             for (int ii = 1; ii < this.pageCount; ii++) {
                 
                 createDisplayComponentsForPage(ii, null);
-                obj = (FormObject) compData.getRawFormData().get(ref);
+                obj = compData.getRawFormData().get(ref);
                 
                 if (obj != null) {
                     break;
@@ -1449,7 +1497,7 @@ public class AcroRenderer{
 
     FormObject convertRefToFormObject(final String objRef, final int page) {
         
-        FormObject formObject = (FormObject) compData.getRawFormData().get(objRef);
+        FormObject formObject = compData.getRawFormData().get(objRef);
         if (formObject == null) {
 
             formObject = new FormObject(objRef);
@@ -1480,7 +1528,7 @@ public class AcroRenderer{
      * FormTypes (XFA_LEGACY, XFA_DYNAMIC, NON_XFA)
      * @return
      */
-    public Enum getPDFformType() {
+    public Enum<FormTypes> getPDFformType() {
         return PDFformType;
     }
 

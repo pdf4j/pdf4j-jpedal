@@ -41,7 +41,7 @@ import org.jpedal.utils.LogWriter;
 public class Post extends Table {
 	
 	/**map glyphs onto ID values in font*/
-    private final Map translateToID=new HashMap();
+    private final Map<String, Integer> translateToID=new HashMap<String, Integer>();
 	
 	@SuppressWarnings({"FieldCanBeLocal"})
     private final String[] macEncoding = { ".notdef", ".null",
@@ -189,7 +189,7 @@ public class Post extends Table {
 	 */
 	public int convertGlyphToCharacterCode(final String glyph) {
 
-		final Integer newID=(Integer) translateToID.get(glyph);
+		final Integer newID= translateToID.get(glyph);
 		
 		if(newID==null) {
             return 0;

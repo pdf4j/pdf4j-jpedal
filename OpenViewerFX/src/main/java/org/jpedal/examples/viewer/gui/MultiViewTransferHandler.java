@@ -74,7 +74,7 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
 				} else if (testURL.startsWith("file:/")) {
 					final String[] urls = url.split("file:/");
 					
-					final List files = new LinkedList();
+					final List<File> files = new LinkedList<File>();
                     for (final String file : urls) {
                         if (!file.isEmpty()) {
                             final File file2 = new File(new URL("file:/" + file).getFile());
@@ -99,7 +99,7 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
 
 	private boolean openFiles(final List files) {
 		fileCount = 0;
-		final List flattenedFiles = getFlattenedFiles(files, new ArrayList());
+		final List<String> flattenedFiles = getFlattenedFiles(files, new ArrayList<String>());
 		
 		if (fileCount == commonValues.getMaxMiltiViewers()) {
 			currentGUI.showMessageDialog("You have choosen to import more files than your current set " + 
@@ -200,12 +200,12 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
 		return true;
 	}
 
-	private static List[] filterFiles(final List flattenedFiles) {
-		final List allowedFiles = new LinkedList();
-		final List disAllowedFiles = new LinkedList();
+	private static List[] filterFiles(final List<String> flattenedFiles) {
+		final List<String> allowedFiles = new LinkedList<String>();
+		final List<String> disAllowedFiles = new LinkedList<String>();
 
-        for (final Object flattenedFile : flattenedFiles) {
-            final String file = ((String) flattenedFile);
+        for (final String flattenedFile : flattenedFiles) {
+            final String file = (flattenedFile);
             final String testFile = file.toLowerCase();
 
             final boolean isValid = ((testFile.endsWith(".pdf")) || (testFile.endsWith(".fdf")) ||
@@ -223,7 +223,7 @@ public class MultiViewTransferHandler extends BaseTransferHandler {
 		return new List[] { allowedFiles, disAllowedFiles };
 	}
 
-	private List getFlattenedFiles(final List files, final List flattenedFiles) {
+	private List<String> getFlattenedFiles(final List files, final List<String> flattenedFiles) {
         for (final Object file1 : files) {
             if (fileCount == commonValues.getMaxMiltiViewers()) {
                 return flattenedFiles;

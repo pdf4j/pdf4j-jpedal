@@ -832,7 +832,7 @@ public class PdfGroupingAlgorithms {
 	private void findVerticalLines(final float minX, final float minY, final float maxX, final float maxY, final int currentWritingMode) throws PdfException {
 
 		//hold counters on all x values
-		final HashMap xLines = new HashMap();
+		final HashMap<Integer, Integer> xLines = new HashMap<Integer, Integer>();
 
 		//counter on most popular item
 		int most_frequent = 0;
@@ -960,12 +960,12 @@ public class PdfGroupingAlgorithms {
 		}
 
 		//now analyse the data
-		final Iterator keys = xLines.keySet().iterator();
+		final Iterator<Integer> keys = xLines.keySet().iterator();
 		final int minimum_needed =  most_frequent / 2;
 
 		while (keys.hasNext()) {
-			final Integer current_key = (Integer) keys.next();
-			final int current_count = (Integer) xLines.get(current_key);
+			final Integer current_key = keys.next();
+			final int current_count = xLines.get(current_key);
 
 			if (current_count > minimum_needed) {
                 lineBreaks.addElement(current_key);
@@ -2257,7 +2257,7 @@ public class PdfGroupingAlgorithms {
 	 * @throws PdfException If the co-ordinates are not valid
 	 */
 	@SuppressWarnings("UnusedParameters")
-    public final Map extractTextAsTable(
+    public final Map<String, String> extractTextAsTable(
 		int x1,
 		int y1,
 		int x2,
@@ -2278,7 +2278,7 @@ public class PdfGroupingAlgorithms {
 		y2 = v[3];
 		
 		/** return the content as an Element */
-		final Map table_content = new HashMap();
+		final Map<String, String> table_content = new HashMap<String, String>();
 
 		LogWriter.writeLog("extracting Text As Table");
 
@@ -2424,7 +2424,7 @@ public class PdfGroupingAlgorithms {
 	 * @throws PdfException If the co-ordinates are not valid
 	 */
     @SuppressWarnings("UnusedParameters")
-    public final List extractTextAsWordlist(
+    public final List<String> extractTextAsWordlist(
 		int x1,
 		int y1,
 		int x2,
@@ -2507,7 +2507,7 @@ public class PdfGroupingAlgorithms {
 			}
 
 		/** put into a Vector */
-		final List values = new ArrayList();
+		final List<String> values = new ArrayList<String>();
 			
 			for (int i = 0; i < content.length; i++) {
 				if (content[i] != null) {
@@ -2726,7 +2726,7 @@ public class PdfGroupingAlgorithms {
 				 */
 			
 				/** set mappings */
-				final Map asciiMappings = new HashMap();
+				final Map<String, String> asciiMappings = new HashMap<String, String>();
 				/** [#x1-#x8] */
 				for (int i = 1; i <= 8; i++) {
                     asciiMappings.put("&#" + i + ';', "");
@@ -2754,7 +2754,7 @@ public class PdfGroupingAlgorithms {
 				/** substitute illegal XML characters for mapped values */
                 for (final Object o : asciiMappings.keySet()) {
                     final String character = (String) o;
-                    final String mappedCharacter = (String) asciiMappings.get(character);
+                    final String mappedCharacter = asciiMappings.get(character);
 
                     buf = buf.replace(character, mappedCharacter);
                 }

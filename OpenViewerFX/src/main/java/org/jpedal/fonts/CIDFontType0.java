@@ -68,7 +68,7 @@ public class CIDFontType0 extends Type1C {
     
     /**read in a font and its details from the pdf file*/
     @Override
-    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map substitutedFonts) throws Exception{
+    public void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map<String, PdfJavaGlyphs> substitutedFonts) throws Exception{
         
         fontTypes=StandardFonts.CIDTYPE0;
         this.fontID=fontID;

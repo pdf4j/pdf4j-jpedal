@@ -44,7 +44,7 @@ public class HTMLMarkedContentGenerator extends MarkedContentGenerator {
         isHTML=true;
     }
 
-    public Object getLookup() {
+    public java.util.Map<String, String> getLookup() {
         return reverseLookup;
     }
 }

@@ -59,12 +59,12 @@ public class FontResolver {
         if(gs!=null && cache.resolvedFonts.get("t-"+fontID)!=null){ //see if cached type3 font and use colour if so
              fontKey = fontID + ':' + gs.nonstrokeColorSpace.getColor().getRGB();
         }
-        restoredFont=(PdfFont) cache.resolvedFonts.get(fontKey);
+        restoredFont=cache.resolvedFonts.get(fontKey);
         
         //check it was decoded
         if(restoredFont==null){
 
-            PdfObject newFont=(PdfObject) cache.unresolvedFonts.get(fontID);
+            PdfObject newFont= cache.unresolvedFonts.get(fontID);
             if(newFont==null){ //once decoded remove from this list of stub font objects 
                 cache.directFonts.remove(fontID);
             }
@@ -114,7 +114,7 @@ public class FontResolver {
                 pdfStreamDecoder.cache.resolvedFonts.put(fontKey, restoredFont);
                 
                 if(restoredFont.getFontType()==StandardFonts.TYPE3){
-                    pdfStreamDecoder.cache.resolvedFonts.put("t-"+fontID, "T3");
+                    pdfStreamDecoder.cache.resolvedFonts.put("t-"+fontID, new PdfFont());
                 }
             }
         }

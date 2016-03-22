@@ -103,12 +103,12 @@ public class Wizard
         cardLayout = new CardLayout(); 
         cardPanel.setLayout(cardLayout);
         
-        final Map panels = panelManager.getJPanels();
-        final Set keys = panels.keySet();
+        final Map<String, JPanel> panels = panelManager.getJPanels();
+        final Set<String> keys = panels.keySet();
 
-        for (final Object key1 : keys) {
-            final String key = (String) key1;
-            cardPanel.add(key, (JPanel) panels.get(key));
+        for (final String key1 : keys) {
+            final String key = key1;
+            cardPanel.add(key, panels.get(key));
         }
 		
 		backButton = new JButton(BACK_TEXT);

@@ -56,8 +56,8 @@ import org.jpedal.render.DynamicVectorRenderer;
 public abstract class GenericFormFactory {
     
     
-    public final Map groups=new HashMap();
-    public final Map firstButtons=new HashMap();
+    public final Map<String, Object> groups = new HashMap<String, Object>();
+    public final Map<String, Object> firstButtons = new HashMap<String, Object>();
     
     /**
      * handle on Resources if exists

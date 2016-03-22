@@ -172,10 +172,11 @@ public class EmptyActionHandler implements ActionHandler {
         gotoDest(formObj,eventType,PdfDictionary.Dest);
         
         final int subtype=formObj.getParameterConstant(PdfDictionary.Subtype);
+        final int formType=formObj.getNameAsConstant(PdfDictionary.FT);
         
         final int popupFlag = formObj.getActionFlag();
         
-        if (subtype == PdfDictionary.Sig) {
+        if (formType == PdfDictionary.Sig) {
             
            // additionalAction_Signature(formObj, eventType);
             
@@ -1202,7 +1203,7 @@ public class EmptyActionHandler implements ActionHandler {
         
     }
     
-    final Map Ccalled = new HashMap();
+    final Map<String, String> Ccalled = new HashMap<String, String>();
     /**
      * C action when another field changes (recalculate this field) [javascript]
      * <br>

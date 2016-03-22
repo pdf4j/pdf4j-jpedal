@@ -77,9 +77,9 @@ public class LogWriter
      *
      * @return null if the argument is not found, otherwise a HashSet of the contained values
      */
-    private static Set getFilterSet(){
+    private static Set<String> getFilterSet(){
         final String filters = System.getProperty("org.jpedal.inclusiveLogFilters");
-        Set filterSet = null;
+        Set<String> filterSet = null;
         
         if(filters != null){
             filterSet = new HashSet<String>(Arrays.asList(filters.toLowerCase().split("[,]")));

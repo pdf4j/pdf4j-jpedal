@@ -48,7 +48,7 @@ import org.jpedal.fonts.glyph.T1Glyphs;
 public class StandardFonts {
     
     /**holds names of every character*/
-    private static Map unicode_name_mapping_table = new HashMap();
+    private static Map<String, String> unicode_name_mapping_table = new HashMap<String, String>();
     
     /**holds lookup to map char values for decoding char into name*/
     private static String[][] unicode_char_decoding_table = new String[7][335];
@@ -96,7 +96,7 @@ public class StandardFonts {
     private static final String enc = "Cp1252";
     
     /**lookup table to workout index from glyf*/
-    private static Map[] glyphToChar= new HashMap[7];
+    private static Map<String,Integer>[] glyphToChar= new HashMap[7];
     
     /**holds lookup to map char values for decoding NAME into encoded char*/
     private static String[] MAC_char_encoding_table;
@@ -127,18 +127,18 @@ public class StandardFonts {
     private static ClassLoader loader = StandardFonts.class.getClassLoader();
     
     /**list of standard fonts*/
-    private static Map standardFileList=new HashMap();
+    private static Map<String, Integer> standardFileList=new HashMap<String, Integer>();
     
     /**flag if standard font loaded*/
-    private static  Map standardFontLoaded=new HashMap();
+    private static Map<Integer, String> standardFontLoaded=new HashMap<Integer, String>();
     
     /**lookup for standard fonts which we read when object created
      * (deliberately switched back to hashtable - see case 13910)
      */
-    private static Map widthTableStandard = new Hashtable();
+    private static Map<String, Float> widthTableStandard = new Hashtable<String, Float>();
     
     /**lookup table for java fonts*/
-    protected static Map javaFontList=new HashMap();
+    protected static Map<String, String> javaFontList=new HashMap<String, String>();
     
     /**java font versions of fonts*/
     protected static String javaFonts[] =
@@ -191,13 +191,13 @@ public class StandardFonts {
         "TimesNewRoman,BoldItalic",
         "TimesNewRoman,Italic",
         "TimesNewRoman",
-        "ZapfDingbats" };
+        "Wingdings" };
     
     /**holds lookup values used by truetype font mapping*/
-    private static HashMap adobeMap;
+    private static HashMap<String, Integer> adobeMap;
     
     //hold bounds (deliberately switched back to hashtable - see case 13910)
-    private static Map fontBounds=new Hashtable();
+    private static Map<String, float[]> fontBounds=new Hashtable<String, float[]>();
     
     /**flag if standard_encoding loaded*/
     public static boolean usesGlyphlist;
@@ -294,12 +294,12 @@ public class StandardFonts {
      * get FontBonds set in afm file
      */
     public static float[] getFontBounds(final String fontName){
-        return (float[]) fontBounds.get(fontName);
+        return fontBounds.get(fontName);
     }
     
     
     public static String getUnicodeName(final String key){
-        return (String) unicode_name_mapping_table.get(key);
+        return unicode_name_mapping_table.get(key);
     }
     
     public static String getUnicodeChar(final int i, final int key){
@@ -311,7 +311,7 @@ public class StandardFonts {
         
         font=font.toLowerCase();
         
-        Object value=widthTableStandard.get(font+key);
+        Float value=widthTableStandard.get(font+key);
         if(value==null){
             String altfont=font;
             final int p=altfont.indexOf(',');
@@ -321,7 +321,7 @@ public class StandardFonts {
             }
         }
         
-        return (Float) value;
+        return value;
     }
     
     //////////////////////////////////////////////////////////////////////////
@@ -336,7 +336,7 @@ public class StandardFonts {
         int value;
         BufferedReader input_stream = null;
         
-        glyphToChar[key]=new HashMap();
+        glyphToChar[key]=new HashMap<String,Integer>();
         
         
         try {
@@ -460,7 +460,7 @@ public class StandardFonts {
         try {
             
             //initialise inverse lookup
-            glyphToChar[idx]=new HashMap();
+            glyphToChar[idx]=new HashMap<String,Integer>();
             
             input_stream =
                     new BufferedReader(
@@ -823,7 +823,7 @@ public class StandardFonts {
     protected static void loadStandardFontWidth(final String fontName){
         
         //get name of font if standard
-        final Integer fileNumber=(Integer) standardFileList.get(fontName);
+        final Integer fileNumber= standardFileList.get(fontName);
         
         
         if( fileNumber!=null && standardFontLoaded.get(fileNumber)==null){
@@ -861,7 +861,7 @@ public class StandardFonts {
         if(adobeMap==null){
             try {
                 //initialise
-                adobeMap=new HashMap();
+                adobeMap=new HashMap<String, Integer>();
                 
                 input_stream =new BufferedReader(
                         new InputStreamReader(
@@ -915,11 +915,11 @@ public class StandardFonts {
      */
     public static int getAdobeMap(final String key){
         
-        final Object value=adobeMap.get(key);
+        final Integer value=adobeMap.get(key);
         if(value==null) {
             return -1;
         } else {
-            return (Integer) value;
+            return value;
         }
         
     }
@@ -961,9 +961,9 @@ public class StandardFonts {
     /**
      * open font , read postscript, and return Map with font details
      */
-    public static Map getFontDetails(final int type, final String subFont) {
+    public static Map<String, String> getFontDetails(final int type, final String subFont) {
         
-        final Map fontDetails=new HashMap();
+        final Map<String, String> fontDetails=new HashMap<String, String>();
         
         /**read in font data*/
         if(type==TRUETYPE || type==TRUETYPE_COLLECTION){

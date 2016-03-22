@@ -283,7 +283,7 @@ private static final int plusInt = 43;
         if(rawChars.isUnicode()){
             //its unicode
             while(rawChars.hasMoreTokens()){
-                nextChar=rawChars.nextUnicodeToken();
+                nextChar=rawChars.nextUnicodeToken(keepReturns);
                 
                 //breask a file and does not appear used so removed 2013/5/20
                 if(nextChar==9 || (!keepReturns && (nextChar==10 || nextChar==13))){

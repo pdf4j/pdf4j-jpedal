@@ -77,7 +77,7 @@ public class Type3 extends PdfFont {
     
     /**read in a font and its details from the pdf file*/
     @Override
-    public final void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map substitutedFonts) throws Exception{
+    public final void createFont(final PdfObject pdfObject, final String fontID, final boolean renderPage, final ObjectStore objectStore, final Map<String, org.jpedal.fonts.glyph.PdfJavaGlyphs> substitutedFonts) throws Exception{
         
         fontTypes=StandardFonts.TYPE3;
         
@@ -188,7 +188,7 @@ public class Type3 extends PdfFont {
                         otherKey=-1;
                         
                        // System.out.println("str="+" "+rawDiffKeys.keySet());
-                        key=((Number)rawDiffKeys.get(keyPairs.getNextKeyAsString())).intValue();
+                        key=(rawDiffKeys.get(keyPairs.getNextKeyAsString()));
                         
                         glyphs.setT3Glyph(key,otherKey, glyph);
                         

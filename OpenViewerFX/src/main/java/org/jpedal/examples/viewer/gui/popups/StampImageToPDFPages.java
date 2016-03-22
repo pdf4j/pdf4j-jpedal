@@ -82,17 +82,17 @@ public class StampImageToPDFPages extends Save
 	
 	final JSpinner rotationBox = new JSpinner(new SpinnerNumberModel(0, 0, 360, 1));
 	
-	final JComboBox placementBox = new JComboBox(new String[] {Messages.getMessage("PdfViewerLabel.Overlay"),
+	final JComboBox<String> placementBox = new JComboBox<String>(new String[] {Messages.getMessage("PdfViewerLabel.Overlay"),
 			Messages.getMessage("PdfViewerLabel.Underlay")});
 	
 	final JSpinner heightScale = new JSpinner(new SpinnerNumberModel(100, 1, 1000, 1));
 	final JSpinner widthScale = new JSpinner(new SpinnerNumberModel(100, 1, 1000, 1));
 		
-	final JComboBox horizontalBox = new JComboBox(new String[]{Messages.getMessage("PdfViewerLabel.FromLeft"),
+	final JComboBox<String> horizontalBox = new JComboBox<String>(new String[]{Messages.getMessage("PdfViewerLabel.FromLeft"),
 			Messages.getMessage("PdfViewerLabel.Centered"),Messages.getMessage("PdfViewerLabel.FromRight")
 	});
 	
-	final JComboBox verticalBox = new JComboBox(new String[]{Messages.getMessage("PdfViewerLabel.FromTop"),
+	final JComboBox<String> verticalBox = new JComboBox<String>(new String[]{Messages.getMessage("PdfViewerLabel.FromTop"),
 			Messages.getMessage("PdfViewerLabel.Centered"),Messages.getMessage("PdfViewerLabel.FromBottom")
 	});
 	

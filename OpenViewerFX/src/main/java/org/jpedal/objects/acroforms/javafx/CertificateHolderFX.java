@@ -80,7 +80,7 @@ public class CertificateHolderFX {
         button1.setOnAction(new EventHandler<javafx.event.ActionEvent>(){
             @Override
             public void handle(final ActionEvent t) {
-//                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//                throw new UnsupportedOperationException("Not supported yet."); 
                 frame.close();
             }
             

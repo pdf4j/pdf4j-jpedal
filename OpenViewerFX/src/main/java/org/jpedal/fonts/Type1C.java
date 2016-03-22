@@ -1241,7 +1241,7 @@ public class Type1C extends Type1{
             final PdfObject pdfObject,
             final String fontID,
             final boolean renderPage,
-            final ObjectStore objectStore, final Map substitutedFonts)
+            final ObjectStore objectStore, final Map<String, PdfJavaGlyphs> substitutedFonts)
             throws Exception {
         
         fontTypes = StandardFonts.TYPE1;
@@ -2579,7 +2579,7 @@ public class Type1C extends Type1{
         if(BBox==null){
             if(isFontEmbedded) {
                 BBox=new Rectangle((int)FontBBox[0], (int)FontBBox[1],
-                        (int)(FontBBox[2]-FontBBox[0]), (int)(FontBBox[3]-FontBBox[1]));  //To change body of created methods use File | Settings | File Templates.
+                        (int)(FontBBox[2]-FontBBox[0]), (int)(FontBBox[3]-FontBBox[1]));  
             } else {
                 BBox=super.getBoundingBox();
             }

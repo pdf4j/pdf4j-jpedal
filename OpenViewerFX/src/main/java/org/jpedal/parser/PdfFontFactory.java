@@ -46,6 +46,7 @@ import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Convert font info into one of our supporting classes
@@ -68,7 +69,7 @@ public class PdfFontFactory {
     private int origfontType;
 
     //only load 1 instance of any 1 font
-    private final  HashMap fontsLoaded=new HashMap(50);
+    private final HashMap<String, org.jpedal.fonts.glyph.PdfJavaGlyphs> fontsLoaded=new HashMap<String, org.jpedal.fonts.glyph.PdfJavaGlyphs>(50);
 
     final PdfObjectReader currentPdfFile;
 
@@ -160,7 +161,7 @@ public class PdfFontFactory {
                     }
                 }
                 
-                subFont=(String) FontMappings.fontSubstitutionLocation.get(replacementFont);
+                subFont= FontMappings.fontSubstitutionLocation.get(replacementFont);
                 fontType=StandardFonts.TRUETYPE;
                 
             }  
@@ -365,9 +366,9 @@ public class PdfFontFactory {
 
         String testFont=baseFont, nextSubType;
 
-        subFont=(String) FontMappings.fontSubstitutionLocation.get(testFont);
+        subFont= FontMappings.fontSubstitutionLocation.get(testFont);
 
-        String newSubtype=(String)FontMappings.fontSubstitutionTable.get(testFont);
+        String newSubtype= FontMappings.fontSubstitutionTable.get(testFont);
 
         //do not replace on MAC as default does not have certain values we need
         if(DecoderOptions.isRunningOnMac && testFont.equals("zapfdingbats")) {
@@ -377,10 +378,10 @@ public class PdfFontFactory {
         //check aliases
         if(newSubtype==null){
             //check for mapping
-            final HashMap fontsMapped=new HashMap(50);
+            final HashSet<String> fontsMapped=new HashSet<String>(50);
             String nextFont;
             while(true){
-                nextFont=(String) FontMappings.fontSubstitutionAliasTable.get(testFont);
+                nextFont= FontMappings.fontSubstitutionAliasTable.get(testFont);
 
                 if(nextFont==null) {
                     break;
@@ -388,23 +389,23 @@ public class PdfFontFactory {
 
                 testFont=nextFont;
 
-                nextSubType=(String)FontMappings.fontSubstitutionTable.get(testFont);
+                nextSubType= FontMappings.fontSubstitutionTable.get(testFont);
 
                 if(nextSubType!=null){
                     newSubtype=nextSubType;
-                    subFont=(String) FontMappings.fontSubstitutionLocation.get(testFont);
+                    subFont= FontMappings.fontSubstitutionLocation.get(testFont);
                 }
 
-                if(fontsMapped.containsKey(testFont)){
+                if(fontsMapped.contains(testFont)){
                 	//use string buffer and stringbuilder does not exist in java ME
                     final StringBuilder errorMessage = new StringBuilder("[PDF] Circular font mapping for fonts");
-                    for (final Object o : fontsMapped.keySet()) {
+                    for (final Object o : fontsMapped.toArray()) {
                         errorMessage.append(' ');
                         errorMessage.append(o);
                     }
                     throw new PdfException(errorMessage.toString());
                 }
-                fontsMapped.put(nextFont,"x");
+                fontsMapped.add(nextFont);
             }
         }
         return newSubtype;
@@ -413,7 +414,7 @@ public class PdfFontFactory {
     /**
      * check for embedded font file to see if font embedded
      */
-    private static boolean isFontEmbedded(PdfObject pdfObject) {
+    public static boolean isFontEmbedded(PdfObject pdfObject) {
 
         //ensure we are looking in DescendantFonts object if CID
         final int fontType=pdfObject.getParameterConstant(PdfDictionary.Subtype);

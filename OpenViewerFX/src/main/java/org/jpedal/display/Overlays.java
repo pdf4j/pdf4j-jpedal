@@ -42,13 +42,13 @@ import java.util.Map;
 @SuppressWarnings("UnusedDeclaration")
 public class Overlays {
 
-    private final Map overlayType = new HashMap();
-    private final Map overlayColors = new HashMap();
-    private final Map overlayObj = new HashMap();
+    private final Map<Integer, int[]> overlayType = new HashMap<Integer, int[]>();
+    private final Map<Integer, Color[]> overlayColors = new HashMap<Integer, Color[]>();
+    private final Map<Integer, Object[]> overlayObj = new HashMap<Integer, Object[]>();
 
-    private final Map overlayTypeG = new HashMap();
-    private final Map overlayColorsG = new HashMap();
-    private final Map overlayObjG = new HashMap();
+    private final Map<Integer, int[]> overlayTypeG = new HashMap<Integer, int[]>();
+    private final Map<Integer, Color[]> overlayColorsG = new HashMap<Integer, Color[]>();
+    private final Map<Integer, Object[]> overlayObjG = new HashMap<Integer, Object[]>();
 
     public void printAdditionalObjectsOverPage(final int page, final int[] type, final Color[] colors, final Object[] obj) throws PdfException {
 
@@ -65,7 +65,7 @@ public class Overlays {
 
 
 
-            final int[] oldType = (int[]) overlayType.get(key);
+            final int[] oldType = overlayType.get(key);
             if (oldType == null){
                 overlayType.put(key, type);
 
@@ -83,7 +83,7 @@ public class Overlays {
             }
 
 
-            final Color[] oldCol = (Color[]) overlayColors.get(key);
+            final Color[] oldCol = overlayColors.get(key);
             if (oldCol == null) {
                 overlayColors.put(key, colors);
             } else { //merge items
@@ -99,7 +99,7 @@ public class Overlays {
                 overlayColors.put(key, combined);
             }
 
-            final Object[] oldObj = (Object[]) overlayObj.get(key);
+            final Object[] oldObj = overlayObj.get(key);
 
             if (oldType == null) {
                 overlayObj.put(key, obj);
@@ -130,7 +130,7 @@ public class Overlays {
 
         } else { //store for printing and add if items already there
 
-            final int[] oldType = (int[]) overlayTypeG.get(key);
+            final int[] oldType = overlayTypeG.get(key);
             if (oldType == null){
                 overlayTypeG.put(key, type);
 
@@ -148,7 +148,7 @@ public class Overlays {
             }
 
 
-            final Color[] oldCol = (Color[]) overlayColorsG.get(key);
+            final Color[] oldCol = overlayColorsG.get(key);
             if (oldCol == null) {
                 overlayColorsG.put(key, colors);
             } else { //merge items
@@ -164,7 +164,7 @@ public class Overlays {
                 overlayColorsG.put(key, combined);
             }
 
-            final Object[] oldObj = (Object[]) overlayObjG.get(key);
+            final Object[] oldObj = overlayObjG.get(key);
 
             if (oldType == null) {
                 overlayObjG.put(key, obj);
@@ -199,9 +199,9 @@ public class Overlays {
 
         //store for printing (global first)
         final Integer keyG = -1;
-        final int[] typeG = (int[]) overlayTypeG.get(keyG);
-        final Color[] colorsG = (Color[]) overlayColorsG.get(keyG);
-        final Object[] objG = (Object[]) overlayObjG.get(keyG);
+        final int[] typeG = overlayTypeG.get(keyG);
+        final Color[] colorsG = overlayColorsG.get(keyG);
+        final Object[] objG = overlayObjG.get(keyG);
 
         //add to screen display
         dvr.drawAdditionalObjectsOverPage(typeG, colorsG, objG);
@@ -209,9 +209,9 @@ public class Overlays {
         //store for printing
         final Integer key = page;
 
-        final int[] type = (int[]) overlayType.get(key);
-        final Color[] colors = (Color[]) overlayColors.get(key);
-        final Object[] obj = (Object[]) overlayObj.get(key);
+        final int[] type = overlayType.get(key);
+        final Color[] colors = overlayColors.get(key);
+        final Object[] obj = overlayObj.get(key);
 
         //add to screen display
         dvr.drawAdditionalObjectsOverPage(type, colors, obj);

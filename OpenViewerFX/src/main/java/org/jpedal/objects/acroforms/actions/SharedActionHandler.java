@@ -195,10 +195,11 @@ public abstract class SharedActionHandler implements ActionHandler {
         gotoDest(formObj,eventType,PdfDictionary.Dest);
         
         final int subtype=formObj.getParameterConstant(PdfDictionary.Subtype);
+        final int formType=formObj.getNameAsConstant(PdfDictionary.FT);
         
         final int popupFlag = formObj.getActionFlag();
         
-        if (subtype == PdfDictionary.Sig) {
+        if (formType == PdfDictionary.Sig) {
             
             additionalAction_Signature(formObj, eventType);
             
@@ -403,7 +404,7 @@ public abstract class SharedActionHandler implements ActionHandler {
                 break;
 
             case PdfDictionary.ZoomTo: {//create scaling values list, taken from Viewer.init(resourceBundle)
-                final JComboBox scaling = new JComboBox(new String[]{Messages.getMessage("PdfViewerScaleWindow.text"), Messages.getMessage("PdfViewerScaleHeight.text"),
+                final JComboBox<String> scaling = new JComboBox<String>(new String[]{Messages.getMessage("PdfViewerScaleWindow.text"), Messages.getMessage("PdfViewerScaleHeight.text"),
                     Messages.getMessage("PdfViewerScaleWidth.text"),
                     "25", "50", "75", "100", "125", "150", "200", "250", "500", "750", "1000"});
                 final int option = JOptionPane.showConfirmDialog(null, scaling, Messages.getMessage("PdfViewerToolbarScaling.text") + ':', JOptionPane.DEFAULT_OPTION);
@@ -1439,7 +1440,7 @@ public abstract class SharedActionHandler implements ActionHandler {
         
     }
     
-    final Map Ccalled = new HashMap();
+    final Map<String, String> Ccalled = new HashMap<String, String>();
     /**
      * C action when another field changes (recalculate this field) [javascript]
      * <br>

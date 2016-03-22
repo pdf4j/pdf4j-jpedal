@@ -32,7 +32,9 @@
  */
 package org.jpedal.parser;
 
+import org.jpedal.color.GenericColorSpace;
 import org.jpedal.exception.PdfException;
+import org.jpedal.fonts.PdfFont;
 import org.jpedal.objects.raw.*;
 import org.jpedal.utils.StringUtils;
 
@@ -55,32 +57,33 @@ public class PdfObjectCache {
     private static final int initSize=50;
 
     //int values for all colorspaces
-    private final Map colorspacesUsed=new HashMap(initSize);
+    private final Map<java.io.Serializable, Object> colorspacesUsed=new HashMap<java.io.Serializable, Object>(initSize);
 
-    private final Map colorspacesObjects=new HashMap(initSize);
+    private final Map<java.io.Serializable, Object> colorspacesObjects=new HashMap<java.io.Serializable, Object>(initSize);
 
     /**colors*/
-    private Map colorspaces=new HashMap(initSize);
+    private Map<Object, PdfObject> colorspaces=new HashMap<Object, PdfObject>(initSize);
 
-    private Map globalXObjects = new HashMap(initSize),localXObjects=new HashMap(initSize);
+    private Map<Object, PdfObject> globalXObjects = new HashMap<Object, PdfObject>(initSize);
+    private Map<Object, PdfObject> localXObjects=new HashMap<Object, PdfObject>(initSize);
 
-    public final Map XObjectColorspaces=new HashMap(initSize);
+    public final Map<String, GenericColorSpace> XObjectColorspaces=new HashMap<String, GenericColorSpace>(initSize);
 
-    public final Map patterns=new HashMap(initSize);
-    private final Map globalShadings=new HashMap(initSize);
-    private Map localShadings=new HashMap(initSize);
+    public final Map<String, PdfObject> patterns=new HashMap<String, PdfObject>(initSize);
+    private final Map<String, PdfObject> globalShadings=new HashMap<String, PdfObject>(initSize);
+    private Map<String, PdfObject> localShadings=new HashMap<String, PdfObject>(initSize);
 
-    final Map imposedImages = new HashMap(initSize);
+    final Map<String, Integer> imposedImages = new HashMap<String, Integer>(initSize);
 
     public PdfObject groupObj;
 
     /**fonts*/
-    public Map unresolvedFonts=new HashMap(initSize);
-    public Map directFonts=new HashMap(initSize);
-    public Map resolvedFonts=new HashMap(initSize);
+    public Map<Object, PdfObject> unresolvedFonts=new HashMap<Object, PdfObject>(initSize);
+    public Map<String, PdfObject> directFonts=new HashMap<String, PdfObject>(initSize);
+    public Map<String, PdfFont> resolvedFonts=new HashMap<String, PdfFont>(initSize);
 
     /**GS*/
-    Map GraphicsStates=new HashMap(initSize);
+    Map<Object, PdfObject> GraphicsStates=new HashMap<Object, PdfObject>(initSize);
 
     public PdfObjectCache copy() {
 
@@ -140,9 +143,9 @@ public class PdfObjectCache {
         return returnValue;
     }
 
-    public Iterator iterator(final int type){
+    public Iterator<java.io.Serializable> iterator(final int type){
 
-        Iterator returnValue=null;
+        Iterator<java.io.Serializable> returnValue=null;
 
         switch(type){
             case ColorspacesUsed:
@@ -190,9 +193,9 @@ public class PdfObjectCache {
 
     public PdfObject getXObjects(final String localName) {
 
-        PdfObject XObject = (PdfObject) localXObjects.get(localName);
+        PdfObject XObject = localXObjects.get(localName);
         if (XObject == null) {
-            XObject = (PdfObject) globalXObjects.get(localName);
+            XObject = globalXObjects.get(localName);
         }
 
         return XObject;
@@ -341,15 +344,15 @@ public class PdfObjectCache {
     public void reset(final PdfObjectCache newCache) {
 
         //reset copies
-        localShadings=new HashMap(initSize);
+        localShadings=new HashMap<String, PdfObject>(initSize);
         resolvedFonts=new HashMap(initSize);
-        unresolvedFonts=new HashMap(initSize);
-        directFonts=new HashMap(initSize);
-        colorspaces=new HashMap(initSize);
-        GraphicsStates=new HashMap(initSize);
-        localXObjects=new HashMap(initSize);
+        unresolvedFonts=new HashMap<Object, PdfObject>(initSize);
+        directFonts=new HashMap<String, PdfObject>(initSize);
+        colorspaces=new HashMap<Object, PdfObject>(initSize);
+        GraphicsStates=new HashMap<Object, PdfObject>(initSize);
+        localXObjects=new HashMap<Object, PdfObject>(initSize);
 
-        Iterator keys=newCache.GraphicsStates.keySet().iterator();
+        Iterator<Object> keys=newCache.GraphicsStates.keySet().iterator();
         while(keys.hasNext()){
             final Object key=keys.next();
             GraphicsStates.put(key,newCache.GraphicsStates.get(key));

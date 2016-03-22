@@ -68,7 +68,9 @@ public class BooleanValue {
             
         }else if(raw[keyStart]=='f' && raw[keyStart+1]=='a' && raw[keyStart+2]=='l' && raw[keyStart+3]=='s' && raw[keyStart+4]=='e'){
             pdfObject.setBoolean(PDFkeyInt,false);
-            
+         }else if(raw[keyStart]=='0' && raw[keyStart+1]=='/' ){ //allow for zero instead of false (see 24449) 
+            pdfObject.setBoolean(PDFkeyInt,false);
+             
         }else {
             throw new RuntimeException("Unexpected value for Boolean value for" + PDFkeyInt);
         }

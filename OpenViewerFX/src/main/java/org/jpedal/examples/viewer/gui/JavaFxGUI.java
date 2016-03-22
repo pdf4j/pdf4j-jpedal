@@ -115,12 +115,10 @@ import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions.TransitionType;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXInputDialog;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXMessageDialog;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXOptionDialog;
-import org.jpedal.examples.viewer.gui.popups.PrintPanelFX;
 import org.jpedal.examples.viewer.paper.PaperSizes;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.external.ExternalHandlers;
 import org.jpedal.external.Options;
-import org.jpedal.external.RenderChangeListener;
 import org.jpedal.fonts.tt.TTGlyph;
 import org.jpedal.io.StatusBarFX;
 import org.jpedal.objects.PdfPageData;
@@ -260,8 +258,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     private MenuBar options;
 
     private boolean cursorOverPage;
-
-    private PrintPanelFX printPanel;
 
     private TransitionType transitionType = TransitionType.None;
     // Scrolls between pages when the pdf is not zoomed in
@@ -1140,8 +1136,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
          */
         fxButtons.addButton(GUIFactory.BUTTONBAR, Messages.getMessage("PdfViewerToolbarTooltip.openFile"), "open.gif", Commands.OPENFILE, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
 
-        fxButtons.addButton(GUIFactory.BUTTONBAR, Messages.getMessage("PdfViewerToolbarTooltip.print"), "print.gif", Commands.PRINT, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
-
         if (searchFrame != null && (searchFrame.getViewStyle() == GUISearchWindow.SEARCH_EXTERNAL_WINDOW || (searchFrame.getViewStyle() == GUISearchWindow.SEARCH_MENU_BAR && !isSingle))) {
             searchFrame.setViewStyle(GUISearchWindow.SEARCH_EXTERNAL_WINDOW);
             fxButtons.addButton(GUIFactory.BUTTONBAR, Messages.getMessage("PdfViewerToolbarTooltip.search"), "find.gif", Commands.FIND, menuItems, this, currentCommandListener, pagesToolBar, navToolBar);
@@ -1633,11 +1627,6 @@ public class JavaFxGUI extends GUI implements GUIFactory {
             Platform.runLater(doPaintComponent);
         }
 
-        boolean needsReset = (displayView != Display.SINGLE_PAGE || lastDisplayView != Display.SINGLE_PAGE);
-        if (needsReset && (lastDisplayView == Display.FACING || displayView == Display.FACING)) {
-            needsReset = false;
-        }
-
         final boolean hasChanged = displayView != lastDisplayView;
 
         options.setDisplayView(displayView);
@@ -1672,25 +1661,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
                 pages = new PageFlowDisplayFX((GUIFactory) customFXHandle, comp);
 
                 break;
-              
-            default:
-
-                if (needsReset) {
-                    pages = new MultiDisplayFX(this, pageNumber, decode_pdf.getDynamicRenderer(), displayView, comp, options, fileAccess);
-                    //displayRotation = displayRotation;
-                    pages.setPageRotation(decode_pdf.getDisplayRotation()); //force update
-                } else {
-                    pages = new MultiDisplayFX(this, pageNumber, decode_pdf.getDynamicRenderer(), displayView, comp, options, fileAccess);
-                }
-
-                //pass in value if needed
-                final RenderChangeListener customRenderChangeListener = (RenderChangeListener) externalHandlers.getExternalHandler(Options.RenderChangeListener);
-                if (customRenderChangeListener != null) {
-                    pages.setObjectValue(Options.RenderChangeListener, customRenderChangeListener);
-                }
-                
-                break;
-
+            
         }
 
         /**
@@ -3175,44 +3146,9 @@ public class JavaFxGUI extends GUI implements GUIFactory {
     @Override
     public Object printDialog(final String[] printersList, final String defaultPrinter) {
 
-        if (debugFX) {
-            System.out.println("printDialog");
-        }
-
-        //get default resolution
-        String propValue = properties.getValue("defaultDPI");
-        int defaultDPI = -1;
-        if (propValue != null && !propValue.isEmpty()) {
-            try {
-                propValue = propValue.replaceAll("[^0-9]", "");
-                defaultDPI = Integer.parseInt(propValue);
-            } catch (final Exception e) {
-                LogWriter.writeLog("Exception attempting get properties value" + e);
-            }
-        }
-
-        if (printPanel == null) {
-            printPanel = new PrintPanelFX(printersList, defaultPrinter, getPaperSizes(), defaultDPI, commonValues.getCurrentPage(), decode_pdf);
-            //System.out.println("New print panel!!!!");
-        } else {
-            printPanel.resetDefaults(printersList, defaultPrinter, commonValues.getPageCount(), commonValues.getCurrentPage());
-        }
-//
-//		printDialog.getContentPane().add(printPanel);
-//
-//		printDialog.setSize(670, 415);
-//        printDialog.setResizable(false);
-//        //printDialog.setIconImage(new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
-//		printDialog.setLocationRelativeTo(frame);
-//		printDialog.setName("printDialog");
-//		printDialog.setVisible(true);
-//
-//		printDialog.remove(printPanel);
-
-        //Required as flag is not reset as it is in swing version
-        printPanel.setVisible(true);
-
-        return printPanel;
+        System.err.println("Print is  not supported in FX Viewer");
+        
+        return null;
     }
 
     @Override
@@ -3642,7 +3578,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
      */
     @Override
     protected void addComboListenerAndLabel(final GUICombo combo, final String title) {
-        ((JavaFXCombo) combo).setOnAction((EventHandler)currentCommandListener.getCommandListener());
+        ((JavaFXCombo) combo).setOnAction((EventHandler<ActionEvent>)currentCommandListener.getCommandListener());
     }
 
     /**
@@ -4115,7 +4051,7 @@ public class JavaFxGUI extends GUI implements GUIFactory {
 
     /**
      * Creates the top two menu bars, the file loading & viewer properties one
-     * and the PDF toolbar, the one which controls printing, searching etc.
+     * and the PDF toolbar, the one which controls searching etc.
      */
     @Override
     protected void createTopMenuBar() {

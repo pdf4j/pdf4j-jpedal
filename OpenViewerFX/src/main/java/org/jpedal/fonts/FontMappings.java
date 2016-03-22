@@ -69,32 +69,36 @@ public class FontMappings {
     /**
      * used to remap fonts onto truetype fonts (set internally)
      */
-    public static Map fontSubstitutionTable;
+    public static Map<String, String> fontSubstitutionTable;
     
     /**
      * hold details of all fonts
      */
-    public static Map fontPropertiesTable;
-    
+    public static Map<String, String> fontPropertiesTable;
+
+    public static Map<String, Integer> fontPropertiesTableType;
+
+    public static Map<String, String> fontPropertiesTablePath;
+
     /**
      * used to ensure substituted fonts unique
      */
-    public static Map fontPossDuplicates;
+    public static Map<String, String> fontPossDuplicates;
     
     /**
      * used to store number for subfonts in TTC
      */
-    public static Map fontSubstitutionFontID;
+    public static Map<String, Integer> fontSubstitutionFontID;
     
     /**
      * used to remap fonts onto truetype fonts (set internally)
      */
-    public static Map fontSubstitutionLocation = new ConcurrentHashMap();
+    public static Map<String, String> fontSubstitutionLocation = new ConcurrentHashMap<String, String>();
     
     /**
      * used to remap fonts onto truetype fonts (set internally)
      */
-    public static Map fontSubstitutionAliasTable = new ConcurrentHashMap();
+    public static Map<String, String> fontSubstitutionAliasTable = new ConcurrentHashMap<String, String>();
     
     /**only upload all fonts once*/
     private static boolean fontsSet;
@@ -245,6 +249,9 @@ public class FontMappings {
         
         fontSubstitutionTable=null;
         fontPropertiesTable=null;
+        fontPropertiesTableType=null;
+        fontPropertiesTablePath=null;
+
         fontPossDuplicates=null;
         fontSubstitutionFontID = null;
         fontSubstitutionLocation = null;
@@ -257,10 +264,12 @@ public class FontMappings {
     public static String addTTDir(final String fontPath, String failed) {
         
         if ( fontSubstitutionTable == null) {
-            fontSubstitutionTable = new ConcurrentHashMap();
-            fontSubstitutionFontID = new ConcurrentHashMap();
-            fontPossDuplicates = new ConcurrentHashMap();
-            fontPropertiesTable = new ConcurrentHashMap();
+            fontSubstitutionTable = new ConcurrentHashMap<String, String>();
+            fontSubstitutionFontID = new ConcurrentHashMap<String, Integer>();
+            fontPossDuplicates = new ConcurrentHashMap<String, String>();
+            fontPropertiesTable = new ConcurrentHashMap<String, String>();
+            fontPropertiesTableType = new ConcurrentHashMap<String, Integer>();
+            fontPropertiesTablePath = new ConcurrentHashMap<String, String>();
         }
         
         final File currentDir = new File(fontPath);
@@ -363,6 +372,7 @@ public class FontMappings {
             setSubstitutedFontAliases("times",new String[] {"Times-Roman","TimesNewRoman","Times","TimesNewRomanPSMT"});
             
             setSubstitutedFontAliases("wingdings",new String[] {"ZapfDingbats","ZaDb"});
+            // setSubstitutedFontAliases("wingding",new String[] {"ZapfDingbats","ZaDb","wingdings"});
             
         }
         
@@ -418,10 +428,12 @@ public class FontMappings {
         String failed = null;
         
         if (FontMappings.fontSubstitutionTable == null) {
-            fontSubstitutionTable = new ConcurrentHashMap();
-            fontSubstitutionFontID = new ConcurrentHashMap();
-            fontPossDuplicates = new ConcurrentHashMap();
-            fontPropertiesTable = new ConcurrentHashMap();
+            fontSubstitutionTable = new ConcurrentHashMap<String, String>();
+            fontSubstitutionFontID = new ConcurrentHashMap<String, Integer>();
+            fontPossDuplicates = new ConcurrentHashMap<String, String>();
+            fontPropertiesTable = new ConcurrentHashMap<String, String>();
+            fontPropertiesTableType = new ConcurrentHashMap<String, Integer>();
+            fontPropertiesTablePath = new ConcurrentHashMap<String, String>();
         }
         
         try {
@@ -434,6 +446,8 @@ public class FontMappings {
                 fontSubstitutionFontID.clear();
                 fontPossDuplicates.clear();
                 fontPropertiesTable.clear();
+                fontPropertiesTableType.clear();
+                fontPropertiesTablePath.clear();
                 
                 fontsSet=false;
             } else {
@@ -550,7 +564,7 @@ public class FontMappings {
                     if (in != null) {
                         System.out.println("Found  " + path + ' ' + in);
                         
-                        final ArrayList fonts;
+                        final ArrayList<String> fonts;
                         
                         try {
                             
@@ -564,9 +578,9 @@ public class FontMappings {
                             String value, fontName;
                             
                             // now assign the fonts
-                            for (final Object font : fonts) {
+                            for (final String font : fonts) {
                                 
-                                value = (String) font;
+                                value = font;
                                 
                                 if (value == null) {
                                     break;
@@ -635,12 +649,14 @@ public class FontMappings {
     public static void addFontFile(final String currentFont, String fontPath) {
         
         if ( fontSubstitutionTable == null) {
-            fontSubstitutionTable = new ConcurrentHashMap();
-            fontSubstitutionFontID = new ConcurrentHashMap();
-            fontPossDuplicates = new ConcurrentHashMap();
-            fontPropertiesTable = new ConcurrentHashMap();
+            fontSubstitutionTable = new ConcurrentHashMap<String, String>();
+            fontSubstitutionFontID = new ConcurrentHashMap<String, Integer>();
+            fontPossDuplicates = new ConcurrentHashMap<String, String>();
+            fontPropertiesTable = new ConcurrentHashMap<String, String>();
+            fontPropertiesTableType = new ConcurrentHashMap<String, Integer>();
+            fontPropertiesTablePath = new ConcurrentHashMap<String, String>();
         }
-        
+
         //add separator if needed
         if (fontPath != null && !fontPath.endsWith("/") && !fontPath.endsWith("\\")) {
             fontPath += separator;
@@ -696,8 +712,8 @@ public class FontMappings {
                     fontSubstitutionLocation.put(fontName, fontPath + currentFont);
                     
                     //store details under file
-                    fontPropertiesTable.put(fontName+"_type", type);
-                    fontPropertiesTable.put(fontName+"_path",fontPath + currentFont);
+                    fontPropertiesTableType.put(fontName, type);
+                    fontPropertiesTablePath.put(fontName,fontPath + currentFont);
                     
                 } else if (type == StandardFonts.TRUETYPE_COLLECTION || type == StandardFonts.TRUETYPE) {
                     
@@ -735,8 +751,8 @@ public class FontMappings {
                                 familyNames[ii] = Strip.stripAllSpaces(fontName);
                             }
                             
-                            final Object fontSubValue=  fontSubstitutionTable.get(postscriptNames[ii]);
-                            final Object possDuplicate= fontPossDuplicates.get(postscriptNames[ii]);
+                            final String fontSubValue=  fontSubstitutionTable.get(postscriptNames[ii]);
+                            final String possDuplicate= fontPossDuplicates.get(postscriptNames[ii]);
                             if(fontSubValue==null && possDuplicate==null){ //first time so store and track
                                 
                                 //System.out.println("store "+postscriptNames[ii]);
@@ -758,8 +774,8 @@ public class FontMappings {
                                 fontSubstitutionFontID.put(postscriptNames[ii], ii);
                                 
                                 //store details under file
-                                fontPropertiesTable.put(postscriptNames[ii]+"_type", type);
-                                fontPropertiesTable.put(postscriptNames[ii]+"_path",fontPath + currentFont);
+                                fontPropertiesTableType.put(postscriptNames[ii], type);
+                                fontPropertiesTablePath.put(postscriptNames[ii],fontPath + currentFont);
                                 
                                 //if second find change first match
                                 if(!possDuplicate.equals("DONE")){
@@ -773,7 +789,7 @@ public class FontMappings {
                                     fontSubstitutionTable.remove(postscriptNames[ii]);
                                     fontSubstitutionTable.put(familyNames[ii], "/TrueType");
                                     
-                                    final String font=(String) fontSubstitutionLocation.get(postscriptNames[ii]);
+                                    final String font= fontSubstitutionLocation.get(postscriptNames[ii]);
                                     fontSubstitutionLocation.remove(postscriptNames[ii]);
                                     fontSubstitutionLocation.put(familyNames[ii], font);
                                     
@@ -781,11 +797,11 @@ public class FontMappings {
                                     fontSubstitutionFontID.put(familyNames[ii], ii);
                                     
                                     //store details under file
-                                    fontPropertiesTable.remove(familyNames[ii]+"_path");
-                                    fontPropertiesTable.remove(familyNames[ii]+"_type");
+                                    fontPropertiesTablePath.remove(familyNames[ii]);
+                                    fontPropertiesTableType.remove(familyNames[ii]);
                                     
-                                    fontPropertiesTable.put(familyNames[ii]+"_type", type);
-                                    fontPropertiesTable.put(familyNames[ii]+"_path",fontPath + currentFont);
+                                    fontPropertiesTableType.put(familyNames[ii], type);
+                                    fontPropertiesTablePath.put(familyNames[ii],fontPath + currentFont);
                                     
                                 }
                             }
@@ -813,8 +829,8 @@ public class FontMappings {
                                 fontSubstitutionFontID.put(fontNames[i], i);
                                 
                                 //store details under file
-                                fontPropertiesTable.put(fontNames[i]+"_type", type);
-                                fontPropertiesTable.put(fontNames[i]+"_path",fontPath + currentFont);
+                                fontPropertiesTableType.put(fontNames[i], type);
+                                fontPropertiesTablePath.put(fontNames[i],fontPath + currentFont);
                             }
                         }
                     }
@@ -843,8 +859,8 @@ public class FontMappings {
                             fontSubstitutionFontID.put(fontNames[i], i);
                             
                             //store details under file
-                            fontPropertiesTable.put(fontNames[i]+"_type", type);
-                            fontPropertiesTable.put(fontNames[i]+"_path",fontPath + currentFont);
+                            fontPropertiesTableType.put(fontNames[i], type);
+                            fontPropertiesTablePath.put(fontNames[i],fontPath + currentFont);
                             
                         }
                     }
@@ -864,13 +880,13 @@ public class FontMappings {
         }
     }
     
-    private static ArrayList getDirectoryMatches(String sDirectoryName) throws IOException {
+    private static ArrayList<String> getDirectoryMatches(String sDirectoryName) throws IOException {
         
         sDirectoryName=sDirectoryName.replaceAll("\\.", "/");
         
         final URL u = Thread.currentThread().getContextClassLoader().getResource(
                 sDirectoryName);
-        final ArrayList retValue = new ArrayList(0);
+        final ArrayList<String> retValue = new ArrayList<String>(0);
         String s = u.toString();
         
         System.out.println("scanning " + s);
@@ -886,8 +902,8 @@ public class FontMappings {
             final JarURLConnection conn = (JarURLConnection) url.openConnection();
             final JarFile jar = conn.getJarFile();
             
-            for (final Enumeration e = jar.entries(); e.hasMoreElements();) {
-                final JarEntry entry = (JarEntry) e.nextElement();
+            for (final Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements();) {
+                final JarEntry entry = e.nextElement();
                 if ((!entry.isDirectory())
                         && (entry.getName().startsWith(sDirectoryName))) { // this
                     // is how you can match
@@ -907,11 +923,11 @@ public class FontMappings {
     /**
      * read values from the classpath
      */
-    private static ArrayList readIndirectValues(final InputStream in)
+    private static ArrayList<String> readIndirectValues(final InputStream in)
             throws IOException {
-        final ArrayList fonts;
+        final ArrayList<String> fonts;
         final BufferedReader inpStream = new BufferedReader(new InputStreamReader(in));
-        fonts = new ArrayList(0);
+        fonts = new ArrayList<String>(0);
         while (true) {
             final String nextValue = inpStream.readLine();
             if (nextValue == null) {

@@ -63,7 +63,7 @@ public class JavaFXOutline extends Tab implements GUIOutline{
     private final TreeView<Label> list;
     
     public JavaFXOutline(){
-        this.nodeToRef = new HashMap();
+        this.nodeToRef = new HashMap<Integer, String>();
         list= new TreeView<Label>();
         
         pageLookupTableViaTitle=new HashMap<String, String>();

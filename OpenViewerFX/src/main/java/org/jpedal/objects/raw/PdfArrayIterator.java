@@ -141,7 +141,7 @@ public class PdfArrayIterator {
 			//////////////////////////////////////////////////////
 			
 			//see if space
-			if(raw.length==5 && raw[0]=='s' && raw[1]=='p' && raw[2]=='a' && raw[3]=='c' && raw[4]=='e') {
+			if(spaceChar==-1 && raw.length==5 && raw[0]=='s' && raw[1]=='p' && raw[2]=='a' && raw[3]=='c' && raw[4]=='e') {
                 spaceChar = pointer;
             }
 			

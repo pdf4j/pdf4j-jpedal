@@ -852,12 +852,12 @@ public class Parser {
         /**
          * execute any JS needed (true flushes list)
          */
-        final Iterator commands=layers.getJSCommands();
+        final Iterator<String> commands=layers.getJSCommands();
         final Javascript javascript=externalHandlers.getJavaScript();
         if(javascript!=null && commands!=null){
             //execute code here
             while(commands.hasNext()){
-                javascript.executeAction((String) commands.next());
+                javascript.executeAction(commands.next());
             }
         }
 

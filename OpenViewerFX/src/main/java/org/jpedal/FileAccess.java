@@ -422,7 +422,7 @@ public class FileAccess {
      *
      * object reference to first trailer
      */
-    public int readAllPageReferences(final boolean ignoreRecursion, final PdfObject pdfObject , final Map rotations, final Map parents, int tempPageCount, final AcroRenderer formRenderer, final PdfResources res, final int insetW, final int insetH) {
+    public int readAllPageReferences(final boolean ignoreRecursion, final PdfObject pdfObject , final Map<String, Integer> rotations, final Map<String, String> parents, int tempPageCount, final AcroRenderer formRenderer, final PdfResources res, final int insetW, final int insetH) {
 
         final String currentPageOffset=pdfObject.getObjectRefAsString();
 
@@ -459,14 +459,14 @@ public class FileAccess {
             while(parent!=null && rawRotation==-1){
 
                 if(parent!=null){
-                    final Object savedRotation=rotations.get(parent);
+                    final Integer savedRotation=rotations.get(parent);
                     if(savedRotation!=null) {
-                        rawRotation= (Integer) savedRotation;
+                        rawRotation= savedRotation;
                     }
                 }
 
                 if(rawRotation==-1) {
-                    parent=(String) parents.get(parent);
+                    parent=parents.get(parent);
                 }
 
             }
@@ -914,7 +914,7 @@ public class FileAccess {
                     }
 
                     //recursively read all pages
-                    final int tempPageCount=readAllPageReferences(ignoreRecursion, pdfObject, new HashMap(1000), new HashMap(1000),1,formRenderer,res, options.getInsetW(), options.getInsetH());
+                    final int tempPageCount=readAllPageReferences(ignoreRecursion, pdfObject, new HashMap<String, Integer>(1000), new HashMap<String, String>(1000),1,formRenderer,res, options.getInsetW(), options.getInsetH());
 
                     //set PageCount if in Linearized data
                     if(linearPageCount>0){

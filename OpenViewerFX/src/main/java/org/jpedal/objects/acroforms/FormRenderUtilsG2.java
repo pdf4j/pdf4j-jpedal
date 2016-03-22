@@ -80,15 +80,15 @@ public class FormRenderUtilsG2 {
         return BG;
     }
     
-    private static void renderBorderSolid(Graphics2D g2, FormObject formObject, int borderWidth, int pageHeight) {
+    private static void renderBorderSolid(Graphics2D g2, int borderWidth, int x, int y, int w, int h) {
         g2.setStroke(new BasicStroke(borderWidth));
-        g2.drawRect(formObject.getBoundingRectangle().x + borderWidth - 1,
-                pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height) + borderWidth - 1,
-                formObject.getBoundingRectangle().width - (borderWidth * 2) + 2,
-                formObject.getBoundingRectangle().height - (borderWidth * 2) + 2);
+        g2.drawRect(x + borderWidth - 1,
+                y + borderWidth - 1,
+                w - (borderWidth * 2) + 1,
+                h - (borderWidth * 2) + 1);
     }
 
-    private static void renderBorderDashed(Graphics2D g2, FormObject formObject, PdfArrayIterator dashPattern, int borderWidth, int pageHeight) {
+    private static void renderBorderDashed(Graphics2D g2, PdfArrayIterator dashPattern, int borderWidth, int x, int y, int w, int h) {
 
         float[] dash = {3};
         int phase = 0;
@@ -110,104 +110,103 @@ public class FormRenderUtilsG2 {
                     BasicStroke.JOIN_MITER, 10.0f, dash, phase));
         }
 
-        g2.drawRect(formObject.getBoundingRectangle().x + borderWidth - 1,
-                pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height) + borderWidth - 1,
-                formObject.getBoundingRectangle().width - (borderWidth * 2) + 2,
-                formObject.getBoundingRectangle().height - (borderWidth * 2) + 2);
+        g2.drawRect(x + borderWidth - 1,
+                y + borderWidth - 1,
+                w - (borderWidth * 2) + 1,
+                h - (borderWidth * 2) + 1);
     }
 
-    private static void renderBorderBeveled(Graphics2D g2, FormObject formObject, Color BG, int borderWidth, int pageHeight) {
+    private static void renderBorderBeveled(Graphics2D g2, Color BG, int borderWidth, int x, int y, int w, int h) {
 
         final Color bckUp = g2.getColor();
-
-        int x = formObject.getBoundingRectangle().x;
-        int y = pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height);
-        int width = formObject.getBoundingRectangle().width;
-        int height = formObject.getBoundingRectangle().height;
-
+        
         //Outer Line
         g2.setStroke(new BasicStroke(borderWidth, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_MITER, 10.0f));
         g2.drawRect(x,
                 y,
-                width,
-                height);
+                w,
+                h);
 
         //Inner Line
         g2.setStroke(new BasicStroke(1));
 
         x += 1;
         y += 1;
-        width -= 2;
-        height -= 2;
+        w -= 2;
+        h -= 2;
 
         //DARKER
         g2.setColor(BG.darker());
         g2.fillPolygon(
-                new int[]{x + width, x + width, x + width - borderWidth, x + width - borderWidth, x + borderWidth, x},
-                new int[]{y + height, y, y + borderWidth, y + height - borderWidth, y + height - borderWidth, y + height},
+                new int[]{x + w, x + w, x + w - borderWidth, x + w - borderWidth, x + borderWidth, x},
+                new int[]{y + h, y, y + borderWidth, y + h - borderWidth, y + h - borderWidth, y + h},
                 6);
 
         //LIGHTER
         g2.setColor(BG.brighter());
         g2.fillPolygon(
-                new int[]{x, x, x + borderWidth, x + borderWidth, x + width - borderWidth, x + width},
-                new int[]{y, y + height, y + height - borderWidth, y + borderWidth, y + borderWidth, y},
+                new int[]{x, x, x + borderWidth, x + borderWidth, x + w - borderWidth, x + w},
+                new int[]{y, y + h, y + h - borderWidth, y + borderWidth, y + borderWidth, y},
                 6);
 
         g2.setColor(bckUp);
     }
 
-    private static void renderBorderInset(Graphics2D g2, FormObject formObject, int borderWidth, int pageHeight) {
+    private static void renderBorderInset(Graphics2D g2, int borderWidth, int x, int y, int w, int h) {
 
         final Color bckUp = g2.getColor();
-
-        int x = formObject.getBoundingRectangle().x;
-        int y = pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height);
-        int width = formObject.getBoundingRectangle().width;
-        int height = formObject.getBoundingRectangle().height;
-
+        
         //Outer Line
         g2.setStroke(new BasicStroke(borderWidth));
         g2.drawRect(x,
                 y,
-                width,
-                height);
+                w,
+                h);
 
         //Inner Line
         g2.setStroke(new BasicStroke(1));
 
         x += 1;
         y += 1;
-        width -= 2;
-        height -= 2;
+        w -= 2;
+        h -= 2;
         //LIGHTER
         g2.setColor(Color.LIGHT_GRAY);
         g2.fillPolygon(
-                new int[]{x + width, x + width, x + width - borderWidth, x + width - borderWidth, x + borderWidth, x},
-                new int[]{y + height, y, y + borderWidth, y + height - borderWidth, y + height - borderWidth, y + height},
+                new int[]{x + w, x + w, x + w - borderWidth, x + w - borderWidth, x + borderWidth, x},
+                new int[]{y + h, y, y + borderWidth, y + h - borderWidth, y + h - borderWidth, y + h},
                 6);
 
         //DARKER
         g2.setColor(Color.GRAY);
         g2.fillPolygon(
-                new int[]{x, x, x + borderWidth, x + borderWidth, x + width - borderWidth, x + width},
-                new int[]{y, y + height, y + height - borderWidth, y + borderWidth, y + borderWidth, y},
+                new int[]{x, x, x + borderWidth, x + borderWidth, x + w - borderWidth, x + w},
+                new int[]{y, y + h, y + h - borderWidth, y + borderWidth, y + borderWidth, y},
                 6);
 
         g2.setColor(bckUp);
     }
 
-    private static void renderBorderUnderline(Graphics2D g2, FormObject formObject, int borderWidth, int pageHeight) {
+    private static void renderBorderUnderline(Graphics2D g2, int borderWidth, int x, int y, int w, int h) {
         g2.setStroke(new BasicStroke(borderWidth));
-        g2.drawLine(formObject.getBoundingRectangle().x + borderWidth - 1,
-                pageHeight - (formObject.getBoundingRectangle().y) + borderWidth - 1,
-                formObject.getBoundingRectangle().x + formObject.getBoundingRectangle().width - 1,
-                pageHeight - (formObject.getBoundingRectangle().y) + borderWidth - 1);
+        g2.drawLine(x + borderWidth - 1,
+                y + borderWidth - 1,
+                x + w - 1,
+                y + borderWidth - 1);
 
     }
 
     public static int renderBorder(Graphics2D g2, FormObject formObject, int page, int pageHeight){
+        int x = formObject.getBoundingRectangle().x;
+        int y = pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height);
+        int w = formObject.getBoundingRectangle().width;
+        int h = formObject.getBoundingRectangle().height;
+        
+        return renderBorder(g2, formObject, x, y, w, h);
+    }
+    
+    public static int renderBorder(Graphics2D g2, FormObject formObject, int x, int y, int w, int h){
         
         //Turn off antialiasing for border and background
         final Object antiA = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
@@ -225,6 +224,11 @@ public class FormRenderUtilsG2 {
             final PdfObject BS = formObject.getDictionary(PdfDictionary.BS);
             final String s = BS.getName(PdfDictionary.S);
             borderWidth = BS.getInt(PdfDictionary.W);
+            
+            if(borderWidth==-1){
+                borderWidth = 1;
+            }
+            
 
             if (borderWidth > 0) {//Ignore border is width is 0 or less
 
@@ -232,20 +236,20 @@ public class FormRenderUtilsG2 {
                 g2.setColor(BC);
 
                 if (s == null || s.equals("S")) {
-                    renderBorderSolid(g2, formObject, page, pageHeight);
+                    renderBorderSolid(g2, borderWidth, x, y, w, h);
                     borderCreated = true;
                 } else if (s.equals("D")) {
                     final PdfArrayIterator dashPattern = BS.getMixedArray(PdfDictionary.D);
-                    renderBorderDashed(g2, formObject, dashPattern, page, pageHeight);
+                    renderBorderDashed(g2, dashPattern, borderWidth, x, y, w, h);
                     borderCreated = true;
                 } else if (s.equals("B")) {
-                    renderBorderBeveled(g2, formObject, BG, page, pageHeight);
+                    renderBorderBeveled(g2, BG, borderWidth, x, y, w, h);
                     borderCreated = true;
                 } else if (s.equals("I")) {
-                    renderBorderInset(g2, formObject, page, pageHeight);
+                    renderBorderInset(g2, borderWidth, x, y, w, h);
                     borderCreated = true;
                 } else if (s.equals("U")) {
-                    renderBorderUnderline(g2, formObject, page, pageHeight);
+                    renderBorderUnderline(g2, borderWidth, x, y, w, h);
                     borderCreated = true;
                 }
 
@@ -264,11 +268,10 @@ public class FormRenderUtilsG2 {
             g2.setColor(BC);
             borderWidth = 1;
             g2.setStroke(new BasicStroke(borderWidth));
-            g2.drawRect(formObject.getBoundingRectangle().x + borderWidth - 1,
-                    pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height) + borderWidth - 1,
-                    formObject.getBoundingRectangle().width - (borderWidth * 2) + 2,
-                    formObject.getBoundingRectangle().height - (borderWidth * 2) + 2);
-            
+            g2.drawRect((x + borderWidth) - 1,
+                    (y + borderWidth) - 1,
+                    w - (borderWidth * 2)+1,
+                    h - (borderWidth * 2)+1);
         }
 
         //Reset Antialiasing for the text

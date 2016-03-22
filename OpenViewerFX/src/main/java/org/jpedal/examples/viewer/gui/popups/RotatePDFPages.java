@@ -72,7 +72,7 @@ public class RotatePDFPages extends Save
 ,Messages.getMessage("PdfViewerComboBox.180Degrees")};
 	
 	final JLabel direction = new JLabel(Messages.getMessage("PdfViewerMessage.Direction"));
-	final JComboBox directionBox = new JComboBox(rotationItems);
+	final JComboBox<String> directionBox = new JComboBox<String>(rotationItems);
 	public RotatePDFPages( final String root_dir, final int end_page, final int currentPage )
 	{
 		super(root_dir, end_page, currentPage);

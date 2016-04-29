@@ -34,23 +34,24 @@ package org.jpedal.examples.viewer.gui.javafx;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.jpedal.display.GUIDisplay;
-import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
+import javafx.scene.Node;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.MouseEvent;
 import org.jpedal.display.Display;
+import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.gui.CommandListener;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUIButton;
 import org.jpedal.examples.viewer.gui.generic.GUIButtons;
-import org.jpedal.examples.viewer.gui.CommandListener;
+import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
 import org.jpedal.gui.GUIFactory;
 import static org.jpedal.gui.GUIFactory.BUTTONBAR;
 import static org.jpedal.gui.GUIFactory.NAVBAR;
@@ -266,7 +267,7 @@ public class JavaFXButtons implements GUIButtons{
         
         continuousButton.setEnabled(flag);
         continuousFacingButton.setEnabled(flag);
-        /**
+        /*
          * Currently Disabled until corresponding view mode are implemented.
          */
         /////////////////
@@ -341,7 +342,7 @@ public class JavaFXButtons implements GUIButtons{
     
     @Override
     public void checkButtonSeparators() {
-        /**
+        /*
          * Ensure the buttonBar doesn't start or end with a separator
          */
         boolean before=false, after=false;
@@ -392,7 +393,7 @@ public class JavaFXButtons implements GUIButtons{
 
         GUIButton newButton = new JavaFXButton();
         
-        /**
+        /*
          * specific buttons
          */
         switch (ID) {
@@ -432,7 +433,7 @@ public class JavaFXButtons implements GUIButtons{
                 break;
             case Commands.SINGLE:
                 newButton = getButton(Commands.SINGLE);
-                ((JavaFXButton) newButton).setOnAction(new EventHandler<ActionEvent>() {
+                ((ButtonBase) newButton).setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent t) {
                         fxMenuItems.setMenusForDisplayMode(Commands.SINGLE, -1);
@@ -442,7 +443,7 @@ public class JavaFXButtons implements GUIButtons{
             case Commands.CONTINUOUS:
                 newButton = getButton(Commands.CONTINUOUS);
                 newButton.setEnabled(false);
-                ((JavaFXButton) newButton).setOnAction(new EventHandler<ActionEvent>() {
+                ((ButtonBase) newButton).setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent t) {
                         fxMenuItems.setMenusForDisplayMode(Commands.CONTINUOUS, -1);
@@ -452,7 +453,7 @@ public class JavaFXButtons implements GUIButtons{
             case Commands.CONTINUOUS_FACING:
                 newButton = getButton(Commands.CONTINUOUS_FACING);
                 newButton.setEnabled(false);
-                ((JavaFXButton) newButton).setOnAction(new EventHandler<ActionEvent>() {
+                ((ButtonBase) newButton).setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent t) {
                         fxMenuItems.setMenusForDisplayMode(Commands.CONTINUOUS_FACING, -1);
@@ -493,7 +494,7 @@ public class JavaFXButtons implements GUIButtons{
                 break;
             case Commands.MOUSEMODE:
                 newButton = getButton(Commands.MOUSEMODE);
-                ((JavaFXButton) newButton).setOnAction(new EventHandler<ActionEvent>() {
+                ((ButtonBase) newButton).setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent t) {
                         if (currentGUI.getPdfDecoder().getDisplayView() == Display.SINGLE_PAGE) {
@@ -507,21 +508,21 @@ public class JavaFXButtons implements GUIButtons{
 
         
         //Changes the cursor style to hand if we enter the buttons area
-        ((JavaFXButton) newButton).setOnMouseEntered(new EventHandler<MouseEvent>() {
+        ((Node) newButton).setOnMouseEntered(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent me) {
                 if (GUIDisplay.allowChangeCursor) {
-                    ((JavaFXButton) me.getSource()).setCursor(Cursor.HAND);
+                    ((Node) me.getSource()).setCursor(Cursor.HAND);
                 }
             }
         });
         
         //Changes the cursor style to default if we exit the buttons area
-        ((JavaFXButton) newButton).setOnMouseExited(new EventHandler<MouseEvent>() {
+        ((Node) newButton).setOnMouseExited(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent me) {
                 if (GUIDisplay.allowChangeCursor) {
-                    ((JavaFXButton) me.getSource()).setCursor(Cursor.DEFAULT);
+                    ((Node) me.getSource()).setCursor(Cursor.DEFAULT);
                 }
             }
         });
@@ -529,17 +530,17 @@ public class JavaFXButtons implements GUIButtons{
         newButton.init(currentGUI.getGUICursor().getURLForImage(path), ID, toolTip);
 
         //add listener
-        ((JavaFXButton) newButton).setOnAction((EventHandler<ActionEvent>) currentCommandListener.getCommandListener());
+        ((ButtonBase) newButton).setOnAction((EventHandler<ActionEvent>) currentCommandListener.getCommandListener());
 
         final int mode = currentGUI.getValues().getModeOfOperation();
 
         //add to toolbar
         if (line == BUTTONBAR || mode == Values.RUNNING_PLUGIN) {
-            topButtons.getItems().add((Button) newButton);
+            topButtons.getItems().add((Node) newButton);
         } else if (line == NAVBAR) {
-            navToolBar.getItems().add((Button) newButton);
+            navToolBar.getItems().add((Node) newButton);
         } else if (line == PAGES) {
-            pagesToolBar.getItems().add((Button) newButton);
+            pagesToolBar.getItems().add((Node) newButton);
         }
         
         disableUnimplementedItems(ID);

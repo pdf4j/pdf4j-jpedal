@@ -35,9 +35,11 @@ package org.jpedal.examples.viewer.gui.javafx;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import org.jpedal.examples.viewer.*;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.SharedViewer;
 import org.jpedal.examples.viewer.gui.CommandListenerImpl;
 import org.jpedal.examples.viewer.gui.generic.GUIButton;
+import org.jpedal.examples.viewer.gui.generic.GUICombo;
 
 /**
  *
@@ -59,9 +61,9 @@ public class JavaFXCommandListener extends CommandListenerImpl implements EventH
         if (source instanceof GUIButton) {
             ID = ((GUIButton) source).getID();
         } else if (source instanceof JavaFXMenuItem) {
-            ID = ((JavaFXMenuItem) source).getID();
+            ID = ((JavaFXID) source).getID();
         } else if (source instanceof JavaFXCombo) {
-            ID = ((JavaFXCombo) source).getID();
+            ID = ((GUICombo) source).getID();
         } else {
             ID = ((JavaFXID) source).getID();
         }

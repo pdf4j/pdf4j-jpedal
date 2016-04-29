@@ -80,7 +80,7 @@ public class HTMLStructuredContentHandler extends StructuredContentHandler {
         //     System.out.println("Close "+MCID+" "+param+" "+current);
         }
         
-        /**
+        /*
         //any custom tags
         if(isOpenTag && BDCobj!=null){
             final Map metadata=BDCobj.getOtherDictionaries();

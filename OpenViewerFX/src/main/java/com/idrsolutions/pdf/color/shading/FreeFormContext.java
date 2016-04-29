@@ -54,8 +54,8 @@ import org.jpedal.objects.raw.PdfObject;
  */
 public class FreeFormContext implements PaintContext {
 
-    //private final GenericColorSpace shadingColorSpace;
-   // private final float[] background;
+    private final GenericColorSpace shadingColorSpace;
+    private final float[] background;
     private final int bitsPerCoordinate;
     private final int bitsPerComponent;
     private final int bitsPerFlag;
@@ -73,11 +73,11 @@ public class FreeFormContext implements PaintContext {
     private final int offY;
     private final BitReader reader;
 
-    FreeFormContext(final GenericColorSpace shadingColorSpace,
-                    PdfObject shadingObject, float[][] matrix, int pageHeight, float scaling, int offX, int offY) {
+    FreeFormContext(final GenericColorSpace shadingColorSpace,float[] background,
+            PdfObject shadingObject, float[][] matrix, int pageHeight, float scaling, int offX, int offY) {
 
-       // this.shadingColorSpace = shadingColorSpace;
-      //  this.background = background;
+        this.shadingColorSpace = shadingColorSpace;
+        this.background = background;
         bitsPerComponent = shadingObject.getInt(PdfDictionary.BitsPerComponent);
         bitsPerFlag = shadingObject.getInt(PdfDictionary.BitsPerFlag);
         bitsPerCoordinate = shadingObject.getInt(PdfDictionary.BitsPerCoordinate);
@@ -93,8 +93,8 @@ public class FreeFormContext implements PaintContext {
         triangles = new ArrayList<Point2D>();
         triColors = new ArrayList<Color>();
         shapes = new ArrayList<GeneralPath>();
-        boolean hasSmallBits = bitsPerFlag<8 || bitsPerComponent<8 || bitsPerCoordinate<8;
-        this.reader = new BitReader(shadingObject.getDecodedStream(),hasSmallBits);
+        boolean hasSmallBits = bitsPerFlag < 8 || bitsPerComponent < 8 || bitsPerCoordinate < 8;
+        this.reader = new BitReader(shadingObject.getDecodedStream(), hasSmallBits);
         process();
         adjustPoints();
 
@@ -230,11 +230,25 @@ public class FreeFormContext implements PaintContext {
         final int rastSize = (w * h * 4);
         final int[] data = new int[rastSize];
 
+        if (background != null) {
+            shadingColorSpace.setColor(background, 4);
+            final Color c = (Color) shadingColorSpace.getColor();
+            for (int i = 0; i < h; i++) {
+                for (int j = 0; j < w; j++) {
+                    final int base = (i * w + j) * 4;
+                    data[base] = c.getRed();
+                    data[base + 1] = c.getGreen();
+                    data[base + 2] = c.getBlue();
+                    data[base + 3] = 255;
+                }
+            }
+        }
+
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
 //                float pdfX = xStart + x;
 //                float pdfY = pageHeight - (yStart + y);
-                float[] xy = PixelFactory.convertPhysicalToPDF(false, x, y, offX, offY, 1/scaling, xStart, yStart, 0, pageHeight);
+                float[] xy = PixelFactory.convertPhysicalToPDF(false, x, y, offX, offY, 1 / scaling, xStart, yStart, 0, pageHeight);
                 float pdfX = xy[0];
                 float pdfY = xy[1];
                 int sc = 0; //shape counts

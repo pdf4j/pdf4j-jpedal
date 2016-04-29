@@ -232,9 +232,6 @@ public class CompressedObject extends PdfObject {
                 x += 8;
             }
 
-            /**
-             * not standard
-             */
             switch(id){
 
 //                case StandardFonts.CIDTYPE0:

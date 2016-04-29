@@ -69,9 +69,7 @@ public class Find {
     			}
     		}
 
-            /**
-             * Take highlighted text and add to search
-             */
+            // Take highlighted text and add to search
             if (decode_pdf.getTextLines().getHighlightedAreasAs2DArray(commonValues.getCurrentPage()) != null) {
                 final String searchText = GUICopy.copySelectedText(decode_pdf, currentGUI, commonValues);
                 searchFrame.setSearchText(searchText);

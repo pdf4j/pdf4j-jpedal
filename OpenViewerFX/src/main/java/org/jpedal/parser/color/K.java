@@ -54,7 +54,7 @@ public class K {
         final int operandCount=operand.length;
 
 
-        /**allow for less than 4 values
+        /* allow for less than 4 values
          * (ie second mapping for device colourspace
          */
         if (operandCount > 3) {

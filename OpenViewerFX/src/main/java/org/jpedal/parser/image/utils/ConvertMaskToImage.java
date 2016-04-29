@@ -32,12 +32,11 @@
  */
 package org.jpedal.parser.image.utils;
 
+import java.awt.image.*;
 import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-
-import java.awt.image.*;
 
 public class ConvertMaskToImage {
 
@@ -45,9 +44,7 @@ public class ConvertMaskToImage {
         BufferedImage image;
         byte opacity, d0 = 0, d1 = (byte) 255;
 
-        /**
-         * get opacity if not default
-         */
+        // get opacity if not default
         final float[] maskDecode = newSMask.getFloatArray(PdfDictionary.Decode);
         if (maskDecode != null) {
             opacity = (byte) ((maskDecode[0]) * 255);

@@ -32,6 +32,11 @@
  */
 package org.jpedal.linear;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import org.jpedal.FileAccess;
 import org.jpedal.io.LinearizedHintTable;
 import org.jpedal.io.PdfObjectReader;
@@ -39,12 +44,6 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 
 /**
  * handles download of rest of file in Linearized mode
@@ -172,11 +171,11 @@ public class LinearThread extends Thread {
 
                 fileAccess.setIO(new PdfObjectReader());
 
-                /** get reader object to open the file if all downloaded*/
+                /* get reader object to open the file if all downloaded*/
                 if(isAlive() && !isInterrupted()){
                     fileAccess.openPdfFile(tempURLFile.getAbsolutePath());
 
-                    /** store fi name for use elsewhere as part of ref key without .pdf */
+                    /* store fi name for use elsewhere as part of ref key without .pdf */
                     fileAccess.getObjectStore().storeFileName(tempURLFile.getName().substring(0, tempURLFile.getName().lastIndexOf('.')));
                 }
 

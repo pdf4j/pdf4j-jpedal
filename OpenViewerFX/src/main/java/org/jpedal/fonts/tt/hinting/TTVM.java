@@ -32,24 +32,22 @@
  */
 package org.jpedal.fonts.tt.hinting;
 
-import org.jpedal.fonts.tt.BaseTTGlyph;
-import org.jpedal.fonts.tt.FontFile2;
-import org.jpedal.fonts.tt.Maxp;
-import org.jpedal.utils.LogWriter;
-
-import javax.swing.*;
 import java.awt.*;
-import java.io.Serializable;
-import java.util.HashMap;
-
-import java.awt.geom.Path2D;
-import java.text.NumberFormat;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import javax.swing.*;
+import org.jpedal.fonts.tt.BaseTTGlyph;
+import org.jpedal.fonts.tt.FontFile2;
+import org.jpedal.fonts.tt.Maxp;
+import org.jpedal.utils.LogWriter;
 
 public class TTVM implements Serializable {
     protected static final int TWILIGHT_ZONE = 0;
@@ -166,7 +164,7 @@ public class TTVM implements Serializable {
     private final HashMap<Integer, int[]> instructions;
 
 
-    /**
+    /*
      * Instruction Opcodes
      */
     private static final int SVTCAy = 0x00;
@@ -2830,7 +2828,7 @@ public class TTVM implements Serializable {
         debugWindow.setLayout(new BorderLayout());
 
 
-        /**
+        /*
          * Top panel
          */
         //Buttons
@@ -2885,7 +2883,7 @@ public class TTVM implements Serializable {
 
         debugWindow.add(BorderLayout.NORTH,buttonPanel);
 
-        /**
+        /*
          * Left panel
          */
         final JPanel instructionPanel = new JPanel();
@@ -2917,10 +2915,7 @@ public class TTVM implements Serializable {
 
         debugWindow.add(BorderLayout.WEST,instructionPanel);
 
-
-
-
-        /**
+        /*
          * Centre panel
          */
         final JPanel glyphPanel = new JPanel();
@@ -3167,7 +3162,7 @@ public class TTVM implements Serializable {
 
 
 
-        /**
+        /*
          * Right panel
          */
         final JPanel dataPanel = new JPanel(){
@@ -3219,7 +3214,7 @@ public class TTVM implements Serializable {
         debugWindow.add(BorderLayout.EAST, dataPanel);
 
 
-        /**
+        /*
          * Bottom panel
          */
         final JPanel statePanel = new JPanel();
@@ -3493,7 +3488,7 @@ public class TTVM implements Serializable {
             int p2=(j+2)%fc;
             int pm1=(j-1)%fc;
 
-            /**special cases
+            /* special cases
              *
              *round up to last point at end
              *First point
@@ -3596,7 +3591,7 @@ public class TTVM implements Serializable {
                         current_path.curveTo(x1, y1, x2, y2, x3, y3);
                     }
 
-                    /**if end after curve, roll back so we pick up the end*/
+                    /*if end after curve, roll back so we pick up the end*/
                     if( checkEnd && endOfContour[j]){
 
                         isEnd=true;

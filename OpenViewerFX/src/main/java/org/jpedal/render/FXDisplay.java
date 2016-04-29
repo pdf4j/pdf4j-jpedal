@@ -33,29 +33,30 @@
 package org.jpedal.render;
 
 
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
-//import javafx.stage.Modality;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.PatternColorSpace;
 import org.jpedal.exception.PdfException;
-//import org.jpedal.examples.viewer.gui.javafx.dialog.FXMessageDialog;
 import org.jpedal.fonts.PdfFont;
-import org.jpedal.fonts.glyph.*;
+import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.tt.TTGlyph;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
@@ -64,9 +65,6 @@ import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.Vector_Int;
 import org.jpedal.utils.repositories.Vector_Object;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
-import java.util.ArrayList;
-import javafx.scene.image.Image;
-import javafx.scene.paint.ImagePattern;
 
 
 public class FXDisplay extends GUIDisplay {
@@ -90,7 +88,10 @@ public class FXDisplay extends GUIDisplay {
 
     }
     
-    @Override
+    public void setInset(DynamicVectorRenderer currentDisplay, final int x, final int y) {
+            ((FXDisplay)currentDisplay).setInset(x, y);   
+    }
+    
     public void setInset(final int x, final int y) {
         xx = x;
         yy = y;
@@ -193,18 +194,6 @@ public class FXDisplay extends GUIDisplay {
                 h = (int) (CTM[1][0] * HeightModifier);
             }
             
-            //fix for bug if sheered in low res
-            if(!useHiResImageForDisplay && CTM[1][0]<0 && CTM[0][1]>0 && CTM[0][0]==0 && CTM[1][1]==0){
-                final int tmp=w;
-                w=-h;
-                h=tmp;
-            }
-            
-            //corrected in generation
-            if(h<0 && !useHiResImageForDisplay) {
-                h = -h;
-            }
-            
             //fix negative height on Ghostscript image in printing
             final int x1=(int)currentGraphicsState.x;
             int y1=(int)currentGraphicsState.y;
@@ -225,22 +214,19 @@ public class FXDisplay extends GUIDisplay {
             objectType.addElement(DynamicVectorRenderer.IMAGE);
         }
         
-        if(!isRenderingToImage()){ //don ot cache image on disk if generating image
-        
-            final boolean cacheInMemory=(image.getWidth()<100 && image.getHeight()<100) || image.getHeight()==1;
-            if(useHiResImageForDisplay && !cacheInMemory){
-                pageObjects.addElement(null);
-            }else {
-                pageObjects.addElement(image);
-            }
+        final boolean cacheInMemory=(image.getWidth()<100 && image.getHeight()<100) || image.getHeight()==1;
+        if(!cacheInMemory){
+            pageObjects.addElement(null);
+        }else {
+            pageObjects.addElement(image);
+        }
 
-            if(rawKey==null){
-                objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem,image,false,false,"tif");
-                imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem);
-            }else{
-                objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem+ '_' +rawKey,image,false,false,"tif");
-                imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem+ '_' +rawKey);
-            }
+        if(rawKey==null){
+            objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem,image,false,false,"tif");
+            imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem);
+        }else{
+            objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem+ '_' +rawKey,image,false,false,"tif");
+            imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem+ '_' +rawKey);
         }
         
         currentItem++;
@@ -369,7 +355,7 @@ public class FXDisplay extends GUIDisplay {
         }
     }
 
-     @Override
+    @Override
     public void drawCustom(final Object value) {
 	 
             addToScene((Node) value);
@@ -404,13 +390,13 @@ public class FXDisplay extends GUIDisplay {
             final Text t = new Text(glyf);
             // Get the affine
 
-            /**
+            /*
              * Set the font for the current decoded page in the Viewer
              */
             final Font f = Font.font(currentFontData.getGlyphData().font_family_name, fontSize);
             t.setFont(f);
             
-            /**
+            /*
              * Set the text color (fill and stroke)
              */
             setFXParams(t, GraphicsState.FILL, gs, textColor!=null);
@@ -424,10 +410,10 @@ public class FXDisplay extends GUIDisplay {
 
             // Set the affines
             if(type!=DynamicVectorRenderer.TRUETYPE){
-                final double r=1d / (double) fontSize;
+                final double r=1d / fontSize;
                 t.getTransforms().add(Transform.affine(textScaling[0]*r,textScaling[1]*r,textScaling[2]*r,textScaling[3]*r,Trm[2][0],Trm[2][1]));        
             }else{
-                final double r=1d / (double) fontSize;
+                final double r=1d / fontSize;
                 t.getTransforms().setAll(Transform.affine(Trm[0][0]*r,Trm[0][1]*r,Trm[1][0]*r,Trm[1][1]*r,Trm[2][0],Trm[2][1]));          
             }
             
@@ -494,7 +480,7 @@ public class FXDisplay extends GUIDisplay {
                 areas.addElement(rectParams);
                 
             }else{
-                /**now text*/
+                /*now text*/
                 int realSize=fontSize;
                 if(realSize<0) {
                     realSize = -realSize;
@@ -527,7 +513,7 @@ public class FXDisplay extends GUIDisplay {
                     clip.getTransforms().add(inverseAff);
                 }
                 
-                /**
+                /*
                  * 
                  * PDFdata\test_data\Hand_Test\awjune2003.pdf and
                  * PDFdata\test_data\Hand_Test\rechnung_file.PDF
@@ -614,24 +600,7 @@ public class FXDisplay extends GUIDisplay {
         collection.add(items);
         
     }
-    
-    
-    /**
-     * Adds items to scene, ensuring we are on the FX thread
-     * @param items All the nodes that are added to the Scene
-     */
-//    private void addToScenes(final Node... items){
-//        if(Platform.isFxApplicationThread()){
-//            children.addAll(items);
-//        }else{
-//            Platform.runLater(new Runnable(){
-//                @Override public void run() {
-//                    children.addAll(items);
-//                }
-//            });
-//        }
-//    }
-    
+
     /**
      * 
      * @param defaultSize The size of the array

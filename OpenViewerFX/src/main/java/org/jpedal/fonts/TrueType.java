@@ -32,25 +32,24 @@
  */
 package org.jpedal.fonts;
 
+import java.awt.Rectangle;
 import java.io.BufferedInputStream;
-import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.awt.*;
-
 import org.jpedal.exception.PdfFontException;
 import org.jpedal.external.ExternalHandlers;
-import org.jpedal.fonts.tt.TTGlyphs;
-import org.jpedal.fonts.objects.FontData;
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
-import org.jpedal.io.PdfObjectReader;
+import org.jpedal.fonts.objects.FontData;
+import org.jpedal.fonts.tt.TTGlyphs;
 import org.jpedal.io.ObjectStore;
-import org.jpedal.utils.LogWriter;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 
 /**
  * handles truetype specifics
@@ -166,7 +165,7 @@ public class  TrueType extends PdfFont {
         //generic setup
         init(fontID, renderPage);
         
-        /**
+        /*
          * get FontDescriptor object - if present contains metrics on glyphs
          */
         final PdfObject pdfFontDescriptor=pdfObject.getDictionary(PdfDictionary.FontDescriptor);
@@ -209,7 +208,7 @@ public class  TrueType extends PdfFont {
                 FontData fontData=null;
                 int objSize=0;
                 
-                /**
+                /*
                  * see if we cache or read
                  */
                 if(!subfontAlreadyLoaded){

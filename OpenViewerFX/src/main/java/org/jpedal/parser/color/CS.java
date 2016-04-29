@@ -32,11 +32,7 @@
  */
 package org.jpedal.parser.color;
 
-import org.jpedal.color.ColorSpaces;
-import org.jpedal.color.ColorspaceFactory;
-import org.jpedal.color.DeviceRGBColorSpace;
-import org.jpedal.color.GenericColorSpace;
-import org.jpedal.color.PatternColorSpace;
+import org.jpedal.color.*;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfPageData;
@@ -56,9 +52,6 @@ public class CS {
         //set flag for stroke
         final boolean isStroke = !isLowerCase;
 
-        /**
-         * work out colorspace
-         */
         PdfObject ColorSpace=(PdfObject)cache.get(PdfObjectCache.Colorspaces,colorspaceObject);
 
         if(ColorSpace==null) {
@@ -69,16 +62,6 @@ public class CS {
         final String ref2=ref+ '-'+isLowerCase;
 
         final GenericColorSpace newColorSpace;
-
-        //(ms) 20090430 new code does not work so commented out
-
-        //int ID=ColorSpace.getParameterConstant(PdfDictionary.ColorSpace);
-
-        //        if(isLowerCase)
-        //            System.out.println(" cs="+colorspaceObject+" "+alreadyUsed+" ref="+ref);
-        //        else
-        //            System.out.println(" CS="+colorspaceObject+" "+alreadyUsed+" ref="+ref);
-
         if(ColorSpace.getParameterConstant(PdfDictionary.ColorSpace)==PdfDictionary.Pattern && colorspaceObject.equals("Pattern")){
             
             newColorSpace= new PatternColorSpace(currentPdfFile, new DeviceRGBColorSpace());
@@ -101,15 +84,7 @@ public class CS {
 
             newColorSpace.setPrinting(isPrinting);
 
-            //use alternate as preference if CMYK
-            //if(newColorSpace.getID()==ColorSpaces.ICC && ColorSpace.getParameterConstant(PdfDictionary.Alternate)==ColorSpaces.DeviceCMYK)
-            //  newColorSpace=new DeviceCMYKColorSpace();
-
-            //broken on calRGB so ignore at present
-            //if(newColorSpace.getID()!=ColorSpaces.CalRGB)
-
             if((newColorSpace.getID()==ColorSpaces.ICC || newColorSpace.getID()==ColorSpaces.Separation)){
-                //if(newColorSpace.getID()==ColorSpaces.Separation)
 
                 if(ref.contains("-1")){ //ignore
                 }else if(!alreadyUsed){
@@ -118,9 +93,7 @@ public class CS {
                     cache.put(PdfObjectCache.ColorspacesObjects, ref2, newColorSpace);                  
                 }
 
-                // System.out.println("cache "+ref +" "+isLowerCase+" "+colorspaceObject);
             }
-
         }
 
         //pass in pattern arrays containing all values

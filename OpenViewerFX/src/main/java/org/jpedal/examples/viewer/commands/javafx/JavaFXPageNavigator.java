@@ -34,11 +34,11 @@ package org.jpedal.examples.viewer.commands.javafx;
 
 // Used for page turning mode
 import java.awt.Point;
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.commands.*;
+import org.jpedal.examples.viewer.commands.Images;
 import org.jpedal.examples.viewer.gui.GUI.PageCounter;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXMessageDialog;
 import org.jpedal.gui.GUIFactory;

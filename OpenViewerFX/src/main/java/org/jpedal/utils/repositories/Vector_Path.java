@@ -89,16 +89,7 @@ public class Vector_Path implements Serializable
 	{
 		return items;
 	}
-	///////////////////////////////////
-    ////////////////////////////////////
-	/**
-	 * does nothing
-	 *
-	static final public boolean contains( Shape value )
-	{
-		return false;
-	}/**/
-	///////////////////////////////////
+
 	/**
 	 * clear the array
 	 */

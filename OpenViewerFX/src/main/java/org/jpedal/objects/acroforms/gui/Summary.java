@@ -33,13 +33,7 @@
 
 package org.jpedal.objects.acroforms.gui;
 
-import org.jpedal.objects.acroforms.gui.certificates.CertificateHolder;
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.utils.LogWriter;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
+import java.awt.Frame;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -49,6 +43,11 @@ import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JDialog;
+import org.jpedal.objects.acroforms.gui.certificates.CertificateHolder;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 
 public class Summary extends javax.swing.JPanel {
     private final JDialog frame;
@@ -182,7 +181,7 @@ public class Summary extends javax.swing.JPanel {
     }//GEN-LAST:event_close
 
     private void showCertificate() {//GEN-FIRST:event_showCertificate
-        final JDialog frame = new JDialog((JFrame) null, "Certificate Viewer", true);
+        final JDialog frame = new JDialog((Frame) null, "Certificate Viewer", true);
 
         final CertificateHolder ch = new CertificateHolder(frame);
         

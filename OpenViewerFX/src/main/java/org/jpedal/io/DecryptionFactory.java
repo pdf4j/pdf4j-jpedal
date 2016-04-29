@@ -32,6 +32,19 @@
  */
 package org.jpedal.io;
 
+import java.io.*;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.util.HashMap;
+import java.util.Map;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -51,20 +64,6 @@ import org.jpedal.objects.raw.PdfKeyPairsIterator;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.ObjectCloneFactory;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.security.Key;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Provide AES/RSA decryption support
@@ -263,17 +262,15 @@ public class DecryptionFactory {
 
         final MessageDigest md;
 
-        /**calculate key to use*/
         final byte[] key=getPaddedKey(encryptionPassword,encryptionPassword);
 
-        /**feed into Md5 function*/
         try{
 
             // Obtain a message digest object.
             md = MessageDigest.getInstance("MD5");
             encryptionKey=md.digest(key);
 
-            /**rev 3 extra security*/
+            /*rev 3 extra security*/
             if(rev>=3){
                 for (int ii=0; ii<50; ii++) {
                     encryptionKey = md.digest(encryptionKey);
@@ -350,13 +347,13 @@ public class DecryptionFactory {
     /**test password and set access settings*/
     private void verifyAccess() throws PdfSecurityException{
 
-        /**assume false*/
+        //assume false
         isPasswordSupplied=false;
         extractionIsAllowed=false;
 
         passwordStatus= PDFflags.NO_VALID_PASSWORD;
 
-        /**workout if user or owner password valid*/
+        /*workout if user or owner password valid*/
         boolean isOwnerPassword=false,isUserPassword=false;
         if(rev<5){
             isOwnerPassword =testOwnerPassword();
@@ -393,7 +390,7 @@ public class DecryptionFactory {
 
         if(!isOwnerPassword){
 
-            /**test if user first*/
+            /*test if user first*/
             if(isUserPassword){
 
                 //tell if not default value
@@ -464,9 +461,6 @@ public class DecryptionFactory {
             passwordLength = 127;
         }
 
-        /**
-         * feed in values
-         */
         final MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(password, 0, passwordLength);
 
@@ -485,7 +479,7 @@ public class DecryptionFactory {
      */
     private byte[] getPaddedKey(final byte[] password, final byte[] encryptionPassword){
 
-        /**get 32 bytes for  the key*/
+        /*get 32 bytes for  the key*/
         final byte[] key=new byte[32];
         int passwordLength=0;
 
@@ -514,11 +508,11 @@ public class DecryptionFactory {
      */
     private byte[] calculateKey(final byte[] O, final int P, final byte[] ID) throws PdfSecurityException{
 
-        /**calculate key to use*/
+        /*calculate key to use*/
         final byte[] key=getPaddedKey(encryptionPassword,encryptionPassword);
         final byte[] keyValue;
 
-        /**feed into Md5 function*/
+        /*feed into Md5 function*/
         try{
 
             // Obtain a message digest object.
@@ -561,7 +555,7 @@ public class DecryptionFactory {
             throw new PdfSecurityException("Exception "+e+" generating encryption key");
         }
 
-        /**put significant bytes into key*/
+        /*put significant bytes into key*/
         final byte[] returnKey = new byte[keyLength];
         System.arraycopy(keyValue,0, returnKey,0, keyLength);
 
@@ -694,7 +688,7 @@ public class DecryptionFactory {
             }
         }else if(certificate!=null){
 
-            /**
+            /*
              * set flags and assume it will work correctly
              * (no validation at this point - error will be thrown in decrypt if not)
              */
@@ -725,7 +719,8 @@ public class DecryptionFactory {
      * setup password value isung certificate passed in by User
      */
     private void setPasswordFromCertificate(final PdfObject AESObj){
-        /**
+
+        /*
          * if recipients set, use that for calculating key
          */
         final byte[][] recipients = (AESObj.getStringArray(PdfDictionary.Recipients));
@@ -734,7 +729,7 @@ public class DecryptionFactory {
 
             final byte[] envelopedData=SetSecurity.extractCertificateData(recipients,certificate,key);
 
-            /**
+            /*
              * use match to create the key
              */
             if(envelopedData!=null){
@@ -824,7 +819,7 @@ public class DecryptionFactory {
                 AESObj=StrFObj;
             }
 
-            /**
+            /*
              * reset each time as can change
              * (we can add flag later if slow)
              */
@@ -964,7 +959,7 @@ public class DecryptionFactory {
                 }
 
                 //SecOP java ME - removed to remove additional package secop1_0.jar in java ME
-                /**only initialise once - seems to take a long time*/
+                /* only initialise once - seems to take a long time*/
                 if(cipher==null) {
                     cipher = Cipher.getInstance(algorithm);
                 }
@@ -1106,7 +1101,6 @@ public class DecryptionFactory {
     
     /**
      * decode AES ecnoded data with IV parameters
-     * @param password
      * @param encKey
      * @param encData a data gained from deducting IV bytes in beginning (encData = data - ivBytes)
      * @param ivData

@@ -108,26 +108,7 @@ public class Vector_boolean implements Serializable {
      */
     private void checkSize( final int i )
     {
-        /**
-         * if( i >= max_size )
-         * {
-         * int old_size = max_size;
-         * max_size = max_size + increment_size;
-         * 
-         * //allow for it not creating space
-         * if( max_size <= i )
-         * max_size = i +increment_size+ 2;
-         * boolean[] temp = items;
-         * items = new boolean[max_size];
-         * System.arraycopy( temp, 0, items, 0, old_size );
-         * 
-         * //increase size increase for next time
-         * if( increment_size < 500 )
-         * increment_size = increment_size * 2;
-         * }*/
-        
-        if( i >= max_size )
-        {
+       if( i >= max_size ){
             final int old_size = max_size;
             max_size += increment_size;
             
@@ -137,29 +118,12 @@ public class Vector_boolean implements Serializable {
             }
             final boolean[] temp = items;
             items = new boolean[max_size];
-            
-            /**
-             * //add a default value
-             * if(defaultValue!=0){
-             * for(int i1=old_size;i1<max_size;i1++)
-             * temp[i1]=defaultValue;
-             * }*/
-            
+
             System.arraycopy( temp, 0, items, 0, old_size );
             
             increment_size=incrementSize(increment_size);
-            
-//if( increment_size <= i ){
-//			    if(increment_size<2500)
-//			       increment_size=increment_size*4;
-//			    else if(increment_size<10000)
-//			       increment_size=increment_size*2;
-//		        else
-//		            increment_size=increment_size+2000;
-//			//max_size = i +increment_size+ 2;
-//			}
+
         }
-        
     }
     
 }

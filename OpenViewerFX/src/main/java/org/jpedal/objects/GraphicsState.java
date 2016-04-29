@@ -35,20 +35,18 @@ import java.awt.BasicStroke;
 import java.awt.Stroke;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
-
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import org.jpedal.color.DeviceGrayColorSpace;
-
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.external.ExternalHandlers;
 import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.objects.raw.PdfArrayIterator;
-import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 
 /**
@@ -270,11 +268,6 @@ public class GraphicsState implements Cloneable
         return value;
     }
 
-    /**get stroke op*
-    public boolean getStrokeOP(){
-        return this.OP;
-    } /**/
-
     /**get stroke op
      * @return*/
     public boolean getNonStrokeOP(){
@@ -363,10 +356,7 @@ public class GraphicsState implements Cloneable
         }else{// if(current_clipping_shape.intersects(current_area.getBounds2D().getX(),current_area.getBounds2D().getY(),
             //current_area.getBounds2D().getWidth(),current_area.getBounds2D().getHeight())){
             current_clipping_shape.intersect( current_area );
-            /**if( current_clipping_shape.getBounds().getHeight() == 0 ){
-             current_clipping_shape = current_area;
-             System.out.println("Reset to area");
-             }*/
+
             hasClipChanged=true;
         }
 
@@ -641,9 +631,6 @@ public class GraphicsState implements Cloneable
      * @param GS*/
     public void setMode(final PdfObject GS){
 
-        /**set to defaults*/
-        //strokeAlpha=1.0f;
-        //nonstrokeAlpha=1.0f;
         op=false;
         OP=false;
 
@@ -657,7 +644,7 @@ public class GraphicsState implements Cloneable
             current_line_width = LW;
         }
 
-        /**
+        /*
          * set transparency
          */
         final boolean AIS=GS.getBoolean(PdfDictionary.AIS);

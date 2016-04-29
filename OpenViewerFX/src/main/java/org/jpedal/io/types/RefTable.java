@@ -34,8 +34,13 @@ package org.jpedal.io.types;
 
 import java.io.IOException;
 import org.jpedal.exception.PdfException;
-import org.jpedal.io.*;
-import org.jpedal.objects.raw.*;
+import org.jpedal.io.ObjectDecoder;
+import org.jpedal.io.PdfFileReader;
+import org.jpedal.io.RandomAccessBuffer;
+import org.jpedal.objects.raw.CompressedObject;
+import org.jpedal.objects.raw.PageObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
 

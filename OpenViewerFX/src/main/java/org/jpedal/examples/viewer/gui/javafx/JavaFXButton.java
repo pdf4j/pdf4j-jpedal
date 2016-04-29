@@ -37,7 +37,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import org.jpedal.examples.viewer.gui.generic.GUIButton;
 
 /**Swing specific implementation of GUIButton interface*/
@@ -55,7 +54,6 @@ public class JavaFXButton extends Button implements GUIButton{
 
         path.toString(); //Conver the path to string so can be used in JavaFX
         
-        /**bookmarks icon*/
         this.setTooltip(new Tooltip(toolTip));
        
         if (path!=null)  {

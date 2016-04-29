@@ -117,7 +117,7 @@ public class Messages {
 		String line;
 		final BufferedReader input_stream = null;
 		//ClassLoader loader = Messages.class.getClassLoader();
-		/**must use windows encoding because files were edited on Windows*/
+		/*must use windows encoding because files were edited on Windows*/
 		//String enc = "Cp1252";
 		//int equalsIndex;
 		

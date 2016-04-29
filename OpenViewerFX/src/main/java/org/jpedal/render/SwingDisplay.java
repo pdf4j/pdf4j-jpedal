@@ -35,10 +35,18 @@ package org.jpedal.render;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.JOptionPane;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
@@ -87,7 +95,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     private final Map<String, Integer> cachedHeights=new HashMap<String, Integer>(10);
     
-    private Map fonts=new HashMap(50);
+    private Map<Object, Object> fonts=new HashMap<Object, Object>(50);
     
     private Set<String> fontsUsed=new HashSet<String>(50);
     
@@ -105,15 +113,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     //allow user to diable g2 setting
     boolean stopG2setting;
     
-    
-    
-    
-    
-    /**store x*/
-    float[] x_coord;
-    
-    /**store y*/
-    float[] y_coord;
+    float[] x_coord,y_coord;
 
     private Vector_Object text_color;
     private Vector_Object stroke_color;
@@ -121,10 +121,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     private Vector_Object stroke;
     
-   
     Vector_Int shapeType;
-    
-    private Vector_Rectangle fontBounds;
     
     private Vector_Double af1;
     private Vector_Double af2;
@@ -188,11 +185,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      */
     private boolean[] drawnHighlights;
     
-    /**
-     * flag if OCR so we need to redraw at end
-     */
-    private boolean hasOCR;
-    
 //    protected int type =DynamicVectorRenderer.DISPLAY_SCREEN;
     
     static {
@@ -227,8 +219,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         af3=new Vector_Double(defaultSize);
         af4=new Vector_Double(defaultSize);
         
-        fontBounds=new Vector_Rectangle(defaultSize);
-        
         clips=new Vector_Shape(defaultSize);
         objectType=new Vector_Int(defaultSize);
         
@@ -260,16 +250,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         
     }
     
-    /**
-     * set optimised painting as true or false and also reset if true
-     * @param optimsePainting
-     */
-    @Override
-    public void setOptimsePainting(final boolean optimsePainting) {
-        this.optimsePainting = optimsePainting;
-        lastItemPainted=-1;
-    }
-    
     private void renderHighlight(final Rectangle highlight, final Graphics2D g2){
         
         if(highlight!=null && !ignoreHighlight){
@@ -298,8 +278,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         }
     }
     
-    @Override
-    public void stopG2HintSetting(final boolean isSet){
+   public void stopG2HintSetting(final boolean isSet){
         stopG2setting=isSet;
         
     }
@@ -348,8 +327,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             af2.clear();
             af3.clear();
             af4.clear();
-            
-            fontBounds.clear();
             
             if(opacity!=null) {
                 opacity.clear();
@@ -427,8 +404,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         af3=null;
         af4=null;
         
-        fontBounds=null;
-        
         opacity=null;
         
         BMvalues=null;
@@ -461,14 +436,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     @Override
     @SuppressWarnings("OverlyLongMethod")
     public void paint(final Rectangle[] highlights, final AffineTransform viewScaling, final Rectangle userAnnot){
-        
-        //if OCR we need to track over draw at end
-        Vector_Rectangle ocr_highlights=null;
-        Set<String> ocr_used=null;
-        if(hasOCR){
-            ocr_highlights = new Vector_Rectangle(4000);
-            ocr_used=new HashSet<String>(10);
-        }
         
         //take a lock
         final int currentThreadID=++paintThreadID;
@@ -615,8 +582,8 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             fillCol=this.fillCol;
         }
         
-        /**
-         * now draw all shapes
+        /*
+         * now draw all objects
          */
         for(int i=0; i<count;i++){
             
@@ -630,11 +597,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             
             type=objectTypes[i];
             
-            //ignore items flagged as deleted
-            if(type== DynamicVectorRenderer.DELETED_IMAGE) {
-                continue;
-            }
-            
             Rectangle currentArea=null;
             
             //exit if later paint recall
@@ -644,7 +606,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 return;
             }
             
-            /**
+            /*
              * generate glyph for text
              */
             if(type<0){
@@ -707,7 +669,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                     imageUsed = -1;
                 }
                 
-                /**
+                /*
                  * workout area occupied by glyf
                  */
                 if(currentArea==null) {
@@ -821,7 +783,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                                 newClip=false;
                             }
 
-                            paintText(highlights, ocr_highlights, ocr_used, afValues1, afValues2, afValues3, afValues4, (Area) currentObject, currentTR, fillOpacity, strokeOpacity, x, y, afCount, textStrokeCol, textFillCol, currentArea, highlight);
+                            paintText(highlights, afValues1, afValues2, afValues3, afValues4, (Area) currentObject, currentTR, fillOpacity, strokeOpacity, x, y, afCount, textStrokeCol, textFillCol, currentArea, highlight);
                             
                             break;
                             
@@ -836,7 +798,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                                 newClip=false;
                             }
                             
-                            paintTrueType(highlights, ocr_highlights, ocr_used, afValues1, afValues2, afValues3, afValues4, currentObject, currentTR, lineWidth, fillOpacity, strokeOpacity, x, y, afCount, textStrokeCol, textFillCol, currentArea, highlight);
+                            paintTrueType(highlights, afValues1, afValues2, afValues3, afValues4, currentObject, currentTR, lineWidth, fillOpacity, strokeOpacity, x, y, afCount, textStrokeCol, textFillCol, currentArea, highlight);
 
                             break;
                             
@@ -855,16 +817,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
                             if(!invertHighlight) {
                                 highlight = setHighlightForGlyph(currentArea, highlights);
-                            }
-
-                            if(hasOCR && highlight!=null){
-                                final String key=highlight.x+" "+highlight.y;
-                                if(ocr_used.contains(key)){
-
-                                    ocr_used.add(key); //avoid multiple additions
-                                    ocr_highlights.addElement(highlight);
-
-                                }
                             }
 
                             renderEmbeddedText(currentTR,currentObject,DynamicVectorRenderer.TYPE1C,aff,highlight,textStrokeCol,textFillCol,strokeOpacity,fillOpacity,lineWidth);
@@ -886,16 +838,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                             
                             if(!invertHighlight) {
                                 highlight = setHighlightForGlyph(currentArea, highlights);
-                            }
-                            
-                            if(hasOCR && highlight!=null){
-                                final String key=highlight.x+" "+highlight.y;
-                                if(ocr_used.contains(key)){
-                                    
-                                    ocr_used.add(key); //avoid multiple additions
-                                    ocr_highlights.addElement(highlight);
-                                    
-                                }
                             }
                             
                             renderEmbeddedText(currentTR,currentObject,DynamicVectorRenderer.TYPE3,aff,highlight, textStrokeCol,textFillCol,strokeOpacity,fillOpacity,lineWidth);
@@ -1058,15 +1000,13 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
                             g2.getTransform().getMatrix(af);
 
-                            if(super.getMode()!= Mode.XFA){
-                                if(af[2]!=0) {
-                                    af[2] = -af[2];
-                                }
-                                if(af[3]!=0) {
-                                    af[3] = -af[3];
-                                }
+                            if(af[2]!=0) {
+                                af[2] = -af[2];
                             }
-
+                            if(af[3]!=0) {
+                                af[3] = -af[3];
+                            }
+                            
                             g2.setTransform(new AffineTransform(af));
 
                             final Font javaFont=(Font) javaObjects[stringCount];
@@ -1170,11 +1110,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             }
         }
         
-        //draw OCR highlights at end
-        if(ocr_highlights!=null){
-            paintOCRHighlights(ocr_highlights,g2);
-        }
-        
         if(g2!=null){
             //restore defaults
             g2.setClip(defaultClip);
@@ -1223,7 +1158,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     }
 
 
-    private void paintTrueType(Rectangle[] highlights, Vector_Rectangle ocr_highlights, Set<String> ocr_used, double[] afValues1, double[] afValues2, double[] afValues3, double[] afValues4, Object currentObject, int currentTR, int lineWidth, float fillOpacity, float strokeOpacity, float x, float y, int afCount, PdfPaint textStrokeCol, PdfPaint textFillCol, Rectangle currentArea, Rectangle highlight) {
+    private void paintTrueType(Rectangle[] highlights, double[] afValues1, double[] afValues2, double[] afValues3, double[] afValues4, Object currentObject, int currentTR, int lineWidth, float fillOpacity, float strokeOpacity, float x, float y, int afCount, PdfPaint textStrokeCol, PdfPaint textFillCol, Rectangle currentArea, Rectangle highlight) {
 
         //hack to fix exceptions in a PDF using this code to create ReadOnly image
         if(afCount!=-1) {
@@ -1232,16 +1167,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
             if (!invertHighlight) {
                 highlight = setHighlightForGlyph(currentArea, highlights);
-            }
-
-            if (hasOCR && highlight != null) {
-
-                final String key = highlight.x + " " + highlight.y;
-                if (ocr_used.contains(key)) {
-
-                    ocr_used.add(key); //avoid multiple additions
-                    ocr_highlights.addElement(highlight);
-                }
             }
 
             renderEmbeddedText(currentTR, currentObject, DynamicVectorRenderer.TRUETYPE, aff, highlight, textStrokeCol, textFillCol, strokeOpacity, fillOpacity, lineWidth);
@@ -1263,18 +1188,9 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         }
     }
 
-    private void paintText(Rectangle[] highlights, Vector_Rectangle ocr_highlights, Set<String> ocr_used, double[] afValues1, double[] afValues2, double[] afValues3, double[] afValues4, Area currentObject, int currentTR, float fillOpacity, float strokeOpacity, float x, float y, int afCount, PdfPaint textStrokeCol, PdfPaint textFillCol, Rectangle currentArea, Rectangle highlight) {
+    private void paintText(Rectangle[] highlights, double[] afValues1, double[] afValues2, double[] afValues3, double[] afValues4, Area currentObject, int currentTR, float fillOpacity, float strokeOpacity, float x, float y, int afCount, PdfPaint textStrokeCol, PdfPaint textFillCol, Rectangle currentArea, Rectangle highlight) {
         if(!invertHighlight) {
             highlight = setHighlightForGlyph(currentArea, highlights);
-        }
-
-        if(hasOCR && highlight!=null){
-            final String key=highlight.x+" "+highlight.y;
-            if(ocr_used.contains(key)){
-
-                ocr_used.add(key); //avoid multiple additions
-                ocr_highlights.addElement(highlight);
-            }
         }
 
         final AffineTransform def=g2.getTransform();
@@ -1285,32 +1201,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             renderText(x,y, currentTR, currentObject, highlight, textStrokeCol,textFillCol,strokeOpacity,fillOpacity);
 
             g2.setTransform(def);
-        }
-    }
-
-    static void paintOCRHighlights(Vector_Rectangle ocr_highlights, Graphics2D g2) {
-        final Rectangle[] highlights2 = ocr_highlights.get();
-
-        //Backup current g2 paint and composite
-        final Composite comp = g2.getComposite();
-        final Paint p = g2.getPaint();
-
-        for(int h=0; h!=highlights2.length; h++){
-            if(highlights2[h]!=null){
-
-                //Set new values for highlight
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, DecoderOptions.highlightComposite));
-
-                g2.setPaint(DecoderOptions.highlightColor);
-
-                //Draw highlight
-                g2.fill(highlights2[h]);
-
-            }
-            //Reset to starting values
-            g2.setComposite(comp);
-            g2.setPaint(p);
-
         }
     }
 
@@ -1368,21 +1258,19 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
              Object currentObject, final float fillOpacity,
             final float x, final float y, final int iCount, final int afCount, final int imageUsed, final int i){
         
-        
-        int sampling=1,w1=0,pY=0,defaultSampling=1;
+        int sampling=1,w1=0,pY,defaultSampling=1;
         
         // generate unique value to every image on given page (no more overighting stuff in the hashmap)
         final String key = Integer.toString(this.rawPageNumber) + Integer.toString(iCount);
         
-        //useHiResImageForDisplay added back by Mark as break memory images - use customers1/annexe1.pdf to test any changes
-        if(useHiResImageForDisplay && !isType3Font && objectStoreRef.isRawImageDataSaved(key)){
+        if(!isType3Font && objectStoreRef.isRawImageDataSaved(key)){
             
             float  scalingToUse=scaling;
             
             //fix for rescaling on Enkelt-Scanning_-_Bank-10.10.115.166_-_12-12-2007_-_15-27-57jpg50-300.pdf
-            if(useHiResImageForDisplay && scaling<1) {
-                    scalingToUse = 1f;
-                }
+            if(scaling<1) {
+                scalingToUse = 1f;
+            }
             
             final int defaultX= (Integer) objectStoreRef.getRawImageDataParameter(key, ObjectStore.IMAGE_pX);
             final int pX=(int)(defaultX*scalingToUse);
@@ -1490,55 +1378,25 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
                 currentObject=image;
             }
         }
-        
-        //now draw the image (hires or downsampled)
-        if(this.useHiResImageForDisplay){
             
-            double aa=1;
-            if(sampling>=1 && scaling>1 && w1>0) //factor in any scaling
-            {
-                aa = ((float) sampling) / defaultSampling;
-            }
-            
-            final AffineTransform imageAf=new AffineTransform(afValues1[afCount]*aa,afValues2[afCount]*aa,afValues3[afCount]*aa,afValues4[afCount]*aa,x,y);
-            
-            //get image and reload if needed
-            BufferedImage img=null;
-            if(currentObject!=null) {
-                img = (BufferedImage) currentObject;
-            }
-            
-            if(currentObject==null) {
-                img = reloadCachedImage(imageUsed, i, img);
-            }
-            
-            if(img!=null) {
-                renderImage(imageAf, img, fillOpacity, null, x, y);
-            }
-            
+        double aa=1;
+        if(sampling>=1 && scaling>1 && w1>0) //factor in any scaling
+        {
+            aa = ((float) sampling) / defaultSampling;
+        }
+
+        final AffineTransform imageAf=new AffineTransform(afValues1[afCount]*aa,afValues2[afCount]*aa,afValues3[afCount]*aa,afValues4[afCount]*aa,x,y);
+
+        //get image and reload if needed
+        BufferedImage img=null;
+        if(currentObject!=null) {
+            img = (BufferedImage) currentObject;
         }else{
-            
-            final AffineTransform before=g2.getTransform();
-           
-            if(pY>0){
-                
-                final double[] matrix=new double[6];
-                g2.getTransform().getMatrix(matrix);
-                final double ratio=((float)pY)/((RenderedImage)currentObject).getHeight();
-                
-                matrix[0]=ratio;
-                matrix[1]=0;
-                matrix[2]=0;
-                matrix[3]=-ratio;
-                
-                g2.scale(1f/scaling,1f/scaling);
-                
-                g2.setTransform(new AffineTransform(matrix));
-                
-            }
-            
-            renderImage(null,(BufferedImage)currentObject,fillOpacity,null,x,y);
-            g2.setTransform(before);
+            img = reloadCachedImage(imageUsed, i, img);
+        }
+
+        if(img!=null) {
+            renderImage(imageAf, img, fillOpacity, null, x, y);
         }
     }
     
@@ -1703,7 +1561,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      * if unset no message will appear
      * @param frame
      */
-    @Override
     public void setMessageFrame(final Container frame){
         this.frame=frame;
     }
@@ -1873,55 +1730,46 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         lastAf[1]=nextAf[1];
         lastAf[2]=nextAf[2];
         lastAf[3]=nextAf[3];
-         
-        if(!useHiResImageForDisplay) {
+            
+        int w,h;
 
-            if(CTM[1][1]>0 && image.getHeight()>1){//needed to manually turn in low res (used in ULC)
-                image = RenderUtils.invertImage(image);
-            }
+        if(!alreadyCached || cachedWidths.get(key)==null){
+            w = image.getWidth();
+            h = image.getHeight();
         }else{
+            w= cachedWidths.get(key);
+            h= cachedHeights.get(key);
+        }
             
-            final int w;
-            final int h;
+        if(!alreadyCached && !cacheInMemory){
 
-            if(!alreadyCached || cachedWidths.get(key)==null){
-                w = image.getWidth();
-                h = image.getHeight();
+            if(!isPrinting){
+
+                //cache PDF with single image for speed
+                if(imageCount==0){
+                    singleImage=image.getSubimage(0,0,image.getWidth(),image.getHeight());
+
+                    imageCount++;
+                }else {
+                    singleImage = null;
+                }
+            }
+            if(rawKey==null){
+                objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem,image,false,false,"tif");
+                imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem);
             }else{
-                w= cachedWidths.get(key);
-                h= cachedHeights.get(key);
+                objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem+ '_' +rawKey,image,false,false,"tif");
+                imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem+ '_' +rawKey);
             }
-            
-            if(!alreadyCached && !cacheInMemory){
-                
-                if(!isPrinting){
 
-                    //cache PDF with single image for speed
-                    if(imageCount==0){
-                        singleImage=image.getSubimage(0,0,image.getWidth(),image.getHeight());
-                        
-                        imageCount++;
-                    }else {
-                        singleImage = null;
-                    }
-                }
-                if(rawKey==null){
-                    objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem,image,false,false,"tif");
-                    imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem);
-                }else{
-                    objectStoreRef.saveStoredImage(pageNumber+"_HIRES_"+currentItem+ '_' +rawKey,image,false,false,"tif");
-                    imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+currentItem+ '_' +rawKey);
-                }
-                
-                if(rawKey==null) {
-                    key = pageNumber + "_" + currentItem;
-                } else {
-                    key = rawKey + '_' + currentItem;
-                }
-                
-                cachedWidths.put(key, w);
-                cachedHeights.put(key, h);
+            if(rawKey==null) {
+                key = pageNumber + "_" + currentItem;
+            } else {
+                key = rawKey + '_' + currentItem;
             }
+
+            cachedWidths.put(key, w);
+            cachedHeights.put(key, h);
         }
         
         x_coord=RenderUtils.checkSize(x_coord,currentItem);
@@ -1945,19 +1793,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             if(h==0) {
                 h = (int) (CTM[1][0] * HeightModifier);
             }
-            
-            //fix for bug if sheered in low res
-            if(!useHiResImageForDisplay && CTM[1][0]<0 && CTM[0][1]>0 && CTM[0][0]==0 && CTM[1][1]==0){
-                final int tmp=w;
-                w=-h;
-                h=tmp;
-            }
-            
-            //corrected in generation
-            if(h<0 && !useHiResImageForDisplay) {
-                h = -h;
-            }
-            
+           
             //fix negative height on Ghostscript image in printing
             final int x1=(int)currentGraphicsState.x;
             int y1=(int)currentGraphicsState.y;
@@ -1979,7 +1815,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             checkWidth(rectParams);
         }
         
-        if(useHiResImageForDisplay && !cacheInMemory){
+        if(!cacheInMemory){
             pageObjects.addElement(null);
         }else {
             pageObjects.addElement(image);
@@ -2004,22 +1840,18 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         final float x=currentGraphicsState.x;
         final float y=currentGraphicsState.y;
         
-        
-        if(useHiResImageForDisplay){
-            
-            final double[] nextAf= storedImageValues.get("imageAff-"+previousUse);
-            this.drawAffine(nextAf);
-            
-            lastAf[0]=nextAf[0];
-            lastAf[1]=nextAf[1];
-            lastAf[2]=nextAf[2];
-            lastAf[3]=nextAf[3];
-            
-            if(rawKey==null && imageIDtoName.containsKey(previousUse)){
-                imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+previousUse);
-            }else{
-                imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+previousUse+ '_' +rawKey);
-            }
+        final double[] nextAf= storedImageValues.get("imageAff-"+previousUse);
+        this.drawAffine(nextAf);
+
+        lastAf[0]=nextAf[0];
+        lastAf[1]=nextAf[1];
+        lastAf[2]=nextAf[2];
+        lastAf[3]=nextAf[3];
+
+        if(rawKey==null && imageIDtoName.containsKey(previousUse)){
+            imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+previousUse);
+        }else{
+            imageIDtoName.put(currentItem,pageNumber+"_HIRES_"+previousUse+ '_' +rawKey);
         }
         
         x_coord=RenderUtils.checkSize(x_coord,currentItem);
@@ -2082,7 +1914,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      * return which part of page drawn onto
      * @return
      */
-    @Override
     public Rectangle getOccupiedArea(){
         return new Rectangle(pageX1,pageY1,(pageX2-pageX1),(pageY1-pageY2));
     }
@@ -2215,8 +2046,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     }
     
     /*save shape colour*/
-    @Override
-    public void drawFillColor(final PdfPaint currentCol) {
+    private void drawFillColor(final PdfPaint currentCol) {
         
         pageObjects.addElement(null);
         objectType.addElement(DynamicVectorRenderer.FILLCOLOR);
@@ -2365,8 +2195,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             
             af4.setCheckpoint();
             
-            fontBounds.setCheckpoint();
-            
             if(opacity!=null) {
                 opacity.setCheckpoint();
             }
@@ -2430,9 +2258,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         af3.resetToCheckpoint();
         
         af4.resetToCheckpoint();
-        
-        fontBounds.resetToCheckpoint();
-        
+         
         if(opacity!=null) {
             opacity.resetToCheckpoint();
         }
@@ -2464,8 +2290,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     }
     
     /*save shape colour*/
-    @Override
-    public void drawStrokeColor(final Paint currentCol) {
+    private void drawStrokeColor(final Paint currentCol) {
         
         pageObjects.addElement(null);
         objectType.addElement(DynamicVectorRenderer.STROKECOLOR);
@@ -2486,7 +2311,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         resetTextColors=true;
         
     }
-    
+   
     /*save custom shape*/
     @Override
     public void drawCustom(final Object value) {
@@ -2535,7 +2360,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     
     
     /*save shape stroke*/
-    @Override
     public void drawStroke(final Stroke current) {
         
         pageObjects.addElement(null);
@@ -2744,31 +2568,10 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     }
     
     /**
-     * store fontBounds info
-     */
-    @Override
-    public void drawFontBounds(final Rectangle newfontBB) {
-        
-        pageObjects.addElement(null);
-        objectType.addElement(DynamicVectorRenderer.fontBB);
-        areas.addElement(null);
-        
-        fontBounds.addElement(newfontBB);
-        
-        x_coord=RenderUtils.checkSize(x_coord,currentItem);
-        y_coord=RenderUtils.checkSize(y_coord,currentItem);
-        x_coord[currentItem]=0;
-        y_coord[currentItem]=0;
-        
-        currentItem++;
-        
-    }
-    
-    /**
      * store af info
      */
     @Override
-    public void drawAffine(final double[] afValues) {
+    void drawAffine(final double[] afValues) {
         
         pageObjects.addElement(null);
         objectType.addElement(DynamicVectorRenderer.AF);
@@ -2791,8 +2594,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     /**
      * store af info
      */
-    @Override
-    public void drawFontSize(final int fontSize) {
+    private void drawFontSize(final int fontSize) {
         
         int realSize=fontSize;
         if(realSize<0) {
@@ -2826,8 +2628,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     /**
      * store line width info
      */
-    @Override
-    public void setLineWidth(final int lineWidth) {
+    private void setLineWidth(final int lineWidth) {
         
         if(lineWidth!=lastLW ){
             
@@ -2861,7 +2662,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      * @param fonts
      *
      */
-    public SwingDisplay(final byte[] stream, final Map fonts){
+    public SwingDisplay(final byte[] stream, final Map<Object, Object> fonts){
         
         // we use Cannoo to turn our stream back into a DynamicVectorRenderer
         try{
@@ -2876,7 +2677,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             }
             
             final int isHires=bis.read(); //0=no,1=yes
-            useHiResImageForDisplay = isHires == 1;
             
             rawPageNumber =bis.read();
             
@@ -2913,9 +2713,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
             af3 = (Vector_Double) RenderUtils.restoreFromStream(bis);
             
             af4 = (Vector_Double) RenderUtils.restoreFromStream(bis);
-            
-            fontBounds= new Vector_Rectangle();
-            fontBounds.restoreFromStream(bis);
             
             clips = new Vector_Shape();
             clips.restoreFromStream(bis);
@@ -2964,11 +2761,10 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         
     }
     
-    /**stop screen bein cleared on repaint - used by Canoo code
+    /**stop screen being cleared on repaint - used by Canoo code
      *
      * NOT PART OF API and subject to change (DO NOT USE)
      **/
-    @Override
     public void stopClearOnNextRepaint(final boolean flag) {
         noRepaint=flag;
     }
@@ -2982,7 +2778,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
      * @throws IOException
      */
     @Override
-    public byte[] serializeToByteArray(final Set fontsAlreadyOnClient) throws IOException{
+    public byte[] serializeToByteArray(final Set<String> fontsAlreadyOnClient) throws IOException{
         
         final ByteArrayOutputStream bos=new ByteArrayOutputStream();
         
@@ -2991,11 +2787,7 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         
         //flag hires
         //0=no,1=yes
-        if(useHiResImageForDisplay) {
-            bos.write(1);
-        } else {
-            bos.write(0);
-        }
+        bos.write(1);
         
         //save page
         bos.write(rawPageNumber);
@@ -3028,8 +2820,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         af2.trim();
         af3.trim();
         af4.trim();
-        
-        fontBounds.trim();
         
         clips.trim();
         objectType.trim();
@@ -3070,8 +2860,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         RenderUtils.writeToStream(bos,af2);
         RenderUtils.writeToStream(bos,af3);
         RenderUtils.writeToStream(bos,af4);
-        
-        fontBounds.writeToStream(bos);
         
         clips.writeToStream(bos);
         
@@ -3138,7 +2926,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
     /**
      * for font if we are generatign glyph on first render
      */
-    @Override
     public void checkFontSaved(final Object glyph, final String name, final PdfFont currentFontData) {
         
         //save glyph at start
@@ -3154,37 +2941,8 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
         }
     }
     
-    /**
-     * This method is deprecated, please use getAreaAsArray and
-     * create fx/swing rectangles where needed.
-     * @deprecated 
-     * @param i
-     * @return 
-     */
-    @Deprecated
-    @Override
-    public Rectangle getArea(final int i) {
-        return new Rectangle(areas.elementAt(i)[0], areas.elementAt(i)[1],areas.elementAt(i)[2],areas.elementAt(i)[3]);
-    }
-    
-    @Override
     public void setPrintPage(final int currentPrintPage) {
         rawPageNumber = currentPrintPage;
-    }
-    
-    @Override
-    public void flagImageDeleted(final int i) {
-        objectType.setElementAt(DynamicVectorRenderer.DELETED_IMAGE,i);
-    }
-    
-    @Override
-    public void setOCR(final boolean isOCR) {
-        this.hasOCR=isOCR;
-    }
-    
-    @Override
-    protected void showMessageDialog(final String message){
-        JOptionPane.showMessageDialog(null,message);
     }
 }
 

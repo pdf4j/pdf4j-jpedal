@@ -53,8 +53,8 @@ import org.jpedal.objects.raw.PdfObject;
  */
 public class LatticeFormContext implements PaintContext {
 
-    //private final GenericColorSpace shadingColorSpace;
-    //private final float[] background;
+    private final GenericColorSpace shadingColorSpace;
+    private final float[] background;
     private final int bitsPerCoordinate;
     private final int bitsPerComponent;
     private final int verticesPerRow;
@@ -77,6 +77,7 @@ public class LatticeFormContext implements PaintContext {
 
         //this.shadingColorSpace = shadingColorSpace;
         //this.background = background;
+        this.shadingColorSpace = shadingColorSpace;
         bitsPerComponent = shadingObject.getInt(PdfDictionary.BitsPerComponent);
         bitsPerCoordinate = shadingObject.getInt(PdfDictionary.BitsPerCoordinate);
         verticesPerRow = shadingObject.getInt(PdfDictionary.VerticesPerRow);
@@ -84,7 +85,8 @@ public class LatticeFormContext implements PaintContext {
         colCompCount = shadingColorSpace.getColorComponentCount();
         boolean hasSmallBits = bitsPerComponent<8 || bitsPerCoordinate<8;
         reader = new BitReader(shadingObject.getDecodedStream(),hasSmallBits);
-
+        
+        this.background = background;
         this.matrix = matrix;
         this.pageHeight = pageHeight;
         this.scaling = scaling;
@@ -255,6 +257,21 @@ public class LatticeFormContext implements PaintContext {
 
         final int rastSize = (w * h * 4);
         final int[] data = new int[rastSize];
+        
+        if (background != null) {
+            shadingColorSpace.setColor(background, 4);
+            final Color c = (Color) shadingColorSpace.getColor();
+            for (int i = 0; i < h; i++) {
+                for (int j = 0; j < w; j++) {
+                    final int base = (i * w + j) * 4;
+                    data[base] = c.getRed();
+                    data[base + 1] = c.getGreen();
+                    data[base + 2] = c.getBlue();
+                    data[base + 3] = 255;
+                }
+            }
+        }
+
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {

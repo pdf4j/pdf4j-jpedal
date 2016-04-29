@@ -32,12 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.EncryptPDFDocument;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -62,7 +62,7 @@ public class Security {
             } else {
                 //get values from user
                 final EncryptPDFDocument encryptPage = new EncryptPDFDocument(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int encrypt = encryptPage.display((Container)currentGUI.getFrame(), "Standard Security");
+                final int encrypt = encryptPage.display((Component)currentGUI.getFrame(), "Standard Security");
 
                 //get parameters and call if YES
                 if (encrypt == JOptionPane.OK_OPTION) {

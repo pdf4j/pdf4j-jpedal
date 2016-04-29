@@ -33,11 +33,10 @@
 
 package org.jpedal.parser.image;
 
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import org.jpedal.JDeliHelper;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.exception.PdfException;
-import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.image.data.ImageData;
 import org.jpedal.utils.LogWriter;
 
@@ -48,36 +47,16 @@ import org.jpedal.utils.LogWriter;
 public class JPeg2000ImageDecoder {
     
     
-    public static BufferedImage decode(final String name, int w, int h, GenericColorSpace decodeColorData, byte[] data, final float[] decodeArray, final ImageData imageData, int d) throws RuntimeException, PdfException {
-        
-        
-        BufferedImage image;
-        
-//needs imageio library
-        
-        LogWriter.writeLog("JPeg 2000 Image " + name + ' ' + w + "W * " + h + 'H');
-        
-        /**
-         * try {
-         * java.io.FileOutputStream a =new java.io.FileOutputStream("/Users/markee/Desktop/"+ name + ".jpg");
-         *
-         * a.write(data);
-         * a.flush();
-         * a.close();
-         *
-         * } catch (Exception e) {
-         * LogWriter.writeLog("Unable to save jpeg " + name);
-         *
-         * }  /**/
-        
-        
-        
-        image = decodeColorData.JPEG2000ToRGBImage(data,w,h,decodeArray,imageData.getpX(),imageData.getpY(),d);
-        
-        return image;
+    public static BufferedImage decode(final int w, final int h, final GenericColorSpace decodeColorData, final byte[] data, 
+            final float[] decodeArray, final ImageData imageData, int d) throws RuntimeException, PdfException {
+
+        LogWriter.writeLog("JPeg 2000 Image " + w + "W * " + h + 'H');
+
+        return decodeColorData.JPEG2000ToRGBImage(data,w,h,decodeArray,imageData.getpX(),imageData.getpY(),d);
+
     }
     
-    public static byte[] getBytesFromJPEG2000(final byte[] data, GenericColorSpace decodeColorData,final PdfObject XObject) {
+    public static byte[] getBytesFromJPEG2000(final byte[] data) {
         
         try {
             return JDeliHelper.getBytesFromJPEG(data);

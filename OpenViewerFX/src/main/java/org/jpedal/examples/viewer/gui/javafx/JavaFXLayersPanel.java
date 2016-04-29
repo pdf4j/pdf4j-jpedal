@@ -37,12 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
@@ -183,9 +178,7 @@ public class JavaFXLayersPanel extends Tab implements GUILayersPanel {
                     name = new String((byte[]) layerName);
                 }
 
-                /**
-                 * remove full path in name
-                 */
+                // remove full path in name
                 String title = name;
                 final int ptr = name.indexOf(PdfLayerList.deliminator);
                 if (ptr != -1) {

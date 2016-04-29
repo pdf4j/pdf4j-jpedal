@@ -36,6 +36,8 @@ import org.jpedal.color.ColorSpaces;
 import org.jpedal.exception.PdfSecurityException;
 import org.jpedal.io.DecryptionFactory;
 import org.jpedal.io.ObjectDecoder;
+import static org.jpedal.io.ObjectDecoder.debugFastCode;
+import static org.jpedal.io.ObjectDecoder.padding;
 import org.jpedal.io.ObjectUtils;
 import org.jpedal.io.PdfFileReader;
 import org.jpedal.objects.raw.ColorSpaceObject;
@@ -44,9 +46,6 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
-
-import static org.jpedal.io.ObjectDecoder.debugFastCode;
-import static org.jpedal.io.ObjectDecoder.padding;
 /**
  * specific to Color object
  */
@@ -76,7 +75,7 @@ public class ColorObjectDecoder {
 
            if(raw[i]=='/'){
 
-               /** read the first value which is ID**/
+               // read the first value which is ID
                i++;
 
                //move cursor to start of text
@@ -333,14 +332,14 @@ public class ColorObjectDecoder {
             }else{
 
                 int j=0;
-                if(data[0]!='[' && data[0]!='<'){
+                if(data[0]!='[' && data[0]!='<' && data[0]!='('){
                     //lose obj at start
                     j=3;
                     while(data[j-1]!=106 && data[j-2]!=98 && data[j-3]!=111){
                         j++;
                     }
                 }
-
+                
                 if(debugColorspace) {
                     System.out.println("Read obj i=" + i + " j=" + j + ' ' + (char) data[j] + (char) data[j + 1]);
                 }
@@ -420,9 +419,7 @@ public class ColorObjectDecoder {
    
         int endPoint = i;
         
-        /**
-         * special case where value is stored in separate data structure we have not read yet 
-         */
+        // special case where value is stored in separate data structure we have not read yet
         if(i==8 && raw.length==8 && raw[i-1]=='n' && raw[i-2]=='r' && raw[i-3]=='e' && raw[i-4]=='t' && raw[i-5]=='t' && raw[i-6]=='a' && raw[i-7]=='P' && raw[i-8]=='/'){
              
             pdfObject.setConstant(PdfDictionary.ColorSpace, PdfDictionary.Pattern);
@@ -539,9 +536,6 @@ public class ColorObjectDecoder {
         i = DirectDictionaryToObject.convert(pdfObject, "", i, raw, -1,objectReader);
 
         //allow for stream
-        /**
-         * look for stream afterwards
-         */
         if(pdfObject.hasStream()){
             final int count=raw.length;
             int ends=0;

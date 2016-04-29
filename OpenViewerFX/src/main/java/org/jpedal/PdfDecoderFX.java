@@ -32,13 +32,10 @@
  */
 package org.jpedal;
 
-import org.jpedal.external.FXExternalHandlers;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
@@ -64,31 +61,34 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
-import javax.print.attribute.SetOfIntegerSyntax;
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import org.jpedal.constants.JPedalSettings;
 import org.jpedal.constants.PDFflags;
 import org.jpedal.constants.SpecialOptions;
-import org.jpedal.display.*;
-import org.jpedal.display.javafx.*;
-
+import org.jpedal.display.Display;
+import org.jpedal.display.DisplayOffsets;
+import org.jpedal.display.GUIModes;
+import org.jpedal.display.PageOffsets;
+import org.jpedal.display.javafx.SingleDisplayFX;
 import org.jpedal.examples.viewer.commands.javafx.JavaFXPreferences;
-import org.jpedal.examples.viewer.gui.*;
+import org.jpedal.examples.viewer.gui.FXAdditionalData;
+import org.jpedal.examples.viewer.gui.GUI;
+import org.jpedal.examples.viewer.gui.JavaFxGUI;
 import org.jpedal.examples.viewer.gui.javafx.JavaFXMouseFunctionality;
 import org.jpedal.examples.viewer.gui.javafx.JavaFXMouseListener;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.ExternalHandlers;
+import org.jpedal.external.FXExternalHandlers;
 import org.jpedal.external.Options;
 import org.jpedal.external.PluginHandler;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.grouping.PdfGroupingAlgorithms;
-import org.jpedal.gui.*;
 import org.jpedal.io.*;
 import org.jpedal.objects.*;
 import org.jpedal.objects.acroforms.AcroRenderer;
-import org.jpedal.objects.acroforms.actions.*;
+import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.javascript.ExpressionEngine;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.outlines.OutlineData;
@@ -102,7 +102,7 @@ import org.jpedal.utils.DPIFactory;
 import org.jpedal.utils.LogWriter;
 import org.w3c.dom.Document;
 
-/**
+ /**
  * Provides an object to decode pdf files and provide a rasterizer if required -
  * Normal usage is to create instance of PdfDecoder and access via public
  * methods. Examples showing usage in org.jpedal.examples
@@ -180,7 +180,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     private StatusBar statusBar;
     
     /**
-     * see if file open - may not be open if user interrupted open or problem encountered
+     * see if the file is open - may not be if the user interrupted open or encountered a problem
      */
     @Override
     public boolean isOpen() {
@@ -190,10 +190,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     Canvas previewThumbnail;
     /**
      * put a little thumbnail of page on display for user in viewer as he scrolls through
-     * @param g2
-     * @param visibleRect
      */
-    private void drawPreviewImage(final Graphics2D g2, final Rectangle visibleRect) {
+    private void drawPreviewImage() {
 
         if(previewImage!=null){
             GraphicsContext context = previewThumbnail.getGraphicsContext2D();
@@ -347,14 +345,10 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
     }
    
-    /**
+    /*
      * work out machine type so we can call OS X code to get around Java bugs.
      */
     static {
-        
-        /**
-         * see if mac
-         */
         final String name = System.getProperty("os.name");
         if (name.equals("Mac OS X")) {
             DecoderOptions.isRunningOnMac = true;
@@ -368,9 +362,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             }
         }
         
-        /**
-         * get version number so we can avoid bugs in various versions
-         */
+        // get version number so we can avoid bugs in various versions
         try{
             DecoderOptions.javaVersion=Float.parseFloat(System.getProperty("java.specification.version"));
         }catch(final NumberFormatException e){
@@ -394,20 +386,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         //swingPainter.resetViewableArea(this, fileAccess.getPdfPageData());
         
     }
-
-    /**
-     * Deprecated on 07/07/2014
-     * please use getPages().setViewableArea instead.
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
-        
-        return null;
-        //return swingPainter.setViewableArea(viewport, this, fileAccess.getPdfPageData());
-        
-    }
     
     /**
      * return type of alignment for pages if smaller than panel
@@ -421,14 +399,12 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     /**
      * This will be needed for text extraction and set to true
      * as paramter makes sure widths included in text stream
-     *
-     * @param newEmbedWidthData -
-     *                          flag to embed width data in text fragments for use by grouping
-     *                          algorithms
+     * @param newEmbedWidthData - flag to embed width data in text fragments 
+     * for use by grouping algorithms
      */
     public static void init(final boolean newEmbedWidthData) {
         
-        /** get local handles onto objects/data passed in */
+        // get local handles onto objects/data passed in 
         DecoderOptions.embedWidthData = newEmbedWidthData;
         
     }
@@ -444,7 +420,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
         pages = new SingleDisplayFX(this,options);
         
-        /** get local handles onto flag passed in */
+        // get local handles onto flag passed in
         options.setRenderPage(newRender);
         
         //once only setup for fonts (dispose sets flag to false just incase)
@@ -464,30 +440,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     }
     
     protected int specialMode= SpecialOptions.NONE;
-    
-    /**
-     * Recommend way to create a PdfDecoder for renderer only viewer (not
-     * recommended for server extraction only processes)
-     */
-    public PdfDecoderFX(final int specialMode, final UIViewerInt viewer) {
-        
-        //swingPrinter.uiViewer = viewer;
-        
-        this.specialMode=specialMode;
-        
-        pages = new SingleDisplayFX(this,options);
-        
-        options.setRenderPage(true);
-        //@swing
-//        setLayout(null);
-        
-        //once only setup for fonts (dispose sets flag to false just incase)
-        if(!FontMappings.fontsInitialised){
-            FontMappings.initFonts();
-            FontMappings.fontsInitialised=true;
-        }
-        setId("PdfDecoderFX");
-    }
+
     
     /**
      * NOT PART OF API
@@ -498,13 +451,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     public void setPageDisplayMode(final int pageDisplayMode) {
         specialMode=pageDisplayMode;
     }
-    
-    @SuppressWarnings("UnusedDeclaration")
-    public static UIViewerInt getUIViewer(){
-//        return swingPrinter.uiViewer;
-        return null;
-    }
-    
+
     /**
      * Recommend way to create a PdfDecoder for renderer only viewer (not
      * recommended for server extraction only processes)
@@ -526,26 +473,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
 //        setPreferredSize(new Dimension(100, 100));
         setId("PdfDecoderFX");
     }
-    
-    /**
-     * Recommend way to create a PdfDecoder for renderer only viewer (not
-     * recommended for server extraction only processes)
-     */
-    public PdfDecoderFX(final org.jpedal.gui.UIViewerInt uiViewer, final org.jpedal.gui.ViewerInt viewer, final int pageCount) {
-        
-//        swingPrinter.uiViewer = uiViewer;
-//        swingPrinter.viewer = viewer;
-        fileAccess.setPageCount(pageCount);
-        
-//        swingPrinter.isCustomPrinting = true;
-        
-        pages = new SingleDisplayFX(this,options);
-        
-        options.setRenderPage(true);
-        setId("PdfDecoderFX");
-        //@swing
-//        setLayout(null);
-    }
+
     
     /**
      * remove all static elements - only do once completely finished with JPedal
@@ -652,47 +580,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     public final PdfPageData getPdfPageData() {
         return fileAccess.getPdfPageData();
     }
-    
-   
-    /**
-     * set page range (inclusive) -
-     * If end is less than start it will print them
-     * backwards (invalid range will throw PdfException)
-     *
-     * @throws PdfException
-     */
-    public void setPagePrintRange(final int start, final int end) throws PdfException {
-        
-//        swingPrinter.setPagePrintRange(start, end, fileAccess.getPageCount());
-        
-    }
-    
-    /**
-     * tells program to try and use Java's font printing if possible as work
-     * around for issue with PCL printing - values are PdfDecoder.TEXTGLYPHPRINT
-     * (use Java to rasterize font if available) PdfDecoder.TEXTSTRINGPRINT(
-     * print as text not raster - fastest option) PdfDecoder.NOTEXTPRINT
-     * (default - highest quality)
-     */
-    public void setTextPrint(final int textPrint) {
-        this.textPrint = textPrint;
-    }
-    
-    /**
-     * flag to use Java's inbuilt font renderer if possible
-     */
-    public int textPrint;
-    
-    /**
-     * If you are printing PDFs using JPedal in your custom
-     * code, you may find pages missing, because JPedal does
-     * not know about these additional pages. This method
-     * allows you to tell JPedal you have already printed pagesPrinted
-     */
-    public void useLogicalPrintOffset(final int pagesPrinted){
-//        swingPrinter.useLogicalPrintOffset(pagesPrinted);
-    }
-    
+
     /**
      * Implements the standard Java printing functionality.
      *
@@ -813,7 +701,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
     /**
      * return scaleup factor applied to last Hires image of page generated
-     *
      * negative values mean no upscaling applied and should be ignored
      */
     @Override
@@ -1032,7 +919,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             }
         }
         
-        /**update the AffineTransform using the current rotation*/
+        //update the AffineTransform using the current rotation
         pages.setPageRotation(displayRotation);
         
         
@@ -1056,7 +943,9 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
     }
     
-    /** calls setPageParameters(scaling,pageNumber) after setting rotation to draw page */
+    /** 
+     * calls setPageParameters(scaling,pageNumber) after setting rotation to draw page 
+     */
     @Override
     public void setPageParameters(final float scaling, final int pageNumber, final int newRotation) {
         
@@ -1112,9 +1001,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
     }
     
-    //All Pdf decoder to remember the default for current settings
-    //private Cursor defaultCursor = null;
-    
     /**
      * When changing the mouse mode we call this method to set the mouse mode default cursor
      * @param c :: The cursor to set as the default
@@ -1125,20 +1011,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         }
     }
     
-    //When default option is used, use the set default not the component default
-    //@swing
-    /**
-    @Override
-    public void setCursor(Cursor c){
-        if(GUIDisplay.allowChangeCursor){
-            if(c.getType()==Cursor.DEFAULT_CURSOR && defaultCursor!=null){
-                super.setCursor(defaultCursor);
-            }else{
-                super.setCursor(c);
-            }
-        }
-    }
-    /**/ 
     /**
      * decode a page, - <b>page</b> must be between 1 and
      * <b>PdfDecoder.getPageCount()</b> - Will kill off if already running
@@ -1159,9 +1031,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             hasLayersChanged=false;
         }
         
-        /**
-         * if linearized and PdfObject then setup
-         */
+        //if linearized and PdfObject then setup
         if(!isPageAvailable){
             return;
         }else if(isPageAvailable && pdfObject!=null){
@@ -1171,9 +1041,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         parser.setStatusBar(statusBar);
         
         parser.setParms(displayRotation,scaling,(int)pages.getIndent(),specialMode);
-        
-        pages.setCursorBoxOnScreen(null,rawPage== fileAccess.getLastPageDecoded());
-        
+
         final DynamicVectorRenderer currentDisplay=new FXDisplay(rawPage,getObjectStore(), false);
         
         fileAccess.setDVR(currentDisplay);
@@ -1186,11 +1054,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         }
         
         if(Platform.isFxApplicationThread()){
-        //    try{
-                
-                /**
-                 * Updated variables for highlighting on page decode.
-                 */
+                //Updated variables for highlighting on page decode.
                 color = DecoderOptions.highlightColor.getRGB();
                 opacity = DecoderOptions.highlightComposite;
                 highlightsPane.getChildren().clear();
@@ -1205,9 +1069,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
                 @Override
                 public void run() {
                     
-                    /**
-                     * Updated variables for highlighting on page decode.
-                     */
+                    //Updated variables for highlighting on page decode.
                     color = DecoderOptions.highlightColor.getRGB();
                     opacity = DecoderOptions.highlightComposite;
                     highlightsPane.getChildren().clear();
@@ -1228,35 +1090,9 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      */
     @Override
     public synchronized boolean isPageAvailable(final int rawPage) {
-        
+
         return parser.isPageAvailable(rawPage);
-        
-    }
-    
-    /**
-     * store objects to use on a print
-     * @param page
-     * @param type
-     * @param colors
-     * @param obj
-     * @throws PdfException
-     */
-    public void printAdditionalObjectsOverPage(final int page, final int[] type, final Color[] colors, final Object[] obj) throws PdfException {
-        
-//        swingPrinter.printAdditionalObjectsOverPage(page, type, colors, obj);
-        
-    }
-    
-    /**
-     * store objects to use on a print
-     * @param type
-     * @param colors
-     * @param obj
-     * @throws PdfException
-     */
-    public void printAdditionalObjectsOverAllPages(final int[] type, final Color[] colors, final Object[] obj) throws PdfException {
-        
-//        swingPrinter.printAdditionalObjectsOverAllPages(type, colors, obj);
+
     }
     
     /**
@@ -1300,32 +1136,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             decodePage(page);
         }
     }
-    
-    /**
-     * uses hires images to create a higher quality display - downside is it is
-     * slower and uses more memory (default is false).- Does nothing in OS
-     * version
-     *
-     */
-    @Override
-    public boolean isHiResScreenDisplay() {
-        
-        return options.useHiResImageForDisplay();
-        
-    }
-    
-    /**
-     * uses hires images to create a higher quality display - downside is it is
-     * slower and uses more memory (default is false).- Does nothing in OS
-     * version
-     *
-     * @param value
-     */
-    @Override
-    public void useHiResScreenDisplay(final boolean value) {
-        options.useHiResImageForDisplay(value);
-    }
-    
 
     /**
      * decode a page as a background thread (use other background methods to access data)
@@ -1491,11 +1301,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     @Override
     public void openPdfFile(final String filename, final Certificate certificate, final PrivateKey key) throws PdfException{
         
-        /**
-         * set values and then call generic open
-         */
+        //set values and then call generic open
         fileAccess.setUserEncryption(certificate, key);
-        
         openPdfFile(filename);
     }
 
@@ -1846,7 +1653,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     }
     
     /**
-     *
      * Allow user to access Forms renderer object if needed
      */
     @Override
@@ -1977,7 +1783,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      * returns object containing grouped text of last decoded page
      * - if no page decoded, a Runtime exception is thrown to warn user
      * Please see org.jpedal.examples.text for example code.
-     *
      */
     @Override
     public PdfGroupingAlgorithms getGroupingObject() throws PdfException {
@@ -2015,10 +1820,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
      */
     @Override
     public void resetForNonPDFPage(final int pageCount) {
-        
-        /** set hires mode or not for display */
-        final DynamicVectorRenderer currentDisplay= fileAccess.getDynamicRenderer();
-        currentDisplay.setHiResImageForDisplayMode(false);
         
         parser.resetFontsInFile();
         fileAccess.setPageCount(pageCount);
@@ -2069,23 +1870,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
         return resultsFromDecode.getPageDecodeStatusReport(status);
     }
-    
-    /**
-     * set print mode (Matches Abodes Auto Print and rotate output
-     */
-    public void setPrintAutoRotateAndCenter(final boolean value) {
-//        swingPrinter.setCenterOnScaling(value);
-//        swingPrinter.setAutoRotate(value);
-        
-    }
-    
-    /**
-     * tell printout to print only visiable area in viewer if set
-     */
-    public void setPrintCurrentView(final boolean value) {
-//        swingPrinter.printOnlyVisible = value;
-    }
-    
+
     /**
      * not part of API used internally
      *
@@ -2185,26 +1970,14 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
     /**
      * part of pageable interface
-     *
-     * @see java.awt.print.Pageable#getPrintable(int)
      */
     @Override
     public Printable getPrintable(final int page) throws IndexOutOfBoundsException {
         
         return this;
     }
-    
-    
+
     /**
-     * allow printing of different sizes pages
-     * @param allowDifferentPrintPageSizes
-     */
-    public void setAllowDifferentPrintPageSizes(final boolean allowDifferentPrintPageSizes) {
-//        swingPrinter.allowDifferentPrintPageSizes = allowDifferentPrintPageSizes;
-    }
-    
-    /**
-     *
      * access textlines object
      */
     @Override
@@ -2213,7 +1986,8 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     }
    
     /**
-     * set an inset display so that display will not touch edge of panel*/
+     * set an inset display so that display will not touch edge of panel
+     */
     @Override
     public final void setInset(final int width, final int height) {
         options.setInset(width, height);
@@ -2225,23 +1999,10 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
             formRenderer.setInsets(width, height);
         }
     }
-    
+
     /**
-     * set a left margin for printing pages (ie for duplex)
-     * @param oddPages
-     */
-    public void setPrintIndent(final int oddPages, final int evenPages) {
-        
-//        swingPrinter.setPrintIndent(oddPages,evenPages);
-        
-    }
-    
-    /**
-     *
      * not part of API used internally
-     *
      * allow user to 'move' display of PDF
-     *
      * mode is a Constant in org.jpedal.external.OffsetOptions (ie OffsetOptions.SWING_DISPLAY,OffsetOptions.PRINTING)
      */
     @Override
@@ -2297,29 +2058,13 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         return pageSize;
         
     }
-    /**/
     
-    /* get width of panel*/
+    /** 
+     * get width of panel
+     */
     private int[] getMinimumSize() {
         
         return new int[]{100+options.getInsetW(),100+options.getInsetH()};
-    }
-   
-    /**
-     * Deprecated on 04/07/2014, please use 
-     * updateCursorBoxOnScreen(final int[] rectParams, final int outlineColor) instead
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public final void updateCursorBoxOnScreen(final Rectangle newOutlineRectangle, final Color outlineColor) {
-        
-        if(options.getDisplayView()!=Display.SINGLE_PAGE) {
-            return;
-        }
-        
-        throw new RuntimeException(" updateCursorBoxOnScreen called in PdfDecoderFxm please call updateCursorBoxOnScreenFX instead");
-        
     }
     
     /**
@@ -2376,9 +2121,11 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
     }
     
-    /**set border for screen and print which will be displayed<br>
+    /**
+     * set border for screen and print which will be displayed<br>
      * Setting a new value will enable screen and border painting - disable
-     * with disableBorderForPrinting() */
+     * with disableBorderForPrinting() 
+     */
     @Override
     public final void setPDFBorder(final Border newBorder){
         this.myBorder=newBorder;
@@ -2392,13 +2139,17 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         options.useHardwareAcceleration(useAcceleration);
     }
     
-    /**return amount to scroll window by when scrolling (default is 10)*/
+    /**
+     * return amount to scroll window by when scrolling (default is 10)
+     */
     @Override
     public int getScrollInterval() {
         return scrollInterval;
     }
     
-    /**set amount to scroll window by when scrolling*/
+    /**
+     * set amount to scroll window by when scrolling
+     */
     @Override
     public void setScrollInterval(final int scrollInterval) {
         this.scrollInterval = scrollInterval;
@@ -2411,19 +2162,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     public int getDisplayView() {
         return options.getDisplayView();
     }
-   
-    /**
-     * set page scaling mode to use - default setting is  PAGE_SCALING_REDUCE_TO_PRINTER_MARGINS
-     * All values start PAGE_SCALING
-     */
-    public void setPrintPageScalingMode(final int pageScalingMode) {
-//        swingPrinter.setPrintPageScalingMode(pageScalingMode);
-    }
-    
-    public void setUsePDFPaperSize(final boolean usePDFPaperSize) {
-//        swingPrinter.usePDFPaperSize = usePDFPaperSize;
-    }
-    
+
     /**
      * returns current scaling value used internally
      * @return
@@ -2446,8 +2185,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     /**
      * part of pageable interface - used only in printing
      * Use getPageCount() for number of pages
-     *
-     * @see java.awt.print.Pageable#getNumberOfPages()
      */
     @Override
     public int getNumberOfPages() {
@@ -2458,8 +2195,6 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
     /**
      * part of pageable interface
-     *
-     * @see java.awt.print.Pageable#getPageFormat(int)
      */
     @Override
     public PageFormat getPageFormat(final int p) throws IndexOutOfBoundsException {
@@ -2474,87 +2209,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         return null;
         
     }
-    
-    /**
-     * Returns pageFormats set by the user for a given page or a standard page format for all pages if set.
-     * @param p :: Page to check for a page format
-     * @return PageFormat that has been set or null is no value has been sets
-     * @throws IndexOutOfBoundsException
-     */
-    public static PageFormat getUserSetPageFormat(final int p) throws IndexOutOfBoundsException {
-        
-//        return swingPrinter.getPageFormat(p, fileAccess.getPdfPageData(), fileAccess.getPageCount());
-        return null;
-        
-    }
-    
-    /**
-     * Specify if the pdf page should be centered within the pageformat when print.
-     * This method has been depricated, please use setPrintPageCentering(boolean center) instead.
-     * @param center :: If true the pdf page will be centered in the imageable area.
-     */
-    public void setCenterOnScaling(final boolean center){
-        
-//        swingPrinter.setCenterOnScaling(center);
-    }
-    
-    /**
-     * Specify if the pdf page should be rotated to best fit the printed page imagable area.
-     *
-     * @param rotate :: If true the pdf page will be rotated to better fit the imageable area.
-     */
-    public void setPrintAutoRotate(final boolean rotate){
-        
-//        swingPrinter.setAutoRotate(rotate);
-    }
-    
-    /**
-     * set pageformat for a specific page - if no pageFormat is set a default
-     * will be used. Recommended to use setPageFormat(PageFormat pf)
-     */
-    public void setPageFormat(final int p, final PageFormat pf) {
-        
-//        swingPrinter.putPageFormat(p, pf);
-    }
-    
-    /**
-     * set pageformat for a specific page - if no pageFormat is set a default
-     * will be used.
-     */
-    public void setPageFormat(final PageFormat pf) {
-        
-//        swingPrinter.putPageFormat("standard", pf);
-    }
-    
-    /**
-     * set inclusive range to print (see SilentPrint.java and Viewer.java
-     * for sample print code (invalid range will throw PdfException)
-     * can  take values such as  new PageRanges("3,5,7-9,15");
-     */
-    public static void setPagePrintRange(final SetOfIntegerSyntax range) throws PdfException {
-        
-        if (range == null) {
-            throw new PdfException("[PDF] null page range entered");
-        }
-        
-//        swingPrinter.setPagePrintRange(range, fileAccess.getPageCount());
-        
-    }
-    
-    /**
-     * allow user to select only odd or even pages to print
-     */
-    public void setPrintPageMode(final int mode) {
-//        swingPrinter.setPrintPageMode(mode);
-    }
-    
-    /**
-     * ask JPedal to stop printing a page
-     */
-    public final void stopPrinting() {
-//        swingPrinter.stopPrinting();
-    }
-    
+
     /**
      * return page currently being printed or -1 if finished
      */
@@ -2587,9 +2242,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         return boundsArr;
     }
     
-    /**
-     * Variables for text highlights.
-     */
+    //Variables for text highlights.
     public final Pane highlightsPane = new Pane();
     private static int color = DecoderOptions.highlightColor.getRGB();
     private static float opacity = DecoderOptions.highlightComposite;
@@ -2621,7 +2274,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
         
         drawHighlightsForImage();
         
-        drawPreviewImage(null, new Rectangle((int)getBoundsInLocal().getMinX(), (int)getBoundsInLocal().getMinY(), (int)getBoundsInLocal().getWidth(), (int)getBoundsInLocal().getHeight()));
+        drawPreviewImage();
         
     }
     
@@ -2697,7 +2350,7 @@ public class PdfDecoderFX extends Pane implements Printable, Pageable, PdfDecode
     
      @Override
     public int getTextPrint() {
-       return textPrint;
+       return -1;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class CIDTextUtils {
     
     static int getCIDCharValues(int i, final byte[] stream, final int streamLength, final GlyphData glyphData, final PdfFont currentFontData, final ParserOptions parserOptions) {
         
-        /**
+        /*
          * first time we read the first 2 values and then decide if we are in single or
          * double byte mode
          * (ie is there a 0 x 0y pattern)
@@ -65,9 +65,7 @@ public class CIDTextUtils {
         String newValue=null;
 
         //System.out.println(">>"+Integer.toHexString(firstVal));
-        /**
-         * read first value
-         */
+
         //if escaped roll on
         if(firstVal==92){
             
@@ -116,7 +114,7 @@ public class CIDTextUtils {
             System.out.println("1 byte values=" + (int) glyphData.getRawChar() + " val=" + firstValue + " isDouble=" + currentFontData.isCIDFont() + " currentFontData.hasDoubleBytes=" + currentFontData.hasDoubleBytes+ ' ' +currentFontData.isDoubleBytes());//+" "+(char)stream[i-2]+" "+(char)stream[i-1]+" "+(char)stream[i]+" "+(char)stream[i+1]+" "+(char)stream[i+2]+" "+(char)stream[i+3]);
         }
         
-        /**
+        /*
          * read second byte if needed (we always read first time to see if double byte or single)
          */
         final boolean isEmbedded =currentFontData.isFontEmbedded;

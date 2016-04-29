@@ -44,14 +44,14 @@ public class DefaultErrorTracker implements org.jpedal.external.ErrorTracker {
     /**Any printer errors*/
     private String pageErrorMessages="";
 
-    /**
+    /*
      * flag to show if printing failed
      * use getPageDecodeStatus(DecodeStatus.PageDecodingSuccessful)
      *
      public boolean isPageSuccessful() {
 
      return pageSuccessful;
-     }/**/
+     }/*/
 
     /**
      * return list of messages

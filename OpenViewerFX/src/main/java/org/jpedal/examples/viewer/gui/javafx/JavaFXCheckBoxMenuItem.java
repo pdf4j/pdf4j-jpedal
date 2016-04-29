@@ -62,8 +62,4 @@ public class JavaFXCheckBoxMenuItem extends CheckMenuItem implements JavaFXID {
 		ID = id;
 	}
 
-    @Override
-    public void setToolTipText(final String text) {
-        //throw new UnsupportedOperationException("Not supported yet."); 
-    }
 }

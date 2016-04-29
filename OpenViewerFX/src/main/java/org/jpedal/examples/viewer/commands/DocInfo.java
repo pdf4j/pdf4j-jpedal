@@ -40,24 +40,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTree;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
@@ -138,7 +123,7 @@ public class DocInfo {
 
         int nextTab = ii;
 
-        /**
+        /*
          * add form details if applicable
          */
         if (getFormList(decode_pdf) != null) {
@@ -147,7 +132,7 @@ public class DocInfo {
             nextTab++;
         }
 
-        /**
+        /*
          * optional tab for new XML style info
          */
         final PdfFileInformation currentFileInformation = decode_pdf.getFileInformationData();
@@ -167,7 +152,7 @@ public class DocInfo {
 
         final PdfFileInformation currentFileInformation = decode_pdf.getFileInformationData();
 
-        /**
+        /*
          * get the Pdf file information object to extract info from
          */
         if (currentFileInformation != null) {
@@ -256,7 +241,7 @@ public class DocInfo {
 
             details.add(Box.createVerticalStrut(10));
 
-            /**
+            /*
              * get the Pdf file information object to extract info from
              */
             final PdfPageData currentPageSize = decode_pdf.getPdfPageData();
@@ -309,7 +294,7 @@ public class DocInfo {
         details.setEnabled(false);
         details.setLayout(new BoxLayout(details, BoxLayout.PAGE_AXIS));
 
-        /**
+        /*
          * list of fonts
          */
         StringBuilder xmlText = new StringBuilder("Font Substitution mode: ");
@@ -362,7 +347,7 @@ public class DocInfo {
      */
     private static JScrollPane getImageInfoBox(final PdfDecoderInt decode_pdf) {
 
-        /**
+        /*
          * the generic panel details
          */
         final JPanel details = new JPanel();
@@ -378,7 +363,7 @@ public class DocInfo {
         details.setEnabled(false);
         details.setLayout(new BoxLayout(details, BoxLayout.PAGE_AXIS));
 
-        /**
+        /*
          * list of Images (not forms)
          */
         final String xmlTxt = decode_pdf.getInfo(PdfDictionary.Image);
@@ -505,7 +490,7 @@ public class DocInfo {
         details.setEnabled(false);
         details.setLayout(new BoxLayout(details, BoxLayout.PAGE_AXIS));
 
-        /**
+        /*
          * list of all fonts fonts
          */
         final StringBuilder fullList = new StringBuilder();
@@ -617,7 +602,7 @@ public class DocInfo {
             @Override
             public void keyReleased(final KeyEvent e) {
                 final DefaultMutableTreeNode fontlist = new DefaultMutableTreeNode("Fonts");
-                populateAvailableFonts(fontlist, ((JTextField) e.getSource()).getText());
+                DefaultMutableTreeNode populateAvailableFonts = populateAvailableFonts(fontlist, ((JTextComponent) e.getSource()).getText());
                 displayAvailableFonts(fontlist);
             }
 
@@ -672,7 +657,7 @@ public class DocInfo {
                 scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
                 scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-                /**
+                /*
                  * create a JPanel to list forms and popup details
                  */
                 formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
@@ -682,7 +667,7 @@ public class DocInfo {
 
                 formPanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
-                /**
+                /*
                  * populate our list with details
                  */
                 for (final Object aFormsOnPage : formsOnPage) {
@@ -710,7 +695,7 @@ public class DocInfo {
 
                         final JLabel ref = new JLabel(PDFrefs.toString());
 
-                        /**
+                        /*
                          * display the form component description
                          */
                         // int formComponentType = ((Integer) formData.getTypeValueByName(formName)).intValue();
@@ -721,7 +706,7 @@ public class DocInfo {
                                 + PdfDictionary.showAsConstant(formObj.getParameterConstant(PdfDictionary.Type))
                                 + " Subtype=" + PdfDictionary.showAsConstant(formObj.getParameterConstant(PdfDictionary.Subtype)));
 
-                        /**
+                        /*
                          * get the current Swing component type
                          */
                         final String standardDetails = "java class=" + comp[0].getClass();
@@ -744,19 +729,6 @@ public class DocInfo {
                         formPanel.add(type);
                         formPanel.add(details);
                         formPanel.add(ref);
-
-                        /**
-                         * not currently used or setup JButton more = new
-                         * JButton("View Form Data"); more.setFont(textFont);
-                         * more.setForeground(Color.blue);
-                         *
-                         * more.addActionListener(new
-                         * ShowFormDataListener(formName)); formPanel.add(more);
-                         *
-                         * formPanel.add(new JLabel(" "));
-                         *
-                         * /*
-                         */
                     }
                 }
             }

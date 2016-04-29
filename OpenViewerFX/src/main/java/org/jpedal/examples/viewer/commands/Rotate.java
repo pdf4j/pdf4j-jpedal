@@ -32,12 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.RotatePDFPages;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -61,7 +61,7 @@ public class Rotate {
             } else {
                 //get values from user
                 final RotatePDFPages current_selection = new RotatePDFPages(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int userChoice = current_selection.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerRotation.text"));
+                final int userChoice = current_selection.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerRotation.text"));
 
                 //get parameters and call if YES
                 if (userChoice == JOptionPane.OK_OPTION) {

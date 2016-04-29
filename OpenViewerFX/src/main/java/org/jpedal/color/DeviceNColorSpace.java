@@ -32,14 +32,12 @@
  */
 package org.jpedal.color;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-
-import java.awt.image.DataBufferByte;
 import java.awt.image.DataBuffer;
-
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.util.HashMap;
+import java.util.Map;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfObject;
 

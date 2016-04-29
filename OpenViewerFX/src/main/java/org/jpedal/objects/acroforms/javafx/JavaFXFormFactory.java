@@ -59,12 +59,7 @@ import org.jpedal.color.DeviceCMYKColorSpace;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.objects.acroforms.GUIData;
-import org.jpedal.objects.acroforms.actions.JavaFX.JavaFXComboListener;
-import org.jpedal.objects.acroforms.actions.JavaFX.JavaFXControlListener;
-import org.jpedal.objects.acroforms.actions.JavaFX.JavaFXFormButtonListener;
-import org.jpedal.objects.acroforms.actions.JavaFX.JavaFXFormsListener;
-import org.jpedal.objects.acroforms.actions.JavaFX.JavaFXListListener;
-import org.jpedal.objects.acroforms.actions.JavaFX.JavaFXRadioListener;
+import org.jpedal.objects.acroforms.actions.JavaFX.*;
 import org.jpedal.objects.acroforms.creation.FormFactory;
 import org.jpedal.objects.acroforms.creation.GenericFormFactory;
 import org.jpedal.objects.acroforms.utils.FormsCSSHelper;
@@ -367,7 +362,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
         if(subtype == PdfDictionary.Popup){
             return createAnnotationPopup(form);
         }
-        /**
+        /*
          * @kieran - there are several types of annotation (Underline, highlight, Ink).
          *
          * We implemented them by adding a button and putting the content on the button's image
@@ -1183,7 +1178,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
                     
             }
         }
-        /**
+        /*
          * ensure we sync back to FormObject if altered
          */
         textcomp.setOnAction(new JavaFXDocumentListener(textcomp,form));
@@ -1259,7 +1254,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
      * @param comp 
      */
     private void setupToggleGroup(final FormObject form, final ToggleButton comp){
-        /**
+        /*
          * put in group (just store first time as you cannot have 1 button in group)
          */
         String name=form.getTextStreamValue(PdfDictionary.T);
@@ -1287,21 +1282,17 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
                 }
             });
             
-        }else{
-            
+        }else {
+
             //add any first comp
-            final ToggleButton firstButton= (ToggleButton) firstButtons.get(name);
-            
-            if(firstButton!=null){
+            final ToggleButton firstButton = (ToggleButton) firstButtons.get(name);
+
+            if (firstButton != null) {
                 firstButtons.remove(name);
                 tg.getToggles().add(firstButton);
             }
             tg.getToggles().add(comp);
         }
-        /**
-         * ensure we sync back to FormObject if altered
-         */
-//        new JavaFXRadioListener(comp,form);
     }
     
     /**
@@ -1475,7 +1466,7 @@ public class JavaFXFormFactory extends GenericFormFactory implements FormFactory
         
         //moved to end as flagLastUsed can call the imageicon
         if (form.isSelected() && down != null && comp instanceof ToggleButton){
-            ((ToggleButton)comp).setSelected(true);
+            ((Toggle)comp).setSelected(true);
             down.swapImage(true);
         }
 

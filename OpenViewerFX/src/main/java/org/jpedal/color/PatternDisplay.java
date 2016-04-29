@@ -34,7 +34,6 @@
 package org.jpedal.color;
 
 import java.awt.image.BufferedImage;
-
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.render.T3Display;
@@ -68,8 +67,7 @@ public class PatternDisplay extends T3Display implements T3Renderer
     }
     
     
-    @Override
-    public BufferedImage getSingleImagePattern(){
+    BufferedImage getSingleImagePattern(){
         if(imageCount!=1) {
             return null;
         } else {

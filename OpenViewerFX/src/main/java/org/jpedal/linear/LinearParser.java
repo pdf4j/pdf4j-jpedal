@@ -32,9 +32,20 @@
  */
 package org.jpedal.linear;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.Map;
 import org.jpedal.FileAccess;
 import org.jpedal.exception.PdfException;
-import org.jpedal.io.*;
+import org.jpedal.io.LinearizedHintTable;
+import org.jpedal.io.ObjectDecoder;
+import org.jpedal.io.PdfFileReader;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.LinearizedObject;
 import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
@@ -43,12 +54,6 @@ import org.jpedal.parser.PdfStreamDecoder;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
 import org.jpedal.utils.repositories.FastByteArrayOutputStream;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LinearParser {
     
@@ -115,7 +120,7 @@ public class LinearParser {
             }
         }
         
-        /**
+        /*
          * read linear object
          */
         if(isLinear){
@@ -156,7 +161,7 @@ public class LinearParser {
                 final byte[] pageData=linHintTable.getObjData(objID);
                 if(pageData!=null){
                     
-                    /**
+                    /*
                      * turn page into obj
                      */
                     linObject=new PageObject(objID+" 0 R");
@@ -171,7 +176,7 @@ public class LinearParser {
                         isPageAvailable = false;
                     } else{  //cache once available
                         
-                        /**
+                        /*
                          * check content as well
                          */
                         if(linObject!=null){
@@ -313,7 +318,7 @@ public class LinearParser {
             pdfObject =currentPdfFile.getObjectReader().readReferenceTable(null);
         }
         
-        /**
+        /*
          * read and decode the hints table
          */
         final int[] H=linearObj.getIntArray(PdfDictionary.H);

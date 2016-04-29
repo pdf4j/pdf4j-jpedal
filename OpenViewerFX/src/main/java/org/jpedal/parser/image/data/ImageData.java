@@ -50,6 +50,8 @@ public class ImageData {
     boolean isDCT,isJPX,isJBIG;
     private int numComponents;
     
+    boolean isDownsampled;
+  
     int mode;
     
     private boolean removed;
@@ -74,6 +76,14 @@ public class ImageData {
 
     public ImageData(int mode) {
         this.mode=mode;
+    }
+    
+    public void setIsDownsampled(boolean isDownsampled) {
+        this.isDownsampled = isDownsampled;
+    }
+
+    public boolean isDownsampled() {
+        return isDownsampled;
     }
 
     public int getMode() {
@@ -186,7 +196,6 @@ public class ImageData {
     }
 
     /**
-     * @param set if image removed as not visible
      */
     public void setRemoved(boolean removed) {
         this.removed = removed;

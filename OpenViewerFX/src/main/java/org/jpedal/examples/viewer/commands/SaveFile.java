@@ -59,9 +59,6 @@ public class SaveFile {
 
     private static void saveFile(final GUIFactory currentGUI, final Values commonValues) {
 
-        /**
-         * create the file chooser to select the file
-         */
         File file;
         String fileToSave;
         boolean finished = false;

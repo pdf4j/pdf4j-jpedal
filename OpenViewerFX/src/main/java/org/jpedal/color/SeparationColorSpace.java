@@ -33,25 +33,23 @@
 
 package org.jpedal.color;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.io.ByteArrayInputStream;
+import java.util.Iterator;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import org.jpedal.JDeliHelper;
 import org.jpedal.exception.PdfException;
 import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
-
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.io.ByteArrayInputStream;
-import java.util.*;
-import org.jpedal.JDeliHelper;
 
 /**
  * handle Separation ColorSpace and some DeviceN functions
@@ -196,7 +194,7 @@ public class SeparationColorSpace extends GenericColorSpace {
             
         }else{
             
-            /**
+            /*
              * work out colorspace (can also be direct ie /Pattern)
              */
             colorSpace=colorSpace.getDictionary(PdfDictionary.AlternateSpace);
@@ -268,7 +266,7 @@ public class SeparationColorSpace extends GenericColorSpace {
             pantoneName=new String(name);
         }
         
-        /**
+        /*
          * setup transformation
          **/
         if(functionObj==null) {

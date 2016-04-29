@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands.javafx;
 
-import org.jpedal.PdfDecoderFX;
+import javafx.scene.layout.Pane;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Values;
@@ -53,7 +53,7 @@ public class JavaFXScaling {
                 
                 int mode=decode_pdf.getDisplayView();
                 int alignment=decode_pdf.getPageAlignment();
-                ((PdfDecoderFX)decode_pdf).getChildren().clear();
+                ((Pane)decode_pdf).getChildren().clear();
                // final int pageNumber=commonValues.getCurrentPage();
                 currentGUI.scaleAndRotate();
                 currentGUI.setDisplayView(mode,alignment);

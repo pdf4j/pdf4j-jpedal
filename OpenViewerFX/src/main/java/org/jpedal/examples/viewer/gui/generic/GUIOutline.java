@@ -33,7 +33,6 @@
 package org.jpedal.examples.viewer.gui.generic;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-
 import org.w3c.dom.Node;
 
 /**abstract level for outlines panel*/

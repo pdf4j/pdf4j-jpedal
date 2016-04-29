@@ -32,17 +32,16 @@
  */
 package org.jpedal.objects.raw;
 
+import java.awt.Shape;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.File;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.awt.Shape;
-import java.util.Collections;
-
 import org.jpedal.fonts.StandardFonts;
-import org.jpedal.io.PdfFileReader;
 import org.jpedal.io.ObjectStore;
+import org.jpedal.io.PdfFileReader;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
 import org.jpedal.utils.StringUtils;
@@ -74,7 +73,7 @@ public class PdfObject implements Cloneable{
     byte[] unresolvedData;
     
     //hold Other dictionary values
-    final Map otherValues=new HashMap();
+    final Map<Object, Object> otherValues=new HashMap<Object, Object>();
     
     protected int pageNumber = -1;
     
@@ -126,7 +125,7 @@ public class PdfObject implements Cloneable{
     private PdfFileReader objReader;
     private String cacheName;
     
-    private byte[][] Filter, TR;
+    private byte[][] Filter, Nums,TR;
     
     private byte[][] keys;
     
@@ -709,11 +708,7 @@ public class PdfObject implements Cloneable{
      */
     public int setConstant(final int pdfKeyType, final int id) {
         int PDFvalue =id;
-        
-        
-        /**
-         * map non-standard
-         */
+
         switch(id){
             
             case PdfDictionary.FontDescriptor:
@@ -721,8 +716,7 @@ public class PdfObject implements Cloneable{
                 break;
                 
         }
-        
-        
+
         switch(pdfKeyType){
             
             case PdfDictionary.ColorSpace:
@@ -735,8 +729,6 @@ public class PdfObject implements Cloneable{
                 
             case PdfDictionary.Type:
                 
-                //@speed if is temp hack as picks up types on some subobjects
-                //if(type==PdfDictionary.Unknown)
                 this.type=PDFvalue;
                 
                 break;
@@ -796,7 +788,6 @@ public class PdfObject implements Cloneable{
     public byte[][] getKeyArray(final int id) {
         
         switch(id){
-            
             
             default:
                 
@@ -982,8 +973,11 @@ public class PdfObject implements Cloneable{
                 
                 Filter=value;
                 break;
-                
-                
+             
+            case PdfDictionary.Nums:
+                Nums=value;
+            break;
+            
             default:
                 
                 if(debug) {
@@ -1371,9 +1365,6 @@ public class PdfObject implements Cloneable{
                     j++;
                 }
                 
-                /**
-                 * get generation number
-                 */
                 keyStart = j;
                 //move cursor to end of reference
                 while (data[j] != 10 && data[j] != 13 && data[j] != 32 && data[j] != 47 && data[j] != 60 && data[j] != 62) {
@@ -1402,6 +1393,9 @@ public class PdfObject implements Cloneable{
             case PdfDictionary.Filter:
                 return new PdfArrayIterator(Filter);
                 
+            case PdfDictionary.Nums:
+                return new PdfArrayIterator(Nums);
+
             default:
                 if(debug) {
                     throw new RuntimeException("unknown value " + id + " passed into getMixedArray in " + this);
@@ -1455,7 +1449,7 @@ public class PdfObject implements Cloneable{
     public byte[][] getStringArray(final int id) {
         
         switch(id){
-            
+           
             case PdfDictionary.TR:
                 return deepCopy(TR);
                 
@@ -1637,16 +1631,15 @@ public class PdfObject implements Cloneable{
     
     public String getCachedStreamFile(final PdfFileReader objReader){
         
-        File tmpFile=null;
+        File tmpFile;
         
         if(startStreamOnDisk!=-1){ //cached so we need to read it
             
             try{
                 
                 tmpFile=File.createTempFile("jpedal-", ".bin",new File(ObjectStore.temp_dir));
-                tmpFile.deleteOnExit();
                 
-                /**
+                /*
                  * we use Length if available
                  */
                 final int length=this.getInt(PdfDictionary.Length);
@@ -1663,11 +1656,6 @@ public class PdfObject implements Cloneable{
                 //System.out.println("cached file size="+tmpFile.length()+" "+this.getObjectRefAsString());
             }catch(final Exception e){
                 LogWriter.writeLog("Exception: " + e.getMessage());
-            }finally{
-                //remove at end
-                if(tmpFile!=null) {
-                    tmpFile.deleteOnExit();
-                }
             }
         }
         

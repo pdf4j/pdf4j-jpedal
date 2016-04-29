@@ -72,7 +72,7 @@ public class GUIExtractText {
             }
         }
 
-        /**
+        /*
          * get the text
          */
         final java.util.List words = decode_pdf.getGroupingObject().extractTextAsWordlist(
@@ -96,9 +96,6 @@ public class GUIExtractText {
 
                 String currentWord = (String) wordIterator.next();
 
-                /**
-                 * remove the XML formatting if present - not needed for pure text
-                 */
                 if (!isXML) {
                     currentWord = Strip.convertToText(currentWord, decode_pdf.isXMLExtraction());
                 }
@@ -108,9 +105,6 @@ public class GUIExtractText {
                 final int wx2 = (int) Float.parseFloat((String) wordIterator.next());
                 final int wy2 = (int) Float.parseFloat((String) wordIterator.next());
 
-                /**
-                 * this could be inserting into a database instead
-                 */
                 textOutput.append(currentWord).append(',').append(wx1).append(',').append(wy1).append(',').append(wx2).append(',').append(wy2).append('\n');
 
             }
@@ -123,13 +117,9 @@ public class GUIExtractText {
 
     protected static String extractTextTable(final Values commonValues, final PdfDecoderInt decode_pdf, final boolean isCSV, final int t_x1, final int t_x2, final int t_y1, final int t_y2) throws PdfException {
 
-        //int page = commonValues.getCurrentHighlightedPage();
-        //if(page==-1)
-        //	page = commonValues.getCurrentPage();
-        //rest to default in case text option selected
         final Map content;
 
-        /**
+        /*
          * find out if xml or text - as we need to turn xml off before
          * extraction. So we assume xml and strip out. This is obviously
          */
@@ -152,17 +142,11 @@ public class GUIExtractText {
 
     protected static String extractTextRectangle(final Values commonValues, final PdfDecoderInt decode_pdf, final GUIFactory currentGUI, final boolean isXML, final int t_x1, final int t_x2, final int t_y1, final int t_y2) throws PdfException {
 
-        //int page = commonValues.getCurrentHighlightedPage();
-        //if(page==-1)
-        //	page = commonValues.getCurrentPage();
-        /**
-         * get the text
-         */
         String extractedText = decode_pdf.getGroupingObject().extractTextInRectangle(
                 t_x1, t_y1, t_x2, t_y2, commonValues.getCurrentPage(), false,
                 true);
 
-        /**
+        /*
          * find out if xml or text - as we need to turn xml off before
          * extraction. So we assume xml and strip out. This is obviously
          */

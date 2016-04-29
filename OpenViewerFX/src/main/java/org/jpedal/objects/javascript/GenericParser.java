@@ -33,6 +33,16 @@
 package org.jpedal.objects.javascript;
 
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.script.*;
+import javax.swing.SwingUtilities;
 import org.jpedal.objects.Javascript;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
@@ -42,17 +52,6 @@ import org.jpedal.objects.javascript.jsobjects.JSField;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.utils.LogWriter;
-
-import javax.script.*;
-import javax.swing.*;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class GenericParser implements ExpressionEngine {

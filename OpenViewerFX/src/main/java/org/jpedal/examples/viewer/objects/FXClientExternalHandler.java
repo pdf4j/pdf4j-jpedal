@@ -33,7 +33,7 @@
 package org.jpedal.examples.viewer.objects;
 
 import org.jpedal.examples.viewer.gui.FXAdditionalData;
-import org.jpedal.external.*;
+import org.jpedal.external.Options;
 
 /**
  * Additional handlers used in Client

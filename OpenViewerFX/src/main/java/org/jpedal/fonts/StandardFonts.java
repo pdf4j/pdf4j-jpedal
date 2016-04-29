@@ -32,18 +32,14 @@
  */
 package org.jpedal.fonts;
 
-import java.io.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import org.jpedal.utils.LogWriter;
-import org.jpedal.fonts.tt.*;
-import org.jpedal.fonts.objects.FontData;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 import org.jpedal.fonts.glyph.T1Glyphs;
+import org.jpedal.fonts.objects.FontData;
+import org.jpedal.fonts.tt.TTGlyphs;
+import org.jpedal.utils.LogWriter;
 
 public class StandardFonts {
     
@@ -941,19 +937,31 @@ public class StandardFonts {
     /**
      * see if a standard font (ie Arial, Helvetica)
      */
-    public static boolean isStandardFont(final String fontName, final boolean includeWeights) {
+    public static boolean isStandardFont(final String fontName, final boolean excludeWeights) {
         
-        boolean isStandard=(standardFileList.get(fontName)!=null);
-        
-        if(!isStandard && includeWeights){
-            
-            final int ptr=fontName.indexOf('-');
-            if(ptr!=-1){
-                final String rawName=fontName.substring(0,ptr);
-                //System.out.println(ptr+"<>"+fontName+"<>"+rawName+"<>"+standardFileList.get(fontName)!=null);
-                isStandard=(standardFileList.get(rawName)!=null);
+        boolean isStandard = (standardFileList.get(fontName) != null);
+
+        if (!isStandard && excludeWeights) {
+
+            final char[] valuesToTest = {'-', ','};
+            for (char valueToTest : valuesToTest) {
+
+                isStandard = checkSubFontName(fontName, valueToTest);
+                if (isStandard) {
+                    break;
+                }
             }
-            
+        }
+        return isStandard;
+    }
+
+    private static boolean checkSubFontName(final String fontName, final char charToTest) {
+        
+        boolean isStandard=false;
+        
+        final int ptr=fontName.indexOf(charToTest);
+        if(ptr!=-1){
+            isStandard=(standardFileList.get(fontName.substring(0,ptr))!=null);
         }
         return isStandard;
     }

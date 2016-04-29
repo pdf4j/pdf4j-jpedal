@@ -34,20 +34,16 @@ package org.jpedal.examples.viewer.gui.javafx;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.gui.CommandListener;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUIButtons;
 import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
-import org.jpedal.examples.viewer.gui.CommandListener;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.Messages;
@@ -61,7 +57,7 @@ import org.jpedal.utils.Messages;
 public class JavaFXMenuItems extends GUIMenuItems {
 
     
-    /**holds all menu entries (File, View, Help)*/
+    //holds all menu entries (File, View, Help)
 	private MenuBar currentMenu =new MenuBar();
     
     //Menu items for gui
@@ -329,7 +325,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
     	goTo.setDisable(!enabled);
     }
     
-	protected void addMenuItem(final Menu parentMenu, final String text, final String toolTip, final int ID) {
+	protected void addMenuItem(final Menu parentMenu, final String text, final int ID) {
 
         boolean isCheckBox = false; //default value
         if (ID == Commands.SEPARATECOVER || ID == Commands.PANMODE || ID == Commands.TEXTSELECT) {
@@ -339,15 +335,12 @@ public class JavaFXMenuItems extends GUIMenuItems {
         final JavaFXID menuItem;
         if (isCheckBox) {
             menuItem = new JavaFXCheckBoxMenuItem(text);
-            parentMenu.getItems().add((CheckMenuItem) menuItem);
+            parentMenu.getItems().add((MenuItem) menuItem);
         } else {
             menuItem = new JavaFXMenuItem(text);
             parentMenu.getItems().add((MenuItem) menuItem);
         }
 
-        if (!toolTip.isEmpty()) {
-            menuItem.setToolTipText(toolTip);
-        }
         menuItem.setID(ID);
         setKeyAccelerators(ID, (MenuItem) menuItem);
 
@@ -616,9 +609,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
 
 		addToMainMenu(fileMenu);
 
-		/**
-		 * add open options
-		 **/
+		 //add open options
 
 		openMenu = new Menu(Messages.getMessage("PdfViewerFileMenuOpen.text"));
         
@@ -626,9 +617,9 @@ public class JavaFXMenuItems extends GUIMenuItems {
         
 		fileMenu.getItems().add(openMenu);
 
-		addMenuItem(openMenu,Messages.getMessage("PdfViewerFileMenuOpen.text"),Messages.getMessage("PdfViewerFileMenuTooltip.open"),Commands.OPENFILE);
+		addMenuItem(openMenu,Messages.getMessage("PdfViewerFileMenuOpen.text"), Commands.OPENFILE);
 
-		addMenuItem(openMenu,Messages.getMessage("PdfViewerFileMenuOpenurl.text"),Messages.getMessage("PdfViewerFileMenuTooltip.openurl"),Commands.OPENURL);
+		addMenuItem(openMenu,Messages.getMessage("PdfViewerFileMenuOpenurl.text"), Commands.OPENURL);
 
 
 		addSeparator = properties.getValue("Save")
@@ -640,19 +631,18 @@ public class JavaFXMenuItems extends GUIMenuItems {
 		
 		
 		addMenuItem(fileMenu,Messages.getMessage("PdfViewerFileMenuSave.text"),
-				Messages.getMessage("PdfViewerFileMenuTooltip.save"),Commands.SAVE);
+                Commands.SAVE);
 
         //not set if I just run from jar as no IText....
 		if(includeAll) {
             addMenuItem(fileMenu,
                     Messages.getMessage("PdfViewerFileMenuResaveForms.text"),
-                    Messages.getMessage("PdfViewerFileMenuTooltip.saveForms"),
                     Commands.SAVEFORM);
         }
 
 
 		// Remember to finish this off
-		addMenuItem(fileMenu, Messages.getMessage("PdfViewerFileMenuFind.text"), Messages.getMessage("PdfViewerFileMenuTooltip.find"), Commands.FIND);
+		addMenuItem(fileMenu, Messages.getMessage("PdfViewerFileMenuFind.text"), Commands.FIND);
 
 		// =====================
 
@@ -663,15 +653,15 @@ public class JavaFXMenuItems extends GUIMenuItems {
 			fileMenu.getItems().add(new SeparatorMenuItem());
 		}
 		addMenuItem(fileMenu,Messages.getMessage("PdfViewerFileMenuDocProperties.text"),
-				Messages.getMessage("PdfViewerFileMenuTooltip.props"),Commands.DOCINFO);
+                Commands.DOCINFO);
 
         if(commonValues.isEncrypOnClasspath()) {
             addMenuItem(fileMenu,Messages.getMessage("PdfViewerFileMenuSignPDF.text"),
-                    Messages.getMessage("PdfViewerFileMenuTooltip.sign"),Commands.SIGN);
+                    Commands.SIGN);
         }
         else {
             addMenuItem(fileMenu,Messages.getMessage("PdfViewerFileMenuSignPDF.text"),
-                    Messages.getMessage("PdfViewerFileMenuSignPDF.NotPath"),Commands.SIGN);
+                    Commands.SIGN);
         }
 
 		addSeparator = properties.getValue("Recentdocuments");
@@ -685,27 +675,27 @@ public class JavaFXMenuItems extends GUIMenuItems {
 			fileMenu.getItems().add(new SeparatorMenuItem());
 		}
 		addMenuItem(fileMenu,Messages.getMessage("PdfViewerFileMenuExit.text"),
-				Messages.getMessage("PdfViewerFileMenuTooltip.exit"),Commands.EXIT);
+                Commands.EXIT);
 
 		//EDIT MENU
 		editMenu = new Menu(Messages.getMessage("PdfViewerEditMenu.text"));
 		addToMainMenu(editMenu);
 
 		addMenuItem(editMenu,Messages.getMessage("PdfViewerEditMenuCopy.text"),
-				Messages.getMessage("PdfViewerEditMenuTooltip.Copy"),Commands.COPY);
+                Commands.COPY);
 
 		addMenuItem(editMenu,Messages.getMessage("PdfViewerEditMenuSelectall.text"),
-				Messages.getMessage("PdfViewerEditMenuTooltip.Selectall"),Commands.SELECTALL);
+                Commands.SELECTALL);
 
 		addMenuItem(editMenu,Messages.getMessage("PdfViewerEditMenuDeselectall.text"),
-				Messages.getMessage("PdfViewerEditMenuTooltip.Deselectall"),Commands.DESELECTALL);
+                Commands.DESELECTALL);
 
 		addSeparator = properties.getValue("Preferences");
 		if(!addSeparator.isEmpty() && addSeparator.equalsIgnoreCase("true")){
 			editMenu.getItems().add(new SeparatorMenuItem());
 		}
 		addMenuItem(editMenu, Messages.getMessage("PdfViewerEditMenuPreferences.text"),
-				Messages.getMessage("PdfViewerEditMenuTooltip.Preferences"), Commands.PREFERENCES);
+                Commands.PREFERENCES);
 
 
 		viewMenu = new Menu(Messages.getMessage("PdfViewerViewMenu.text"));
@@ -717,15 +707,15 @@ public class JavaFXMenuItems extends GUIMenuItems {
 
 		viewMenu.getItems().add(goToMenu);
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.FirstPage"),"",Commands.FIRSTPAGE);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.FirstPage"), Commands.FIRSTPAGE);
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.BackPage"),"",Commands.BACKPAGE);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.BackPage"), Commands.BACKPAGE);
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.ForwardPage"),"",Commands.FORWARDPAGE);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.ForwardPage"), Commands.FORWARDPAGE);
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.LastPage"),"",Commands.LASTPAGE);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.LastPage"), Commands.LASTPAGE);
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.GoTo"),"",Commands.GOTO);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.GoTo"), Commands.GOTO);
 
 		addSeparator = properties.getValue("Previousdocument")
 			+properties.getValue("Nextdocument");
@@ -733,13 +723,11 @@ public class JavaFXMenuItems extends GUIMenuItems {
 			goToMenu.getItems().add(new SeparatorMenuItem());
 		}
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.PreviousDoucment"),"",Commands.PREVIOUSDOCUMENT);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.PreviousDoucment"), Commands.PREVIOUSDOCUMENT);
 
-		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.NextDoucment"),"",Commands.NEXTDOCUMENT);
+		addMenuItem(goToMenu,Messages.getMessage("GoToViewMenuGoto.NextDoucment"), Commands.NEXTDOCUMENT);
 
-		/**
-		 * add page layout
-		 **/
+		//add page layout
 		if(isSingle){
 			pageLayoutMenu = new Menu(Messages.getMessage("PageLayoutViewMenu.PageLayout"));
 			//pageLayoutMenu.getPopupMenu().setLightWeightPopupEnabled(!JavaFXHelper.isJavaFXAvailable());
@@ -754,18 +742,18 @@ public class JavaFXMenuItems extends GUIMenuItems {
         }
 
         if(properties.getValue("separateCover").equals("true")) {
-            addMenuItem(viewMenu, Messages.getMessage("PdfViewerViewMenuSeparateCover.text"), Messages.getMessage("PdfViewerViewMenuTooltip.separateCover"), Commands.SEPARATECOVER);
+            addMenuItem(viewMenu, Messages.getMessage("PdfViewerViewMenuSeparateCover.text"), Commands.SEPARATECOVER);
         }
 
 		// addMenuItem(view,Messages.getMessage("PdfViewerViewMenuAutoscroll.text"),Messages.getMessage("PdfViewerViewMenuTooltip.autoscroll"),Commands.AUTOSCROLL);
         if(properties.getValue("panMode").equals("true") || properties.getValue("textSelect").equals("true")){
         	viewMenu.getItems().add(new SeparatorMenuItem());
         	if(properties.getValue("panMode").equals("true")) {
-                addMenuItem(viewMenu, Messages.getMessage("PdfViewerViewMenuPanMode.text"), Messages.getMessage("PdfViewerViewMenuTooltip.panMode"), Commands.PANMODE);
+                addMenuItem(viewMenu, Messages.getMessage("PdfViewerViewMenuPanMode.text"), Commands.PANMODE);
             }
 
         	if(properties.getValue("textSelect").equals("true")) {
-                addMenuItem(viewMenu, Messages.getMessage("PdfViewerViewMenuTextSelectMode.text"), Messages.getMessage("PdfViewerViewMenuTooltip.textSelect"), Commands.TEXTSELECT);
+                addMenuItem(viewMenu, Messages.getMessage("PdfViewerViewMenuTextSelectMode.text"), Commands.TEXTSELECT);
             }
         	viewMenu.getItems().add(new SeparatorMenuItem());
         }
@@ -776,75 +764,71 @@ public class JavaFXMenuItems extends GUIMenuItems {
 		}
 
 		//full page mode
-		addMenuItem(viewMenu,Messages.getMessage("PdfViewerViewMenuFullScreenMode.text"),Messages.getMessage("PdfViewerViewMenuTooltip.fullScreenMode"),Commands.FULLSCREEN);
+		addMenuItem(viewMenu,Messages.getMessage("PdfViewerViewMenuFullScreenMode.text"), Commands.FULLSCREEN);
 
 		if (!isSingle) {
 			windowMenu = new Menu(Messages.getMessage("PdfViewerWindowMenu.text"));
 			addToMainMenu(windowMenu);
 
-			addMenuItem(windowMenu, Messages.getMessage("PdfViewerWindowMenuCascade.text"), "",	Commands.CASCADE);
+			addMenuItem(windowMenu, Messages.getMessage("PdfViewerWindowMenuCascade.text"), Commands.CASCADE);
 
-			addMenuItem(windowMenu, Messages.getMessage("PdfViewerWindowMenuTile.text"), "", Commands.TILE);
+			addMenuItem(windowMenu, Messages.getMessage("PdfViewerWindowMenuTile.text"), Commands.TILE);
 
 		}
 
-		/**
-		 * add export menus
-		 **/
+		//add export menus
+        
 //		if(commonValues.isItextOnClasspath()){
 			exportMenu = new Menu(Messages.getMessage("PdfViewerExportMenu.text"));
 			addToMainMenu(exportMenu);
 
-			//<link><a name="newmenu" />
-			/**
-			 * external/itext menu option example adding new option to Export menu
-			 */
-			// addMenuItem(export,"NEW",tooltip,Commands.NEWFUNCTION);
-			/**
+			/*
 			 * external/itext menu option example adding new option to Export menu
 			 * Tooltip text can be externalised in Messages.getMessage("PdfViewerTooltip.NEWFUNCTION")
 			 * and text added into files in res package
+             * addMenuItem(export,"NEW",tooltip,Commands.NEWFUNCTION);
 			 */
 
 
 			pdfMenu = new Menu(Messages.getMessage("PdfViewerExportMenuPDF.text"));
 			exportMenu.getItems().add(pdfMenu);
 
-			addMenuItem(pdfMenu,Messages.getMessage("PdfViewerExportMenuOnePerPage.text"),"",Commands.PDF);
+			addMenuItem(pdfMenu,Messages.getMessage("PdfViewerExportMenuOnePerPage.text"), Commands.PDF);
 
-			addMenuItem(pdfMenu,Messages.getMessage("PdfViewerExportMenuNUp.text"),"",Commands.NUP);
+			addMenuItem(pdfMenu,Messages.getMessage("PdfViewerExportMenuNUp.text"), Commands.NUP);
 
-			addMenuItem(pdfMenu,Messages.getMessage("PdfViewerExportMenuHandouts.text"),"",Commands.HANDOUTS);
+			addMenuItem(pdfMenu,Messages.getMessage("PdfViewerExportMenuHandouts.text"), Commands.HANDOUTS);
 
 
 
 			contentMenu=new Menu(Messages.getMessage("PdfViewerExportMenuContent.text"));
 			exportMenu.getItems().add(contentMenu);
 
-			addMenuItem(contentMenu,Messages.getMessage("PdfViewerExportMenuImages.text"),"",Commands.IMAGES);
+			addMenuItem(contentMenu,Messages.getMessage("PdfViewerExportMenuImages.text"), Commands.IMAGES);
 
-			addMenuItem(contentMenu,Messages.getMessage("PdfViewerExportMenuText.text"),"",Commands.TEXT);
+			addMenuItem(contentMenu,Messages.getMessage("PdfViewerExportMenuText.text"), Commands.TEXT);
 
 
-			addMenuItem(exportMenu,Messages.getMessage("PdfViewerExportMenuBitmap.text"),"",Commands.BITMAP);
+			addMenuItem(exportMenu,Messages.getMessage("PdfViewerExportMenuBitmap.text"), Commands.BITMAP);
 //		}
         
-        /**
-         * items options if IText available
-         */
-//		if(commonValues.isItextOnClasspath()){
-			pageToolsMenu = new Menu(Messages.getMessage("PdfViewerPageToolsMenu.text"));
-			addToMainMenu(pageToolsMenu);
-
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuRotate.text"),"",Commands.ROTATE);
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuDelete.text"),"",Commands.DELETE);
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuAddPage.text"),"",Commands.ADD);
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuAddHeaderFooter.text"),"",Commands.ADDHEADERFOOTER);
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuStampText.text"),"",Commands.STAMPTEXT);
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuStampImage.text"),"",Commands.STAMPIMAGE);
-			addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuSetCrop.text"),"",Commands.SETCROP);
-
-//		}
+       /*
+        * items options if IText available
+        *
+	    * if(commonValues.isItextOnClasspath()){
+	    *	pageToolsMenu = new Menu(Messages.getMessage("PdfViewerPageToolsMenu.text"));
+		*	addToMainMenu(pageToolsMenu);
+        *
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuRotate.text"), Commands.ROTATE);
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuDelete.text"), Commands.DELETE);
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuAddPage.text"), Commands.ADD);
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuAddHeaderFooter.text"), Commands.ADDHEADERFOOTER);
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuStampText.text"), Commands.STAMPTEXT);
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuStampImage.text"), Commands.STAMPIMAGE);
+		*	addMenuItem(pageToolsMenu,Messages.getMessage("PdfViewerPageToolsMenuSetCrop.text"), Commands.SETCROP);
+        *
+		* }
+        */
 
 		if(includeAll && GUI.debugFX){
 			
@@ -853,45 +837,44 @@ public class JavaFXMenuItems extends GUIMenuItems {
 			addToMainMenu(debugViewport);
 
 			// toggle viewport border
-			addMenuItem(debugViewport,"Toggle viewport border","",Commands.TOGGLE);
-
-			//setViewport option button
-			addMenuItem(debugViewport,"Set viewport","",Commands.SET);
+			addMenuItem(debugViewport,"Toggle viewport border", Commands.TOGGLE);
 
 			//reset vieport option button
-			addMenuItem(debugViewport,"Reset viewport","Resets the viewport to the default value",Commands.RESET);
+			addMenuItem(debugViewport,"Reset viewport", Commands.RESET);
 
 			//switch for testing hardware acceleration
-			addMenuItem(debugViewport,"Enable acceleration","Enable Hardware diplay acceleration for screen",Commands.ACCELERATIONON);
+			addMenuItem(debugViewport,"Enable acceleration", Commands.ACCELERATIONON);
 
 			//switch for testing hardware acceleration
-			addMenuItem(debugViewport,"Disable acceleration","Disable Hardware diplay acceleration for screen",Commands.ACCELERATIONOFF);
+			addMenuItem(debugViewport,"Disable acceleration", Commands.ACCELERATIONOFF);
 
-			addMenuItem(debugViewport,"Show form NAMES","displays a list of all the forms names",Commands.SHOWFORMNAMES);
+			addMenuItem(debugViewport,"Show form NAMES", Commands.SHOWFORMNAMES);
 
             //delete properties file on exit
-            addMenuItem(debugViewport,"Wipe properties on exit","deletes the properties file on exit",Commands.DELETEPROPERTIESONEXIT);
+            addMenuItem(debugViewport,"Wipe properties on exit", Commands.DELETEPROPERTIESONEXIT);
 
-            addMenuItem(debugViewport,"Always show mouse coords","prevents anything other than mouse coordinates displaying in the multibox",Commands.ALWAYSSHOWMOUSE);
+            addMenuItem(debugViewport,"Always show mouse coords", Commands.ALWAYSSHOWMOUSE);
 
 		}
 		
 		helpMenu = new Menu(Messages.getMessage("PdfViewerHelpMenu.text"));
 		addToMainMenu(helpMenu);
 
-		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenu.VisitWebsite"),"",Commands.VISITWEBSITE);
-		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuTip.text"),"",Commands.TIP);
+		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenu.VisitWebsite"), Commands.VISITWEBSITE);
+		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuTip.text"), Commands.TIP);
 		//addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuUpdates.text"),"",Commands.UPDATE);
-		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuabout.text"),Messages.getMessage("PdfViewerHelpMenuTooltip.about"),Commands.ABOUT);
+		addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuabout.text"), Commands.ABOUT);
 
 		if(includeExtraMenus){
-            addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuTutorial.text"),"Visit http://www.idrsolutions.com/java-pdf-library-support/",Commands.HELP);
+            addMenuItem(helpMenu,Messages.getMessage("PdfViewerHelpMenuTutorial.text"), Commands.HELP);
         }
 
 	}
     
     
-	/**setup keyboard shortcuts*/
+	/**
+     * setup keyboard shortcuts
+     */
 	static void setKeyAccelerators(final int ID, final MenuItem menuItem){
 		      switch (ID) {
 
@@ -1000,7 +983,6 @@ public class JavaFXMenuItems extends GUIMenuItems {
     /**
      * Temporary Method to Disable unimplemented Viewer Items.
      * Edit and Remove the items from this method as we implement features.
-     * 
      */
     public void disableUnimplementedItems(final int ID,  final boolean disableViewModes){
         
@@ -1011,15 +993,11 @@ public class JavaFXMenuItems extends GUIMenuItems {
         if(ID != ALL){
             if(!disableViewModes){
                 switch(ID){
-                    /**
-                     * View Menu.
-                     */
+                     //View Menu.
                     case Commands.SEPARATECOVER:
                         separateCover.setDisable(debug);
                         break;
-                    /**
-                     * File Menu.
-                     */
+                    //File Menu.
                     case Commands.FIND:
                         find.setDisable(debug);
                         break;
@@ -1032,9 +1010,7 @@ public class JavaFXMenuItems extends GUIMenuItems {
 
                 }
             }else{
-                /**
-                 * Disable View Modes.
-                 */
+                //Disable View Modes.
                 switch(ID){
                    
                     case Display.PAGEFLOW:

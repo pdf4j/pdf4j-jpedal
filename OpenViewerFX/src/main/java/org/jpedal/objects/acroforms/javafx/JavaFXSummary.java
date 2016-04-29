@@ -90,7 +90,6 @@ public class JavaFXSummary extends javafx.scene.layout.Pane{
    /**
     * Creates new form Signatures
     *
-    * @param frame
     * @param sig
     */
    public JavaFXSummary(final Stage stage, final PdfObject sig) {

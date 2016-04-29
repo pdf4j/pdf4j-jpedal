@@ -48,8 +48,6 @@ public interface JavaFXID {
 	 */
     void setID(int id);
 
-    void setToolTipText(String text);
-    
     /**
      * Call this method instead of addActionListener for JavaFX
      * @param eh 

@@ -32,19 +32,18 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
+import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.AddHeaderFooterToPDFPages;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.utils.Messages;
-
-import javax.swing.*;
 
 
 
@@ -66,7 +65,7 @@ public class AddHeaderFooter {
 
                 //get values from user
                 final AddHeaderFooterToPDFPages addHeaderFooter = new AddHeaderFooterToPDFPages(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int headerFooterPagesChoice = addHeaderFooter.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerTitle.AddHeaderAndFooters"));
+                final int headerFooterPagesChoice = addHeaderFooter.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerTitle.AddHeaderAndFooters"));
 
                 //get parameters and call if YES
                 if (headerFooterPagesChoice == JOptionPane.OK_OPTION) {

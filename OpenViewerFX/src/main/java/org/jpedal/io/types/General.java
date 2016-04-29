@@ -99,9 +99,6 @@ public class General {
                     j++;
                 }
 
-                /**
-                 * get generation number
-                 */
                 keyStart = j;
                 //move cursor to end of reference
                 while (data[j] != 10 && data[j] != 13 && data[j] != 32 && data[j] != 47 && data[j] != 60 && data[j] != 62) {
@@ -110,9 +107,6 @@ public class General {
 
                 generation = NumberUtils.parseInt(keyStart, j, data);
 
-                /**
-                 * check R at end of reference and abort if wrong
-                 */
                 //move cursor to start of R
                 while (data[j] == 10 || data[j] == 13 || data[j] == 32 || data[j] == 47 || data[j] == 60) {
                     j++;

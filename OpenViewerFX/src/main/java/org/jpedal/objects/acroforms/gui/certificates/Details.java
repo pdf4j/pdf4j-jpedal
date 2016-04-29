@@ -33,10 +33,10 @@
 
 package org.jpedal.objects.acroforms.gui.certificates;
 
-import javax.swing.table.TableModel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigInteger;
+import javax.swing.table.TableModel;
 
 public class Details extends javax.swing.JPanel {
 

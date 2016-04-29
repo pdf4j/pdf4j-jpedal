@@ -33,12 +33,11 @@
 package org.jpedal;
 
 
-import org.jpedal.exception.PdfException;
-import org.jpedal.utils.LogWriter;
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import org.jpedal.exception.PdfException;
 import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.utils.LogWriter;
 
 /**
  * generates the thumbnails of pages for display

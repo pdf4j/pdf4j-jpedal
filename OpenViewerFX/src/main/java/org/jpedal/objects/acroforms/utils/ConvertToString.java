@@ -144,25 +144,4 @@ public class ConvertToString {
     	
     	return buf.toString();
     }
-
-	/** depth starts at 0 */
-//		StringBuilder buff = new StringBuilder();
-//		buff.append("nodename=");
-//		buff.append(formData.getNodeName());
-//		
-//		buff.append(" nodetype=");
-//		buff.append(formData.getNodeType());
-//		
-//		buff.append(" nodevalue=");
-//		buff.append(formData.getNodeValue());
-//		
-//		buff.append(" parent=");
-//		buff.append(formData.getParentNode());
-//		
-//		buff.append(" Children - \n");
-//		depth++;
-//		for(int i=0;i<depth;i++){
-//			buff.append(' ');
-//}
-
 }

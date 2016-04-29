@@ -38,14 +38,11 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
-
-
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.gui.GUIFactory;
@@ -92,12 +89,9 @@ public class BaseTransferHandler extends TransferHandler {
 			if (bestTextFlavor != null) { // this could be a file from a web page being dragged in
 				final Reader r = bestTextFlavor.getReaderForText(transferable);
 				
-				/** acquire the text data from the reader. */
 				String textData = readTextDate(r);
-	
-//              System.out.println(textData);
-				
-	            /** need to remove all the 0 characters that will appear in the String when importing on Linux */
+
+	            // need to remove all the 0 characters that will appear in the String when importing on Linux
 	            textData = removeChar(textData, (char) 0);
 	
 	            if(textData.contains("ftp:/")) {
@@ -105,10 +99,9 @@ public class BaseTransferHandler extends TransferHandler {
                 	return null;
                 }
 	            
-	            /** get the URL from the text data */
 	            textData = getURL(textData);
 	            
-	            /** replace URL spaces */
+	            // replace URL spaces
 	            textData = textData.replaceAll("%20", " ");
 	            
 				return textData;

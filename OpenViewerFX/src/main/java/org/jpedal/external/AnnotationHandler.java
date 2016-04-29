@@ -32,10 +32,9 @@
  */
 package org.jpedal.external;
 
-import org.jpedal.io.PdfObjectReader;
-
 import java.util.Map;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.FormObject;
 
 public interface AnnotationHandler {

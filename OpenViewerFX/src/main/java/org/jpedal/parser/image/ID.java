@@ -32,6 +32,7 @@
  */
 package org.jpedal.parser.image;
 
+import java.awt.image.BufferedImage;
 import org.jpedal.color.ColorspaceFactory;
 import org.jpedal.color.DeviceRGBColorSpace;
 import org.jpedal.color.GenericColorSpace;
@@ -46,18 +47,16 @@ import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.PdfObjectCache;
 import org.jpedal.parser.image.data.ImageData;
 
-import java.awt.image.BufferedImage;
-
 public class ID extends ImageDecoder {
-    public ID(final int imageCount, final PdfObjectReader currentPdfFile, final ErrorTracker errorTracker, final ImageHandler customImageHandler, final ObjectStore objectStoreStreamRef, final PdfImageData pdfImages, final int formLevel, final PdfPageData pageData, final String imagesInFile, final String formName) {
-        super(imageCount, currentPdfFile, errorTracker, customImageHandler, objectStoreStreamRef, pdfImages, formLevel, pageData, imagesInFile, formName);
+    public ID(final int imageCount, final PdfObjectReader currentPdfFile, final ErrorTracker errorTracker, final ImageHandler customImageHandler, final ObjectStore objectStoreStreamRef, final PdfImageData pdfImages, final PdfPageData pageData, final String imagesInFile) {
+        super(imageCount, currentPdfFile, errorTracker, customImageHandler, objectStoreStreamRef, pdfImages, pageData, imagesInFile);
     }
 
 
     @Override
     public int processImage(int dataPointer, final int startInlineStream, final byte[] stream, final int tokenNumber) throws Exception{
 
-        /**
+        /*
          * read Dictionary
          */
         final PdfObject XObject=new org.jpedal.objects.raw.XObject(PdfDictionary.ID);
@@ -105,7 +104,7 @@ public class ID extends ImageDecoder {
             }
         }
         
-        if(renderImages || finalImagesExtracted || clippedImagesExtracted || rawImagesExtracted){
+        if(parserOptions.imagesNeeded()){
 
             //load the data
             //		generate the name including file name to make it unique
@@ -122,7 +121,7 @@ public class ID extends ImageDecoder {
                 inline_start_pointer++;
             }
 
-            /**
+            /*
              * put image data in array
              */
             byte[] i_data = new byte[endPtr - inline_start_pointer];
@@ -135,7 +134,7 @@ public class ID extends ImageDecoder {
 
             XObject.setStream(i_data);
 
-            /**
+            /*
              * work out colorspace
              */
             PdfObject ColorSpace=XObject.getDictionary(PdfDictionary.ColorSpace);
@@ -153,7 +152,7 @@ public class ID extends ImageDecoder {
                 }
             }
 
-            /**
+            /*
              * allow user to process image
              */
             if(customImageHandler!=null) {
@@ -186,7 +185,7 @@ public class ID extends ImageDecoder {
             GenericColorSpace decodeColorData=new DeviceRGBColorSpace();
             if(ColorSpace!=null){
                 decodeColorData= ColorspaceFactory.getColorSpaceInstance(currentPdfFile, ColorSpace);
-                decodeColorData.setPrinting(isPrinting);
+                decodeColorData.setPrinting(parserOptions.isPrinting());
 
                 //track colorspace use
                 cache.put(PdfObjectCache.ColorspacesUsed, decodeColorData.getID(),"x");
@@ -218,28 +217,16 @@ public class ID extends ImageDecoder {
 
                 }
 
-                //skip if smaller than zero as work around for JPS bug
-                if(isPrinting && image!=null && gs!=null && image.getHeight()==1
-                        && gs.CTM[1][1]<1){
-                    image=null;
-                }
-
                 if (image != null){
 
                     if(current.isHTMLorSVG()){
                         generateTransformedImage(image, image_name);
-                    }else if(parserOptions.renderDirectly() || this.useHiResImageForDisplay){
+                    }else{
 
                         gs.x=gs.CTM[2][0];
                         gs.y=gs.CTM[2][1];
 
                         current.drawImage(parserOptions.getPageNumber(), image, gs, false, image_name, -1);
-                    }else{
-                        if(clippedImagesExtracted) {
-                            generateTransformedImage(image, image_name);
-                        } else {
-                            generateTransformedImageSingle(image, image_name);
-                        }
                     }
 
                     if(image!=null) {

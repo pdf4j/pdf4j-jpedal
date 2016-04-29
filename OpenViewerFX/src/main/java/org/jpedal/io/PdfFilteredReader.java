@@ -32,14 +32,14 @@
  */
 package org.jpedal.io;
 
-import org.jpedal.jbig2.io.JBIG2;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jpedal.io.filter.*;
-
-import org.jpedal.objects.raw.*;
+import org.jpedal.jbig2.io.JBIG2;
+import org.jpedal.objects.raw.PdfArrayIterator;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 
 /**
@@ -130,7 +130,7 @@ public class PdfFilteredReader {
                 System.out.println("---------filterCount=" + filterCount + " hasMore" + filters.hasMoreTokens() + " parmsCount=" + parmsCount);
             }
 
-    		/**
+    		/*
 			 * apply each filter in turn to data
 			 */
     		while (filters.hasMoreTokens()) {

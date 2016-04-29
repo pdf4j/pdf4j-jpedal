@@ -244,14 +244,6 @@ public class ColorSpaceObject extends PdfObject {
 
             switch(id){
 
-//            case PdfDictionary.Image:
-//                PDFvalue =PdfDictionary.Image;
-//            break;
-//
-//            case PdfDictionary.Form:
-//                PDFvalue =PdfDictionary.Form;
-//            break;
-
                 case PdfDictionary.G:
                     PDFvalue =ColorSpaces.DeviceGray;
                 break;
@@ -263,31 +255,7 @@ public class ColorSpaceObject extends PdfObject {
                 
                 default:
 
-//                	if(pdfKeyType==PdfDictionary.Encoding){
-//                		PDFvalue=PdfCIDEncodings.getConstant(id);
-//
-//                		if(PDFvalue==PdfDictionary.Unknown){
-//
-//                			byte[] bytes=new byte[keyLength];
-//
-//                            System.arraycopy(raw,keyStart,bytes,0,keyLength);
-//
-//                			unknownValue=new String(bytes);
-//                		}
-//
-//                		if(debug && PDFvalue==PdfDictionary.Unknown){
-//                			System.out.println("Value not in PdfCIDEncodings");
-//
-//                           	 byte[] bytes=new byte[keyLength];
-//
-//                               System.arraycopy(raw,keyStart,bytes,0,keyLength);
-//                               System.out.println("Add to CIDEncodings and as String");
-//                               System.out.println("key="+new String(bytes)+" "+id+" not implemented in setConstant in PdfFont Object");
-//
-//                               System.out.println("final public static int CMAP_"+new String(bytes)+"="+id+";");
-//                		}
-//                	}else
-                		PDFvalue=super.setConstant(pdfKeyType,id);
+                	PDFvalue=super.setConstant(pdfKeyType,id);
 
                     if(PDFvalue==-1 && debug){
 
@@ -308,7 +276,6 @@ public class ColorSpaceObject extends PdfObject {
             LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
-        //System.out.println(pdfKeyType+"="+PDFvalue);
         switch(pdfKeyType){
 
         case PdfDictionary.Alternate:
@@ -345,21 +312,10 @@ public class ColorSpaceObject extends PdfObject {
         return def;
     }
 
-    
-
-//    public void setStream(){
-//
-//        hasStream=true;
-//    }
-
-
     @Override
     public PdfArrayIterator getMixedArray(final int id) {
 
     	switch(id){
-
-            //case PdfDictionary.Differences:
-            //    return new PdfArrayIterator(Differences);
 
             default:
 			return super.getMixedArray(id);

@@ -58,7 +58,8 @@ import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.DecoderOptions;
-import org.jpedal.render.*;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.SwingDisplay;
 import org.jpedal.utils.LogWriter;
 
 public class FileAccess {
@@ -175,12 +176,11 @@ public class FileAccess {
                 currentPdfFile = new PdfObjectReader();
             }
         
-            /** get reader object to open the file */
             currentPdfFile.openPdfFile(data);
 
             openPdfFile();
 
-            /** store file name for use elsewhere as part of ref key without .pdf */
+            /* store file name for use elsewhere as part of ref key without .pdf */
             objectStoreRef.storeFileName("r" + System.currentTimeMillis());
 
         } catch (final PdfException e) {
@@ -243,12 +243,12 @@ public class FileAccess {
             res.flush();
             res.flushObjects();
 
-            /** store file name for use elsewhere as part of ref key without .pdf */
+            /* store file name for use elsewhere as part of ref key without .pdf */
             objectStoreRef.storeFileName(this.filename);
 
             currentPdfFile = new PdfObjectReader(password);
 
-            /** get reader object to open the file */
+            /* get reader object to open the file */
             currentPdfFile.openPdfFile(iis);
 
             openPdfFile();
@@ -274,12 +274,12 @@ public class FileAccess {
         res.flush();
         res.flushObjects();
 
-        /** store file name for use elsewhere as part of ref key without .pdf */
+        /* store file name for use elsewhere as part of ref key without .pdf */
         objectStoreRef.storeFileName(filename);
 
         currentPdfFile = new PdfObjectReader(password);
 
-        /** get reader object to open the file */
+        /* get reader object to open the file */
         currentPdfFile.openPdfFile(filename);
 
         openPdfFile();
@@ -446,11 +446,11 @@ public class FileAccess {
         }
 
 
-        /**
+        /*
          * handle common values which can occur at page level or higher
          */
 
-        /** page rotation for this or up tree*/
+        /* page rotation for this or up tree*/
         int rawRotation=pdfObject.getInt(PdfDictionary.Rotate);
         String parent=pdfObject.getStringKey(PdfDictionary.Parent);
 
@@ -489,7 +489,7 @@ public class FileAccess {
 
         pageData.setPageRotation(rotation, tempPageCount);
 
-        /**
+        /*
          * handle media and crop box, defaulting to higher value if needed (ie
          * Page uses Pages and setting crop box
          */
@@ -512,7 +512,7 @@ public class FileAccess {
             pageData.setCropBox(cropBox);
         }
 
-        /** process page to read next level down */
+        /* process page to read next level down */
         if (type==PdfDictionary.Pages) {
 
             if(pdfObject.getDictionary(PdfDictionary.Resources)!=null) {
@@ -530,7 +530,7 @@ public class FileAccess {
                 System.out.println("PAGES---------------------currentPageOffset="+currentPageOffset+" kidCount="+kidCount);
             }
 
-            /** allow for empty value and put next pages in the queue */
+            /* allow for empty value and put next pages in the queue */
             if (kidCount> 0) {
 
                 if(debug) {
@@ -568,7 +568,7 @@ public class FileAccess {
 
             pageData.checkSizeSet(tempPageCount); // make sure we have min values
 
-            /**
+            /*
              * add Annotations
              */
             if (formRenderer != null) {
@@ -674,7 +674,7 @@ public class FileAccess {
                     tempURLFile = ObjectStore.createTempFile(rawFileName);
                 }
 
-                /** store fi name for use elsewhere as part of ref key without .pdf */
+                /* store file name for use elsewhere as part of ref key without .pdf */
                 objectStoreRef.storeFileName(tempURLFile.getName().substring(0, tempURLFile.getName().lastIndexOf('.')));
 
                 if(supportLinearized){
@@ -683,9 +683,6 @@ public class FileAccess {
 
                     if(linearBytes!=null){
 
-                        /**
-                         * read partial data so we can display
-                         */
 
                         currentPdfFile.openPdfFile(linearBytes);
 
@@ -720,14 +717,11 @@ public class FileAccess {
                 }
 
                 if(supportLinearized){
-                    //else{
-                    //          System.out.println("xx");
-                    /** get reader object to open the file */
+                    /* get reader object to open the file */
                     openPdfFile(tempURLFile.getAbsolutePath());
 
-                    /** store fi name for use elsewhere as part of ref key without .pdf */
+                    /* store file name for use elsewhere as part of ref key without .pdf */
                     objectStoreRef.storeFileName(tempURLFile.getName().substring(0, tempURLFile.getName().lastIndexOf('.')));
-                    // }
                 }
 
             } catch (final IOException e) {
@@ -854,7 +848,7 @@ public class FileAccess {
             //linear page object set differently
             if(linearParser.hasLinearData()){
 
-                /**
+                /*
                  * read and decode the hints table and the ref table
                  */
                 pdfObject=linearParser.readHintTable(currentPdfFile);
@@ -876,11 +870,9 @@ public class FileAccess {
 
                     res.setValues(pdfObject, currentPdfFile);
 
-                    //check read as may be used for Dest
-                    final PdfObject nameObj=pdfObject.getDictionary(PdfDictionary.Names);
-                    if (nameObj != null){
-                        currentPdfFile.readNames(nameObj, externalHandlers.getJavaScript(), false);
-                    }
+                    //read Names, Dest, PageLabels (we process last once we have page count)
+                    currentPdfFile.readDocumentMetaData(pdfObject,externalHandlers.getJavaScript());
+                    
                 }
 
                 final int type=pdfObject.getParameterConstant(PdfDictionary.Type);
@@ -899,7 +891,6 @@ public class FileAccess {
                         }                    
                     }
                 }
-
 
                 if (pdfObject != null) {
 
@@ -922,6 +913,9 @@ public class FileAccess {
                     }else{
                         pageCount = tempPageCount - 1; // save page count
                     }
+                    
+                    //now read PageLabels
+                    currentPdfFile.readPageLabels(pageCount);
                     
                     //pageNumber = 0; // reset page number for metadata;
                     if (pageCount == 0) {
@@ -971,18 +965,18 @@ public class FileAccess {
         res.flushObjects();
         //pagesReferences.clear();
 
-        /** store file name for use elsewhere as part of ref key without .pdf */
+        /* store file name for use elsewhere as part of ref key without .pdf */
         objectStoreRef.storeFileName(filename);
 
-        /**
+        /*
          * create Reader, passing in certificate if set
          */
         currentPdfFile = getNewReader();
 
-        /** get reader object to open the file */
+        /* get reader object to open the file */
         currentPdfFile.openPdfFile(filename);
 
-        /**test code in case we need to test byte[] version
+        /*test code in case we need to test byte[] version
          //get size
          try{
          File file=new File(filename);

@@ -39,7 +39,6 @@ import java.awt.image.Raster;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.io.ColorSpaceConvertor;
-import static org.jpedal.parser.image.ImageDecoder.allBytesZero;
 import org.jpedal.utils.LogWriter;
 
 /**
@@ -57,7 +56,6 @@ public class IndexedImage {
         LogWriter.writeLog("Indexed " + w + ' ' + h);
         
             
-            /**convert index to rgb if CMYK or ICC*/
             if(!decodeColorData.isIndexConverted()){
                 index=decodeColorData.convertIndexToRGB(index);
             }
@@ -112,6 +110,19 @@ public class IndexedImage {
                 LogWriter.writeLog("Exception: " + e.getMessage());
             }
         return image;
+    }
+    
+    private static boolean allBytesZero(final byte[] data) {
+        
+        boolean allZero=true;
+        
+        for(final byte bytes :data){
+            if(bytes!=0){
+                allZero=false;
+                break;
+            }
+        }
+        return allZero;
     }
     
 }

@@ -39,7 +39,6 @@ provide matrix functionality used in PDF to calculate co-ords
  */
 public class Matrix {
     
-    //////////////////////////////////////////////////////////////////////////
     /**multiply two 3 * 3 matrices together & return result*/
     public static final float[][] multiply(final float[][] matrix1, final float[][] matrix2) {
         
@@ -51,7 +50,7 @@ public class Matrix {
             for (int row = 0; row < 3; row++) {
                 output_matrix[row][col] = (matrix1[row][0] * matrix2[0][col]) + (matrix1[row][1] * matrix2[1][col]) + (matrix1[row][2] * matrix2[2][col]);
                 //allow for rounding errors
-                /**
+                /*
                 if((output_matrix[row][col]>0.99)&&(output_matrix[row][col]<1))
                 output_matrix[row][col]=1;
                 else if((output_matrix[row][col]<-0.99)&&(output_matrix[row][col]>-1))
@@ -67,7 +66,7 @@ public class Matrix {
         }
         return output_matrix;
     }
-//////////////////////////////////////////////////////////////////////////
+
     /**Calculates the inverse of a 3 * 3 matrix  return result*/
     public static final float[][] inverse(final float[][] input_matrix) {
         

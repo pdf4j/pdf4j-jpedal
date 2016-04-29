@@ -49,21 +49,22 @@ import org.jpedal.external.Options;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.fonts.tt.TTGlyph;
 import org.jpedal.grouping.PdfGroupingAlgorithms;
-import org.jpedal.io.*;
+import org.jpedal.io.ColorSpaceConvertor;
+import org.jpedal.io.ObjectStore;
+import org.jpedal.io.PdfObjectReader;
+import org.jpedal.io.StatusBar;
 import org.jpedal.objects.*;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-
 import org.jpedal.parser.*;
-
-import org.jpedal.render.*;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.ImageDisplay;
 import org.jpedal.text.TextLines;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.Vector_Int;
-
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
 public class Parser {
@@ -283,7 +284,7 @@ public class Parser {
 
                         final ObjectStore backgroundObjectStoreRef = new ObjectStore();
 
-                        final PdfStreamDecoder backgroundDecoder=formRenderer.getStreamDecoder(getIO(), options.useHiResImageForDisplay(),res.getPdfLayerList(),false);
+                        final PdfStreamDecoder backgroundDecoder=formRenderer.getStreamDecoder(getIO(), res.getPdfLayerList(),false);
 
                         backgroundDecoder.setParameters(true, false, 0, extractionMode,false,useJavaFX);
 
@@ -507,7 +508,7 @@ public class Parser {
      */
     PdfGroupingAlgorithms getGroupingObject() throws PdfException {
 
-        return options.getGroupingObject(fileAcces.getLastPageDecoded() , getPdfData(), fileAcces.getPdfPageData());
+        return options.getGroupingObject(fileAcces.getLastPageDecoded() , getPdfData());
 
     }
 
@@ -517,7 +518,7 @@ public class Parser {
      */
     PdfGroupingAlgorithms getBackgroundGroupingObject() {
 
-        return options.getBackgroundGroupingObject(pdfBackgroundData, fileAcces.getPdfPageData());
+        return options.getBackgroundGroupingObject(pdfBackgroundData);
     }
     
     /**
@@ -876,12 +877,12 @@ public class Parser {
 
         /** read page or next pages */
         if(formRenderer.isXFA() && formRenderer.useXFA()){
-            current = formRenderer.getStreamDecoder(getIO(), options.useHiResImageForDisplay(), res.getPdfLayerList(), false);
+            current = formRenderer.getStreamDecoder(getIO(), res.getPdfLayerList(), false);
             Resources=(PdfObject) formRenderer.getFormResources()[0];//XFA in Acroforms
         }else{
             
             //needs to be out of loop as we can get flattened forms on pages with no content
-            current = formRenderer.getStreamDecoder(getIO(), options.useHiResImageForDisplay(),res.getPdfLayerList(),false);
+            current = formRenderer.getStreamDecoder(getIO(), res.getPdfLayerList(),false);
 
             if(!warnOnceOnForms){
                 warnOnceOnForms=true; //not used in XFA at present but set for consistency
@@ -895,8 +896,6 @@ public class Parser {
         /** set hires mode or not for display */
         current.setXMLExtraction(options.isXMLExtraction());
 
-        currentDisplay.setHiResImageForDisplayMode(options.useHiResImageForDisplay());
-        currentDisplay.setPrintPage(page);
         currentDisplay.setCustomColorHandler((ColorHandler) externalHandlers.getExternalHandler(Options.ColorHandler));
 
         current.setParameters(true, options.getRenderPage(), renderMode, extractionMode,false,useJavaFX);

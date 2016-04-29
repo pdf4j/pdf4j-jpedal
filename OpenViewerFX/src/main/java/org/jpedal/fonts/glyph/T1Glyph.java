@@ -32,7 +32,10 @@
  */
 package org.jpedal.fonts.glyph;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
@@ -187,7 +190,7 @@ public class T1Glyph extends BaseT1Glyph
 			
 			int count=0;
 			
-			/** find out how many items are in the collection */
+			/* find out how many items are in the collection */
 			for (int i = 0; i < paths.length; i++) {
 				if(paths[i]==null){
 					count = i;
@@ -195,10 +198,10 @@ public class T1Glyph extends BaseT1Glyph
 				}
 			}
 			
-			/** write out the number of items are in the collection */
+			/* write out the number of items are in the collection */
 			os.writeObject(count);
 			
-			/** iterate throught the collection, and write out each path individualy */
+			/* iterate throught the collection, and write out each path individualy */
 			for (int i = 0; i < count; i++) {
 				final PathIterator pathIterator = paths[i].getPathIterator(new AffineTransform());
 				PathSerializer.serializePath(os, pathIterator);

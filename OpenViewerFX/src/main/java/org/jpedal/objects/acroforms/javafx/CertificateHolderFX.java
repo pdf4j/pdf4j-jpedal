@@ -41,6 +41,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import org.jpedal.utils.LogWriter;
 
 public class CertificateHolderFX {
     private final Stage frame;
@@ -50,12 +51,14 @@ public class CertificateHolderFX {
      public void setValues(final String name, final int version, final String hashAlgorithm, final String subjectFields, final String issuerFields,
                           final BigInteger serialNumber, final String notBefore, final String notAfter, final String publicKeyDescription, final String publicKey,
                           final String x509Data, final String sha1Digest, final String md5Digest) {
-        // TODO Auto-generated method stub
+
         generalTab = new JavaFXGeneral();
        
         generalTab.setValues(name, notBefore, notAfter);
-        JavaFXDetails.setValues(
-        );
+        JavaFXDetails.setValues();
+
+         LogWriter.writeLog("JavaFX does not make use of "+version+' '+hashAlgorithm+' '+subjectFields+' '+issuerFields+
+                 ' '+serialNumber+' '+publicKeyDescription+' '+publicKey+' '+x509Data+' '+sha1Digest+' '+md5Digest);
         
         
      }

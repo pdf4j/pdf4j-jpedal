@@ -35,11 +35,10 @@ package org.jpedal.color;
 
 
 import java.awt.color.ColorSpace;
+import java.util.Map;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-
-import java.util.Map;
 
 
 /**
@@ -109,7 +108,7 @@ public class ColorspaceFactory {
         
         int rawID=-1;
         
-        /**setup colorspaces which map onto others*/
+        /*setup colorspaces which map onto others*/
         if (ID==ColorSpaces.Indexed || ID==PdfDictionary.I){
             
             isIndexed=true;
@@ -127,7 +126,7 @@ public class ColorspaceFactory {
         
         GenericColorSpace currentColorData = getColorspace(currentPdfFile, colorSpace, ID);
         
-        /**handle CMAP as object or direct*/
+        /*handle CMAP as object or direct*/
         if(isIndexed){
             
             
@@ -208,8 +207,7 @@ public class ColorspaceFactory {
         
         GenericColorSpace currentColorData=new DeviceRGBColorSpace();
         
-        //int ID;
-        /**
+        /*
          * Switch ICC to alt Gray
          */
         final int alt=colorSpace.getParameterConstant(PdfDictionary.Alternate);

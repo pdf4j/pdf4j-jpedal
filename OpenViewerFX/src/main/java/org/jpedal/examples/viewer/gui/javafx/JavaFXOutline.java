@@ -35,13 +35,7 @@ package org.jpedal.examples.viewer.gui.javafx;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jpedal.examples.viewer.gui.generic.GUIOutline;

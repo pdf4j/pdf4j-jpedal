@@ -32,9 +32,10 @@
  */
 package org.jpedal.function;
 
-import org.jpedal.io.*;
-import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.io.ObjectDecoder;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.FunctionObject;
+import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 
 /**
@@ -51,10 +52,7 @@ public class FunctionFactory {
 
 		PDFFunction newFunction=null;
 
-		/**
-		 * get values and handle reference
-		 **/
-        final byte[] stream=functionObj.getDecodedStream();
+		final byte[] stream=functionObj.getDecodedStream();
 
         final float[] domain=functionObj.getFloatArray(PdfDictionary.Domain);
         final float[] range=functionObj.getFloatArray(PdfDictionary.Range);
@@ -105,7 +103,7 @@ public class FunctionFactory {
 
 			functions = new PDFFunction[subFunction.length];
 
-            /**
+            /*
              * get values for sub stream Function
              */
             for (int i1 =0,imax= subFunction.length; i1 <imax; i1++) {

@@ -76,7 +76,7 @@ public abstract class PDFtoImageConvertor {
     
     public int mediaH,w,h;
     public int rotation;
-    public float crw,crh,crx,cry;
+    public double crw,crh,crx,cry;
     public boolean rotated;
     
     // Temporarily lock FX out of form rendering (breaks thumbnail generation)
@@ -139,7 +139,7 @@ public abstract class PDFtoImageConvertor {
             imageDisplay.setValue(DynamicVectorRenderer.ENHANCE_FRACTIONAL_LINES, 0);
         }
         
-        final PdfStreamDecoder currentImageDecoder = formRenderer.getStreamDecoder(currentPdfFile,true,null,true);
+        final PdfStreamDecoder currentImageDecoder = formRenderer.getStreamDecoder(currentPdfFile,null,true);
         
         currentImageDecoder.setParameters(true, true, renderMode, PdfDecoderInt.TEXT,false,externalHandlers.getMode().equals(GUIModes.JAVAFX));
 
@@ -239,7 +239,7 @@ public abstract class PDFtoImageConvertor {
                     for (Object nextVal : formsOrdered[pageIndex]) {
 
                         if (nextVal != null) {
-                            formRenderer.getFormFlattener().drawFlattenedForm(currentImageDecoder, (org.jpedal.objects.raw.FormObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
+                            formRenderer.getFormFlattener().drawFlattenedForm(currentImageDecoder, (PdfObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
                         }
                     }
                     
@@ -255,7 +255,7 @@ public abstract class PDFtoImageConvertor {
                     
                     if (nextVal !=null) {
                        
-                        formRenderer.getFormFlattener().drawFlattenedForm(currentImageDecoder, (org.jpedal.objects.raw.FormObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
+                        formRenderer.getFormFlattener().drawFlattenedForm(currentImageDecoder, (PdfObject) nextVal, false, (PdfObject) formRenderer.getFormResources()[0]);
                         
                     }
                 }

@@ -32,17 +32,19 @@
  */
 package org.jpedal.objects.outlines;
 
-import org.jpedal.io.types.Array;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.jpedal.io.PdfObjectReader;
-import org.jpedal.objects.raw.*;
+import org.jpedal.io.types.Array;
+import org.jpedal.objects.raw.OutlineObject;
+import org.jpedal.objects.raw.PdfArrayIterator;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * encapsulate the Outline data
@@ -94,42 +96,8 @@ public class OutlineData {
 
 		}
 
-		/**
-		//build lookup table
-		int pageCount=this.refTop.length;
-		String lastLink=null,currentBottom;
-		for(int i=1;i<pageCount;i++){
-
-		    //if page has link use bottom
-		    //otherwise last top
-		    String link=this.refTop[i];
-
-		    if(link!=null){
-		        lookup[i]=link;
-		    }else
-		        lookup[i]=lastLink;
-
-		    //System.out.println("Default for page "+i+" = "+lookup[i]+" "+refBottom[i]+" "+refTop[i]);
-		    //track last top link
-		    String top=this.refBottom[i];
-		    if(top!=null){
-		        lastLink=top;
-		    }
-
-		}
-
-		/***/
 		return count;
 	}
-
-	/**
-	 * returns default bookmark to select for each page
-	 * - not part of API and not live
-	 *
-	public Map getPointsForPage(){
-	    return this.pointLookupTable;
-	}*/
-
 
 	/**
 	 * read a level
@@ -158,7 +126,7 @@ public class OutlineData {
 			//coord=-1;
 			page=-1;
 
-			/**
+			/*
 			 * process and move onto next value
 			 */
 			FirstObj=outlineObj.getDictionary(PdfDictionary.First);
@@ -198,11 +166,15 @@ public class OutlineData {
 					if(DestObj.isNextValueRef()) {
                         ref = DestObj.getNextValueAsString(true);
                     } else{ //its nameString name (name) linking to obj so read that
-                        final String nameString =DestObj.getNextValueAsString(true);
+                        String nameString =DestObj.getNextValueAsString(true);
 
                         //check if object and read if so (can also be an indirect name which we lookup
                         if(nameString!=null ){
 
+                            if(nameString.startsWith("/")){
+                                nameString=nameString.substring(1);
+                            }
+                            
                             ref=currentPdfFile.convertNameToRef(nameString);
 
                             //allow for direct value
@@ -221,8 +193,13 @@ public class OutlineData {
                             if(DestObj!=null){
                                 count=DestObj.getTokenCount();
 
-                                if(count>0 && DestObj.hasMoreTokens() && DestObj.isNextValueRef()) {
-                                    ref = DestObj.getNextValueAsString(true);
+                                if(count>0 && DestObj.hasMoreTokens()) { //can be object or raw number
+                                    if(DestObj.isNextValueRef()){
+                                        ref = DestObj.getNextValueAsString(true);
+                                    }else {
+                                        ref=null;
+                                        page=1+DestObj.getNextValueAsInteger(); //note it treats 0 as first page
+                                    }
                                 }
                             }
                         }

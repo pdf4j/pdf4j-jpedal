@@ -41,11 +41,11 @@ import org.jpedal.objects.raw.PdfObject;
 
 public class T3StreamDecoder extends PdfStreamDecoder {
 
-    public T3StreamDecoder(final PdfObjectReader currentPdfFile, final boolean useHires, final boolean isPrinting) {
+    public T3StreamDecoder(final PdfObjectReader currentPdfFile, final boolean isPrinting) {
 
-        super(currentPdfFile, useHires,null);
+        super(currentPdfFile);
 
-        isType3Font=true;
+        parserOptions.isType3Font(true);
 
         this.isPrinting=isPrinting;
     }

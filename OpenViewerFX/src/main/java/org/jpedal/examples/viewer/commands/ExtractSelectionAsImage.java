@@ -33,23 +33,13 @@
 
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.examples.viewer.Values;
@@ -74,7 +64,7 @@ public class ExtractSelectionAsImage extends GUIExtractSelectionAsImage {
         }
         
         final Container frame = (Container) currentGUI.getFrame();
-        final JDialog displayFrame = new JDialog((JFrame) null, true);
+        final JDialog displayFrame = new JDialog((Frame) null, true);
         final JPanel image_display = new JPanel();
 
         
@@ -132,7 +122,7 @@ public class ExtractSelectionAsImage extends GUIExtractSelectionAsImage {
             }
         });
 
-        /**
+        /*
          * yes option allows user to save content
          */
         final JButton yes = new JButton(Messages.getMessage("PdfSnapshotPreview.Save"));
@@ -150,7 +140,7 @@ public class ExtractSelectionAsImage extends GUIExtractSelectionAsImage {
                 boolean finished = false;
                 while (!finished) {
 
-                    /**
+                    /*
                      * Sets the saveable file-types for snapshot image.
                      */
                     final JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
@@ -208,7 +198,7 @@ public class ExtractSelectionAsImage extends GUIExtractSelectionAsImage {
             }
         });
 
-        /**
+        /*
          * no option just removes display
          */
         final JButton no = new JButton(Messages.getMessage("PdfSnapshotPreview.Cancel"));

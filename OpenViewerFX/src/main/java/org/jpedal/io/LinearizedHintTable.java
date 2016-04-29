@@ -32,14 +32,13 @@
  */
 package org.jpedal.io;
 
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 
 /**
  * Java representation of Linear hint tabke defined in F3/F4 of PDF spec
@@ -105,7 +104,7 @@ public class LinearizedHintTable {
         //int[] sharedObjectsIdentifier=new int[N+1];
         //int[] objectNumerator=new int[N+1];
         
-        /**
+        /*
          * read page offset hint table header (Appendix F F3 in PDF Ref)
          */
 
@@ -197,7 +196,7 @@ public class LinearizedHintTable {
         startByte += 2;
 
 
-        /**
+        /*
          * read page offset hint table (Appendix F F4 in PDF Ref)
          */
 
@@ -290,7 +289,7 @@ public class LinearizedHintTable {
        // int obj=O;
         //show results at end
 
-        /**
+        /*
         for(int pageReached=1;pageReached<5;pageReached++){
             System.out.println("-------------------------------------------------------------------------------");
 

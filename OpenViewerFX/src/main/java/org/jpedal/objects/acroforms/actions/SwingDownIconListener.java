@@ -34,9 +34,7 @@ package org.jpedal.objects.acroforms.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.AbstractButton;
-
 import org.jpedal.objects.acroforms.overridingImplementations.FixImageIcon;
 
 
@@ -46,7 +44,7 @@ import org.jpedal.objects.acroforms.overridingImplementations.FixImageIcon;
  * @author chris
  */
 public class SwingDownIconListener implements ActionListener{
-	/**
+	/*
 	 * stores the down icon images for use when more than one pressed icon needs to be used
 	 */
 	//private int width,height;

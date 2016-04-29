@@ -36,16 +36,8 @@ import java.awt.Color;
 import java.awt.PaintContext;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBufferInt;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import java.awt.geom.*;
+import java.awt.image.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -82,10 +74,6 @@ public class CoonsContext implements PaintContext {
      *
      * @param shapes
      * @param background
-     * @param pageHeight
-     * @param scaling
-     * @param offX
-     * @param offY
      */
     CoonsContext(final AffineTransform xform,final GenericColorSpace shadingColorSpace, final ArrayList<Shape67> shapes, final float[] background, float[][] mm, PDFFunction[] function) {
 

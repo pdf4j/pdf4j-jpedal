@@ -70,19 +70,13 @@ public class JavaFXInfo {
     }
     
     private static void getInfoBox(){
-        
-        /**
-         * Build Main Body Title.
-         */
+
         final Text title = new Text ("JavaFX Viewer Information");
         title.setTextAlignment(TextAlignment.CENTER);
         title.setFont(Font.font("SansSerif", FontWeight.BOLD, 14));
         ImageView imageView;
         Hyperlink link;
          
-        /**
-         * Build Main Body Text.
-         */
         Text info ;
    
         if (OpenViewerFX.isOpenFX) {
@@ -106,15 +100,9 @@ public class JavaFXInfo {
         
         link.setBorder(Border.EMPTY);
         
-        /**
-         * Build Main Body ok Button.
-         */
         final Button okButton = new Button("OK");
         okButton.setPadding(new Insets(7,25,7,25));
         
-        /**
-         * Build Text Seperators.
-         */
         final Separator sepBottom = new Separator();
         sepBottom.setPrefHeight(50);
         sepBottom.setVisible(false);
@@ -132,9 +120,6 @@ public class JavaFXInfo {
         sepAfterLink.setVisible(false);
         sepAfterLink.setOrientation(Orientation.HORIZONTAL);
 
-        /**
-         * Add Items to a VBox Container.
-         */
         final VBox vBox = new VBox();
         vBox.getChildren().addAll(title,sepTop,info,sepBottom,imageView,sepAfterImg,link,sepAfterLink,okButton);
         vBox.setAlignment(Pos.CENTER);

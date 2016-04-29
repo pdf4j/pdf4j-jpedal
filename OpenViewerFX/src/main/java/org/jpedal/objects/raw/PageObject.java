@@ -36,7 +36,7 @@ public class PageObject extends PdfObject {
 	
     private byte[][] Annots, Contents, Kids, OpenAction;
     
-    PdfObject AA, AcroForm, Group, OCProperties, O, OpenActionDict, PO, Properties, PV, Metadata, Outlines, Pages, MarkInfo, Names,StructTreeRoot;
+    PdfObject AA, AcroForm, Dests, Group, OCProperties, O, OpenActionDict, PO, PageLabels, Properties, PV, Metadata, Outlines, Pages, MarkInfo, Names,StructTreeRoot;
     
     private int StructParents=-1, pageMode=-1;
 
@@ -92,6 +92,9 @@ public class PageObject extends PdfObject {
             case PdfDictionary.AcroForm:
 	        	return AcroForm;
 
+            case PdfDictionary.Dests:
+                return Dests;
+
             case PdfDictionary.Group:
 	        	return Group;
 
@@ -115,6 +118,9 @@ public class PageObject extends PdfObject {
 
             case PdfDictionary.Pages:
                 return Pages;
+                
+            case PdfDictionary.PageLabels:
+                return PageLabels;
 
             case PdfDictionary.PO:
 	        	return PO;
@@ -178,14 +184,14 @@ public class PageObject extends PdfObject {
             case PdfDictionary.AcroForm:
 	        	AcroForm=value;
 	        break;
+            
+             case PdfDictionary.Dests:
+                Dests=value;
+                break;
 
             case PdfDictionary.Group:
 	        	Group=value;
 	        break;
-
-            case PdfDictionary.OCProperties:
-                OCProperties=value;
-            break;
 
             case PdfDictionary.MarkInfo:
 	        	MarkInfo=value;
@@ -199,6 +205,10 @@ public class PageObject extends PdfObject {
                 O=value;
             break;
 
+            case PdfDictionary.OCProperties:
+                OCProperties=value;
+            break;
+
             case PdfDictionary.OpenAction:
                 OpenActionDict=value;
             break;
@@ -210,6 +220,10 @@ public class PageObject extends PdfObject {
             case PdfDictionary.Pages:
                 Pages=value;
             break;
+            
+            case PdfDictionary.PageLabels:
+                PageLabels=value;
+                break;
 
             case PdfDictionary.PO:
                 PO=value;
@@ -393,12 +407,12 @@ public class PageObject extends PdfObject {
                 Annots=value;
             break;
 
-            case PdfDictionary.Kids:
-                Kids=value;
-            break;
-
             case PdfDictionary.Contents:
                 Contents=value;
+            break;
+
+            case PdfDictionary.Kids:
+                Kids=value;
             break;
 
             default:

@@ -32,9 +32,8 @@
  */
 package org.jpedal.parser;
 
-import org.jpedal.constants.PageInfo;
-
 import java.util.Iterator;
+import org.jpedal.constants.PageInfo;
 
 public class DecoderResults {
 

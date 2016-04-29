@@ -33,21 +33,24 @@
 package org.jpedal.color;
 
 //standard java
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
+import java.awt.color.ICC_ColorSpace;
+import java.awt.color.ICC_Profile;
 import java.awt.image.*;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Iterator;
-
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
-
+import org.jpedal.JDeliHelper;
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.exception.PdfException;
 import org.jpedal.io.ColorSpaceConvertor;
@@ -55,12 +58,6 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
-
-import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_Profile;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.jpedal.JDeliHelper;
-
 import org.w3c.dom.NodeList;
 
 /**
@@ -176,7 +173,6 @@ public class GenericColorSpace  implements Cloneable, Serializable {
             
             final FastColorSpaceCMYK cmykCS = new FastColorSpaceCMYK();
             
-            /**define the conversion. PdfColor.hints can be replaced with null or some hints*/
             CSToRGB = new ColorConvertOp(cmykCS, rgbCS, ColorSpaces.hints);
        
     }
@@ -434,7 +430,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
             //test
             
             if(!isProcessed){
-                /**1.3 version or vanilla version*/
+
                 final WritableRaster rgbRaster;
                 
                 if (cmykType == 4) { //CMYK
@@ -449,7 +445,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
                     image =new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
                     image.setData(rgbRaster);
                     
-                } else { //type 7 - these seem to crash the new 1.4 IO routines as far as I can see
+                } else {
                     
                     boolean isYCC=false;
                     try{
@@ -587,7 +583,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     
     protected static Raster cleanupRaster(Raster ras, final int pX, final int pY, final int comp) {
         
-        /**
+        /*
          * allow user to disable this function and just return raw data
          */
         final String avoidCleanupRaster=System.getProperty("org.jpedal.avoidCleanupRaster");
@@ -740,7 +736,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
     
     private static BufferedImage cleanupBGRImage(BufferedImage img, final int pX, final int pY) {
         
-        /**
+        /*
          * allow user to disable this function and just return raw data
          */
         final String avoidCleanupRaster=System.getProperty("org.jpedal.avoidCleanupRaster");
@@ -1193,7 +1189,6 @@ public class GenericColorSpace  implements Cloneable, Serializable {
      */
     public final void setCIEValues(final float[] W, final float[] R, final float[] Ma, final float[] G){
         
-        /**set to CIEXYZ colorspace*/
         cs = ColorSpace.getInstance(ColorSpace.CS_CIEXYZ);
         
         //set values
@@ -1243,7 +1238,7 @@ public class GenericColorSpace  implements Cloneable, Serializable {
 
         try {
 
-            /**turn it into a BufferedImage so we can convert then extract the data*/
+            /*turn it into a BufferedImage so we can convert then extract the data*/
             final int width = data.length / compCount;
             final int height = 1;
             final DataBuffer db = new DataBufferByte(data, data.length);
@@ -1263,10 +1258,8 @@ public class GenericColorSpace  implements Cloneable, Serializable {
 
             final DataBuffer convertedData = rgbRaster.getDataBuffer();
 
-            /**put into byte array*/
             final int size = width * height * 3;
             data = new byte[size];
-
 
             for (int ii = 0; ii < size; ii++){
                 data[ii] = (byte) convertedData.getElem(ii);

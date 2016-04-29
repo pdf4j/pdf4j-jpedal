@@ -33,24 +33,21 @@
 package org.jpedal.render;
 
 import com.idrsolutions.pdf.color.blends.BlendMode;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.jpedal.color.PdfColor;
 import org.jpedal.color.PdfPaint;
-import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.FontHandler;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.glyph.PdfGlyph;
-import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfShape;
@@ -63,8 +60,6 @@ import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
 public abstract class BaseDisplay implements DynamicVectorRenderer {
 
-    private boolean isRenderingToImage;
-
     /**holds object type*/
     protected Vector_Int objectType;
 
@@ -74,8 +69,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     protected int type;
 
     boolean isType3Font;
-
-    private boolean saveImageData=true;
 
     /**set flag to show if we add a background*/
     protected boolean addBackground = true;
@@ -104,9 +97,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     Graphics2D g2;
 
-    /**use hi res images to produce better quality display*/
-    public boolean useHiResImageForDisplay;
-
     //used by type3 fonts as identifier
     String rawKey;
 
@@ -132,10 +122,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
     protected final Map<Integer, String> imageIDtoName=new HashMap<Integer, String>(10);
 
-    protected boolean needsHorizontalInvert;
-
-    protected boolean needsVerticalInvert;
-
     /**real size of pdf page */
     int w, h;
 
@@ -150,11 +136,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     /**allow user to control*/
     public static RenderingHints userHints;
 
-    private Mode mode = Mode.PDF;//declared in DynamicVectorRenderer
-
-    @Override
-    public void setInset(final int x, final int y) {}
-	
     @Override
     public void setG2(final Graphics2D g2) {
     	this.g2 = g2;
@@ -222,9 +203,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
             //type of draw operation to use
             final Composite comp = g2.getComposite();
 
-            /**
-             * Fill Text
-             */
             if ((text_fill_type & GraphicsState.FILL) == GraphicsState.FILL) {
 
             	//If we have an alt text color, its within threshold and not an additional item, use alt color
@@ -267,9 +245,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
             }
 
-            /**
-             * Stroke Text (Can be fill and stroke so not in else)
-             */
             if (text_fill_type == GraphicsState.STROKE) {
                 glyph.setStrokedOnly(true);
             }
@@ -447,137 +422,130 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         final Composite c = g2.getComposite();
         renderComposite(alpha);
 
-        if (renderDirect || useHiResImageForDisplay) {
+        AffineTransform upside_down;
 
-            AffineTransform upside_down;
-
-            float CTM[][] = new float[3][3];
-            if (currentGraphicsState != null) {
-                CTM = currentGraphicsState.CTM;
-            }else{
-                double[] values=new double[6];
-                imageAf.getMatrix(values);
-                CTM[0][0]=(float) values[0];
-                CTM[0][1]=(float) values[1];
-                CTM[1][0]=(float) values[2];
-                CTM[1][1]=(float) values[3];
-                CTM[2][0]= x;
-                CTM[2][1]= y;
-            }
-
-            final int w = image.getWidth();
-            final int h = image.getHeight();
-
-            final double[] values={CTM[0][0] / w, CTM[0][1] / w, -CTM[1][0] / h, -CTM[1][1] / h, 0, 0};
-            upside_down = new AffineTransform(values);
-
-            g2.translate(CTM[2][0] + CTM[1][0], CTM[2][1] + CTM[1][1]);
-
-            //allow user to over-ride
-            boolean useCustomRenderer = customImageHandler != null;
-
-            if (useCustomRenderer) {
-                useCustomRenderer = customImageHandler.drawImageOnscreen(image, 0, upside_down, null, g2, renderDirect, objectStoreRef, isPrinting);
-
-                //exit if done
-                if (useCustomRenderer) {
-                    g2.setComposite(c);
-                    return;
-                }
-            }
-
-            //hack to make bw
-            if (customColorHandler != null) {
-                final BufferedImage newImage = customColorHandler.processImage(image, rawPageNumber, isPrinting);
-                if (newImage != null) {
-                    image = newImage;
-                }
-            } else if (DecoderOptions.Helper != null) {
-                final BufferedImage newImage = DecoderOptions.Helper.processImage(image, rawPageNumber, isPrinting);
-                if (newImage != null) {
-                    image = newImage;
-                }
-            }
-
-            final Shape g2clip = g2.getClip();
-            boolean isClipReset = false;
-
-            //hack to fix clipping issues due to sub-pixels
-            if (g2clip != null) {
-
-                final double cy = g2.getClip().getBounds2D().getY();
-                final double ch = g2.getClip().getBounds2D().getHeight();
-                double diff = image.getHeight() - ch;
-                if (diff < 0) {
-                    diff = -diff;
-                }
-
-                if (diff > 0 && diff < 1 && cy < 0 && image.getHeight() > 1 && image.getHeight() < 10) {
-
-                    final boolean isSimpleOutline = isSimpleOutline(g2.getClip());
-
-                    if (isSimpleOutline) {
-                        final double cx = g2.getClip().getBounds2D().getX();
-                        final double cw = g2.getClip().getBounds2D().getWidth();
-
-                        g2.setClip(new Rectangle((int) cx, (int) cy, (int) cw, (int) ch));
-
-                        isClipReset = false;
-                    }
-                }
-            }
-
-            AffineTransform aff = g2.getTransform();
-
-            double mx = aff.getScaleX();
-            double my = aff.getScaleX();
-            double sx = upside_down.getScaleX();
-            double sy = upside_down.getScaleY();
-
-            //Rotated images can cause issue when scaling up
-            //Only handle rotated page with rotation on image
-            if ((image.getType() != 0) && //Catch issue with images with odd types
-                    (mx == 0 && my == 0 && sx > 0 && sy < 0)) {
-                mx = aff.getShearX();
-                my = aff.getShearY();
-                sx = Math.abs(sx);
-                sy = Math.abs(sy);
-
-                //90 rotation on page
-                if (mx > 0 && my > 0) {
-                    int newWidth = Math.abs((int) ((image.getWidth() * sx) * mx));
-                    int newHeight = Math.abs((int) ((image.getHeight() * sy) * my));
-
-                    //Only use if new image size is large than the original image
-                    if (newWidth > 0 && newHeight > 0 && newWidth > image.getWidth() && newHeight > image.getHeight()) {
-                        BufferedImage bi = new BufferedImage(newWidth, newHeight, image.getType());
-                        Graphics2D g = bi.createGraphics();
-
-                        g.setRenderingHints(g2.getRenderingHints());
-
-                        g.drawImage(image, AffineTransform.getScaleInstance(mx * sx, my * sy), null);
-
-                        upside_down.scale(1 / sx, -(1 / sy));
-                        aff.scale(1 / mx, -(1 / my));
-
-                        g2.setTransform(aff);
-
-                        image = bi;
-                    }
-                }
-            }
-
-            //Draw image as normal
-            g2.drawImage(image, upside_down, null);
-
-            if (isClipReset) {
-                g2.setClip(g2clip);
-            }
-
+        float CTM[][] = new float[3][3];
+        if (currentGraphicsState != null) {
+            CTM = currentGraphicsState.CTM;
         } else {
+            double[] values = new double[6];
+            imageAf.getMatrix(values);
+            CTM[0][0] = (float) values[0];
+            CTM[0][1] = (float) values[1];
+            CTM[1][0] = (float) values[2];
+            CTM[1][1] = (float) values[3];
+            CTM[2][0] = x;
+            CTM[2][1] = y;
+        }
 
-            g2.drawImage(image, (int) x, (int) y, null);
+        final int w = image.getWidth();
+        final int h = image.getHeight();
 
+        final double[] values = {CTM[0][0] / w, CTM[0][1] / w, -CTM[1][0] / h, -CTM[1][1] / h, 0, 0};
+        upside_down = new AffineTransform(values);
+
+        g2.translate(CTM[2][0] + CTM[1][0], CTM[2][1] + CTM[1][1]);
+
+        //allow user to over-ride
+        boolean useCustomRenderer = customImageHandler != null;
+
+        if (useCustomRenderer) {
+            useCustomRenderer = customImageHandler.drawImageOnscreen(image, 0, upside_down, null, g2, renderDirect, objectStoreRef, isPrinting);
+
+            //exit if done
+            if (useCustomRenderer) {
+                g2.setComposite(c);
+                return;
+            }
+        }
+
+        //hack to make bw
+        if (customColorHandler != null) {
+            final BufferedImage newImage = customColorHandler.processImage(image, rawPageNumber, isPrinting);
+            if (newImage != null) {
+                image = newImage;
+            }
+        } else if (DecoderOptions.Helper != null) {
+            final BufferedImage newImage = DecoderOptions.Helper.processImage(image, rawPageNumber, isPrinting);
+            if (newImage != null) {
+                image = newImage;
+            }
+        }
+
+        final Shape g2clip = g2.getClip();
+        boolean isClipReset = false;
+
+        //hack to fix clipping issues due to sub-pixels
+        if (g2clip != null) {
+
+            final double cy = g2.getClip().getBounds2D().getY();
+            final double ch = g2.getClip().getBounds2D().getHeight();
+            double diff = image.getHeight() - ch;
+            if (diff < 0) {
+                diff = -diff;
+            }
+
+            if (diff > 0 && diff < 1 && cy < 0 && image.getHeight() > 1 && image.getHeight() < 10) {
+
+                final boolean isSimpleOutline = isSimpleOutline(g2.getClip());
+
+                if (isSimpleOutline) {
+                    final double cx = g2.getClip().getBounds2D().getX();
+                    final double cw = g2.getClip().getBounds2D().getWidth();
+
+                    g2.setClip(new Rectangle((int) cx, (int) cy, (int) cw, (int) ch));
+
+                    isClipReset = false;
+                }
+            }
+        }
+
+        AffineTransform aff = g2.getTransform();
+
+        double mx = aff.getScaleX();
+        double my = aff.getScaleX();
+        double sx = upside_down.getScaleX();
+        double sy = upside_down.getScaleY();
+
+        //Rotated images can cause issue when scaling up
+        //Only handle rotated page with rotation on image
+        if ((image.getType() != 0)
+                && //Catch issue with images with odd types
+                (mx == 0 && my == 0 && sx > 0 && sy < 0)) {
+            mx = aff.getShearX();
+            my = aff.getShearY();
+            sx = Math.abs(sx);
+            sy = Math.abs(sy);
+
+            //90 rotation on page
+            if (mx > 0 && my > 0) {
+                int newWidth = Math.abs((int) ((image.getWidth() * sx) * mx));
+                int newHeight = Math.abs((int) ((image.getHeight() * sy) * my));
+
+                //Only use if new image size is large than the original image
+                if (newWidth > 0 && newHeight > 0 && newWidth > image.getWidth() && newHeight > image.getHeight()) {
+                    BufferedImage bi = new BufferedImage(newWidth, newHeight, image.getType());
+                    Graphics2D g = bi.createGraphics();
+
+                    g.setRenderingHints(g2.getRenderingHints());
+
+                    g.drawImage(image, AffineTransform.getScaleInstance(mx * sx, my * sy), null);
+
+                    upside_down.scale(1 / sx, -(1 / sy));
+                    aff.scale(1 / mx, -(1 / my));
+
+                    g2.setTransform(aff);
+
+                    image = bi;
+                }
+            }
+        }
+
+        //Draw image as normal
+        g2.drawImage(image, upside_down, null);
+
+        if (isClipReset) {
+            g2.setClip(g2clip);
         }
 
         g2.setTransform(before);
@@ -706,32 +674,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
 	g2.setPaint(currentCol);
     }
-
-    //used internally - please do not use
-    @Override
-    public ObjectStore getObjectStore() {
-	return objectStoreRef;
-    }
-
-    /**
-     * Screen drawing using hi res images and not down-sampled images but may be slower
-     * and use more memory
-     */
-    @Override
-    public void setHiResImageForDisplayMode(final boolean useHiResImageForDisplay) {
-	    this.useHiResImageForDisplay = useHiResImageForDisplay;
-
-    }
-
-    /**
-     * Screen drawing using hi res images and not down-sampled images but may be slower
-     * and use more memory
-     */
-    @Override
-    public boolean getHiResImageForDisplayMode() {
-	    return this.useHiResImageForDisplay;
-
-    }
     
     @Override
     public void setScalingValues(final double cropX, final double cropH, final float scaling) {
@@ -758,40 +700,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      */
     @Override
     public void resetOnColorspaceChange() {
-    }
-
-    @Override
-    public void drawFontBounds(final Rectangle newfontBB) {
-    }
-
-    /**
-     * store af info
-     */
-    @Override
-    public void drawAffine(final double[] afValues) {
-    }
-
-    /**
-     * store af info
-     */
-    @Override
-    public void drawFontSize(final int fontSize) {
-    }
-
-    /**
-     * store line width info
-     */
-    @Override
-    public void setLineWidth(final int lineWidth) {
-    }
-
-    /**
-     * stop screen bein cleared on repaint - used by Canoo code
-     * <br>
-     * NOT PART OF API and subject to change (DO NOT USE)
-     */
-    @Override
-    public void stopClearOnNextRepaint(final boolean flag) {
     }
 
     @Override
@@ -871,14 +779,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     public void flagDecodingFinished() {
     }
 
-    @Override
-    public void flagImageDeleted(final int i) {
-    }
-
-    @Override
-    public void setOCR(final boolean isOCR) {
-    }
-
     /**
      * turn object into byte[] so we can move across
      * this way should be much faster than the stadard Java serialise.
@@ -888,120 +788,8 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
      * @throws java.io.IOException
      */
     @Override
-    public byte[] serializeToByteArray(final Set fontsAlreadyOnClient) throws IOException {
+    public byte[] serializeToByteArray(final Set<String> fontsAlreadyOnClient) throws IOException {
 	return new byte[0];
-    }
-
-    /**
-     * for font if we are generatign glyph on first render
-     */
-    @Override
-    public void checkFontSaved(final Object glyph, final String name, final PdfFont currentFontData) {
-    }
-
-    /**
-     * This method is deprecated, please use getAreaAsArray and
-     * create fx/swing rectangles where needed.
-     * @deprecated
-     * @param i
-     * @return
-     */
-    @Deprecated
-    @Override
-    public Rectangle getArea(final int i) {
-	return null;  
-    }
-
-    @Override
-    /**
-     * Returns a Rectangles X,Y,W,H as an Array of integers
-     * Where 0 = x, 1 = y, 2 = w, 3 = h.
-     */
-    public int[] getAreaAsArray(final int i){
-
-        return areas.elementAt(i);
-    }
-
-    /**
-     * return number of image in display queue
-     * or -1 if none
-     * @return
-     */
-    @Override
-    public int isInsideImage(final int x, final int y){
-        int outLine=-1;
-
-        final int[][] areas=this.areas.get();
-        int[] possArea = null;
-        final int count=areas.length;
-
-        if(objectType!=null){
-            final int[] types=objectType.get();
-            for(int i=0;i<count;i++){
-                if((areas[i]!=null) &&
-                    (RenderUtils.rectangleContains(areas[i],x, y) && types[i]==DynamicVectorRenderer.IMAGE)){
-                        //Check for smallest image that contains this point
-                        if(possArea!=null){
-                            final int area1 = possArea[3] * possArea[2];
-                            final int area2 = areas[i][3] * areas[i][2];
-                            if(area2<area1) {
-                                possArea = areas[i];
-                            }
-                            outLine=i;
-                        }else{
-                            possArea = areas[i];
-                            outLine=i;
-                        }
-                    }
-                }
-            }
-
-        return outLine;
-    }
-
-
-    @Override
-    public void saveImage(final int id, final String des, final String type) {
-        final String name = imageIDtoName.get(id);
-        BufferedImage image;
-        if(useHiResImageForDisplay){
-            image=objectStoreRef.loadStoredImage(name);
-
-            //if not stored, try in memory
-            if(image==null) {
-                image = (BufferedImage) pageObjects.elementAt(id);
-            }
-        }else {
-            image = (BufferedImage) pageObjects.elementAt(id);
-        }
-
-        if(image!=null){
-
-            if(image.getType()==BufferedImage.TYPE_CUSTOM || (type.equals("jpg") && image.getType()==BufferedImage.TYPE_INT_ARGB)){
-                image=ColorSpaceConvertor.convertToRGB(image);
-            }
-
-            if(needsHorizontalInvert){
-                image = RenderUtils.invertImageBeforeSave(image, true);
-            }
-
-            if(needsVerticalInvert){
-                image = RenderUtils.invertImageBeforeSave(image, false);
-            }
-
-            try {
-                DefaultImageHelper.write(image, type, des);
-            } catch (IOException ex) {
-                LogWriter.writeLog("Exception in writing image "+ex);
-            }
-        }
-    }
-
-    /**
-     * Show dialog prompt, overridden in Swing and FX
-     */
-    protected void showMessageDialog(final String message){
-
     }
 
     /**
@@ -1012,71 +800,9 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     	return type;
     }
 
-
-
-
-    /**
-     * return number of image in display queue or -1 if none.
-     *
-     * @return
-     */
-    @Override
-    public int getObjectUnderneath(final int x, final int y) {
-        int typeFound = -1;
-        final int[][] areas = this.areas.get();
-        //Rectangle possArea = null;
-        final int count = areas.length;
-
-        if(objectType!=null){
-            final int[] types = objectType.get();
-            boolean nothing = true;
-            for (int i = count - 1; i > -1; i--) {
-                if ((areas[i] != null && RenderUtils.rectangleContains(areas[i], x, y)) &&
-                         (types[i] != DynamicVectorRenderer.SHAPE && types[i] != DynamicVectorRenderer.CLIP)) {
-                            nothing = false;
-                            typeFound = types[i];
-                            i = -1;
-                        }
-                    }
-
-
-
-            if (nothing) {
-                return -1;
-            }
-        }
-        return typeFound;
-    }
-
-    @Override
-    public void setneedsVerticalInvert(final boolean b) {
-        needsVerticalInvert = b;
-    }
-
-    @Override
-    public void setneedsHorizontalInvert(final boolean b) {
-        needsHorizontalInvert=b;
-    }
-
-    /**
-     * just for printing
-     */
-    @Override
-    public void stopG2HintSetting(final boolean isSet) {
-    }
-
-    @Override
-    public void setPrintPage(final int currentPrintPage) {
-    }
-
     @Override
     public void drawShape(final PdfShape pdfShape, final GraphicsState currentGraphicsState, final int cmd) {
 	//    throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void drawCustom(final Object value) {
-	//  throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -1091,11 +817,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     @Override
-    public void setMessageFrame(final Container frame) {
-	//  throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public void dispose() {
     }
 
@@ -1105,20 +826,11 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     @Override
-    public void drawFillColor(final PdfPaint currentCol) {
-    }
-
-    @Override
     public void drawAdditionalObjectsOverPage(final int[] type, final Color[] colors, final Object[] obj) throws PdfException {
     }
 
     @Override
     public void flushAdditionalObjOnPage() {
-    }
-
-    @Override
-    public void setOptimsePainting(final boolean optimsePainting) {
-	// throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -1132,17 +844,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     @Override
-    public Rectangle getOccupiedArea() {
-	return null;//throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public void setGraphicsState(final int fillType, final float value, final int BM) {
-	//throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void drawStrokeColor(final Paint currentCol) {
 	//throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -1150,12 +852,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     public void drawTR(final int value) {
 	//throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    @Override
-    public void drawStroke(final Stroke current) {
-	//  throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 
     @Override
     public void drawClip(final GraphicsState currentGraphicsState, final Shape defaultClip, final boolean alwaysDraw) {
@@ -1171,7 +867,7 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
 
 	/** allow tracking of specific commands**/
 	@Override
-    public void flagCommand(final int commandID, final int tokenNumber) {
+    public void updateTokenNumber(final int tokenNumber) {
 
 	}
 
@@ -1204,27 +900,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     /**
-     * used by Pattern code internally (do not use)
-     * @return
-     */
-    @Override
-    public BufferedImage getSingleImagePattern() {
-        return null;  
-    }
-
-    /**used by JavaFX and HTML5 conversion to override scaling*/
-    @Override
-    public boolean isScalingControlledByUser() {
-        return false;
-    }
-
-    /**used by HTML to retai nimage quality*/
-    @Override
-    public boolean avoidDownSamplingImage() {
-        return false;
-    }
-
-    /**
      * allow user to read
      */
     @Override
@@ -1233,23 +908,14 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     }
 
     /**
-     * page scaling used by HTML code only
-     * @return
-     */
-    @Override
-    public float getScaling() {
-        return scaling;
-    }
-
-    /**
      * only used in HTML5 and SVG conversion
      *
-     * @param baseFontName
+     * @param fontObjID
      * @param s
      * @param potentialWidth
      */
     @Override
-    public void saveAdvanceWidth(final String baseFontName, final String s, final int potentialWidth) {
+    public void saveAdvanceWidth(final int fontObjID, final String s, final int potentialWidth) {
 
     }
 
@@ -1264,22 +930,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
         }
 
         return count;
-    }
-
-	@Override
-    public void setMode(final Mode mode) {
-		this.mode = mode;
-	}
-
-	@Override
-    public Mode getMode() {
-		return mode;
-	}
-
-    @Override
-    //used by HTML/SVG mode only
-    public Object getObjectValue(final int id) {
-        return null;
     }
 
     /*save shape in array to draw*/
@@ -1310,35 +960,6 @@ public abstract class BaseDisplay implements DynamicVectorRenderer {
     @Override
     public boolean isHTMLorSVG() {
         return false;
-    }
-
-    //public Graphics2D getG2() {
-    //    return g2;
-   // }
-
-
-    @Override
-    public void saveImageData(final boolean value) {
-       saveImageData=value;
-    }
-    @Override
-    public boolean saveImageData() {
-        return saveImageData;
-    }
-
-    /**
-     * @return the isRenderingToImage
-     */
-    public boolean isRenderingToImage() {
-        return isRenderingToImage;
-    }
-
-    /**
-     * @param isRenderingToImage the isRenderingToImage to set
-     */
-    @Override
-    public void setIsRenderingToImage(boolean isRenderingToImage) {
-        this.isRenderingToImage = isRenderingToImage;
     }
 
     /**

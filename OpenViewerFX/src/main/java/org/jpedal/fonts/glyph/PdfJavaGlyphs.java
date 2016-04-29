@@ -32,23 +32,23 @@
  */
 package org.jpedal.fonts.glyph;
 
-import org.jpedal.fonts.FontMappings;
-import org.jpedal.fonts.objects.FontData;
-import org.jpedal.parser.DecoderOptions;
-import org.jpedal.render.DynamicVectorRenderer;
-import org.jpedal.utils.StringUtils;
-
-import java.awt.geom.Area;
-import java.awt.geom.AffineTransform;
-import java.awt.font.GlyphVector;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.font.FontRenderContext;
-import java.awt.*;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.jpedal.fonts.FontMappings;
 import org.jpedal.fonts.StandardFonts;
+import org.jpedal.fonts.objects.FontData;
 import org.jpedal.fonts.tt.Table;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.utils.StringUtils;
 
 public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
@@ -82,6 +82,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
     private boolean isIdentity;
     private boolean isFontEmbedded;
     private boolean hasWidths=true;
+    protected int objID;
 
     public void flush(){
         cachedShapes = null;
@@ -211,13 +212,12 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
 
         boolean fontMatched=true;
 
-        /**use default if cannot be displayed*/
+        /*use default if cannot be displayed*/
         GlyphVector gv1=null;
 
         //remap font if needed
         String xx=displayValue;
 
-        /**commented out 18/8/04 when font code updated*/
         //if cannot display return to Lucida
         if(!getUnscaledFont().canDisplay(xx.charAt(0))){
             xx=displayValue;
@@ -527,7 +527,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
                     }
                 }
 
-                /**approximate display if not installed*/
+                /*approximate display if not installed*/
                 if (!isFontInstalled) {
 
                     //try to approximate font
@@ -545,7 +545,7 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
                 unscaledFont = new Font(font_family_name, style, size);
             }
 
-            /**commenting out  this broke originaldoc.pdf*/
+            /*commenting out  this broke originaldoc.pdf*/
             if (unscaledFont == null) {
                 unscaledFont = new Font(defaultFont, Font.PLAIN, 1);
             }
@@ -803,5 +803,9 @@ public class PdfJavaGlyphs implements PdfGlyphs,Serializable{
     
     public boolean hasGIDtoCID() {
         return hasGIDtoCID;
+    }
+
+    public void setObjID(int objID) {
+        this.objID = objID;
     }
 }

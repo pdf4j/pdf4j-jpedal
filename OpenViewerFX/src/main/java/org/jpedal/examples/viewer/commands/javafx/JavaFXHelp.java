@@ -67,7 +67,6 @@ public class JavaFXHelp {
     /**
      * Shows a popup window which displays information for support.
      *
-     * @param currentGUI
      */
     private static void getHelpBox() {
 

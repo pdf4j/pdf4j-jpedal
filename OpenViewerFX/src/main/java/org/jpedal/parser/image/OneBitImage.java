@@ -55,7 +55,7 @@ class OneBitImage {
         
         data = ColorSpaceConvertor.normaliseTo8Bit(d, w, h, data);
         
-        /** create an image from the raw data*/
+        // create an image from the raw data
         final DataBuffer db = new DataBufferByte(data, data.length);
         final int[] bands ={0};
         image =new BufferedImage(w,h,BufferedImage.TYPE_BYTE_GRAY);

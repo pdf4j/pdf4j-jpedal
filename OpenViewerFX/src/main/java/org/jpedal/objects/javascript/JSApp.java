@@ -32,15 +32,17 @@
  */
 package org.jpedal.objects.javascript;
 
-import org.jpedal.parser.DecoderOptions;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.Arrays;
+import javax.swing.*;
+import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.Messages;
 
 
+@SuppressWarnings("ALL")
 public class JSApp{
 
 	private static final int ICON_ERROR = 0;

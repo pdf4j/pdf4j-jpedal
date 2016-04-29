@@ -51,8 +51,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
-
-
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXDialog;
 import org.jpedal.utils.BrowserLauncher;
 

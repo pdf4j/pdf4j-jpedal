@@ -38,12 +38,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.StandardFonts;
-import org.jpedal.fonts.glyph.*;
+import org.jpedal.fonts.glyph.MarkerGlyph;
+import org.jpedal.fonts.glyph.PdfJavaGlyphs;
+import org.jpedal.fonts.glyph.UnrendererGlyph;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.parser.ParserOptions;
 import org.jpedal.parser.ValueTypes;
 import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.SwingDisplay;
 
 /**
  *
@@ -56,20 +59,20 @@ class JavaTextRenderer {
         
         final float actualWidth=glyphData.getActualWidth();
         
-        /**set values used if rendering as well*/
+        /*set values used if rendering as well*/
         Object transformedGlyph2;
         AffineTransform glyphAt=null;
         
         final int rawInt=glyphData.getRawInt();
         
-        /**
+        /*
          * store info needed to create glyph on first render or create now
          */
         if(parserOptions.generateGlyphOnRender() && !parserOptions.renderDirectly()){
             if(glyphData.isfirstTime()){
                 transformedGlyph2=new MarkerGlyph(Trm[0][0],Trm[0][1],Trm[1][0],Trm[1][1],currentFontData.getBaseFontName());
                 
-                current.checkFontSaved(transformedGlyph2,currentFontData.getBaseFontName(),currentFontData);
+                ((SwingDisplay)current).checkFontSaved(transformedGlyph2,currentFontData.getBaseFontName(),currentFontData);
                 glyphData.setFirstTime(false);
                 
             }
@@ -78,16 +81,14 @@ class JavaTextRenderer {
             transformedGlyph2=new UnrendererGlyph(Trm[2][0],Trm[2][1],rawInt,currentWidth);
             
         }else{ //render now
-            final boolean isSTD= actualWidth>0 || DecoderOptions.isRunningOnMac || streamType==ValueTypes.FORM || StandardFonts.isStandardFont(currentFontData.getBaseFontName(),false) || currentFontData.isBrokenFont();
+            final boolean isSTD= actualWidth>0 || DecoderOptions.isRunningOnMac || streamType==ValueTypes.FORM || StandardFonts.isStandardFont(currentFontData.getBaseFontName(), true) || currentFontData.isBrokenFont();
             
-            /**flush cache if needed*/
-            //if(!DynamicVectorRenderer.newCode2){
+            //flush cache if needed
             if(glyphs.lastTrm[0][0]!= Trm[0][0] || glyphs.lastTrm[1][0]!= Trm[1][0] || glyphs.lastTrm[0][1]!= Trm[0][1] || glyphs.lastTrm[1][1]!= Trm[1][1]){
                 glyphs.lastTrm = Trm;
                 glyphs.flush();
             }
-            // }
-            
+
             //either calculate the glyph to draw or reuse if already drawn
             Area glyph = glyphs.getCachedShape(rawInt);
             glyphAt= glyphs.getCachedTransform(rawInt);
@@ -169,7 +170,7 @@ class JavaTextRenderer {
                 glyphs.setCachedShape(rawInt, glyph,glyphAt);
             }
             
-            if(glyph!=null && Tmode==GraphicsState.CLIPTEXT && glyph.getBounds().width>0){ /**support for TR7*/
+            if(glyph!=null && Tmode==GraphicsState.CLIPTEXT && glyph.getBounds().width>0){ /*support for TR7*/
                 
                 
                 final Area glyphShape=(Area) glyph.clone();

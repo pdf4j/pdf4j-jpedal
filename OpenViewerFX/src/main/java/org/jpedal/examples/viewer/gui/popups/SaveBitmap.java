@@ -33,12 +33,10 @@
 package org.jpedal.examples.viewer.gui.popups;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
-
 import org.jpedal.utils.Messages;
 
 /**specific code for Bitmap save function*/ 

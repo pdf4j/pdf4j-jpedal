@@ -33,33 +33,28 @@
 
 package org.jpedal.examples.viewer.gui;
 
-import org.jpedal.display.GUIThumbnailPanel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.*;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import org.jpedal.*;
+import org.jpedal.FileAccess;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
-import org.jpedal.examples.viewer.*;
-import org.jpedal.examples.viewer.gui.generic.*;
+import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.RecentDocumentsFactory;
+import org.jpedal.examples.viewer.SharedViewer;
+import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.gui.generic.GUICombo;
+import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
+import org.jpedal.examples.viewer.gui.generic.GUIOutline;
+import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
-import org.jpedal.exception.*;
+import org.jpedal.exception.PdfException;
 import org.jpedal.external.AnnotationHandler;
 import org.jpedal.external.CustomMessageHandler;
 import org.jpedal.external.Options;
@@ -74,7 +69,8 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.DecodeStatus;
 import org.jpedal.parser.DecoderOptions;
-import org.jpedal.render.*;
+import org.jpedal.render.BaseDisplay;
+import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 import org.jpedal.utils.StringUtils;
@@ -161,8 +157,6 @@ public abstract class GUI implements GUIFactory {
 
     //private Color[] annotColors={Color.RED,Color.BLUE,Color.BLUE};
 
-    protected boolean hiResPrinting;
-
     //@annot - table of objects we wish to track
     protected Map<org.jpedal.objects.raw.FormObject, String> objs;
 
@@ -181,29 +175,7 @@ public abstract class GUI implements GUIFactory {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public boolean useHiResPrinting() {
-        return hiResPrinting;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setHiResPrinting(final boolean hiResPrinting) {
-        this.hiResPrinting = hiResPrinting;
-    }
-
-    /**
-     * This method is now deprecated. Please use getProperties().setValue(String item, boolean value) instead.
-     * @deprecated
-     * @param item :: Key for the property
-     * @param value :: New value for the property
-     */
-    @Deprecated
-    @SuppressWarnings("UnusedDeclaration")
-    public void setProperties(final String item, final boolean value){
-        properties.setValue(item, String.valueOf(value));
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setPreferences(final int dpi, final int search, final int border, final boolean scroll, int pageMode, final boolean updateDefaultValue, final int maxNoOfMultiViewers, final boolean useHiResPrinting){
+    public void setPreferences(final int dpi, final int search, final int border, final boolean scroll, int pageMode, final boolean updateDefaultValue, final int maxNoOfMultiViewers){
 
         //Set border config value and repaint
         decode_pdf.setBorderPresent(border==1);
@@ -240,9 +212,6 @@ public abstract class GUI implements GUIFactory {
         commonValues.setMaxMiltiViewers(maxNoOfMultiViewers);
         properties.setValue("maxmultiviewers", String.valueOf(maxNoOfMultiViewers));
 
-        hiResPrinting = useHiResPrinting;
-        properties.setValue("useHiResPrinting", String.valueOf(useHiResPrinting));
-
     }
 
     /**handle for internal use*/
@@ -276,9 +245,6 @@ public abstract class GUI implements GUIFactory {
 
     /**scaling factors on the page*/
     protected GUICombo rotationBox;
-
-    /**allows user to set quality of images*/
-    protected GUICombo qualityBox;
 
     /**scaling factors on the page*/
     protected GUICombo scalingBox;
@@ -356,7 +322,7 @@ public abstract class GUI implements GUIFactory {
     /* (non-Javadoc)
 	 * @see org.jpedal.examples.viewer.gui.swing.GUIFactory#addCombo(java.lang.String, java.lang.String, int)
 	 */
-    protected void addCombo(final String title, final String tooltip, final int ID){
+    protected void addCombo(final String tooltip, final int ID){
 
         if(debugFX){
             System.out.println("addCombo");
@@ -364,10 +330,6 @@ public abstract class GUI implements GUIFactory {
 
         GUICombo combo=null;
         switch (ID){
-
-            case Commands.QUALITY:
-                combo=qualityBox;
-                break;
 
             case Commands.SCALING:
                 combo=scalingBox;
@@ -387,7 +349,7 @@ public abstract class GUI implements GUIFactory {
 
         addGUIComboBoxes(combo);
 
-        addComboListenerAndLabel(combo,title);
+        addComboListenerAndLabel(combo);
     }
 
     /**
@@ -448,7 +410,6 @@ public abstract class GUI implements GUIFactory {
         tree=null;
         scalingFloatValues=null;
         rotationBox=null;
-        qualityBox=null;
         scalingBox=null;
     }
 
@@ -456,6 +417,7 @@ public abstract class GUI implements GUIFactory {
     /**
      * main method to initialise Swing specific code and create GUI display
      */
+    @Override
     public void init(final Commands currentCommands) {
 
         //setup custom message and switch off error messages if used
@@ -465,7 +427,7 @@ public abstract class GUI implements GUIFactory {
             GUI.showMessages = false;
         }
 
-        /**
+        /*
          * Set up from properties
          */
         try {
@@ -550,12 +512,7 @@ public abstract class GUI implements GUIFactory {
             if (!propValue.isEmpty()) {
                 commonValues.setMaxMiltiViewers(Integer.parseInt(propValue));
             }
-
-            propValue = properties.getValue("useHiResPrinting");
-            if (!propValue.isEmpty()) {
-                hiResPrinting = Boolean.valueOf(propValue);
-            }
-
+            
             final String val = properties.getValue("highlightBoxColor"); //empty string to old users
             if (!val.isEmpty()) {
                 DecoderOptions.highlightColor = new Color(Integer.parseInt(val));
@@ -620,7 +577,7 @@ public abstract class GUI implements GUIFactory {
         setViewerTitle(windowTitle);
         setViewerIcon();
 
-        /**
+        /*
          * arrange insets
          */
         decode_pdf.setInset(inset, inset);
@@ -706,15 +663,11 @@ public abstract class GUI implements GUIFactory {
     }
 
     /**
-     * get current value for a combobox (options QUALITY,SCALING,ROTATION)
+     * get current value for a combobox (options SCALING,ROTATION)
      */
     public int getSelectedComboIndex(final int ID) {
 
         switch (ID){
-
-            case Commands.QUALITY:
-                return qualityBox.getSelectedIndex();
-
             case Commands.SCALING:
                 return scalingBox.getSelectedIndex();
             case Commands.ROTATION:
@@ -725,15 +678,10 @@ public abstract class GUI implements GUIFactory {
     }
 
     /**
-     * set current index for a combobox (options QUALITY,SCALING,ROTATION)
+     * set current index for a combobox (options SCALING,ROTATION)
      */
     public void setSelectedComboIndex(final int ID, final int index) {
         switch (ID){
-
-            case Commands.QUALITY:
-                qualityBox.setSelectedIndex(index);
-                break;
-
             case Commands.SCALING:
                 scalingBox.setSelectedIndex(index);
                 break;
@@ -746,15 +694,11 @@ public abstract class GUI implements GUIFactory {
     }
 
     /**
-     * get current Item for a combobox (options QUALITY,SCALING,ROTATION)
+     * get current Item for a combobox (options SCALING,ROTATION)
      */
     public Object getSelectedComboItem(final int ID) {
 
         switch (ID){
-
-            case Commands.QUALITY:
-                return qualityBox.getSelectedItem();
-
             case Commands.SCALING:
                 return scalingBox.getSelectedItem();
             case Commands.ROTATION:
@@ -766,15 +710,10 @@ public abstract class GUI implements GUIFactory {
     }
 
     /**
-     * get current Item for a combobox (options QUALITY,SCALING,ROTATION)
+     * get current Item for a combobox (options SCALING,ROTATION)
      */
     public void setSelectedComboItem(final int ID,String index) {
         switch (ID){
-
-            case Commands.QUALITY:
-                qualityBox.setSelectedItem(index);
-                break;
-
             case Commands.SCALING:
                 //When using any of the fit scalings, adding a % will break it
                 //Only add if scaling is a number
@@ -805,7 +744,7 @@ public abstract class GUI implements GUIFactory {
 
         currentGUI.resetRotationBox();
 
-        /** if running terminate first */
+        /* if running terminate first */
         if(thumbnails.isShownOnscreen()) {
             thumbnails.terminateDrawing();
         }
@@ -821,8 +760,12 @@ public abstract class GUI implements GUIFactory {
         }
 
         if (decode_pdf.getDisplayView() == Display.SINGLE_PAGE) {
-            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, String.valueOf(commonValues.getCurrentPage()));
-            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER3, Messages.getMessage("PdfViewerOfLabel.text") + ' ' + commonValues.getPageCount());
+            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, currentGUI.getPageLabel(commonValues.getCurrentPage()));
+            if(pageLabelDiffers(commonValues.getCurrentPage())){
+                currentGUI.setPageCounterText(PageCounter.PAGECOUNTER3, "(" +String.valueOf(commonValues.getCurrentPage()) + ' ' + Messages.getMessage("PdfViewerOfLabel.text") + ' ' + commonValues.getPageCount()+")");
+            }else{
+                currentGUI.setPageCounterText(PageCounter.PAGECOUNTER3, Messages.getMessage("PdfViewerOfLabel.text") + ' ' + commonValues.getPageCount());
+            }
         }
 
         currentGUI.updateTextBoxSize();
@@ -830,9 +773,7 @@ public abstract class GUI implements GUIFactory {
         //allow user to now open tabs
         currentGUI.setTabsNotInitialised(false);
 
-        /**ensure text and color extracted. If you do not need color, take out
-         * line for faster decode
-         */
+        //ensure text and color extracted. If you do not need color, take out line for faster decode
 //		decode_pdf.setExtractionMode(PdfDecoderInt.TEXT);
         decode_pdf.setExtractionMode(PdfDecoderInt.TEXT+PdfDecoderInt.TEXTCOLOR);
 
@@ -842,9 +783,6 @@ public abstract class GUI implements GUIFactory {
 
         //kick-off thread to create pages
         if(decode_pdf.getDisplayView() == Display.FACING){
-
-            /**reset as rotation may change!*/
-            //decode_pdf.setPageParameters(getScaling(), commonValues.getCurrentPage());
 
             currentGUI.scaleAndRotate();
             currentGUI.scrollToPage(commonValues.getCurrentPage());
@@ -887,16 +825,8 @@ public abstract class GUI implements GUIFactory {
             if(!SharedViewer.isFX()){
                 ((StatusBar)currentGUI.getStatusBar()).updateStatus("Decoding Page",0);
             }
-            /**
-             * make sure screen fits display nicely
-             */
-            //if ((resizePanel) && (thumbnails.isShownOnscreen()))
-            //	zoom();
 
-            //			if (Thread.interrupted())
-            //				throw new InterruptedException();
-
-            /**
+            /*
              * decode the page
              */
             try {
@@ -929,43 +859,7 @@ public abstract class GUI implements GUIFactory {
                     currentGUI.showMessageDialog(status);
                 }
 
-                /**
-                 * see if lowres poor quality image and flag up if so
-                 *
-                 String imageDetailStr=decode_pdf.getInfo(PdfDictionary.Image);
-
-                 //get iterator (each image is a single line)
-                 StringTokenizer allImageDetails=new StringTokenizer(imageDetailStr,"\n");
-
-
-                 while(allImageDetails.hasMoreTokens()){
-
-                 String str=allImageDetails.nextToken();
-                 StringTokenizer imageDetails=new StringTokenizer(str," ()");
-
-                 //System.out.println(imageDetails.countTokens()+" ==>"+str);
-                 //if single image check further
-                 if(imageDetails.countTokens()>2){ //ignore forms
-                 String imageName=imageDetails.nextToken();
-                 String imageType=imageDetails.nextToken();
-                 String imageW=imageDetails.nextToken().substring(2);
-                 String imageH=imageDetails.nextToken().substring(2);
-                 String bitsPerPixel=imageDetails.nextToken();
-                 String dpi=imageDetails.nextToken().substring(4);
-
-                 //we can also look at PDF creation tool
-                 String[] metaData=decode_pdf.getFileInformationData().getFieldValues();
-
-                 //test here and take action or set flag
-                 if(Integer.parseInt(dpi)<144 && metaData[5].equals("iText 2.1.7 by 1T3XT")){
-                 System.out.println("Low resolution image will not print well in Java");
-                 }
-                 }
-                 }
-
-                 /**/
-
-                /**
+                /*
                  * Tell user if hinting is probably required
                  */
                 if(decode_pdf.getPageDecodeStatus(DecodeStatus.TTHintingRequired)){
@@ -984,20 +878,10 @@ public abstract class GUI implements GUIFactory {
 
                     currentGUI.showMessageDialog(status);
                 }
-                //read values for page display
-                //PdfPageData page_data = decode_pdf.getPdfPageData();
-
-                //mediaW  = page_data.getMediaBoxWidth(commonValues.getCurrentPage());
-                //mediaH = page_data.getMediaBoxHeight(commonValues.getCurrentPage());
-//						mediaX = page_data.getMediaBoxX(commonValues.getCurrentPage());
-//						mediaY = page_data.getMediaBoxY(commonValues.getCurrentPage());
-
-//						resetRotationBox();
-
 
                 //create custom annot icons
                 if(decode_pdf.getExternalHandler(Options.UniqueAnnotationHandler)!=null){
-                    /**
+                    /*
                      * ANNOTATIONS code to create unique icons
                      *
                      * this code allows you to create a unique set on icons for any type of annotations, with
@@ -1061,7 +945,7 @@ public abstract class GUI implements GUIFactory {
 
 
             if(LogWriter.isRunningFromIDE){
-                /**
+                /*
                  * show time and memory usage
                  */
                 System.out
@@ -1108,12 +992,12 @@ public abstract class GUI implements GUIFactory {
         }
 
 
-        /**adds listeners to GUI widgets to track changes*/
+        /*adds listeners to GUI widgets to track changes*/
 
         //rest forms changed flag to show no changes
         commonValues.setFormsChanged(false);
 
-        /**see if flag set - not default behaviour*/
+        /*see if flag set - not default behaviour*/
         boolean showMessage=false;
         final String formsFlag=System.getProperty("org.jpedal.listenforms");
         if(formsFlag!=null) {
@@ -1144,7 +1028,7 @@ public abstract class GUI implements GUIFactory {
         final int formCount=formsOnPage.length;
 
         final JPanel formPanel=new JPanel();
-        /**
+        /*
          * create a JPanel to list forms and tell user a box example
          **/
         if(showMessage){
@@ -1170,15 +1054,15 @@ public abstract class GUI implements GUIFactory {
             formPanel.add(Box.createRigidArea(new Dimension(10,10)));
         }
 
-        /**
+        /*
          * pop-up to show forms on page
          **/
         if(showMessage){
-            final JDialog displayFrame =  new JDialog((JFrame)null,true);
+            final JDialog displayFrame =  new JDialog((Frame)null,true);
             displayFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             if(commonValues.getModeOfOperation()!=Values.RUNNING_APPLET){
                 displayFrame.setLocationRelativeTo(null);
-                displayFrame.setLocation(((Container)currentGUI.getFrame()).getLocationOnScreen().x+10,((Container)currentGUI.getFrame()).getLocationOnScreen().y+10);
+                displayFrame.setLocation(((Component)currentGUI.getFrame()).getLocationOnScreen().x+10,((Component)currentGUI.getFrame()).getLocationOnScreen().y+10);
             }
 
             final JScrollPane scroll=new JScrollPane();
@@ -1206,11 +1090,10 @@ public abstract class GUI implements GUIFactory {
                     displayFrame.dispose();
                 }});
 
-            /**show the popup*/
             displayFrame.setVisible(true);
         }
         
-        /**
+        /*
          * if page has transition we will have stored values earlier and now need to use and remove
          */
         if(isJavaFX){
@@ -1290,9 +1173,7 @@ public abstract class GUI implements GUIFactory {
     /**
      * Sets the title for the Viewer.
      */
-    protected void setTitle(final String title) {
-        throw new UnsupportedOperationException("Should be over-ridden in SwingGUI or JavaFxGUI");
-    }
+    protected abstract void setTitle(final String title);
 
     /**
      * Sets the icon for the Viewer.
@@ -1304,7 +1185,7 @@ public abstract class GUI implements GUIFactory {
     /**
      * Adds listener for the ComboBoxes and Title.
      */
-    protected void addComboListenerAndLabel(final GUICombo combo, final String title) {
+    protected void addComboListenerAndLabel(final GUICombo combo) {
         throw new UnsupportedOperationException("Should be over-ridden in SwingGUI or JavaFxGUI");
     }
 
@@ -1398,4 +1279,21 @@ public abstract class GUI implements GUIFactory {
         signaturesTitle = Messages.getMessage("PdfViewerJPanel.signatures");
     }
 
+    @Override
+    public String getPageLabel(int pageNumber) {
+        String value = decode_pdf.getIO().convertPageNumberToLabel(pageNumber);
+        if (value != null) {
+            return value;
+        } else {
+            return String.valueOf(pageNumber);
+        }
+    }
+    
+    public boolean pageLabelDiffers(int pageNumber){
+        String value = decode_pdf.getIO().convertPageNumberToLabel(pageNumber);
+        if (value != null) {
+            return !value.equals(String.valueOf(pageNumber));
+        }
+        return false;
+    }
 }

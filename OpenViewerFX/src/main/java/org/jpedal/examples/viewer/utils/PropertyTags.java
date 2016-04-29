@@ -126,6 +126,8 @@ public class PropertyTags {
     public static final int SNAPSHOTBUTTON = 1865770518;
     public static final int ZOOMINBUTTON = 1486773674;
     public static final int ZOOMOUTBUTTON = -1547539123;
+    public static final int ROTATELEFTBUTTON = 947170772;
+    public static final int ROTATERIGHTBUTTON = 1915459539;
     public static final int HELPBUTTON = -649945645;
     public static final int RSSBUTTON = 7632868;
     public static final int CURSORBUTTON = -2082069944;
@@ -133,7 +135,6 @@ public class PropertyTags {
     public static final int DISPLAYOPTIONSMENU = -1942802661;
     public static final int SCALINGDISPLAY = 1227109243;
     public static final int ROTATIONDISPLAY = -1359743132;
-    public static final int IMAGEOPDISPLAY = 1227511014;
     public static final int PROGRESSDISPLAY = -2080788011;
     public static final int DOWNLOADPROGRESSDISPLAY = -676468659;
     public static final int NAVIGATIONBARMENU = -509422786;

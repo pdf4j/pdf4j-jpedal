@@ -77,7 +77,7 @@ public class PdfResources {
             }
         }
 
-        /**read the resources for the page*/
+        /*read the resources for the page*/
         if (Resources != null){
             current.readResources(Resources,true);
 
@@ -87,7 +87,7 @@ public class PdfResources {
             }
         }
 
-        /**
+        /*
          * layers
          */
         if(OCProperties!=null && (layers==null || pageNumber!=layers.getOCpageNumber() || alwaysCheck)){
@@ -223,7 +223,6 @@ public class PdfResources {
     
     public PdfFileInformation getMetaData(final PdfObjectReader currentPdfFile) {
         if (currentPdfFile != null){
-            /**Information object holds information from file*/
             return new PdfFileInformation().readPdfFileMetadata(metadataObj, currentPdfFile);
         }else {
             return null;

@@ -33,7 +33,7 @@
 
 package org.jpedal.examples.viewer.gui.popups;
 
-/**
+/*
  * Creates a wizard dialog with next, back, finish and cancel buttons.
  * In order to use you must implement a WizardPanelModel which gives the 
  * Wizard the panels it must contain and controls the flow of the panels,
@@ -50,7 +50,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Map;
 import java.util.Set;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;

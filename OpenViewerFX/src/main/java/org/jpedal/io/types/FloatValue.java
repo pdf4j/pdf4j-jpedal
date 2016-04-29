@@ -77,7 +77,7 @@ public class FloatValue {
                 i++;
             }
             
-            /**
+            /*
              * get generation number
              */
             keyStart=i;

@@ -32,9 +32,8 @@
  */
 package org.jpedal.external;
 
+import java.awt.Shape;
 import org.jpedal.color.PdfPaint;
-
-import java.awt.*;
 
 /**
  * allow user to recieve raw glyph data as generated
@@ -53,7 +52,7 @@ public interface ShapeTracker {
      */
     void addShape(int tokenNumber, int type, Shape currentShape, PdfPaint nonstrokecolor, PdfPaint strokecolor);
 
-    /** here is an example
+    /* here is an example
     private class TestShapeTracker implements ShapeTracker {
         public void addShape(int tokenNumber, int type, Shape currentShape, PdfPaint nonstrokecolor, PdfPaint strokecolor) {
 

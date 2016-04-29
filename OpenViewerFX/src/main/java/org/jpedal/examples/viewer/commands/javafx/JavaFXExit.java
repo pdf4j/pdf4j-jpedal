@@ -34,13 +34,15 @@ package org.jpedal.examples.viewer.commands.javafx;
 
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
-import org.jpedal.examples.viewer.*;
+import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.SharedViewer;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.commands.SaveForm;
 import org.jpedal.examples.viewer.gui.GUI;
-import org.jpedal.display.GUIThumbnailPanel;
-
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.parser.DecoderOptions;
@@ -69,7 +71,7 @@ public class JavaFXExit {
 
         thumbnails.terminateDrawing();
 
-        /**
+        /*
          * warn user on forms
          */
         SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);
@@ -78,17 +80,14 @@ public class JavaFXExit {
             decode_pdf.getPages().stopGeneratingPage();
         }
         
-        /**
-         * cleanup
-         */
         decode_pdf.closePdfFile();
 
         //needed to save recent files
         try {
             properties.setValue("lastDocumentPage", String.valueOf(commonValues.getCurrentPage()));
             if (properties.getValue("trackViewerSize").equalsIgnoreCase("true")) {
-                properties.setValue("startViewerWidth", String.valueOf(((Stage)currentGUI.getFrame()).getWidth()));
-                properties.setValue("startViewerHeight", String.valueOf(((Stage)currentGUI.getFrame()).getHeight()));
+                properties.setValue("startViewerWidth", String.valueOf(((Window)currentGUI.getFrame()).getWidth()));
+                properties.setValue("startViewerHeight", String.valueOf(((Window)currentGUI.getFrame()).getHeight()));
             }
 
             if (properties.getValue("trackScaling").equalsIgnoreCase("true")) {

@@ -32,20 +32,24 @@
  */
 package org.jpedal.examples.viewer;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
-import org.jpedal.*;
-import org.jpedal.examples.viewer.commands.*;
+import java.util.Map;
+import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.commands.ViewStack;
 import org.jpedal.examples.viewer.gui.generic.GUISearchList;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
-import org.jpedal.examples.viewer.utils.*;
+import org.jpedal.examples.viewer.utils.PrinterInt;
+import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.JPedalActionHandler;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
-import org.jpedal.utils.*;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.Messages;
 
 /**
  * This class contains code to execute the actual commands.
@@ -94,6 +98,8 @@ public class Commands {
     public static final int SEPARATECOVER = 32;
     public static final int EXTRACTTEXT = 33;
     public static final int EXTRACTASIMAGE = 34;
+    public static final int ROTATELEFT = 35;
+    public static final int ROTATERIGHT = 36;
     //0-49 handled in executeMenuBarCommands(final int ID, Object[] args)
     
     //50-249 handled in executeDisplayCommands(final int ID, Object[] args)
@@ -118,7 +124,6 @@ public class Commands {
     
     //250-299 handled in executeComboCommands(final int ID, Object[] args)
     //combo boxes start at 250
-    public static final int QUALITY = 250;
     public static final int ROTATION = 251;
     public static final int SCALING = 252;
     //250-299 handled in executeComboCommands(final int ID, Object[] args)
@@ -198,7 +203,6 @@ public class Commands {
     
     //>=1000 handled in executeDebugCommands(final int ID, Object[] args)
     public static final int TOGGLE = 1000;
-    public static final int SET = 1001;
     public static final int RESET = 1002;
     public static final int ACCELERATIONON = 1003;
     public static final int ACCELERATIONOFF = 1004;
@@ -318,9 +322,7 @@ public class Commands {
             LogWriter.writeLog("Exception " + e + " getting paths");
         }
 
-        /**
-         * check file exists
-         */
+        // check file exists
         final File testFile = new File(commonValues.getSelectedFile());
         if (!isURL && !testFile.exists()) {
             currentGUI.showMessageDialog(Messages.getMessage("PdfViewerFile.text") + commonValues.getSelectedFile() + Messages.getMessage("PdfViewerNotExist"));

@@ -47,10 +47,6 @@ public class Options {
     public static final int ImageHandler = 1;
 
     /**
-     * not used - for future expansion
-     */
-    //final public static int Renderer=2;
-    /**
      * allows user to over-ride form creation code with own - needs to implement
      * {@link org.jpedal.objects.acroforms.creation.FormFactory}
      *
@@ -84,22 +80,12 @@ public class Options {
     public static final int ExpressionEngine = 6;
 
     /**
-     * allows user to link in their own code for Javascript validation - needs
-     * to implement {@link org.jpedal.external.LinkHandler}
-     */
-    //final public static int LinkHandler=7; //allow user to over-ride JPedals link handling
-    /**
      * used by Viewer - use not recommended
      */
     public static final int ThumbnailHandler = 8;
 
 	public static final int JPedalActionHandler = 9;
-	
-//	public static final int SwingMouseHandler = 10;
-    
-    /** @deprecated Replaced with GUIContainer */
-    @Deprecated
-    public static final int SwingContainer = 11;
+
     /**
      * pass in GUI in Viewers
      */

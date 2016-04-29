@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
@@ -54,7 +54,7 @@ public class Pdf {
             } else {
                 //get values from user
                 final SavePDF current_selection = new SavePDF(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int userChoice = current_selection.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerTitle.SavePagesAsPdf"));
+                final int userChoice = current_selection.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerTitle.SavePagesAsPdf"));
 
                 //get parameters and call if YES
                 if (userChoice == JOptionPane.OK_OPTION) {

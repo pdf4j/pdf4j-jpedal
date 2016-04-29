@@ -37,9 +37,10 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.print.PrinterException;
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.exception.PdfException;
-import org.jpedal.external.*;
+import org.jpedal.external.CustomPrintHintingHandler;
+import org.jpedal.external.ErrorTracker;
 import org.jpedal.fonts.glyph.T3Size;
 import org.jpedal.objects.raw.PdfObject;
 

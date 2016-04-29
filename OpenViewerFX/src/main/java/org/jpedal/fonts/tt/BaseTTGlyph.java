@@ -205,7 +205,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
 
     void createUnhintedGlyph() {
 
-        /**create glyphs the first time*/
+        //create glyphs the first time
         for(int i=0;i<this.compCount;i++){
 
             final int[] pX=(int[]) glyfX.elementAt(i);
@@ -391,7 +391,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
             scale10=0; //c
             yscale=1; //d
 
-            /**workout scaling factors*/
+            //workout scaling factors
             if((!WE_HAVE_A_SCALE)&&(!WE_HAVE_AN_X_AND_Y_SCALE)&&(!WE_HAVE_A_TWO_BY_TWO)){
                 //uses defaults already set
 
@@ -526,7 +526,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
             if(currentFontFile.hasValuesLeft()){
 
 
-                /**Don;t comment out !!!!!!!!!
+                /*Don;t comment out !!!!!!!!!
                  * needs to be read to advance pointer*/
                 final int instructionLength=currentFontFile.getNextUint16();
 
@@ -549,7 +549,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
                 int count = lastPt+ 1;
                 int flag;
 
-                /**we read the flags (some can repeat)*/
+                /*we read the flags (some can repeat)*/
                 for (int i = 0; i < count; i++) {
                     if(currentFontFile.getBytesLeft()<1){
                         return;
@@ -568,7 +568,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
                     }
                 }
 
-                /**read the x values and set segment for complex glyph*/
+                /*read the x values and set segment for complex glyph*/
                 for(int i=0;i<count;i++){
                     flag=rawFlags.elementAt(i);
 
@@ -592,7 +592,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
                     }
                 }
 
-                /**read the y values*/
+                /*read the y values*/
                 for(int i=0;i<count;i++){
                     flag=rawFlags.elementAt(i);
                     if ((flag & 32) != 0) {
@@ -615,7 +615,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
                 }
 
 
-                /**
+                /*
                  * calculate the points
                  */
                 int endPtIndex = 0;
@@ -815,7 +815,7 @@ public abstract class BaseTTGlyph extends PdfGlyph {
 
     void createHintedGlyph() {
 
-        /**create glyphs the first time*/
+        /*create glyphs the first time*/
         for(int i=0;i<this.compCount;i++){
 
             final int[] pX=(int[]) glyfX.elementAt(i);

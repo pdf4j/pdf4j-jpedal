@@ -37,66 +37,38 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.jar.JarFile;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.JTree;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
-
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.gui.CheckNode;
 import org.jpedal.examples.viewer.gui.CheckRenderer;
-import org.jpedal.examples.viewer.utils.*;
-import org.jpedal.parser.DecoderOptions;
-import org.jpedal.utils.Messages;
-import org.jpedal.utils.SwingWorker;
-import org.w3c.dom.NodeList;
-import org.jpedal.io.Speech;
-import org.jpedal.utils.JavaFXHelper;
-import org.jpedal.utils.BrowserLauncher;
-
-import org.jpedal.objects.javascript.DefaultParser;
-
-import java.util.jar.JarFile;
-import java.net.URL;
-import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.gui.GUI;
+import org.jpedal.examples.viewer.utils.ItextFunctions;
+import org.jpedal.examples.viewer.utils.Printer;
+import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
-import org.jpedal.utils.LogWriter;
+import org.jpedal.io.Speech;
+import org.jpedal.objects.javascript.DefaultParser;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.utils.*;
+import org.jpedal.utils.SwingWorker;
 import org.mozilla.javascript.ScriptRuntime;
+import org.w3c.dom.NodeList;
 
 public class SwingProperties extends JPanel {
     
@@ -195,9 +167,6 @@ public class SwingProperties extends JPanel {
     JCheckBox border;
     
     //Use Hi Res Printing
-    JCheckBox HiResPrint;
-    
-    //Use Hi Res Printing
     JCheckBox constantTabs;
     
     //Use enhanced viewer
@@ -231,6 +200,13 @@ public class SwingProperties extends JPanel {
     //window title
     JTextField windowTitle;
     JLabel windowTitleText;
+    
+    //Icon radio buttons
+    JRadioButton newIconSet;
+    JRadioButton classicIconSet;
+    ButtonGroup skinGroup;
+    static final String newIconLocation = "/org/jpedal/examples/viewer/res/new/";
+    static final String classicIconLocation = "/org/jpedal/examples/viewer/res/";
     
     //icons Location
     JTextField iconLocation;
@@ -320,12 +296,11 @@ final JPanel viewBGColor = new JPanel();
      * showPreferenceWindow()
      *
      * Ensure current values are loaded then display window.
-     * @param swingGUI
      */
     private void showPreferenceWindow(final GUIFactory currentGUI){
         
         if(currentGUI.getFrame() instanceof JFrame) {
-            propertiesDialog = new JDialog(((JFrame) currentGUI.getFrame()));
+            propertiesDialog = new JDialog(((Frame) currentGUI.getFrame()));
         } else {
             propertiesDialog = new JDialog();
         }
@@ -361,7 +336,7 @@ final JPanel viewBGColor = new JPanel();
         }
         
         //		this.swingGUI = swingGUI;
-        propertiesDialog.setLocationRelativeTo((Container)currentGUI.getFrame());
+        propertiesDialog.setLocationRelativeTo((Component)currentGUI.getFrame());
         propertiesDialog.setVisible(true);
     }
     
@@ -369,13 +344,13 @@ final JPanel viewBGColor = new JPanel();
         final Component[] components = tabs.getComponents();
         for(int i=0; i!=components.length; i++){
             if(components[i] instanceof JPanel){
-                final Component[] panelComponets = ((JPanel)components[i]).getComponents();
+                final Component[] panelComponets = ((Container)components[i]).getComponents();
                 for(int j=0; j!=panelComponets.length; j++){
                     if (panelComponets[j] instanceof JScrollPane) {
-                        final Component[] scrollComponents = ((JScrollPane)panelComponets[j]).getComponents();
+                        final Component[] scrollComponents = ((Container)panelComponets[j]).getComponents();
                         for(int k=0; k!=scrollComponents.length; k++){
                             if(scrollComponents[k] instanceof JViewport){
-                                final Component[] viewportComponents = ((JViewport)scrollComponents[k]).getComponents();
+                                final Component[] viewportComponents = ((Container)scrollComponents[k]).getComponents();
                                 for(int l=0; l!=viewportComponents.length; l++){
                                     if(viewportComponents[l] instanceof JTree){
                                         final JTree tree = ((JTree)viewportComponents[l]);
@@ -491,10 +466,46 @@ final JPanel viewBGColor = new JPanel();
         windowTitle = new JTextField();
         windowTitle.setToolTipText(Messages.getMessage("PdfPreferences.windowTitle.toolTip"));
         
+        newIconSet = new JRadioButton(Messages.getMessage("PdfViewerViewMenu.newIconButton"));
+        classicIconSet = new JRadioButton(Messages.getMessage("PdfViewerViewMenu.classicIconButton"));
+        skinGroup = new ButtonGroup();
+        skinGroup.add(newIconSet);
+        skinGroup.add(classicIconSet);
+        
         iconLocationText = new JLabel(Messages.getMessage("PdfViewerViewMenu.iconLocation"));
         iconLocation = new JTextField();
         iconLocation.setToolTipText(Messages.getMessage("PdfPreferences.iconLocation.toolTip"));
         
+        newIconSet.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                iconLocation.setText(newIconLocation);
+            }
+        });
+        
+        classicIconSet.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                iconLocation.setText(classicIconLocation);
+            }
+        });
+        
+        iconLocation.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {}
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if(iconLocation.getText().equals(newIconLocation)){
+                    newIconSet.setSelected(true);
+                }
+                
+                if(iconLocation.getText().equals(classicIconLocation)){
+                    classicIconSet.setSelected(true);
+                }
+            }
+        });
         
         printerBlacklistText = new JLabel(Messages.getMessage("PdfViewerPrint.blacklist"));
         printerBlacklist = new JTextField();
@@ -541,9 +552,6 @@ final JPanel viewBGColor = new JPanel();
         
         border = new JCheckBox(Messages.getMessage("PageLayoutViewMenu.Borders_Show"));
         border.setToolTipText("Set if we should display a border for the page");
-        
-        HiResPrint = new JCheckBox(Messages.getMessage("Printing.HiRes"));
-        HiResPrint.setToolTipText("Set if hi res printing should be enabled / disabled");
         
         constantTabs = new JCheckBox(Messages.getMessage("PdfCustomGui.consistentTabs"));
         constantTabs.setToolTipText("Set to keep sidetabs consistant between files");
@@ -730,7 +738,7 @@ final JPanel viewBGColor = new JPanel();
             
             @Override
             public void keyPressed(final KeyEvent e) {
-                consume = (((JTextField) e.getSource()).getText().contains(".") && e.getKeyChar() == '.') &&
+                consume = (((JTextComponent) e.getSource()).getText().contains(".") && e.getKeyChar() == '.') &&
                         ((e.getKeyChar() < '0' || e.getKeyChar() > '9') && (e.getKeyCode() != 8 || e.getKeyCode() != 127));
             }
             
@@ -764,7 +772,7 @@ final JPanel viewBGColor = new JPanel();
         //if(PdfDecoder.isRunningOnMac)
         //	toolbar.setPreferredSize(new Dimension(120,0));
         
-        add(new ButtonBarPanel(toolbar), BorderLayout.CENTER);
+        add(new ButtonBarPanel(toolbar, gui), BorderLayout.CENTER);
         
         toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.gray));
         
@@ -829,7 +837,6 @@ final JPanel viewBGColor = new JPanel();
         properties.setValue("updateResultsDuringSearch", String.valueOf(liveSearchResuts.isSelected()));
         properties.setValue("automaticupdate", String.valueOf(update.isSelected()));
         properties.setValue("maxmultiviewers", String.valueOf(maxMultiViewers.getText()));
-        properties.setValue("useHiResPrinting", String.valueOf(HiResPrint.isSelected()));
         properties.setValue("consistentTabBar", String.valueOf(constantTabs.isSelected()));
         properties.setValue("highlightComposite", String.valueOf(highlightComposite.getText()));
         properties.setValue("highlightBoxColor", String.valueOf(highlightBoxColor.getBackground().getRGB()));
@@ -871,7 +878,7 @@ final JPanel viewBGColor = new JPanel();
         //		Switch between idependent and properties dependent
         //private boolean newPreferencesCode = true;
         
-        ButtonBarPanel(final JPanel toolbar) {
+        ButtonBarPanel(final JPanel toolbar, final GUIFactory gui) {
             setLayout(new BorderLayout());
             
             //Add scroll pane as too many options
@@ -885,19 +892,19 @@ final JPanel viewBGColor = new JPanel();
             
             final ButtonGroup group = new ButtonGroup();
             
-            addButton(Messages.getMessage("PdfPreferences.GeneralTitle"), "/org/jpedal/examples/viewer/res/display.png", createGeneralSettings(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.GeneralTitle"), gui.getGUICursor().getURLForImage("display.png"), createGeneralSettings(), toolbar, group);
             
-            addButton(Messages.getMessage("PdfPreferences.PageDisplayTitle"), "/org/jpedal/examples/viewer/res/pagedisplay.png", createPageDisplaySettings(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.PageDisplayTitle"), gui.getGUICursor().getURLForImage("pagedisplay.png"), createPageDisplaySettings(), toolbar, group);
             
-            addButton(Messages.getMessage("PdfPreferences.InterfaceTitle"), "/org/jpedal/examples/viewer/res/interface.png", createInterfaceSettings(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.InterfaceTitle"), gui.getGUICursor().getURLForImage("interface.png"), createInterfaceSettings(), toolbar, group);
             
-            addButton(Messages.getMessage("PdfPreferences.ColorTitle"), "/org/jpedal/examples/viewer/res/color.png", createColorSettings(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.ColorTitle"), gui.getGUICursor().getURLForImage("color.png"), createColorSettings(), toolbar, group);
             
-            addButton(Messages.getMessage("PdfPreferences.MenuTitle"), "/org/jpedal/examples/viewer/res/menu.png", createMenuSettings(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.MenuTitle"), gui.getGUICursor().getURLForImage("menu.png"), createMenuSettings(), toolbar, group);
             
-            addButton(Messages.getMessage("PdfPreferences.PrintingTitle"), "/org/jpedal/examples/viewer/res/printing.png", createPrintingSettings(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.PrintingTitle"), gui.getGUICursor().getURLForImage("printing.png"), createPrintingSettings(), toolbar, group);
             
-            addButton(Messages.getMessage("PdfPreferences.ExtensionsTitle"), "/org/jpedal/examples/viewer/res/extensions.png", createExtensionsPane(), toolbar, group);
+            addButton(Messages.getMessage("PdfPreferences.ExtensionsTitle"), gui.getGUICursor().getURLForImage("extensions.png"), createExtensionsPane(), toolbar, group);
         }
         
         private JPanel makePanel(final String title) {
@@ -1196,6 +1203,13 @@ final JPanel viewBGColor = new JPanel();
             loadStringValue(maxMultiViewers, "maxmultiviewers");
             
             loadStringValue(iconLocation, "iconLocation", "/org/jpedal/examples/viewer/res/");
+            if(iconLocation.getText().equals(newIconLocation)){
+                newIconSet.setSelected(true);
+            }else{
+                if(iconLocation.getText().equals(classicIconLocation)){
+                    classicIconSet.setSelected(true);
+                }
+            }
             loadStringValue(sideTabLength, "sideTabBarCollapseLength", "30");
                     
             final String propValue = properties.getValue("searchWindowType");
@@ -1240,6 +1254,12 @@ final JPanel viewBGColor = new JPanel();
             contentPane.add(windowTitleText, c);
             setLayoutConstraints(c, new Insets(3,5,0,5), 1, gridY, 1, 1, 0, 0);
             contentPane.add(windowTitle, c);
+            
+            gridY++;
+            setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
+            contentPane.add(newIconSet, c);
+            setLayoutConstraints(c, new Insets(5,5,5,5), 1, gridY, 1, 1, 0, 0);
+            contentPane.add(classicIconSet, c);
             
             gridY++;
             setLayoutConstraints(c, new Insets(5,5,5,5), 0, gridY, 1, 1, 0, 0);
@@ -1395,9 +1415,7 @@ final JPanel viewBGColor = new JPanel();
          * Creates a pane holding all Printing settings
          */
         private JPanel createPrintingSettings(){
-            
-            loadBooleanValue(HiResPrint, "useHiResPrinting");
-            
+                        
             loadStringValue(printerBlacklist, "printerBlacklist");
             
             String propValue = properties.getValue("defaultPrinter");
@@ -1440,14 +1458,6 @@ final JPanel viewBGColor = new JPanel();
             label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
             label.setFont(label.getFont().deriveFont(Font.BOLD));
             pane.add(label, c);
-            
-            c.gridy++;
-            
-            c.gridwidth = 2;
-            c.gridx = 0;
-            HiResPrint.setMargin(new Insets(0,0,0,0));
-            HiResPrint.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            pane.add(HiResPrint, c);
             
             c.gridy++;
             
@@ -1579,7 +1589,7 @@ final JPanel viewBGColor = new JPanel();
             invertHighlight.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    if(((JCheckBox)e.getSource()).isSelected()){
+                    if(((AbstractButton)e.getSource()).isSelected()){
                         highlightBoxColor.setEnabled(false);
 //                        highlightTextColor.setEnabled(false);
                         highlightComposite.setEnabled(false);
@@ -1680,7 +1690,7 @@ final JPanel viewBGColor = new JPanel();
             replaceDocTextCol.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    if(((JCheckBox)e.getSource()).isSelected()){
+                    if(((AbstractButton)e.getSource()).isSelected()){
                         FGButton.setEnabled(true);
                         foreGroundColor.setEnabled(true);
                         changeTextAndLineArt.setEnabled(true);
@@ -1729,7 +1739,7 @@ final JPanel viewBGColor = new JPanel();
             replaceDisplayBGCol.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    if(((JCheckBox)e.getSource()).isSelected()){
+                    if(((AbstractButton)e.getSource()).isSelected()){
                         PDBButton.setEnabled(true);
                         pdfDecoderBackground.setEnabled(true);
                     }else{
@@ -2324,8 +2334,8 @@ final JPanel viewBGColor = new JPanel();
             repaint();
         }
         
-        private void addButton(final String title, final String iconUrl, final Component component, final JPanel bar, final ButtonGroup group) {
-            final Action action = new AbstractAction(title, new ImageIcon(getClass().getResource(iconUrl))) {
+        private void addButton(final String title, final URL iconUrl, final Component component, final JPanel bar, final ButtonGroup group) {
+            final Action action = new AbstractAction(title, new ImageIcon(iconUrl)) {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     show(component);

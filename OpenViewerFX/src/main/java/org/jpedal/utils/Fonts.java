@@ -78,23 +78,11 @@ public class Fonts {
                 if ((current_token.startsWith(fb))) {
                     current_font = current_token;
                 }
-                
-                /**
-                 * //reset font tracking on td so table fonts preserved
-                 * if ((current_token.toLowerCase().startsWith("</td"))|
-                 * (current_token.toLowerCase().startsWith("</right"))
-                 * |(current_token.toLowerCase().startsWith("</center"))|(current_token.toLowerCase().startsWith("</p"))) {
-                 * current_font = "";
-                 * next_font_is_identical = false;
-                 * }
-                 */
-                
+
                 //ignore if next font the same - otherewise keep
                 if ((current_token.equals(fe))) {
                     
-                    /**don't lose if if we are about to end a token pair
-                     *
-                     */
+                    //don't lose if if we are about to end a token pair
                     final int nextToken=input.indexOf('<', pointer - 1);
                     final int nextEndToken=input.indexOf("</", pointer - 1);
                     
@@ -137,7 +125,7 @@ public class Fonts {
             if ((data_As_tokens.hasMoreTokens())){
                 next_item = data_As_tokens.nextToken();
                 
-                /**allow for it being the last item*/
+                /*allow for it being the last item*/
                 if (!data_As_tokens.hasMoreTokens()){
                     //not token so put in data
                     output_data.append(next_item);

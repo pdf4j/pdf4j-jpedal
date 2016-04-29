@@ -32,16 +32,15 @@
  */
 package org.jpedal.io.filter;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.sun.LZWDecoder;
 import org.jpedal.sun.LZWDecoder2;
 import org.jpedal.sun.TIFFLZWDecoder;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.Map;
 
 /**
  * LZW
@@ -133,17 +132,13 @@ public class LZW extends BaseFilter implements PdfFilter {
 
         if (rows * columns != 1) {
 
-            /**
-             * decompress cached object
-             */
+            // decompress cached object
             if (bis != null) {
 
                 final LZWDecoder2 lzw2 = new LZWDecoder2();
                 lzw2.decode(null, streamCache, bis);
 
             }
-
-
 
             if (predictor != 1 && predictor != 10) {
                 streamCache.flush();

@@ -32,10 +32,9 @@
  */
 package org.jpedal.external;
 
-import org.jpedal.color.PdfPaint;
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import org.jpedal.color.PdfPaint;
 
 @SuppressWarnings("UnusedParameters")
 public interface ColorHandler {

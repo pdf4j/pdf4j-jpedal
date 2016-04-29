@@ -62,8 +62,4 @@ public class JavaFXMenuItem extends MenuItem implements JavaFXID{
 		ID = id;
 	}
 
-    @Override
-    public void setToolTipText(final String text) {
-        
-    }
 }

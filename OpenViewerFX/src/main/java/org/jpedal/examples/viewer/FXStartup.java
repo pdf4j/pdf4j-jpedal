@@ -42,8 +42,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -138,9 +138,9 @@ public class FXStartup extends Application {
             };
             showSplash(loadModsTask);
 
-            loadModsTask.setOnSucceeded(new EventHandler() {
+            loadModsTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                 @Override
-                public void handle(final Event event) {
+                public void handle(final WorkerStateEvent event) {
                     startNew(initstage);
                 }
             });

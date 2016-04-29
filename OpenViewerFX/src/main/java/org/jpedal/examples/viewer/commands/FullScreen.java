@@ -32,22 +32,13 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.examples.viewer.Values;
 import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 
@@ -87,14 +78,14 @@ public class FullScreen {
             }
 
             if (currentGUI.getFrame() instanceof JFrame) {
-                ((JFrame) currentGUI.getFrame()).getContentPane().remove((JSplitPane)currentGUI.getDisplayPane());
+                ((RootPaneContainer) currentGUI.getFrame()).getContentPane().remove((Component)currentGUI.getDisplayPane());
                 // Java 1.6 has issues with original pane remaining visible so hide when fullscreen selected
-                ((Container)currentGUI.getFrame()).setVisible(false);
+                ((Component)currentGUI.getFrame()).setVisible(false);
             } else {
-                ((Container)currentGUI.getFrame()).remove((JSplitPane)currentGUI.getDisplayPane());
+                ((Container)currentGUI.getFrame()).remove((Component)currentGUI.getDisplayPane());
             }
 
-            win.add((JSplitPane)currentGUI.getDisplayPane(), BorderLayout.CENTER);
+            win.add((Component)currentGUI.getDisplayPane(), BorderLayout.CENTER);
 
             // Create a button that leaves full-screen mode
             final JButton btn = new JButton("Return");
@@ -108,7 +99,7 @@ public class FullScreen {
             });
 
             try {
-                screenPosition = ((Container)currentGUI.getFrame()).getLocation();
+                screenPosition = ((Component)currentGUI.getFrame()).getLocation();
                 // Enter full-screen mode
                 gs.setFullScreenWindow(win);
                 win.validate();
@@ -139,29 +130,29 @@ public class FullScreen {
                 final GraphicsDevice gs = ge.getDefaultScreenDevice();
                 gs.setFullScreenWindow(null);
 
-                win.remove((JSplitPane)currentGUI.getDisplayPane());
+                win.remove((Component)currentGUI.getDisplayPane());
 
                 if (currentGUI.getFrame() instanceof JFrame) {
-                    ((JFrame) currentGUI.getFrame()).getContentPane().add((JSplitPane)currentGUI.getDisplayPane(), BorderLayout.CENTER);
+                    ((RootPaneContainer) currentGUI.getFrame()).getContentPane().add((Component)currentGUI.getDisplayPane(), BorderLayout.CENTER);
                     // Java 1.6 has issues with original pane remaining visible so show when fullscreen turned off
-                    ((Container)currentGUI.getFrame()).setVisible(true);
+                    ((Component)currentGUI.getFrame()).setVisible(true);
 
                     //restore to last position which we saved on entering full screen
                     if (screenPosition != null) {
-                        ((Container)currentGUI.getFrame()).setLocation(screenPosition);
+                        ((Component)currentGUI.getFrame()).setLocation(screenPosition);
                     }
                     screenPosition = null;
                 } else {
-                    ((Container)currentGUI.getFrame()).add((JSplitPane)currentGUI.getDisplayPane(), BorderLayout.CENTER);
+                    ((Container)currentGUI.getFrame()).add((Component)currentGUI.getDisplayPane(), BorderLayout.CENTER);
                 }
 
-                ((JSplitPane)currentGUI.getDisplayPane()).invalidate();
-                ((JSplitPane)currentGUI.getDisplayPane()).updateUI();
+                ((Component)currentGUI.getDisplayPane()).invalidate();
+                ((JComponent)currentGUI.getDisplayPane()).updateUI();
 
                 if (currentGUI.getFrame() instanceof JFrame) {
-                    ((JFrame) currentGUI.getFrame()).getContentPane().validate();
+                    ((RootPaneContainer) currentGUI.getFrame()).getContentPane().validate();
                 } else {
-                    ((Container)currentGUI.getFrame()).validate();
+                    ((Component)currentGUI.getFrame()).validate();
                 }
 
                 win.dispose();

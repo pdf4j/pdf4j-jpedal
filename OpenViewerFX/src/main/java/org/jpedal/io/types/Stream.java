@@ -86,7 +86,7 @@ public class Stream {
         
         byte[] stream=null;
         
-        /**
+        /*
          * see if JBIG encoded
          */
         final PdfArrayIterator maskFilters = pdfObject.getMixedArray(PdfDictionary.Filter);
@@ -140,7 +140,7 @@ public class Stream {
                 
                 a--; //move pointer back 1 to allow for zero length stream
                 
-                /**
+                /*
                  * if Length set and valid use it
                  */
                 int streamLength=0;
@@ -217,7 +217,7 @@ public class Stream {
                     
                 }else{
                     
-                    /**workout length and check if length set*/
+                    /*workout length and check if length set*/
                     final int end;
                     
                     while (true) { //find end
@@ -250,7 +250,7 @@ public class Stream {
                     }
                 }
                 
-                /**
+                /*
                  * read stream into object from memory
                  */
                 if(start+streamLength>count) {

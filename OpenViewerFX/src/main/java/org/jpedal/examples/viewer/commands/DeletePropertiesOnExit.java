@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import org.jpedal.examples.viewer.gui.*;
+import org.jpedal.examples.viewer.gui.GUI;
 
 /**
  *

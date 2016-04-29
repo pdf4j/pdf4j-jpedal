@@ -130,13 +130,6 @@ public class PdfFileInformation
             return XMLmetadata;
         }
     }
-
-	/**return XML data embedded inside PDF in its raw format
-     * please use getFileXMLMetaData()
-     * *
-	public byte[] getFileXMLMetaDataArray(){
-		return rawData;
-	} /**/
 	
 	/**set list of field names as file opened by JPedal (should not be used externally)
      * @param rawData An array containing list of field names
@@ -176,9 +169,6 @@ public void readInformationObject(final PdfObject infoObj, final ObjectDecoder o
             LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
-        /**
-         * set the information values
-         **/
         String newValue;
         int id;
         byte[] data;
@@ -239,16 +229,10 @@ public void readInformationObject(final PdfObject infoObj, final ObjectDecoder o
                //get data
                final MetadataObject oldMetaDataObj =new MetadataObject(objectRef);
                objectReader.readObject(oldMetaDataObj);
-               /** breaks on encrypted (ie preptool)
-                boolean failed=PdfObjectReader.checkStreamsIdentical(stream,oldstream);
 
-                if(failed)
-                throw new RuntimeException("Mismatch on info streams");
-                /////////////////////////////////////
-                /**/
                rawData = oldMetaDataObj.getDecodedStream();
 
-               /**
+               /*
                 * remove any rubbish at end  (last char should be > so find last >
                 * and remove the rest)
                 */

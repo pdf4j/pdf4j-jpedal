@@ -32,23 +32,18 @@
  */
 package org.jpedal.objects.javascript.functions;
 
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 import org.jpedal.constants.ErrorCodes;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.ReturnValues;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
-
-import javax.swing.*;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import org.jpedal.parser.DecoderOptions;
 
 /**
  * base class for functions with shared code

@@ -33,7 +33,6 @@
 package org.jpedal.display.javafx;
 
 
-import org.jpedal.PdfDecoderFX;
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -41,26 +40,21 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ClosePath;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.*;
 import javafx.scene.transform.Transform;
+import org.jpedal.PdfDecoderFX;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.commands.javafx.JavaFXPreferences;
-import org.jpedal.examples.viewer.gui.*;
+import org.jpedal.examples.viewer.gui.JavaFxGUI;
 import org.jpedal.external.Options;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.render.FXDisplay;
-import org.jpedal.text.TextLines;
 
 /**
- *
- * JaveFX version
+ * JavaFX version
  */
 public class SingleDisplayFX extends GUIDisplay implements Display {
     
@@ -104,10 +98,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
             }
             
             if(currentDisplay!=null){
-                
-                //init(scaling, displayRotation, pageNumber, currentDisplay, true);
-                paintPage(pdf.highlightsPane, pdf.getFormRenderer(), null);
-                
+                paintPage(pdf.highlightsPane, pdf.getFormRenderer());
             }
         }else{
             //Ensure dialog is handled on FX thread
@@ -120,10 +111,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
                     }
                     
                     if(currentDisplay!=null){
-                        
-                        //init(scaling, displayRotation, pageNumber, currentDisplay, true);
-                        paintPage(pdf.highlightsPane, pdf.getFormRenderer(), null);
-                        
+                        paintPage(pdf.highlightsPane, pdf.getFormRenderer());
                     }                    
                 }
             });
@@ -182,10 +170,10 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         //  myBorder.paintBorder(pdf,g2,crx-myBorder.getBorderInsets(pdf).left, cry-myBorder.getBorderInsets(pdf).bottom, crw+myBorder.getBorderInsets(pdf).left+myBorder.getBorderInsets(pdf).right, crh+myBorder.getBorderInsets(pdf).bottom+myBorder.getBorderInsets(pdf).top);
     }
     
-    @Override
     /**
      * Resets the FXPane when we open a new PDF
      */
+    @Override
     public void disableScreen() {
         if (currentDisplay != null) {
             
@@ -202,8 +190,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         }
     }
     
-    @Override
-    public void paintPage(final Object rawBox, final AcroRenderer formRenderer, final TextLines textLines) {
+    private void paintPage(final Object rawBox, final AcroRenderer formRenderer) {
         final boolean debugPane=false;
         
         final Pane box=(Pane)rawBox;
@@ -213,8 +200,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         
         final Rectangle clip = new Rectangle(crx,cry,crw,crh);
         clip.setFill(Color.WHITE);
-        
-        
+
 // Remove box from the current node it belongs to - avoids duplication errors
         if(box != null && box.getParent() != null) {
             ((Group) box.getParent()).getChildren().remove(box);
@@ -297,10 +283,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         }
         
         addForms(formRenderer);
-   
-        if(pdf.isOpen()){
-            FXHelper.scaleDisplay(pdf.getChildren(),crx,cry,crw,crh);
-        }
+
         
     }
     
@@ -358,9 +341,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
     @Override
     public void setPageSize(final int pageNumber, final float scaling) {
          
-        /**
-         *handle clip - crop box values
-         */
+        //handle clip - crop box values
         pageData.setScalingValue(scaling); //ensure aligned
         topW=pageData.getCropBoxWidth(pageNumber);
         topH=pageData.getCropBoxHeight(pageNumber);
@@ -373,9 +354,7 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         cropW=topW;
         cropH=topH;
         
-        /**
-         * actual clip values - for flipped page
-         */
+        //actual clip values - for flipped page
         if(displayView==Display.SINGLE_PAGE){
             crx =(int)(insetW+cropX);
             cry =(int)(insetH-cropY);
@@ -397,7 +376,9 @@ public class SingleDisplayFX extends GUIDisplay implements Display {
         cry += offsetY;
     }
     
-    /**rectangle drawn on screen by user*/
+    /**
+     * rectangle drawn on screen by user
+     */
     private int[] cursorBoxOnScreen;
     //private Rectangle lastCursorBoxOnScreen;
         

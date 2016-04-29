@@ -69,7 +69,7 @@ public class FontResolver {
                 cache.directFonts.remove(fontID);
             }
 
-            /**
+            /*
              * in Flatten forms, if font not in our resources, we need to create one based on name
              * Otherwise we will not switch from whatever is last being used on page (and might have custom value)
              */
@@ -92,7 +92,7 @@ public class FontResolver {
                     
                     final boolean isHTML=current.isHTMLorSVG();
                     
-                    /** if text as shape or image, display Arial if font not embedded*/
+                    /* if text as shape or image, display Arial if font not embedded*/
                     if(isHTML && !current.getBooleanValue(DynamicVectorRenderer.IsRealText)){
                         fallbackToArial=true;
                     }

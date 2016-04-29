@@ -32,15 +32,15 @@
  */
 package org.jpedal.examples.handlers;
 
-import org.jpedal.external.ImageHandler;
-import org.jpedal.objects.GraphicsState;
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.io.ObjectStore;
-
-import java.awt.image.BufferedImage;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import org.jpedal.external.ImageHandler;
+import org.jpedal.io.ObjectStore;
+import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.raw.PdfObject;
 
 /**
  * example of adding in custom image code , replacing code with a blank image of correct size
@@ -75,17 +75,17 @@ public class ExampleImageHandler implements ImageHandler {
         //see the raw data
         //System.out.println(values);
 
-        /**
+        /*
          * example implementation creates a blank image of correct size
          */
 
-        /**
+        /*
          * workout final size from CTM  (assumes no scaling or rotation)
          */
         int finalWidth=(int) gs.CTM[0][0];
         int finalHeight=(int) gs.CTM[1][1];
 
-        /**allow for image upside down or right to left*/
+        /*allow for image upside down or right to left*/
         if(finalWidth<0) {
             finalWidth = -finalWidth;
         }
@@ -113,7 +113,7 @@ public class ExampleImageHandler implements ImageHandler {
         g2.drawString(message,(int) ((finalWidth-messageBounds.getWidth())/2),-finalHeight-((finalHeight)/2));
 
 
-        /***NOTE - IMAGE is expected to be UPSIDE DOWN!!!!!*/
+        //NOTE - IMAGE is expected to be UPSIDE DOWN!!!!!
         return img;
     }
 }

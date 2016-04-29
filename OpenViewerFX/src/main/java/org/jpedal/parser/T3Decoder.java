@@ -67,7 +67,7 @@ public class T3Decoder extends BaseDecoder{
 	    //float llX = Float.parseFloat(generateOpAsString(3,characterStream));
 	    //float wY = Float.parseFloat(generateOpAsString(4,characterStream));
 	    //float wX = Float.parseFloat(generateOpAsString(5,characterStream));
-	    /***/
+	    /**/
 
 	    //this.minX=(int)llX;
 	    //this.minY=(int)llY;
@@ -93,8 +93,6 @@ public class T3Decoder extends BaseDecoder{
         } else {
             T3maxHeight = (int) wY; //Float.parseFloat(generateOpAsString(5,characterStream));
         }
-
-	    /***/
 	}
 	////////////////////////////////////////////////////////////////////////
 	private void d0(final int w, final int y) {

@@ -33,17 +33,14 @@
 package org.jpedal.gui;
 
 import java.util.Map;
-
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.examples.viewer.*;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.RecentDocumentsFactory;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.GUI.PageCounter;
 import org.jpedal.examples.viewer.gui.GUI.ScrollPolicy;
 import org.jpedal.examples.viewer.gui.SwingCursor;
-import org.jpedal.examples.viewer.gui.generic.GUIButtons;
-import org.jpedal.examples.viewer.gui.generic.GUICombo;
-import org.jpedal.examples.viewer.gui.generic.GUIMenuItems;
-import org.jpedal.examples.viewer.gui.generic.GUISearchList;
-import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
+import org.jpedal.examples.viewer.gui.generic.*;
 import org.jpedal.examples.viewer.paper.PaperSizes;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 
@@ -76,7 +73,7 @@ public interface GUIFactory {
     /**
      * main method to initialise Swing specific code and create GUI display
      */
-    void init(Commands currentCommands, Object currentPrinter);
+    void init(Commands currentCommands);
 
     /**
      * set title or over-ride with message
@@ -104,10 +101,6 @@ public interface GUIFactory {
     float getScaling();
 
     /**
-     * get inset between edge of JPanel and PDF page
-     */
-    //	public int getPDFDisplayInset();
-    /**
      * read value from rotation box and apply - called by combo listener
      */
     void rotate();
@@ -120,10 +113,7 @@ public interface GUIFactory {
     void setupThumbnailPanel();
     
     void setAutoScrolling(boolean autoScroll);
-    /**
-     * remove outlines and flag for redraw
-     */
-    //public void removeOutlinePanels();
+
     /**
      * flush list of pages decoded
      */
@@ -190,9 +180,7 @@ public interface GUIFactory {
     void setStatusProgress(int size);
 
     Object printDialog(String[] printersList, String defaultPrinter);
-
-    void setQualityBoxVisible(boolean visible);
-
+    
     void setPage(int newPage);
 
     Enum getType();
@@ -390,4 +378,6 @@ public interface GUIFactory {
     PdfDecoderInt openNewMultiplePage(final String selectedFile, final Values commonValues);
 
     void triggerPageTurnAnimation(final PdfDecoderInt decode_pdf, final Values commonValues, final int updatedTotal, final boolean rightTurn);
+    
+    String getPageLabel(int pageNumber);
 }

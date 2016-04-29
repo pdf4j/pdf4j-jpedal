@@ -32,17 +32,11 @@
  */
 package org.jpedal.display;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-
-import org.jpedal.exception.PdfException;
-
 import org.jpedal.external.Options;
 import org.jpedal.external.RenderChangeListener;
-
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.parser.DecoderOptions;
@@ -136,29 +130,11 @@ public class GUIDisplay implements Display{
      */
     public float oldScaling=-1,oldRotation=-1;
 
-
     public PdfPageData pageData;
-    
-    
-    @Deprecated
-    /*
-    * Please use PdfDecoder.setBorderPresent(boolean) instead
-    * True : Show border around page.
-    * Flase : Remove border around page.
-    */
-    public static int CURRENT_BORDER_STYLE = 1;
     
     // Affine transformation as a double array
     protected double[] displayScalingDbl;
-    
-//    public static void setBorderStyle(int style){
-//        CURRENT_BORDER_STYLE = style;
-//    }
-//
-//    public static int getBorderStyle(){
-//        return CURRENT_BORDER_STYLE;
-//    }
-
+   
     /**
      * used internally by multiple pages
      * scaling -1 to ignore, -2 to force reset
@@ -208,21 +184,15 @@ public class GUIDisplay implements Display{
     public void setObjectValue(final int type, final Object newHandler) {
 
         //set value
-        switch(type){
+        switch (type) {
             case Options.RenderChangeListener:
                 customRenderChangeListener = (RenderChangeListener) newHandler;
                 break;
 
             default:
-                throw new RuntimeException("setObjectValue does not take value "+type);
+                throw new RuntimeException("setObjectValue does not take value " + type);
         }
     }
-    
-    @Override
-    public void setCursorBoxOnScreen(final Rectangle cursorBoxOnScreen, final boolean isSamePage) {
-        
-    }
-
 
     /**
      * 
@@ -344,7 +314,7 @@ public class GUIDisplay implements Display{
     
      public void setPageSize(final int pageNumber, final float scaling) {
 
-        /**
+        /*
          *handle clip - crop box values
          */
         pageData.setScalingValue(scaling); //ensure aligned
@@ -357,7 +327,7 @@ public class GUIDisplay implements Display{
         cropW=topW;
         cropH=topH;
 
-        /**
+        /*
          * actual clip values - for flipped page
          */
         if(displayView==Display.SINGLE_PAGE){
@@ -428,10 +398,6 @@ public class GUIDisplay implements Display{
         
         this.insetW=options.getInsetW();
         this.insetH=options.getInsetH();
-
-        if(currentDisplay!=null) {
-            currentDisplay.setInset(insetW, insetH);
-        }
 
         //reset over-ride which may have been enabled
         pageData.setScalingValue(scaling); //ensure aligned
@@ -557,12 +523,9 @@ public class GUIDisplay implements Display{
         
         int[] pageW=multiDisplayOptions.getPageW();
         int[] pageH=multiDisplayOptions.getPageH();
-        /**work out page sizes - need to do it first as we can look ahead*/
+        /*work out page sizes - need to do it first as we can look ahead*/
         for(int i=1;i<pageCount+1;i++){
 
-            /**
-             * get unrotated page sizes
-             */
             pageW[i]=pageData.getScaledCropBoxWidth(i);
             pageH[i]=pageData.getScaledCropBoxHeight(i);
 
@@ -713,7 +676,6 @@ public class GUIDisplay implements Display{
         }
     }
 
-
     @Override
     public void dispose() {
         
@@ -722,18 +684,7 @@ public class GUIDisplay implements Display{
         this.isRotated=null;
 
     }
-    
-    /**
-     * Please use public int[] getCursorBoxOnScreenAsArray() instead.
-     * @deprecated on 04/07/2014
-     */
-    @Deprecated
-    @Override
-    public Rectangle getCursorBoxOnScreen() {
-        throw new UnsupportedOperationException("Please use public int[] getCursorBoxOnScreenAsArray() instead");
-    }
-    
-
+   
     @Override
     public int[] getCursorBoxOnScreenAsArray() {
         throw new UnsupportedOperationException("getCursorBoxOnScreenAsArray Not supported yet.");
@@ -807,17 +758,6 @@ public class GUIDisplay implements Display{
     public void paintPage(final Graphics2D g2, final AcroRenderer formRenderer, final TextLines textLines) {
         throw new UnsupportedOperationException("paintPage not supported yet.");
     }
-
-    /**
-     * Deprecated on 04/07/2014, please use 
-     * updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead.
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public void updateCursorBoxOnScreen(final Rectangle newOutlineRectangle, final Color outlineColor, final int pageNumber, final int x_size, final int y_size) {
-        throw new UnsupportedOperationException("please use updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead");
-    }
     
     @Override
     public void updateCursorBoxOnScreen(final int[] newOutlineRectangle, final int outlineColor, final int pageNumber, final int x_size, final int y_size){
@@ -829,51 +769,9 @@ public class GUIDisplay implements Display{
         throw new UnsupportedOperationException("drawCursor Not supported yet.");
     }
 
-    /**
-     * Deprecated on 07/07/2014
-     * Please use setViewableArea(int[] viewport) instead.
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
-        throw new UnsupportedOperationException("setViewableArea Not supported yet."); 
-    }
-    
-    /**
-     * NOT PART OF API
-     *
-     * allows the user to create a viewport within the displayed page, the
-     * aspect ratio is keep for the PDF page <br>
-     * <br>
-     * Passing in a null value is the same as calling resetViewableArea()
-     * <br>
-     * <br>
-     * The viewport works from the bottom left of the PDF page <br>
-     * The general formula is <br>
-     * (leftMargin, <br>
-     * bottomMargin, <br>
-     * pdfWidth-leftMargin-rightMargin, <br>
-     * pdfHeight-bottomMargin-topMargin)
-     * <br>
-     * The viewport will not be incorporated in printing <br>
-     * <br>
-     * Throws PdfException if the viewport is not totally enclosed within the
-     * 100% cropped pdf
-     */
-    @Override
-    public AffineTransform setViewableArea(final int[] viewport) throws PdfException{
-        throw new UnsupportedOperationException("setViewableArea Not supported yet.");
-    }
-    
     @Override
     public void drawFacing(final Rectangle visibleRect) {
         throw new UnsupportedOperationException("drawFacing Not supported yet.");
-    }
-
-    @Override
-    public void paintPage(final Object box, final AcroRenderer formRenderer, final TextLines textLines) {
-        throw new UnsupportedOperationException("paintPage Not supported yet.");
     }
     
     public void setCurrentDisplay(final DynamicVectorRenderer pageView) {
@@ -937,6 +835,5 @@ public class GUIDisplay implements Display{
         }
 
         return userAnnot;
-    }
-    
+    }    
 }

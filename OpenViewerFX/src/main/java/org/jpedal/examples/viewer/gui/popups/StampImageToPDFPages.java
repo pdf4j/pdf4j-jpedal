@@ -39,22 +39,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-
 import javax.print.attribute.standard.PageRanges;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.SpinnerNumberModel;
-
+import javax.swing.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.utils.FileFilterer;
 import org.jpedal.utils.LogWriter;

@@ -32,7 +32,10 @@
  */
 package org.jpedal.examples.viewer.objects;
 
-import org.jpedal.external.*;
+import org.jpedal.external.AdditonalHandler;
+import org.jpedal.external.AnnotationHandler;
+import org.jpedal.external.JPedalActionHandler;
+import org.jpedal.external.Options;
 import org.jpedal.io.Speech;
 
 /**

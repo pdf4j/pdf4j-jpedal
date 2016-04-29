@@ -32,11 +32,10 @@
  */
 package org.jpedal.io;
 
-import org.jpedal.utils.LogWriter;
-
 import java.security.Key;
 import java.security.Security;
 import java.security.cert.Certificate;
+import org.jpedal.utils.LogWriter;
 
 public class SetSecurity {
     

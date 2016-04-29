@@ -32,35 +32,32 @@
  */
 package org.jpedal.objects.acroforms.creation;
 
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import org.jpedal.color.DeviceCMYKColorSpace;
-
-import org.jpedal.objects.acroforms.actions.SwingDownIconListener;
-import org.jpedal.objects.acroforms.actions.SwingFormButtonListener;
-import org.jpedal.objects.acroforms.actions.SwingListener;
-import org.jpedal.objects.acroforms.overridingImplementations.PdfSwingPopup;
-import org.jpedal.objects.raw.*;
-import org.jpedal.objects.acroforms.GUIData;
-import org.jpedal.objects.acroforms.SwingData;
-import org.jpedal.objects.acroforms.overridingImplementations.FixImageIcon;
-
-import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-
-import org.jpedal.parser.DecoderOptions;
-import org.jpedal.utils.LogWriter;
-import org.jpedal.utils.Strip;
-
 import java.util.Iterator;
 import java.util.Map;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import org.jpedal.color.DeviceCMYKColorSpace;
+import org.jpedal.objects.acroforms.GUIData;
+import org.jpedal.objects.acroforms.SwingData;
+import org.jpedal.objects.acroforms.actions.SwingDownIconListener;
+import org.jpedal.objects.acroforms.actions.SwingFormButtonListener;
+import org.jpedal.objects.acroforms.actions.SwingListener;
+import org.jpedal.objects.acroforms.overridingImplementations.FixImageIcon;
+import org.jpedal.objects.acroforms.overridingImplementations.PdfSwingPopup;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.utils.Strip;
 
 
 public class SwingFormFactory extends GenericFormFactory implements FormFactory{
@@ -152,40 +149,8 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
     
     private JButton createAnnotationUnderline(final FormObject form) {
         JButton but = setupAnnotationButton(form);
-        Color color = getAnnotationColor(form);
-        but.setBounds(form.getBoundingRectangle());
-
-        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-        if (quad == null) {
-            quad = form.getFloatArray(PdfDictionary.Rect);
-        }
-
-        final BufferedImage icon = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
-        final Graphics g = icon.getGraphics();
-                    //        			g.setColor(Color.blue);
-        //        			g.fillRect(0,0, icon.getWidth(), icon.getHeight());
-        if (quad.length >= 8) {
-            for (int hi = 0; hi != quad.length; hi += 8) {
-                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                //Adjust y for display
-                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                final int width = (int) (quad[hi + 2] - quad[hi]);
-                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-                final Rectangle rh = new Rectangle(x, y, width, height);
-
-                try {
-                    g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-                    g.fillRect(rh.x, rh.y, rh.width, rh.height);
-                    g.setColor(color);
-                    g.fillRect(rh.x, rh.y + rh.height - 1, rh.width, 1);
-                    but.setBackground(new Color(0, 0, 0, 0));
-                    but.setIcon(new FixImageIcon(form, icon, 0));
-                } catch (final Exception e) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-            }
-        }
+        but.setBackground(new Color(0, 0, 0, 0));
+        but.setIcon(new FixImageIcon(form, AnnotationFactory.getIcon(form), 0));
         return but;
     }
     
@@ -214,41 +179,8 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
     
     private JButton createAnnotationStrikeOut(final FormObject form) {
         JButton but = setupAnnotationButton(form);
-
-        Color color = getAnnotationColor(form);
-
-        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
-        if (quad == null) {
-            quad = form.getFloatArray(PdfDictionary.Rect);
-        }
-
-        final BufferedImage icon = new BufferedImage(form.getBoundingRectangle().width, form.getBoundingRectangle().height, BufferedImage.TYPE_4BYTE_ABGR);
-        final Graphics g = icon.getGraphics();
-                    //        			g.setColor(Color.blue);
-        //        			g.fillRect(0,0, icon.getWidth(), icon.getHeight());
-        if (quad.length >= 8) {
-            for (int hi = 0; hi != quad.length; hi += 8) {
-                final int x = (int) quad[hi] - form.getBoundingRectangle().x;
-                int y = (int) quad[hi + 5] - form.getBoundingRectangle().y;
-                //Adjust y for display
-                y = (form.getBoundingRectangle().height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
-                final int width = (int) (quad[hi + 2] - quad[hi]);
-                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
-                final Rectangle rh = new Rectangle(x, y, width, height);
-
-                try {
-                    g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-                    g.fillRect(0, 0, rh.width, rh.height);
-                    g.setColor(color);
-                    g.fillRect(rh.x, rh.y + (rh.height / 2), rh.width, 1);
-                    but.setBackground(new Color(0, 0, 0, 0));
-                    but.setIcon(new FixImageIcon(form, icon, 0));
-                } catch (final Exception e) {
-                    LogWriter.writeLog("Exception: " + e.getMessage());
-                }
-            }
-        }
-
+        but.setBackground(new Color(0, 0, 0, 0));
+        but.setIcon(new FixImageIcon(form, AnnotationFactory.getIcon(form), 0));
         return but;
     }
     
@@ -258,45 +190,6 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         but.setIcon(new FixImageIcon(form, AnnotationFactory.getIcon(form), 0));
         
         return but;
-    }
-    
-    private static Color getAnnotationColor(final FormObject form){
-        final float[] formColor = form.getFloatArray(PdfDictionary.C);
-        Color color = new Color(0);
-        if (formColor != null) {
-            switch (formColor.length) {
-                case 0:
-                    //Should not happen. Do nothing. Annotation is transparent
-                    break;
-                case 1:
-                    //DeviceGrey colorspace
-                    color = new Color(formColor[0], formColor[0], formColor[0], 1.0f);
-                    break;
-                case 3:
-                    //DeviceRGB colorspace
-                    color = new Color(formColor[0], formColor[1], formColor[2], 1.0f);
-                    break;
-                case 4:
-                    //DeviceCMYK colorspace
-                    final DeviceCMYKColorSpace cmyk = new DeviceCMYKColorSpace();
-                    cmyk.setColor(formColor, 4);
-
-                    final int r;
-                    final int g;
-                    final int b;
-                    final int rgb = cmyk.getColor().getRGB();
-                    r = (rgb >> 16) & 255;
-                    g = (rgb >> 8) & 255;
-                    b = (rgb) & 255;
-
-                    color = new Color(r, g, b, 1);
-
-                    break;
-                default:
-                    break;
-            }
-        }
-        return color;
     }
     
     /**
@@ -731,7 +624,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
              */
             final Color backgroundColor = FormObject.generateColor(form.getDictionary(PdfDictionary.MK).getFloatArray(PdfDictionary.BG));
             if(backgroundColor!=null){
-                final ListCellRenderer renderer = new ComboColorRenderer(backgroundColor);
+                final ListCellRenderer<String> renderer = new ComboColorRenderer(backgroundColor);
                 comboBox.setRenderer(renderer);
             }
         }
@@ -766,7 +659,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         }
         
         if(org.jpedal.DevFlags.GUITESTINGINPROGRESS){
-            final javax.swing.text.Caret c = ((JTextField)comboBox.getEditor().getEditorComponent()).getCaret();
+            final javax.swing.text.Caret c = ((JTextComponent)comboBox.getEditor().getEditorComponent()).getCaret();
             c.setBlinkRate(0);
         }
         
@@ -1509,7 +1402,7 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
             comp.setOpaque(true);
         }else if(DecoderOptions.isRunningOnMac && (comp instanceof JButton)){
             //hack because OS X does not f***king work properly
-            ((JButton)comp).setBorderPainted(false);
+            ((AbstractButton)comp).setBorderPainted(false);
             comp.setBorder(null);
             
         }
@@ -1549,9 +1442,9 @@ public class SwingFormFactory extends GenericFormFactory implements FormFactory{
         final SwingListener jpedalListener = new SwingListener(form, formsActionHandler);
         //if combobox wee need to add the listener to the component at position 0 as well as the normal one, so it works properly.
         if (currentComp instanceof JComboBox) {
-            ((JComboBox) currentComp).getComponent(0).addMouseListener(jpedalListener);
-            ((JComboBox) currentComp).getComponent(0).addKeyListener(jpedalListener);
-            ((JComboBox) currentComp).getComponent(0).addFocusListener(jpedalListener);
+            ((Container) currentComp).getComponent(0).addMouseListener(jpedalListener);
+            ((Container) currentComp).getComponent(0).addKeyListener(jpedalListener);
+            ((Container) currentComp).getComponent(0).addFocusListener(jpedalListener);
             ((JComboBox)currentComp).addActionListener(jpedalListener);
         }
         if(currentComp instanceof JList){

@@ -71,10 +71,10 @@ public class Vector_Rectangle extends GUIVector_Rectangle implements Serializabl
         
         final ObjectOutput os=new ObjectOutputStream(bos);
         
-        /** size of array as first item */
+        /* size of array as first item */
         os.writeObject(max_size);
         
-        /** iterate through the array, and write out each Rectangle individually */
+        /* iterate through the array, and write out each Rectangle individually */
         for (int i = 0; i < max_size; i++) {
             final Rectangle nextObj = items[i];
             
@@ -98,14 +98,14 @@ public class Vector_Rectangle extends GUIVector_Rectangle implements Serializabl
     public void restoreFromStream(final ByteArrayInputStream bis) throws IOException, ClassNotFoundException {
         final ObjectInput os=new ObjectInputStream(bis);
         
-        /** the number of elements in this collection */
+        /* the number of elements in this collection */
         final int size= (Integer) os.readObject();
         
         max_size = size;
         
         items=new Rectangle[size];
         
-        /**
+        /*
          * iterate through each item in the stream and store each object in
          * the collection
          */

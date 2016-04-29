@@ -33,15 +33,13 @@
 
 package org.jpedal.objects.javascript.defaultactions;
 
+import java.awt.Toolkit;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import java.awt.Toolkit;
-
 import org.jpedal.utils.NumberUtils;
 import org.jpedal.utils.StringUtils;
 import org.mozilla.javascript.Context;
@@ -52,6 +50,7 @@ import org.mozilla.javascript.Scriptable;
  * and should not be accessed by anything else
  */
 
+@SuppressWarnings("ALL")
 public class JpedalDefaultJavascript{
 	
 	/** added to make the testing be more predictable */
@@ -528,6 +527,10 @@ public class JpedalDefaultJavascript{
 	
 	/** tells the system to beep at the user */
 	public static void beep(final int type){
-		Toolkit.getDefaultToolkit().beep();
+
+		switch(type) {
+			default:
+			Toolkit.getDefaultToolkit().beep();
+		}
 	}
 }

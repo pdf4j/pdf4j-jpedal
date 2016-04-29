@@ -32,7 +32,8 @@
  */
 package org.jpedal.render;
 
-import java.awt.*;
+import java.awt.Font;
+
 
 /**
  * hold details for String to render

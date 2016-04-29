@@ -38,8 +38,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-
-
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.function.PDFFunction;
 import org.jpedal.parser.DecoderOptions;
@@ -110,9 +108,6 @@ public class FunctionContext implements PaintContext {
 				
 				c= calculateColor(x,y);
 				
-				/**
-				 * workout values
-				 */
 				if(colorsReversed){
 					cr=255-c.getRed();
 					cg=255-c.getGreen();
@@ -146,7 +141,7 @@ public class FunctionContext implements PaintContext {
 		final float cx;
         final float cy;
 
-        /**
+        /*
 		 *take x and y and pass through conversion with domain values - this gives us xx
 		 */
 		//hack for MAC which is f**king broken
@@ -162,7 +157,7 @@ public class FunctionContext implements PaintContext {
 
         final float[] colValues = ShadingFactory.applyFunctions(function,values);
 
-        /**
+        /*
          * this value is converted to a color
          */
 		final int count=colValues.length;

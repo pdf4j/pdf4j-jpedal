@@ -32,8 +32,8 @@
  */
 package org.jpedal.fonts.glyph;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>defines the current shape which is created by command stream</p> 

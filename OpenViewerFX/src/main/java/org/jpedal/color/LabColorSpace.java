@@ -39,9 +39,7 @@ import java.awt.image.Raster;
 import java.util.HashMap;
 import java.util.Map;
 import org.jpedal.examples.handlers.DefaultImageHelper;
-
 import org.jpedal.io.ColorSpaceConvertor;
-
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 
@@ -251,7 +249,7 @@ public class LabColorSpace extends GenericColorSpace {
             bstar = R[3];
         }
         
-        /**don't bother if already calculated*/
+        /*don't bother if already calculated*/
         if ((lastL == l) && (lastA == a) && (lastBstar == bstar)) {
         } else {
             
@@ -263,7 +261,7 @@ public class LabColorSpace extends GenericColorSpace {
             final Integer key = (indexL << 16) + (indexA << 8) + indexB;
             
             final Integer value = cache.get(key);
-            /**used cache value or recalulate*/
+            /*used cache value or recalulate*/
             if (value != null) {
                 
                 final int raw = value;

@@ -32,9 +32,8 @@
  */
 package org.jpedal.examples.viewer;
 
-import org.jpedal.utils.LogWriter;
-
 import java.awt.image.BufferedImage;
+import org.jpedal.utils.LogWriter;
 
 
 /**provides access to values used by multiple classes*/
@@ -88,9 +87,6 @@ public class Values {
     /**flag to show that form values have been altered by user*/
     private boolean formsChanged;
 
-    /**uses hires images for display (uses more memory)*/
-    private boolean useHiresImage=true;
-    
     public int m_x1, m_y1, m_x2, m_y2;
     
     /**offsets to viewport if used*/
@@ -325,22 +321,6 @@ public class Values {
      */
     public void setModeOfOperation(final int modeOfOperation) {
         this.modeOfOperation = modeOfOperation;
-    }
-    
-    /**
-     * flag to show if using images as hires
-     * @return the useHiresImage flag
-     */
-    public boolean isUseHiresImage() {
-        return useHiresImage;
-    }
-    
-    /**
-     * set to show images being used are hires and not downsampled
-     * @param useHiresImage to show images being used are hires
-     */
-    public void setUseHiresImage(final boolean useHiresImage) {
-        this.useHiresImage = useHiresImage;
     }
     
     public boolean isMultiTiff() {

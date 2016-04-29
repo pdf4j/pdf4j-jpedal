@@ -32,7 +32,6 @@
  */
 package org.jpedal.examples.viewer;
 
-import org.jpedal.PdfDecoderFX;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -40,8 +39,11 @@ import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.jpedal.examples.viewer.gui.*;
-import org.jpedal.examples.viewer.gui.javafx.*;
+import org.jpedal.PdfDecoderFX;
+import org.jpedal.examples.viewer.gui.GUI;
+import org.jpedal.examples.viewer.gui.JavaFxGUI;
+import org.jpedal.examples.viewer.gui.javafx.JavaFXSearchWindow;
+import org.jpedal.examples.viewer.gui.javafx.JavaFXThumbnailPanel;
 import org.jpedal.examples.viewer.objects.FXClientExternalHandler;
 import org.jpedal.external.Options;
 import org.jpedal.objects.acroforms.actions.JavaFXDefaultActionHandler;
@@ -262,19 +264,7 @@ public class OpenViewerFX extends SharedViewer implements ViewerInt{
         SharedViewer.closeCalled = true;
         currentCommands.executeCommand(Commands.EXIT, null);
     }
-    
-    /**
-     * Deprecate on 15/07/2014 
-     * To add Viewer to your own parent node, please use:
-     * OpenViewerFX(Parent parentPane, String preferencesPath).
-     * @deprecated
-     * @param args Program arguments passed into the Viewer
-     */
-    @Deprecated
-    public OpenViewerFX(final String[] args) {
-        this(null,args);
-    }
-    
+   
     /**
      * 
      * Not part of the API.

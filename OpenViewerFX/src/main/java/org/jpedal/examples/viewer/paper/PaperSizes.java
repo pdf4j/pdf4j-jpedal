@@ -32,6 +32,11 @@
  */
 package org.jpedal.examples.viewer.paper;
 
+import java.awt.print.PageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -40,9 +45,6 @@ import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSize;
 import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.OrientationRequested;
-
-import java.awt.print.PageFormat;
-import java.util.*;
 
 public class PaperSizes {
 

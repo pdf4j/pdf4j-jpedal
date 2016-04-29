@@ -32,13 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
-
-import javax.swing.*;
+import java.awt.Component;
+import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.InsertBlankPDFPage;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -63,7 +62,7 @@ public class Add {
             } else {
                 //get values from user
                 final InsertBlankPDFPage addPage = new InsertBlankPDFPage(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int positionToAdd = addPage.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewer.BlankPage"));
+                final int positionToAdd = addPage.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewer.BlankPage"));
 
                 //get parameters and call if YES
                 if (positionToAdd == JOptionPane.OK_OPTION) {

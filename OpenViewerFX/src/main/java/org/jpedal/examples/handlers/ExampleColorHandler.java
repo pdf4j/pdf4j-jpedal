@@ -32,11 +32,11 @@
  */
 package org.jpedal.examples.handlers;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.external.ColorHandler;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class ExampleColorHandler implements ColorHandler {
 

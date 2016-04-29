@@ -32,16 +32,15 @@
  */
 package org.jpedal.io.filter;
 
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.zip.Inflater;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 
 /**
  * flate
@@ -96,7 +95,7 @@ public class Flate extends BaseFilter implements PdfFilter{
 
         final int orgSize=data.length;
 
-        /**
+        /*
          * decompress byte[]
          */
         if (data != null) {
@@ -167,7 +166,7 @@ public class Flate extends BaseFilter implements PdfFilter{
         this.streamCache=streamCache;
         this.cachedObjects=cachedObjects;
 
-        /**
+        /*
          * decompress cached object
          */
         if (bis != null) {

@@ -33,12 +33,11 @@
 
 package org.jpedal.io;
 
-import org.jpedal.utils.LogWriter;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import org.jpedal.utils.LogWriter;
 
 
 public class RandomAccessFCTest implements RandomAccessBuffer {

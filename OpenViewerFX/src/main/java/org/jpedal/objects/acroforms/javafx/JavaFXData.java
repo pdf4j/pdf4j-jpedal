@@ -33,16 +33,14 @@
 package org.jpedal.objects.acroforms.javafx;
 
 
-import java.awt.*;
+import java.awt.Rectangle;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.transform.Transform;
-
 import org.jpedal.display.Display;
-import org.jpedal.objects.acroforms.*;
+import org.jpedal.objects.acroforms.GUIData;
 import org.jpedal.objects.raw.FormObject;
-
 import org.jpedal.objects.raw.PdfDictionary;
 
 /**
@@ -71,7 +69,7 @@ public class JavaFXData extends GUIData {
         }
 
         final int curPage=formObject.getPageNumber();
-        /**
+        /*
          * work out if visible in Layer
          */
         if (layers != null) {

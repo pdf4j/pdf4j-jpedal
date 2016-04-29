@@ -61,7 +61,6 @@ public class GUIExtractSelectionAsImage {
      */
     protected static void extractSelectedScreenAsImage(final Values commonValues, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf) {
         
-        /**ensure co-ords in right order*/
         int t_x1=commonValues.m_x1;
         int t_x2=commonValues.m_x2;
         int t_y1=commonValues.m_y1;

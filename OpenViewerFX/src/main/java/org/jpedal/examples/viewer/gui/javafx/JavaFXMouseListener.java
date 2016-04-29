@@ -37,11 +37,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
@@ -54,6 +50,7 @@ import org.jpedal.exception.PdfException;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.FXDisplay;
 
 /**
  * Class to handle JavaFX Mouse Events that take place on the Pane 
@@ -78,19 +75,13 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
 
     //private boolean scrollPageChanging;
 
-    /**
-     * current cursor position
-     */
+    //current cursor position
     private double cx, cy;
 
-    /**
-     * tells user if we enter a link
-     */
+    //tells user if we enter a link
     private static final String message = "";
 
-    /**
-     * tracks mouse operation mode currently selected
-     */
+    //tracks mouse operation mode currently selected
     private MouseMode mouseMode = new MouseMode();
 
     public JavaFXMouseListener(final PdfDecoderFX decode_pdf, final GUIFactory currentGUI,
@@ -109,12 +100,11 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
 
     @Override
     public void setupMouse() {
-        /**
+        /*
          * track and display screen co-ordinates and support links
          */
-        /**
-         * Motion Listener Code.
-         */
+        
+        //Motion Listener Code.
         decode_pdf.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent e) {
@@ -130,9 +120,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
             }
         }); 
 
-        /**
-         * Mouse Listener Code.
-         */
+        //Mouse Listener Code.
         decode_pdf.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(final MouseEvent e) {
@@ -175,7 +163,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
             }
         });
         
-        /**
+        /*
          * Controls for dragging a PDF into the scene
          * Using the dragboard, which extends the clipboard class, 
          * detect a file being dragged onto the scene and if the user drops the file
@@ -196,9 +184,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         });
         
         
-        /**
-         * Mouse Wheel Listener Code.
-         */
+        //Mouse Wheel Listener Code.
         if (GUI.debugFX) {
             System.out.println("addMouseWheelListener in JavaFXMouseListener.java not yet implemented for JavaFX");
         }
@@ -521,8 +507,8 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
        // Rectangle visible_test = new Rectangle(adjustForAlignment((int) e.getX(), decode_pdf), e.getY(), interval, interval);
         if (GUI.debugFX) {
             //System.out.println("getVisibleRect and scrollRectToVisible is not implemented yet in JavaFXMouseListener.java");
-            /**
-             *
+            
+            /*
              * if((currentGUI.allowScrolling())&&(!decode_pdf.getVisibleRect().contains(visible_test))){
              * ((PdfDecoder)decode_pdf).scrollRectToVisible(visible_test); }
              */
@@ -536,7 +522,6 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
         updateCoords(x, y);
     }
 
-    
     /**
      * This method is not currently used as we change cursor via the CSS.
      * @param x
@@ -544,7 +529,7 @@ public class JavaFXMouseListener extends MouseSelector implements GUIMouseHandle
      */
     private void getObjectUnderneath(final int x, final int y) {
         if (decode_pdf.getDisplayView() == Display.SINGLE_PAGE) {
-            final int type = decode_pdf.getDynamicRenderer().getObjectUnderneath(x, y);
+            final int type = ((FXDisplay)decode_pdf.getDynamicRenderer()).getObjectUnderneath(x, y);
             switch (type) {
                 case -1:
                     decode_pdf.setCursor(Cursor.DEFAULT);

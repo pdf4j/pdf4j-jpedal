@@ -42,17 +42,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import static org.jpedal.examples.viewer.gui.GUI.GRABBING_CURSOR;
-import static org.jpedal.examples.viewer.gui.GUI.GRAB_CURSOR;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSOR;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORB;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORBL;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORBR;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORL;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORR;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORT;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORTL;
-import static org.jpedal.examples.viewer.gui.GUI.PAN_CURSORTR;
+import static org.jpedal.examples.viewer.gui.GUI.*;
 import org.jpedal.utils.LogWriter;
 
 /**

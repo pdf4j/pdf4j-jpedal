@@ -32,24 +32,43 @@
  */
 package org.jpedal.parser;
 
-import org.jpedal.PdfDecoderInt;
-import org.jpedal.external.*;
-import java.awt.*;
+import java.awt.Shape;
 import java.util.HashSet;
 import java.util.Set;
+import org.jpedal.PdfDecoderInt;
+import org.jpedal.external.GlyphTracker;
+import org.jpedal.external.ShapeTracker;
 import org.jpedal.objects.layers.PdfLayerList;
-
 import org.jpedal.objects.structuredtext.StructuredContentHandler;
 
 public class ParserOptions {
 
+    //flag to show raw images extracted
+    boolean clippedImagesExtracted=true;
+    
+    //private boolean extractRawCMYK;
+    
+    //flag to show raw images extracted
+    boolean finalImagesExtracted=true;
+    
+    //flag to show if we physical generate a scaled version of the images extracted
+    boolean createScaledVersion = true;
+    
+    //flag to show content is being rendered
+    boolean renderImages;
+    
+    //flag to show raw images extracted
+    boolean rawImagesExtracted=true;
+    
      /**flag to show if YCCK images*/
     public boolean hasYCCKimages;
 
     public boolean imagesProcessedFully;
 
     private boolean isLayerVisible=true;
-
+    
+    private boolean isType3Font;
+    
     private int layerLevel;
 
     private Set<Integer> layerVisibility=new HashSet<Integer>(50);
@@ -117,7 +136,7 @@ public class ParserOptions {
         if(name!=null){
             this.fileName=name.toLowerCase();
 
-            /**check no separators*/
+            /*check no separators*/
             int sep=fileName.lastIndexOf(47); // '/'=47
             if(sep!=-1) {
                 fileName = fileName.substring(sep + 1);
@@ -173,6 +192,18 @@ public class ParserOptions {
 
         textColorExtracted=(extractionMode & PdfDecoderInt.TEXTCOLOR) == PdfDecoderInt.TEXTCOLOR;
 
+        renderImages=renderPage &&(renderMode & PdfDecoderInt.RENDERIMAGES )== PdfDecoderInt.RENDERIMAGES;
+        
+        finalImagesExtracted=(extractionMode & PdfDecoderInt.FINALIMAGES) == PdfDecoderInt.FINALIMAGES;
+        
+        //extractRawCMYK=(extractionMode & PdfDecoderInt.CMYKIMAGES)==PdfDecoderInt.CMYKIMAGES;
+        
+        clippedImagesExtracted=(extractionMode & PdfDecoderInt.CLIPPEDIMAGES)==PdfDecoderInt.CLIPPEDIMAGES;
+        
+        rawImagesExtracted=(extractionMode & PdfDecoderInt.RAWIMAGES) == PdfDecoderInt.RAWIMAGES;
+        
+        createScaledVersion = finalImagesExtracted || renderImages;
+        
     }
 
     public ParserOptions() {
@@ -187,6 +218,10 @@ public class ParserOptions {
         return renderText;
     }
 
+    public void isPrinting(boolean printing){
+        isPrinting=printing;
+    }
+    
     public boolean isPrinting(){
         return isPrinting;
     }
@@ -345,5 +380,37 @@ public class ParserOptions {
      */
     public void setIsLayerVisible(boolean isLayerVisible) {
         this.isLayerVisible = isLayerVisible;
+    }
+
+    public void isType3Font(boolean isType3Font) {
+       this.isType3Font=isType3Font;
+    }
+    
+    public boolean isType3Font() {
+        return isType3Font;
+    }
+
+    public boolean isFinalImagesExtracted() {
+        return finalImagesExtracted;
+    }
+
+    public boolean isRawImagesExtracted() {
+        return rawImagesExtracted;
+    }
+
+    public boolean renderImages() {
+        return renderImages ;
+    }
+    
+    public boolean imagesNeeded() {
+        return renderImages || finalImagesExtracted || clippedImagesExtracted || rawImagesExtracted;
+    }
+    
+    public boolean createScaledVersion(){
+        return createScaledVersion;
+    }
+
+    public boolean isClippedImagesExtracted() {
+        return clippedImagesExtracted;
     }
 }

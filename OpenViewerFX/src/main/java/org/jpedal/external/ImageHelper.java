@@ -32,12 +32,12 @@
  */
 package org.jpedal.external;
 
-import org.jpedal.exception.PdfException;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.IOException;
+import org.jpedal.exception.PdfException;
 
+@SuppressWarnings("ALL")
 public interface ImageHelper {
 
     BufferedImage read(byte[] data) throws IOException;

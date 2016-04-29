@@ -32,7 +32,7 @@
  */
 package org.jpedal.parser.shape;
 
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.external.ShapeTracker;
@@ -41,7 +41,9 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfShape;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.parser.*;
+import org.jpedal.parser.Cmd;
+import org.jpedal.parser.ParserOptions;
+import org.jpedal.parser.PdfObjectCache;
 import org.jpedal.parser.image.PDFObjectToImage;
 import org.jpedal.render.DynamicVectorRenderer;
 
@@ -60,7 +62,7 @@ public class F {
             }
         
         
-        /**
+        /*
          * if SMask with this color, we need to ignore
          *  (only case of white with BC of 1,1,1 at present for 11jun/12.pdf)
          */
@@ -73,7 +75,7 @@ public class F {
             }
         }
         
-        /**
+        /*
          * if SMask with this color, we need to ignore
          *  (only case of white with BC of 1,1,1 at present for 11jun/4.pdf)
          */
@@ -119,7 +121,7 @@ public class F {
             Shape currentShape=null;
             Object fxPath=null;
             
-            /**
+            /*
              * fx alternative
              */
             if(parserOptions.useJavaFX()){
@@ -206,7 +208,7 @@ public class F {
         final float[] BBox;//size
         BBox= maskObj.getFloatArray(PdfDictionary.BBox);
         
-        /**get dimensions as an image*/
+        /*get dimensions as an image*/
         int fx=(int)(BBox[0]+0.5f);
         final int fy=(int)(BBox[1]+0.5f);
         final int fw=(int)(BBox[2]+0.5f);
@@ -217,19 +219,19 @@ public class F {
             fx = 0;
         }
         
-        /**
+        /*
          * get the SMAsk
          */
         final BufferedImage smaskImage = PDFObjectToImage.getImageFromPdfObject(maskObj, fx, fw, fy, fh, currentPdfFile, parserOptions,formLevel, multiplyer,false,1f);
    
 
-        /**
+        /*
          * draw the shape as image
          */
         final GraphicsState gs1 = (GraphicsState)gs.clone();
         gs1.CTM=new float[][]{{smaskImage.getWidth(),0,1},{0,-smaskImage.getHeight(),1},{0,0,0}};
-       
-        /**
+
+        /*
          * interim solution as throws exception in HTML due to unknown type
          */
         if(!current.isHTMLorSVG()){

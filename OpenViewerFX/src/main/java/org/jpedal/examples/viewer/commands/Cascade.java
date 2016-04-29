@@ -57,7 +57,7 @@ public class Cascade {
 
         final JInternalFrame[] frames = desktopPane.getAllFrames();
 
-        /**
+        /*
          * reverse the order of these frames, so when they are cascaded they
          * will maintain the order they were to start with
          */

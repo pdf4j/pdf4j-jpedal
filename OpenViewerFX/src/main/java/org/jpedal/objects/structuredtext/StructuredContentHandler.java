@@ -35,12 +35,11 @@ package org.jpedal.objects.structuredtext;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.render.DynamicVectorRenderer;
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
@@ -325,9 +324,7 @@ public class StructuredContentHandler {
         //set flag to show some content
         contentExtracted=true;
         
-        /**
-         * add current structure to tree
-         **/
+        // add current structure to tree
         currentKey= keys.get(markedContentLevel);
         
         //if no MCID use current level as key

@@ -33,14 +33,7 @@
 package org.jpedal.objects.acroforms;
 
 import com.idrsolutions.pdf.color.blends.BlendMode;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.StringTokenizer;
 import org.jpedal.objects.raw.FormObject;
@@ -188,7 +181,7 @@ public class FormRenderUtilsG2 {
         g2.setColor(bckUp);
     }
 
-    private static void renderBorderUnderline(Graphics2D g2, int borderWidth, int x, int y, int w, int h) {
+    private static void renderBorderUnderline(Graphics2D g2, int borderWidth, int x, int y, int w) {
         g2.setStroke(new BasicStroke(borderWidth));
         g2.drawLine(x + borderWidth - 1,
                 y + borderWidth - 1,
@@ -197,7 +190,7 @@ public class FormRenderUtilsG2 {
 
     }
 
-    public static int renderBorder(Graphics2D g2, FormObject formObject, int page, int pageHeight){
+    public static int renderBorder(Graphics2D g2, FormObject formObject, int pageHeight){
         int x = formObject.getBoundingRectangle().x;
         int y = pageHeight - (formObject.getBoundingRectangle().y + formObject.getBoundingRectangle().height);
         int w = formObject.getBoundingRectangle().width;
@@ -249,7 +242,7 @@ public class FormRenderUtilsG2 {
                     renderBorderInset(g2, borderWidth, x, y, w, h);
                     borderCreated = true;
                 } else if (s.equals("U")) {
-                    renderBorderUnderline(g2, borderWidth, x, y, w, h);
+                    renderBorderUnderline(g2, borderWidth, x, y, w);
                     borderCreated = true;
                 }
 

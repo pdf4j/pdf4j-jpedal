@@ -33,13 +33,12 @@
 package org.jpedal.objects.raw;
 
 
+import java.lang.reflect.Field;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.io.PdfFilteredReader;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
-
-import java.lang.reflect.Field;
 
 /**
  * holds actual data for PDF file to process.
@@ -55,6 +54,7 @@ public class PdfDictionary {
     /**
      * all key values as hashed values
      */
+    public static final int a=49;
     
     public static final int A=17;
 
@@ -756,6 +756,8 @@ public class PdfDictionary {
 
     public static final int QuadPoints=1785890247;
 
+    public static final int r=66;
+    
     public static final int R=34;
 
     public static final int Range=826160983;
@@ -836,6 +838,8 @@ public class PdfDictionary {
     public static final int Square=1160865142;
     
     public static final int Squiggly=1517846914;
+    
+    public static final int ST=8996;
 
     public static final int Stamp=1144077667;
 
@@ -1087,7 +1091,7 @@ public class PdfDictionary {
      */
     public static int getIntKey(final int keyStart, final int keyLength, final byte[] raw) {
 
-        /**
+        /*
         
         byte[] a=StringUtils.toBytes("IRT");
 
@@ -1109,7 +1113,7 @@ public class PdfDictionary {
         final int id = generateChecksum(keyStart, keyLength, raw);
         int PDFkey=id;// standard setting is to use value
 
-        /**
+        /*
          * non-standard values
          */
         switch(id){
@@ -1988,7 +1992,7 @@ public class PdfDictionary {
             	return VALUE_IS_TEXTSTREAM;
 
             case Nums:
-                return VALUE_IS_KEY_ARRAY;
+                return VALUE_IS_MIXED_ARRAY;
 
             case min:
                 return VALUE_IS_FLOAT;
@@ -2072,12 +2076,14 @@ public class PdfDictionary {
                     return VALUE_IS_UNREAD_DICTIONARY;
                 } else if(type==PdfDictionary.Metadata) {
                     return VALUE_IS_DICTIONARY;
+                } else if(type==PdfDictionary.PageLabels) {
+                    return VALUE_IS_TEXTSTREAM;    
                 } else {
                     return VALUE_IS_INT;
                 }
 
             case PageLabels:
-                return VALUE_IS_UNREAD_DICTIONARY;
+                return VALUE_IS_DICTIONARY;
 
             case PageMode:
 	        	return VALUE_IS_STRING_CONSTANT;
@@ -2262,6 +2268,9 @@ public class PdfDictionary {
             case Sound:
                 return VALUE_IS_UNREAD_DICTIONARY;
 
+            case ST:
+                return VALUE_IS_INT;
+                
             case State:
                 return VALUE_IS_MIXED_ARRAY;
 

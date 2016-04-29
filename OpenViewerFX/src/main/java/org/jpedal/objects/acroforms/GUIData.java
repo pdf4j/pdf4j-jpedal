@@ -32,20 +32,18 @@
  */
 package org.jpedal.objects.acroforms;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.*;
-import java.util.List;
 import org.jpedal.external.CustomFormPrint;
 import org.jpedal.external.ExternalHandlers;
-
 import org.jpedal.objects.PdfPageData;
+import org.jpedal.objects.acroforms.creation.FormFactory;
+import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.layers.PdfLayerList;
-import org.jpedal.objects.acroforms.creation.FormFactory;
 
 /**holds all data not specific to Swing/SWT/ULC*/
-public class GUIData {
+public abstract class GUIData {
     
     /**
      * flag to make forms draw as images, not swing components
@@ -245,13 +243,7 @@ public class GUIData {
     	//Nothing to dispose of in generic method, overrode by swing version
     }
     
-    protected void displayComponent( final FormObject formObject, final Object comp) {
-	
-	if(1==1) {
-        throw new RuntimeException("base method displayComponent( ) should not be called");
-    }
-	
-    }
+    protected abstract void displayComponent( final FormObject formObject, final Object comp);
     
     /**
      * put components onto screen display
@@ -277,7 +269,7 @@ public class GUIData {
             removeHiddenForms(1, startPage);
         }
         
-        /**
+        /*
          * forms currently visible
          */
         for (int page = startPage; page < endPage; page++) {
@@ -461,9 +453,7 @@ public class GUIData {
     }
    
     
-    protected void setGUIComp(final FormObject formObject, final Object rawField) {
-	throw new RuntimeException("Should never be called");
-    }
+    protected abstract void setGUIComp(final FormObject formObject, final Object rawField);
 
     /**
      * Allow you to get a list of values from the Forms.
@@ -480,7 +470,7 @@ public class GUIData {
     public List getFormComponents(final String key, final ReturnValues value, final int pageNumber) {
 	
 	final Iterator<String> i=rawFormData.keySet().iterator();
-	final ArrayList<Object> selectedForms=new ArrayList();
+	final ArrayList<Object> selectedForms=new ArrayList<Object>();
 	FormObject form;
 	boolean isPageSelected;
 	String name;
@@ -684,7 +674,7 @@ public class GUIData {
      * @param isOrdered
      * @return 
      */
-    public java.util.List[] getFormList(final boolean isOrdered) {
+    public java.util.List<FormObject>[] getFormList(final boolean isOrdered) {
 
         if(isOrdered) {
             return this.formsOrdered;
@@ -693,7 +683,7 @@ public class GUIData {
         }
     }
 
-    public void renderFormsOntoG2InHeadless(final Object raw, final int pageIndex, final int currentRotation, final Map componentsToIgnore, final FormFactory formFactory, final int pageHeight)  {
+    public void renderFormsOntoG2InHeadless(final Object raw, final int pageIndex, final Map componentsToIgnore, final FormFactory formFactory)  {
         throw new UnsupportedOperationException("renderFormsOntoG2InHeadless Not supported yet.");
     }
 }

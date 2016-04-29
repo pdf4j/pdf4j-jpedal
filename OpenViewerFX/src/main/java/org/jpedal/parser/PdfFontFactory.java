@@ -32,21 +32,20 @@
  */
 package org.jpedal.parser;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import org.jpedal.exception.PdfException;
 import org.jpedal.exception.PdfFontException;
+import org.jpedal.external.ErrorTracker;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.StandardFonts;
-import org.jpedal.external.ErrorTracker;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
-
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Convert font info into one of our supporting classes
@@ -79,15 +78,7 @@ public class PdfFontFactory {
 
     public PdfFont createFont(final boolean fallbackToArial, final PdfObject pdfObject, final String font_id, final ObjectStore objectStoreStreamRef, final boolean renderPage, final ErrorTracker errorTracker, final boolean isPrinting) throws PdfException {
 
-
         PdfFont currentFontData=null;
-        /**
-         * allow for no actual object - ie /PDFdata/baseline_screens/debug/res.pdf
-         **/
-        //found examples with no type set so cannot rely on it
-        //int rawType=pdfObject.getParameterConstant(PdfDictionary.Type);
-        //if(rawType!=PdfDictionary.Font)
-        //	return null;
 
         baseFont="";
         rawFontName=null;
@@ -104,7 +95,7 @@ public class PdfFontFactory {
         while(isFontBroken){ //will try to sub font if error in embedded
             isFontBroken=false;
 
-            /**
+            /*
              * handle any font remapping but not on CID fonts or Type3 and gets too messy
              **/
             if(FontMappings.fontSubstitutionTable!=null && !isEmbedded &&
@@ -116,7 +107,7 @@ public class PdfFontFactory {
             if(fontType==PdfDictionary.Unknown){
                 fontType=pdfObject.getParameterConstant(PdfDictionary.Subtype);
 
-                /**handle CID fonts where /Subtype stored inside sub object*/
+                /*handle CID fonts where /Subtype stored inside sub object*/
                 if (fontType==StandardFonts.TYPE0) {
 
                     //get CID type and use in preference to Type0 on CID fonts
@@ -135,7 +126,7 @@ public class PdfFontFactory {
                 currentFontData=new PdfFont(currentPdfFile);
             }
 
-            /**
+            /*
              * check for OpenType fonts and reassign type
              */
             if(fontType==StandardFonts.TYPE1 || fontType==StandardFonts.CIDTYPE2) {
@@ -169,7 +160,7 @@ public class PdfFontFactory {
             try{
                 currentFontData=FontFactory.createFont(fontType,currentPdfFile,subFont, isPrinting);
 
-                /**set an alternative to Lucida*/
+                /*set an alternative to Lucida*/
                 if(FontMappings.defaultFont!=null) {
                     currentFontData.setDefaultDisplayFont(FontMappings.defaultFont);
                 }
@@ -222,7 +213,7 @@ public class PdfFontFactory {
             }
         }
 
-        /**
+        /*
          * add line giving font info so we can display or user access
          */
         setDetails(font_id, currentFontData, fontType, descendantFont);
@@ -322,7 +313,16 @@ public class PdfFontFactory {
         }
 
 
-        final String newSubtype = getFontSub(rawFont);
+        String newSubtype = getFontSub(rawFont);
+        
+        //Case 24809 ie WingDings-regular needs to use WingDing(s)
+        if(newSubtype==null &&  rawFont.startsWith("Wingdings")){
+            if(DecoderOptions.isRunningOnMac){
+                newSubtype = getFontSub("WingDings");
+            }else{
+                newSubtype = getFontSub("WingDing");
+            }
+        }
 
         if(newSubtype!=null && descendantFont==null){
 

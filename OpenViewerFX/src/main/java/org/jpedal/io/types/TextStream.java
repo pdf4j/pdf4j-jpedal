@@ -442,7 +442,7 @@ public class TextStream {
 
             System.arraycopy(data, start, newString, 0, stringLength);
 
-            /**
+            /*
              * clean up so matches old string so old code works
              */
             if(PDFkeyInt!=PdfDictionary.JS){ //keep returns in code

@@ -71,6 +71,12 @@ public class AnnotationFactory {
             case PdfDictionary.Square :
                 commentIcon = getSquareIcon(form);
                 break;
+            case PdfDictionary.Underline :
+                commentIcon = getUnderLineIcon(form);
+                break;
+            case PdfDictionary.StrickOut :
+                commentIcon = getStrickOutIcon(form);
+                break;
         }
         
         return commentIcon;
@@ -106,46 +112,114 @@ public class AnnotationFactory {
         return c;
     }
     
+    private static Rectangle getFormBounds(FormObject form, float[] rect) {
+        Rectangle bounds = (form).getBoundingRectangle();
+
+        //Bounds is 0 so calculate based on rect areas
+        if (bounds.getWidth() == 0 && bounds.getHeight() == 0) {
+            for (int i = 0; i != rect.length; i++) {
+                if (i % 2 == 0) {
+                    if (bounds.x > rect[i]) {
+                        bounds.x = (int) rect[i];
+                    }
+                    if (bounds.x + bounds.width < rect[i]) {
+                        bounds.width = (int) (rect[i] - bounds.x);
+                    }
+                } else {
+                    if (bounds.y > rect[i]) {
+                        bounds.y = (int) rect[i];
+                    }
+                    if (bounds.y + bounds.height < rect[i]) {
+                        bounds.height = (int) (rect[i] - bounds.y);
+                    }
+                }
+
+            }
+        }
+        return bounds;
+    }
+    
+    private static BufferedImage getStrickOutIcon(final PdfObject form){
+        
+        Color color = convertFloatArrayToColor(form.getFloatArray(PdfDictionary.C));
+
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+
+        Rectangle bounds = getFormBounds((FormObject)form, quad);
+            
+        final BufferedImage icon = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+        final Graphics g = icon.getGraphics();
+        
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - bounds.x;
+                int y = (int) quad[hi + 5] - bounds.y;
+                //Adjust y for display
+                y = (bounds.height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+                
+                try {
+                    g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+                    g.fillRect(0, 0, width, height);
+                    g.setColor(color);
+                    g.fillRect(x, y + (height / 2), width, 1);
+                } catch (final Exception e) {
+                    LogWriter.writeLog("Exception: " + e.getMessage());
+                }
+            }
+        }
+        return icon;
+    }
+    
+    private static BufferedImage getUnderLineIcon(final PdfObject form){
+        
+        Color color = convertFloatArrayToColor(form.getFloatArray(PdfDictionary.C));
+        
+        float[] quad = form.getFloatArray(PdfDictionary.QuadPoints);
+        if (quad == null) {
+            quad = form.getFloatArray(PdfDictionary.Rect);
+        }
+        
+        Rectangle bounds = getFormBounds((FormObject)form, quad);
+            
+        final BufferedImage icon = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+        final Graphics g = icon.getGraphics();
+        
+        if (quad.length >= 8) {
+            for (int hi = 0; hi != quad.length; hi += 8) {
+                final int x = (int) quad[hi] - bounds.x;
+                int y = (int) quad[hi + 5] - bounds.y;
+                //Adjust y for display
+                y = (bounds.height - y) - (int) (quad[hi + 1] - quad[hi + 5]);
+                final int width = (int) (quad[hi + 2] - quad[hi]);
+                final int height = (int) (quad[hi + 1] - quad[hi + 5]);
+
+                try {
+                    g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+                    g.fillRect(x, y, width, height);
+                    g.setColor(color);
+                    g.fillRect(x, y + height - 1, width, 1);
+                } catch (final Exception e) {
+                    LogWriter.writeLog("Exception: " + e.getMessage());
+                }
+            }
+        }
+        
+        return icon;
+    }
+    
     private static BufferedImage getSquareIcon(final PdfObject form){
-        final float[] external = form.getFloatArray(PdfDictionary.C);
-        final float[] internal = form.getFloatArray(PdfDictionary.IC);
-        Color c = new Color(0,0,0,0);
-        Color ic = new Color(0,0,0,0);
-        
-        if (external != null) {
-            c = convertFloatArrayToColor(external);
-        }
-        
-        if (internal != null) {
-            ic = convertFloatArrayToColor(internal);
-        }
+        Color c = convertFloatArrayToColor(form.getFloatArray(PdfDictionary.C));
+        Color ic = convertFloatArrayToColor(form.getFloatArray(PdfDictionary.IC));
         
         float[] quad = form.getFloatArray(PdfDictionary.Rect);
         if (quad != null) {
             
-            Rectangle bounds = ((FormObject)form).getBoundingRectangle();
-            
-            //Bounds is 0 so calculate based on quad areas
-            if(bounds.getWidth()==0 && bounds.getHeight()==0){
-                for(int i=0; i!=quad.length; i++){
-                    if(i%2==0){
-                        if(bounds.x>quad[i]){
-                            bounds.x = (int)quad[i];
-                        }
-                        if(bounds.x+bounds.width<quad[i]){
-                            bounds.width = (int)(quad[i]-bounds.x);
-                        }
-                    }else{
-                        if(bounds.y>quad[i]){
-                            bounds.y = (int)quad[i];
-                        }
-                        if(bounds.y+bounds.height<quad[i]){
-                            bounds.height = (int)(quad[i]-bounds.y);
-                        }
-                    }
-                    
-                }
-            }
+            Rectangle bounds = getFormBounds((FormObject)form, quad);
             
             final BufferedImage icon = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
             final Graphics2D g = (Graphics2D)icon.getGraphics();
@@ -331,7 +405,7 @@ public class AnnotationFactory {
         if (image != null) {
             final GraphicsState gs = new GraphicsState();
 
-            /**
+            /*
              * now draw the finished image of the form
              */
             final int iconHeight = image.getHeight();

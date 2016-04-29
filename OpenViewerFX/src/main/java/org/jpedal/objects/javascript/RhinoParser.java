@@ -34,23 +34,21 @@ package org.jpedal.objects.javascript;
 
 import java.util.List;
 import java.util.StringTokenizer;
-
+import javax.swing.SwingUtilities;
 import org.jpedal.objects.Javascript;
+import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.ReturnValues;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.acroforms.creation.FormFactory;
-import org.jpedal.objects.javascript.functions.JSFunction;
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.javascript.defaultactions.DisplayJavascriptActions;
 import org.jpedal.objects.javascript.defaultactions.JpedalDefaultJavascript;
+import org.jpedal.objects.javascript.functions.JSFunction;
 import org.jpedal.objects.layers.Layer;
 import org.jpedal.objects.layers.PdfLayerList;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
-
-import javax.swing.*;
-import org.jpedal.objects.raw.PdfDictionary;
 
 
 public class RhinoParser extends DefaultParser implements ExpressionEngine{

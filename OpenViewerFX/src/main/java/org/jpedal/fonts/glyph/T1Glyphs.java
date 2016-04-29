@@ -32,13 +32,12 @@
  */
 package org.jpedal.fonts.glyph;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.io.IOException;
-import java.util.Collections;
-
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.fonts.glyph.objects.T1GlyphNumber;
 import org.jpedal.fonts.objects.FontData;
@@ -518,7 +517,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
                 dynamicVectorRenderer != null &&                    //Check right call
                 dynamicVectorRenderer.isHTMLorSVG()) {     //Just to be safe
 
-            dynamicVectorRenderer.saveAdvanceWidth(baseFontName,glyphName,(int)ys);
+            dynamicVectorRenderer.saveAdvanceWidth(objID,glyphName,(int)ys);
             
         }
         
@@ -1304,15 +1303,15 @@ public class T1Glyphs extends PdfJavaGlyphs {
                 dynamicVectorRenderer.isHTMLorSVG()) {       //Just to be safe
 
             if ("notdef".equals(glyph)) {
-                dynamicVectorRenderer.saveAdvanceWidth(baseFontName, String.valueOf(rawInt),potentialWidth);
+                dynamicVectorRenderer.saveAdvanceWidth(objID, String.valueOf(rawInt),potentialWidth);
             } else {
-                dynamicVectorRenderer.saveAdvanceWidth(baseFontName,glyph,potentialWidth);
+                dynamicVectorRenderer.saveAdvanceWidth(objID,glyph,potentialWidth);
             }
             
             //Store the default widths.
             if (!defaultWidthsPassed) {
                 for (int i=0; i<defaultWidthX.length; i++) {
-                    dynamicVectorRenderer.saveAdvanceWidth(baseFontName, "JPedalDefaultWidth"+i, defaultWidthX[i]);
+                    dynamicVectorRenderer.saveAdvanceWidth(objID, "JPedalDefaultWidth"+i, defaultWidthX[i]);
                 }
                 defaultWidthsPassed = true;
             }
@@ -1376,7 +1375,7 @@ public class T1Glyphs extends PdfJavaGlyphs {
             
             //Store the default widths.
             for (int i=0; i<defaultWidthX.length; i++) {
-                dynamicVectorRenderer.saveAdvanceWidth(baseFontName, "JPedalDefaultWidth"+i, defaultWidthX[i]);
+                dynamicVectorRenderer.saveAdvanceWidth(objID, "JPedalDefaultWidth"+i, defaultWidthX[i]);
             }
         }
     }

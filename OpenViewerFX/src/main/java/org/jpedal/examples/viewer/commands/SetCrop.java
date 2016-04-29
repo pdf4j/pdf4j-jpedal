@@ -32,12 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.CropPDFPages;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -61,7 +61,7 @@ public class SetCrop {
             } else {
                 //get values from user
                 final CropPDFPages cropPage = new CropPDFPages(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int cropPageChoice = cropPage.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerTooltip.PDFCropPages"));
+                final int cropPageChoice = cropPage.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerTooltip.PDFCropPages"));
 
                 //get parameters and call if YES
                 if (cropPageChoice == JOptionPane.OK_OPTION) {

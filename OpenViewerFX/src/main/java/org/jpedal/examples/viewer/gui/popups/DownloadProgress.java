@@ -37,9 +37,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-
-import org.jpedal.utils.LogWriter;
 import org.jpedal.io.ObjectStore;
+import org.jpedal.utils.LogWriter;
 
 public class DownloadProgress {
 	//Load file from URL into file then open file

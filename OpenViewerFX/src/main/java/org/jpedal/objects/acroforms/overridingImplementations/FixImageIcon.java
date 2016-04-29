@@ -32,19 +32,12 @@
  */
 package org.jpedal.objects.acroforms.overridingImplementations;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-
 import javax.swing.Icon;
 import javax.swing.SwingConstants;
-
-import org.jpedal.objects.raw.FormObject;
-
 import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.FormStream;
 import org.jpedal.objects.raw.PdfObject;
 
@@ -196,8 +189,8 @@ public class FixImageIcon extends CustomImageIcon implements Icon, SwingConstant
 			if(currentpdffile!=null){
 
 				//work out w,h which we want to draw inside our icon to maintain aspect ratio.
-				float ws = (float)drawWidth / (float)image.getWidth(null);
-				float hs = (float)drawHeight / (float)image.getHeight(null);
+				float ws = drawWidth / (float)image.getWidth(null);
+				float hs = drawHeight / (float)image.getHeight(null);
 				
 				//check if dimensions are correct and alter if not
 				final float diff = ws-hs;
@@ -210,8 +203,8 @@ public class FixImageIcon extends CustomImageIcon implements Icon, SwingConstant
 					drawWidth = drawHeight;
 					drawHeight = tmp;
 					
-					ws = (float)drawWidth / (float)image.getWidth(null);
-					hs = (float)drawHeight / (float)image.getHeight(null);
+					ws = drawWidth / (float)image.getWidth(null);
+					hs = drawHeight / (float)image.getHeight(null);
 				}
 				
 				if(ws<hs){
@@ -242,7 +235,7 @@ public class FixImageIcon extends CustomImageIcon implements Icon, SwingConstant
 				finalRotation = pageRotate;
 			}
 			
-            /** with new decode at needed size code the resize (drawImage) may not be needed. */
+            /* with new decode at needed size code the resize (drawImage) may not be needed. */
             switch (finalRotation) {
                 case 270:
                     g2.rotate(-Math.PI / 2);
@@ -276,7 +269,7 @@ public class FixImageIcon extends CustomImageIcon implements Icon, SwingConstant
             return;
         }
 		
-		/** NOTE the image code may need changing so that we store up to a certain size image
+		/* NOTE the image code may need changing so that we store up to a certain size image
 		 *  and not store large images, once the user has rescaled to a more normal size.
 		 *  we could store the root width and height for the 100% size and use 200% as the 
 		 *  highest image size to keep.

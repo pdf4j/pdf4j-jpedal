@@ -33,7 +33,6 @@
 package org.jpedal.utils;
 
 import java.io.UnsupportedEncodingException;
-
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.io.TextTokens;
 import org.jpedal.parser.DecoderOptions;

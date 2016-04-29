@@ -33,13 +33,11 @@
 
 package org.jpedal.objects.acroforms.actions;
 
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.utils.LogWriter;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
 import javax.sound.sampled.*;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.utils.LogWriter;
 
 public class SoundHandler {
     
@@ -67,22 +65,22 @@ public class SoundHandler {
     
     private static AudioFormat getAudioFormat() {
         
-        /** frame size = sample size in *bytes* multiplied by channels */
+        /* frame size = sample size in *bytes* multiplied by channels */
         frameSize = (sampleSizeInBits / 8) * channels;
         
-        /**
+        /*
          * not sure how to calculate frame rate but saw some other files
          * where it was just the same as sample rate, and in the cases I have
          * seen it seems to work
          */
         final int frameRate = (int) sampleRate;
         
-        /**
+        /*
          * according to the PDF Spec (pg 740) samples larger than 8 bits are
          * big endian
          */
 
-        /**
+        /*
          * also works, but would probably need the big constructor to handle
          * different types of encoding other than Signed and Unsigned
          */
@@ -94,10 +92,7 @@ public class SoundHandler {
     
     public  static AudioInputStream getAudioInputStream(final byte[] data) {
         final AudioFormat audioFormat = getAudioFormat();
-        
-        /**
-         * Taken from PlaySound
-         */
+
         final long length = data.length / frameSize;
 
         return new AudioInputStream(
@@ -109,7 +104,7 @@ public class SoundHandler {
         
         final AudioFormat audioFormat = getAudioFormat();
         
-        /**
+        /*
          * not massively convinced if this is the correct formula for calculating
          * the length, it works for a couple of files though, so may be right.
          */

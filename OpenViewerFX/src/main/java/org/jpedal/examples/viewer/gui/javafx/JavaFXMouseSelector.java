@@ -47,7 +47,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
@@ -64,6 +64,7 @@ import org.jpedal.gui.GUIFactory;
 import org.jpedal.io.Speech;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.parser.DecoderOptions;
+import org.jpedal.render.FXDisplay;
 import org.jpedal.text.TextLines;
 import org.jpedal.utils.Messages;
 
@@ -189,10 +190,13 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
                         final FileChooser.ExtensionFilter extFilterTIFF = new FileChooser.ExtensionFilter("Tiff (*TIFF)", "*.tiff");
                         jf.getExtensionFilters().addAll(extFilterJPG, extFilterPNG, extFilterTIFF);
                        
-                        final File file = jf.showSaveDialog((Stage)currentGUI.getFrame());
+                        final File file = jf.showSaveDialog((Window)currentGUI.getFrame());
                         String fileExt = file.getName();
                         fileExt = fileExt.substring(fileExt.indexOf('.')+1, fileExt.length());
-                        decode_pdf.getDynamicRenderer().saveImage(id, file.getAbsolutePath(), fileExt);
+                        
+                        final FXDisplay fxRenderer=(FXDisplay) decode_pdf.getDynamicRenderer();                       
+                        
+                        fxRenderer.saveImage(id, file.getAbsolutePath(), fileExt);
                   
                     }
                 }
@@ -421,14 +425,17 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
                 commonValues.m_x1 = (int)e.getX()+crx;
                 commonValues.m_y1 = (int)e.getY()+cry;
 
+                final FXDisplay fxRenderer=(FXDisplay) decode_pdf.getDynamicRenderer();                       
+                    
                 if (decode_pdf.getDisplayView() == Display.SINGLE_PAGE) {
-                    id = decode_pdf.getDynamicRenderer().isInsideImage(commonValues.m_x1, commonValues.m_y1);
+                    id = fxRenderer.isInsideImage(commonValues.m_x1, commonValues.m_y1);
                 } else {
                     id = -1;
                 } 
 
                 if (lastId != id && id != -1) {
-                    final int[] imageArea = decode_pdf.getDynamicRenderer().getAreaAsArray(id);
+                       
+                    final int[] imageArea = fxRenderer.getAreaAsArray(id);
 
                     if (imageArea != null) {
                         int h = imageArea[3];
@@ -436,16 +443,17 @@ public class JavaFXMouseSelector extends MouseSelector implements JavaFXMouseFun
 
                         int x = imageArea[0]; 
                         int y = imageArea[1];
-                        decode_pdf.getDynamicRenderer().setneedsHorizontalInvert(false);
-                        decode_pdf.getDynamicRenderer().setneedsVerticalInvert(false);
+                             
+                        fxRenderer.setneedsHorizontalInvert(false);
+                        fxRenderer.setneedsVerticalInvert(false);
                         //						Check for negative values
                         if (w < 0) {
-                            decode_pdf.getDynamicRenderer().setneedsHorizontalInvert(true);
+                            fxRenderer.setneedsHorizontalInvert(true);
                             w = -w;
                             x -= w;
                         }
                         if (h < 0) {
-                            decode_pdf.getDynamicRenderer().setneedsVerticalInvert(true);
+                            fxRenderer.setneedsVerticalInvert(true);
                             h = -h;
                             y -= h;
                         }

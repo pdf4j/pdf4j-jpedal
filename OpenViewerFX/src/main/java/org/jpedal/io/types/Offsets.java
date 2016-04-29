@@ -33,10 +33,12 @@
 package org.jpedal.io.types;
 
 import java.io.IOException;
-
 import org.jpedal.io.RandomAccessBuffer;
-import org.jpedal.utils.*;
-import org.jpedal.utils.repositories.*;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.NumberUtils;
+import org.jpedal.utils.Sorts;
+import org.jpedal.utils.repositories.Vector_Int;
+import org.jpedal.utils.repositories.Vector_boolean;
 
 /**
  * byte positions of objects in PDF file

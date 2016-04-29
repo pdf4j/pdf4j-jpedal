@@ -32,20 +32,22 @@
  */
 package org.jpedal.io;
 
-import org.jpedal.exception.PdfException;
-import org.jpedal.objects.Javascript;
-import org.jpedal.objects.PageLookup;
-import org.jpedal.objects.raw.*;
-import org.jpedal.utils.LogWriter;
-import org.jpedal.utils.StringUtils;
-
-import javax.imageio.stream.ImageInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.HashMap;
 import java.util.Map;
+import javax.imageio.stream.ImageInputStream;
+import org.jpedal.exception.PdfException;
+import org.jpedal.objects.Javascript;
+import org.jpedal.objects.PageLookup;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PageObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.StringUtils;
 
 /**
  *  Provide access to data of PDF file on disk
@@ -69,7 +71,12 @@ public class PdfObjectReader {
     /**names lookup table*/
     private NameLookup nameLookup;
     
+    /**names lookup table*/
+    private PageLabels pageLabels;
+    
     RandomAccessBuffer pdf_datafile;
+    
+    PdfObject pageObj;
     
     public PdfObjectReader() {}
     
@@ -145,6 +152,21 @@ public class PdfObjectReader {
     }
     
     /**
+     * convert page number to label (or null if no value)
+     * @param pageNumber
+     * @return Label as String or null
+     */
+    public String convertPageNumberToLabel(final int pageNumber) {
+        
+        //see if decoded
+        if(pageLabels==null) {
+            return null;
+        } else {
+            return pageLabels.get(pageNumber);
+        }   
+    }
+    
+    /**
      * convert name into object ref
      */
     public String convertNameToRef(final String value) {
@@ -171,18 +193,7 @@ public class PdfObjectReader {
         }
         
     }
-    
-    ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * read any names into names lookup
-     */
-    public void readNames(final PdfObject nameObject, final Javascript javascript, final boolean isKid){
-        
-        nameLookup=new NameLookup(this.objectReader);
-        nameLookup.readNames(nameObject, javascript, isKid);
-    }
-    
     /**
      * given a ref, what is the page
      * @param ref - PDF object reference
@@ -202,6 +213,8 @@ public class PdfObjectReader {
         
         //this.objData=null;
         //this.lastRef=null;
+        
+        pageLabels=null;
         
         nameLookup=null;
         
@@ -278,7 +291,7 @@ public class PdfObjectReader {
     
     public void checkParentForResources(final PdfObject pdfObject) {
         
-        /**
+        /*
          * if no resource, check parent for one
          * (in theory should recurse up whole tree)
          */
@@ -348,8 +361,6 @@ public class PdfObjectReader {
                     
                     final File file=File.createTempFile("page",".bin", new File(ObjectStore.temp_dir));
                     tempFileName=file.getAbsolutePath();
-                    
-                    //file.deleteOnExit();
                     
                     final java.io.FileOutputStream a =new java.io.FileOutputStream(file);
                     
@@ -477,5 +488,37 @@ public class PdfObjectReader {
         }
         
     }
+
+    public void readDocumentMetaData(PdfObject pdfObject, Javascript jsHandler) {
+
+        //check read as may be used for Dest
+        PdfObject nameObj = pdfObject.getDictionary(PdfDictionary.Names);
+        if (nameObj != null) {
+            nameLookup=new NameLookup(this.objectReader);
+            nameLookup.readNames(nameObj, jsHandler, false);
+        } else {
+            nameObj = pdfObject.getDictionary(PdfDictionary.Dests);
+
+            if (nameObj != null) {
+                nameLookup=new NameLookup(this.objectReader);
+                nameLookup.readNames(nameObj, jsHandler, false);
+            }
+        }
+        
+        //any PageLabels
+        pageObj = pdfObject.getDictionary(PdfDictionary.PageLabels);
+       
+    }
     
+    public void readPageLabels(int pageCount) {
+
+        if(pageObj!=null){            
+            pageLabels=new PageLabels(this.objectReader,pageCount);
+            pageLabels.readLabels(pageObj);            
+        }
+    }
+
+    public PageLabels getPageLabels() {
+        return pageLabels;
+    }
 }

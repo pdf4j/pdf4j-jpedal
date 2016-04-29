@@ -39,16 +39,11 @@ import java.util.regex.Pattern;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.PdfData;
-import org.jpedal.objects.PdfPageData;
 import org.jpedal.utils.Fonts;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Sorts;
 import org.jpedal.utils.Strip;
-import org.jpedal.utils.repositories.Vector_Float;
-import org.jpedal.utils.repositories.Vector_Int;
-import org.jpedal.utils.repositories.Vector_Object;
-import org.jpedal.utils.repositories.Vector_Rectangle;
-import org.jpedal.utils.repositories.Vector_String;
+import org.jpedal.utils.repositories.*;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
 /**
@@ -150,7 +145,7 @@ public class PdfGroupingAlgorithms {
 	/**teasers for findtext*/
 	private String[] teasers;
 
-	private final List multipleTermTeasers = new ArrayList();
+	private final List<String> multipleTermTeasers = new ArrayList<String>();
 
 	private boolean usingMultipleTerms;
 
@@ -163,7 +158,7 @@ public class PdfGroupingAlgorithms {
 	private static final int linkedSearchAreas=-101;
 	
 	/** create a new instance, passing in raw data */
-	public PdfGroupingAlgorithms(final PdfData pdf_data, final PdfPageData pageData, final boolean isXMLExtraction) {
+	public PdfGroupingAlgorithms(final PdfData pdf_data, final boolean isXMLExtraction) {
 		this.pdf_data = pdf_data;
 	this.isXMLExtraction=isXMLExtraction;
 		colorExtracted=pdf_data.isColorExtracted();
@@ -3525,7 +3520,9 @@ public class PdfGroupingAlgorithms {
 								yMidPt = (f_y1[i] + f_y2[i]) / 2;
 
 								//see if line & if only or better fit
-								if ((yMidPt < f_y1[c])&& (yMidPt > f_y2[c])&&((smallest_gap < 0)|| (gap < smallest_gap))) {
+								if ((yMidPt < f_y1[c]) && 
+                                        (yMidPt > f_y2[c]) && 
+                                        ((smallest_gap < 0) || (gap < smallest_gap))) {
 									smallest_gap = gap;
 									id = i;
 								}	
@@ -3549,7 +3546,9 @@ public class PdfGroupingAlgorithms {
 					separator =isGapASpace(c,id,possSpace,addMultiplespaceXMLTag,mode);
 					
 					/** merge if adjoin */
-					if ((breakOnSpace)&&(hadSpace!=null)&&((hadSpace[c])||(separator.startsWith(" ")))) {
+					if ((breakOnSpace) &&
+                            (((hadSpace!=null)&&((hadSpace[c])||(separator.startsWith(" ")))) ||
+                            (!separator.isEmpty()))) {
                         break;
                     }
 					
@@ -3565,7 +3564,7 @@ public class PdfGroupingAlgorithms {
 		}
 	}
 
-    static class ResultsComparatorRectangle implements Comparator {
+    static class ResultsComparatorRectangle implements Comparator<Object> {
 		private final int rotation;
 		
 		ResultsComparatorRectangle(final int rotation) {
@@ -3617,7 +3616,7 @@ public class PdfGroupingAlgorithms {
 		}
 	}
     
-	static class ResultsComparator implements Comparator {
+	static class ResultsComparator implements Comparator <Object> {
 		private final int rotation;
 		
 		ResultsComparator(final int rotation) {
@@ -3740,7 +3739,6 @@ public class PdfGroupingAlgorithms {
 	 * @param x2 the right x cord
 	 * @param y2 the lower y cord
 	 * @param rotation the rotation of the page to be searched
-	 * @param page_number the page number to search on
 	 * @param terms the terms to search for
 	 * @param searchType searchType the search type made up from one or more constants obtained from the SearchType class
 	 * @param listener an implementation of SearchListener is required, this is to enable searching to be cancelled
@@ -3749,7 +3747,7 @@ public class PdfGroupingAlgorithms {
 	 * @throws PdfException If the co-ordinates are not valid
 	 */
 	public SortedMap findMultipleTermsInRectangleWithMatchingTeasers(final int x1, final int y1, final int x2, final int y2, final int rotation,
-			final int page_number, final String[] terms, final int searchType, final SearchListener listener) throws PdfException {
+																	 final String[] terms, final int searchType, final SearchListener listener) throws PdfException {
 		
 		usingMultipleTerms = true;
 		multipleTermTeasers.clear();
@@ -3761,7 +3759,7 @@ public class PdfGroupingAlgorithms {
 		
 		final List highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, terms, searchType, listener);
 
-		final SortedMap highlightsWithTeasers = new TreeMap(new ResultsComparatorRectangle(rotation));
+		final SortedMap<Object , String> highlightsWithTeasers = new TreeMap<Object , String>(new ResultsComparatorRectangle(rotation));
 		
 		for (int i = 0; i < highlights.size(); i++) {
 
@@ -3786,7 +3784,6 @@ public class PdfGroupingAlgorithms {
 	 * @param x2 the right x cord
 	 * @param y2 the lower y cord
 	 * @param rotation the rotation of the page to be searched
-	 * @param page_number the page number to search on
 	 * @param terms the terms to search for
 	 * @param searchType searchType the search type made up from one or more constants obtained from the SearchType class
 	 * @param listener an implementation of SearchListener is required, this is to enable searching to be cancelled
@@ -3794,7 +3791,7 @@ public class PdfGroupingAlgorithms {
 	 * @throws PdfException If the co-ordinates are not valid
 	 */
 	public SortedMap findTextWithinInAreaWithTeasers(final int x1, final int y1, final int x2, final int y2, final int rotation,
-			final int page_number, final String[] terms, final int searchType, final SearchListener listener) throws PdfException {
+													 final String[] terms, final int searchType, final SearchListener listener) throws PdfException {
 		
 		usingMultipleTerms = true;
 		multipleTermTeasers.clear();
@@ -3806,7 +3803,7 @@ public class PdfGroupingAlgorithms {
 		
 		final List highlights = findTextWithinArea(x1, y1, x2, y2, terms, searchType, listener);
 
-		final SortedMap highlightsWithTeasers = new TreeMap(new ResultsComparator(rotation));
+		final SortedMap<Object , String> highlightsWithTeasers = new TreeMap<Object , String>(new ResultsComparator(rotation));
 		
 		for (int i = 0; i < highlights.size(); i++) {
 
@@ -3830,9 +3827,8 @@ public class PdfGroupingAlgorithms {
 	 * @param x2 the right x cord
 	 * @param y2 the lower y cord
 	 * @param rotation the rotation of the page to be searched
-	 * @param page_number the page number to search on
 	 * @param terms the terms to search for
-	 * @param orderResults if true the list that is returned is ordered to return the resulting rectangles in a 
+	 * @param orderResults if true the list that is returned is ordered to return the resulting rectangles in a
 	 * logical order descending down the page, if false, rectangles for multiple terms are grouped together.
 	 * @param searchType searchType the search type made up from one or more constants obtained from the SearchType class
 	 * @param listener an implementation of SearchListener is required, this is to enable searching to be cancelled
@@ -3840,13 +3836,13 @@ public class PdfGroupingAlgorithms {
 	 * @throws PdfException If the co-ordinates are not valid
 	 */
 	public List findMultipleTermsInRectangle(final int x1, final int y1, final int x2, final int y2, final int rotation,
-			final int page_number, final String[] terms, final boolean orderResults, final int searchType, final SearchListener listener) throws PdfException {
+											 final String[] terms, final boolean orderResults, final int searchType, final SearchListener listener) throws PdfException {
 		
 		usingMultipleTerms = true;
 		multipleTermTeasers.clear();
 		teasers = null;
 		
-		final List highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, terms, searchType, listener);
+		final List<Object> highlights = findMultipleTermsInRectangle(x1, y1, x2, y2, terms, searchType, listener);
 		
 		if (orderResults) {
 			Collections.sort(highlights, new ResultsComparator(rotation));
@@ -3857,10 +3853,10 @@ public class PdfGroupingAlgorithms {
 		return highlights;
 	}
 
-	private List findMultipleTermsInRectangle(final int x1, final int y1, final int x2, final int y2, final String[] terms, final int searchType,
+	private List<Object> findMultipleTermsInRectangle(final int x1, final int y1, final int x2, final int y2, final String[] terms, final int searchType,
 											  final SearchListener listener) throws PdfException {
 		
-        final List list = new ArrayList();
+        final List<Object> list = new ArrayList<Object>();
 
         for (final String term : terms) {
             if (listener != null && listener.isCanceled()) {
@@ -3912,7 +3908,7 @@ public class PdfGroupingAlgorithms {
     private List findTextWithinArea(final int x1, final int y1, final int x2, final int y2, final String[] terms, final int searchType,
 									final SearchListener listener) throws PdfException {
 		
-        final List list = new ArrayList();
+        final List<Object> list = new ArrayList<Object>();
 
         for (final String term : terms) {
             if (listener != null && listener.isCanceled()) {
@@ -4031,24 +4027,6 @@ public class PdfGroupingAlgorithms {
 		 
 	}
 
-	/**
-	 * Deprecated on 20/06/2014, please use findText(int x1, int y1, int x2, int y2, String[] terms, int searchType).<br>
-	 * Note: input variable page_number no longer functions due to refactoring. FindText functions for the currently decoded page.
-	 * @deprecated
-	 */
-    @Deprecated
-	@SuppressWarnings("UnusedParameters")
-    public final float[] findText(
-			final Rectangle searchArea,
-			final int page_number,
-			final String[] terms,
-			final int searchType)
-	throws PdfException {
-        return findText(searchArea.x, searchArea.y, 
-                searchArea.x+searchArea.width, searchArea.y+searchArea.height, 
-                terms, searchType);
-	}
-    
     //<link><a name="findTextInRectangle" />
 	/**
 	 * Method to find text in the specified area allowing for the text to be split across multiple lines.<br>

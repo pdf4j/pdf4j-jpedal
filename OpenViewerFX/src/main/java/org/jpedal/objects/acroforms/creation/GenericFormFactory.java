@@ -36,17 +36,13 @@ package org.jpedal.objects.acroforms.creation;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-
-import org.jpedal.objects.Javascript;
-import org.jpedal.objects.acroforms.actions.ActionHandler;
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.Javascript;
 import org.jpedal.objects.PdfPageData;
-
+import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.FormStream;
 import org.jpedal.objects.raw.PdfDictionary;

@@ -39,7 +39,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.StringTokenizer;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -67,7 +66,7 @@ public class ShowGUIMessage
     public static final void showstaticGUIMessage( final StringBuffer message, final String title )
 	{
 
-		/**
+		/*
 		 * create a display
 		 */
 		final JTextArea text_pane = new JTextArea();
@@ -83,7 +82,7 @@ public class ShowGUIMessage
 		final int height = (int)text_pane.getSize().getHeight();
 		display.setSize( new Dimension( width + 10, height + 10 ) );
 
-		/**
+		/*
 		 * create the dialog
 		 */
 		JOptionPane.showConfirmDialog( contentPane, /* parentComponent*/ display, /* message*/ title, JOptionPane.DEFAULT_OPTION, /* optionType*/ JOptionPane.PLAIN_MESSAGE ); // messageType
@@ -100,9 +99,7 @@ public class ShowGUIMessage
 	    if(image==null) {
             return;
         }
-		/**
-		 * create a display
-		 */
+
 		final ImagePanel display = new ImagePanel( image );
 		display.setLayout( new BorderLayout() );
 		//display.setBackground(Color.cyan);
@@ -116,9 +113,6 @@ public class ShowGUIMessage
 		
 		display.setSize( new Dimension( width + 10, height + 10 ) );
 
-		/**
-		 * create the dialog
-		 */
 		JOptionPane.showConfirmDialog( contentPane, /* parentComponent*/ display, /* message*/ title, JOptionPane.DEFAULT_OPTION, /* optionType*/ JOptionPane.PLAIN_MESSAGE ); // messageType
 	}
 	///////////////////////////////////////////////////////////
@@ -138,16 +132,10 @@ public class ShowGUIMessage
         final JLabel text_message = new JLabel( output_string.toString() );
         text_message.setBackground( Color.white );
 
-        /**
-         * create a display, including scroll pane
-         */
         final JPanel display = new JPanel();
         display.setLayout( new BorderLayout() );
         display.add( text_message, BorderLayout.CENTER );
 
-        /**
-         * create the dialog
-         */
         JOptionPane.showConfirmDialog( contentPane, /* parentComponent*/ display, /* message*/ title, JOptionPane.DEFAULT_OPTION, /* optionType*/ JOptionPane.PLAIN_MESSAGE ); // messageType
         contentPane.setVisible(true);
 	}

@@ -41,8 +41,8 @@ import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.examples.viewer.utils.PropertyTags;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A class that handles modifying the the viewers GUI based on property values
@@ -248,10 +248,6 @@ public class GUIModifier {
                 currentGUI.getCombo(Commands.ROTATION).setEnabled(set);
                 currentGUI.getCombo(Commands.ROTATION).setVisibility(set);
                 break;
-            case PropertyTags.IMAGEOPDISPLAY:
-                currentGUI.getCombo(Commands.QUALITY).setEnabled(set);
-                currentGUI.getCombo(Commands.QUALITY).setVisibility(set);
-                break;
             case PropertyTags.PROGRESSDISPLAY:
                 currentGUI.enableStatusBar(set, set);
                 break;
@@ -294,6 +290,12 @@ public class GUIModifier {
                 break;
             case PropertyTags.ZOOMOUTBUTTON:
                 setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.ZOOMOUT, set);
+                break;
+            case PropertyTags.ROTATELEFTBUTTON:
+                setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.ROTATELEFT, set);
+                break;
+            case PropertyTags.ROTATERIGHTBUTTON:
+                setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.ROTATERIGHT, set);
                 break;
             case PropertyTags.HELPBUTTON:
                 setButtonEnabledAndVisible(currentGUI.getButtons(), Commands.HELP, set);

@@ -62,7 +62,7 @@ public class PageOffsets {
     public PageOffsets(final int pageCount, final PdfPageData pageData) {
 
 
-			/** calulate sizes for continuous and facing page modes */
+			/* calulate sizes for continuous and facing page modes */
             int pageH, pageW,rotation;
             int facingW = 0, facingH = 0;
             int greatestW = 0, greatestH = 0;

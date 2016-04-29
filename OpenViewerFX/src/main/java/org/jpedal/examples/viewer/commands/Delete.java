@@ -32,12 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.DeletePDFPages;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -61,7 +61,7 @@ public class Delete {
             } else {
                 //get values from user
                 final DeletePDFPages deletedPages = new DeletePDFPages(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int deletedPagesChoice = deletedPages.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerDelete.text"));
+                final int deletedPagesChoice = deletedPages.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerDelete.text"));
 
                 //get parameters and call if YES
                 if (deletedPagesChoice == JOptionPane.OK_OPTION) {

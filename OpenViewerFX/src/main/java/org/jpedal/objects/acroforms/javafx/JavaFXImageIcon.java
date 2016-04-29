@@ -214,7 +214,7 @@ public class JavaFXImageIcon extends ImageView {
             return;
         }
 		
-		/** NOTE the image code may need changing so that we store up to a certain size image
+		/* NOTE the image code may need changing so that we store up to a certain size image
 		 *  and not store large images, once the user has rescaled to a more normal size.
 		 *  we could store the root width and height for the 100% size and use 200% as the 
 		 *  highest image size to keep.

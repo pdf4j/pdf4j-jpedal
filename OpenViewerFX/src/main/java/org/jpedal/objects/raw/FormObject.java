@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.jpedal.color.DeviceCMYKColorSpace;
@@ -952,7 +951,7 @@ public class FormObject extends PdfObject{
                 x += 8;
             }
 
-            /**
+            /*
              * not standard
              */
             switch(id){
@@ -1081,16 +1080,6 @@ public class FormObject extends PdfObject{
            case PdfDictionary.DA:
 	        	return rawDA;     
 
-/**
-	        case PdfDictionary.AC:
-	            return rawAC;
-
-	        case PdfDictionary.CA:
-	            return rawCA;
-
-	        case PdfDictionary.RC:
-	            return rawRC;
-*/
             default:
                 return super.getTextStreamValueAsByte(id);
 
@@ -1873,7 +1862,7 @@ public class FormObject extends PdfObject{
 	 * <b>field</b> is the data to be used to setup the Ff flags
      */
     protected void commandFf(final int flagValue) {
-        /**use formObject.flags
+        /*use formObject.flags
          * to get flags representing field preferences the following are accessed by array address (bit position -1)
          *
          * <b>bit positions</b>
@@ -2790,17 +2779,6 @@ public class FormObject extends PdfObject{
     }
     
     /**
-     * returns to rotation of this field object, 
-     * currently in stamp annotations only
-     *
-     * deprecated use formObject.getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R);
-     *
-    public int getRotation(){
-    	
-    	return getDictionary(PdfDictionary.MK).getInt(PdfDictionary.R);
-    }/**/
-
-    /**
      * returns true if has normal of image
      */
     public boolean hasNormalOff() {
@@ -3129,50 +3107,6 @@ public class FormObject extends PdfObject{
 	}
 
 	/**
-	 * @return the maximum length of the text in the field
-     *
-     *  use formObject.getInt(PdfDictionary.MaxLen)
-	 */
-	//public int getMaxTextLength() {
-		
-	//	return MaxLen;
-	//}
-
-	/**
-	 * @return the normal caption for this button,
-	 * the caption displayed when nothing is interacting with the icon, and at all other times unless 
-	 * a down and/or rollover caption is present
-     *
-     *  use formObject.getDictionary(PdfDictionary.MK).getTextStreamValue(PdfDictionary.CA);
-	 */
-	//public String getNormalCaption() {
-		
-	//	return getDictionary(PdfDictionary.MK).getTextStreamValue(PdfDictionary.CA);
-	//}
-
-	/**
-	 * @return the down caption,
-	 * caption displayed when the button is down/pressed
-     *
-     *  use formObject.getDictionary(PdfDictionary.MK).getTextStreamValue(PdfDictionary.AC);
-	 */
-	//public String getDownCaption() {
-		
-	//	return getDictionary(PdfDictionary.MK).getTextStreamValue(PdfDictionary.AC);
-	//}
-
-	/**
-	 * @return the rollover caption,
-	 * the caption displayed when the user rolls the mouse cursor over the button
-     *
-     * deprecated use formObject.getDictionary(PdfDictionary.MK).getTextStreamValue(PdfDictionary.RC);
-	 *
-	public String getRolloverCaption() {
-		
-		return getDictionary(PdfDictionary.MK).getTextStreamValue(PdfDictionary.RC);
-	}/**/
-
-	/**
 	 * @return the position of the view of the text in this field
 	 * 
 	 * positioning of text relative to icon - (integer)
@@ -3188,21 +3122,6 @@ public class FormObject extends PdfObject{
 		
 		return getDictionary(PdfDictionary.MK).getInt(PdfDictionary.TP);
 	}
-
-	/**
-	 * @return the default state of this field,
-	 * the state to return to when the field is reset
-     *
-     *  use formObject.getName(PdfDictionary.AS);
-	 */
-//	public String getDefaultState() {
-//
-//		if(AS==null)
-//			this.getName(PdfDictionary.AS);
-//
-//		return AS;
-//
-//	}
 
 	/**
 	 * @return the normal on state for this field
@@ -3345,24 +3264,6 @@ public class FormObject extends PdfObject{
 	public Color getTextColor() {
 		return generateColor(textColor);
 	}
-
-	/**
-	 * @return the border style for this field
-     *
-     * deprecated use formObject.getDictionary(pdfDictionary.BS);
-	 *
-	public PdfObject getBorder() {
-		return BS;
-	}/**/
-
-	/**
-	 * @return the background color for this field
-     * deprecated - use FormObject.generateColor(formObj.getDictionary(PdfDictionary.MK).getFloatArray(PdfDictionary.BG));
-	 *
-	public Color getBackgroundColor() {
-    	
-		return generateColor(getDictionary(PdfDictionary.MK).getFloatArray(PdfDictionary.BG));
-	} /**/
 
     /**
      * @return
@@ -3701,14 +3602,10 @@ public class FormObject extends PdfObject{
 
         }
 
-        /**
+        /*
          * update our Swing/ULC component if needed on correct thread
          */
-        if((sync &&
-//            if(cache!=null){
-//                cache.put(this.getObjectRefAsString(),value);
-//            }
-            guiType != FormFactory.ULC) &&//stop ULC for the moment!
+        if((sync && guiType != FormFactory.ULC) && //stop ULC for the moment!
                 guiComp != null) {
                     syncGUI(value);
                 }

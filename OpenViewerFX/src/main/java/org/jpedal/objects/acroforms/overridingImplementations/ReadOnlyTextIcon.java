@@ -32,29 +32,17 @@
  */
 package org.jpedal.objects.acroforms.overridingImplementations;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.StringTokenizer;
-
-import javax.swing.*;
-
+import javax.swing.Icon;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.acroforms.GUIData;
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.objects.raw.FormStream;
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.objects.raw.XObject;
+import org.jpedal.objects.raw.*;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.StringUtils;
 
@@ -159,8 +147,8 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             //only work out scaling if we have a dictionary of an image, as otherwise it could be a blank image (i.e. 1 x 1).
             if(currentpdffile!=null){
                 //work out w,h which we want to draw inside our icon to maintain aspect ratio.
-                final float ws = (float)drawWidth / (float)image.getWidth(null);
-                final float hs = (float)drawHeight / (float)image.getHeight(null);
+                final float ws = drawWidth / (float)image.getWidth(null);
+                final float hs = drawHeight / (float)image.getHeight(null);
                 if(ws<hs){
                     drawWidth = (int)(ws * image.getWidth(null));
                     drawHeight = (int)(ws * image.getHeight(null));
@@ -193,7 +181,7 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
                 finalRotation = pageRotate;
             }
             
-            /** with new decode at needed size code the resize (drawImage) may not be needed. */
+            /* with new decode at needed size code the resize (drawImage) may not be needed. */
             switch (finalRotation) {
                 case 270:
                     g2.rotate(-Math.PI / 2);
@@ -227,7 +215,7 @@ public class ReadOnlyTextIcon extends CustomImageIcon implements Icon, SwingCons
             return;
         }
         
-        /** NOTE the image code may need changing so that we store up to a certain size image
+        /* NOTE the image code may need changing so that we store up to a certain size image
          *  and not store large images, once the user has rescaled to a more normal size.
          *  we could store the root width and height for the 100% size and use 200% as the
          *  highest image size to keep.

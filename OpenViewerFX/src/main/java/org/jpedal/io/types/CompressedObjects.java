@@ -68,7 +68,7 @@ public class CompressedObjects {
                 ii++;
             }
 
-            /**work out key size*/
+            /*work out key size*/
             startKey=ii;
             
             if(startKey==First) {
@@ -80,7 +80,7 @@ public class CompressedObjects {
             }
             endKey=ii-1;
 
-            /**extract key*/
+            /*extract key*/
             int length=endKey-startKey+1;
             char[] newCommand=new char[length];
 
@@ -93,19 +93,19 @@ public class CompressedObjects {
             //track as number for later
             id= NumberUtils.parseInt(startKey, startKey + length, compressedStream);
                 
-            /**move to offset*/
+            /*move to offset*/
             while(compressedStream[ii]==32 || compressedStream[ii]==13 || compressedStream[ii]==10) {
                 ii++;
             }
 
-            /**get size*/
+            /*get size*/
             startOff=ii;
             while((compressedStream[ii]!=32 && compressedStream[ii]!=13 && compressedStream[ii]!=10)&&(ii<First)){
                 ii++;
             }
             endOff=ii-1;
 
-            /**extract offset*/
+            /*extract offset*/
             length=endOff-startOff+1;
             newCommand=new char[length];
             for(int i=0;i<length;i++) {
@@ -114,7 +114,7 @@ public class CompressedObjects {
 
             offsetRef =new String(newCommand);
 
-            /**
+            /*
              * save values if in correct block (can list items over-written in another compressed obj)
              */
             if(compressedID==offset.elementAt(id)){

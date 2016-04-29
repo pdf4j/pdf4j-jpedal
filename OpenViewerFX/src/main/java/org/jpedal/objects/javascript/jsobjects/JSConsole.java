@@ -32,9 +32,9 @@
  */
 package org.jpedal.objects.javascript.jsobjects;
 
+import javax.swing.JDialog;
+import javax.swing.JTextArea;
 import org.jpedal.objects.javascript.JSApp;
-
-import javax.swing.*;
 
 
 public class JSConsole {

@@ -33,7 +33,8 @@
 package org.jpedal.color;
 
 import com.idrsolutions.pdf.color.shading.ShadedPaint;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
@@ -42,10 +43,13 @@ import org.jpedal.exception.PdfException;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
-import org.jpedal.objects.raw.*;
+import org.jpedal.objects.raw.PatternObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.PdfStreamDecoderForPattern;
 import org.jpedal.parser.ValueTypes;
-import org.jpedal.render.*;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.RenderUtils;
 import org.jpedal.utils.LogWriter;
 
 
@@ -77,6 +81,7 @@ public class PatternColorSpace extends GenericColorSpace{
     /**
      * Just initialises variables
      * @param currentPdfFile
+     * @param patternColorSpace
      */
     public PatternColorSpace(final PdfObjectReader currentPdfFile, final GenericColorSpace patternColorSpace){
         
@@ -329,7 +334,7 @@ public class PatternColorSpace extends GenericColorSpace{
         //float[] inputs = PatternObj.getFloatArray(PdfDictionary.Matrix);
         AffineTransform pattern = new AffineTransform();        
         pattern.concatenate(callerAffine);
-        final DynamicVectorRenderer glyphDisplay = decodePatternContent(PatternObj, getMatrix(pattern), streamData, localStore);
+        final PatternDisplay glyphDisplay = decodePatternContent(PatternObj, getMatrix(pattern), streamData, localStore);
         return glyphDisplay.getSingleImagePattern();        
     }
 
@@ -348,7 +353,7 @@ public class PatternColorSpace extends GenericColorSpace{
                 
         final ObjectStore localStore = new ObjectStore();
         BufferedImage image;
-        DynamicVectorRenderer glyphDisplay;
+        PatternDisplay glyphDisplay;
         
         boolean isRotated = affine.getShearX()!=0 || affine.getShearY()!=0;
         
@@ -460,7 +465,7 @@ public class PatternColorSpace extends GenericColorSpace{
    
     
     
-    private DynamicVectorRenderer decodePatternContent(final PdfObject PatternObj, final float[][] matrix, final byte[] streamData, final ObjectStore localStore) {
+    private PatternDisplay decodePatternContent(final PdfObject PatternObj, final float[][] matrix, final byte[] streamData, final ObjectStore localStore) {
         
         final PdfObject Resources=PatternObj.getDictionary(PdfDictionary.Resources);
         
@@ -474,8 +479,8 @@ public class PatternColorSpace extends GenericColorSpace{
         //glyphDecoder.setMultiplier(multiplyer);
         
         //T3Renderer glyphDisplay=new T3Display(0,false,20,localStore);
-        final T3Renderer glyphDisplay=new PatternDisplay(0,false,20,localStore);
-        glyphDisplay.setHiResImageForDisplayMode(true);
+        final PatternDisplay glyphDisplay=new PatternDisplay(0,false,20,localStore);
+       
         try{
             glyphDecoder.setRenderer(glyphDisplay);
             
@@ -497,12 +502,12 @@ public class PatternColorSpace extends GenericColorSpace{
             /**
              * add in a colour (may well need further development)
              */
-            if(strokCol==null){
-                glyphDecoder.setDefaultColors(gs.getStrokeColor(),gs.getNonstrokeColor());
-            }else{
-                glyphDecoder.setDefaultColors(strokCol,new PdfColor(0,255,0));
+            if (strokCol == null) {
+                glyphDecoder.setDefaultColors(gs.getStrokeColor(), gs.getNonstrokeColor());
+            } else {
+                glyphDecoder.setDefaultColors(strokCol, strokCol);
             }
-            
+
             glyphDecoder.decodePageContent(currentGraphicsState, streamData);
             
         } catch (final PdfException e) {

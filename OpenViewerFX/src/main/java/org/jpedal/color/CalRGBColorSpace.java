@@ -35,7 +35,6 @@ package org.jpedal.color;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
-
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 

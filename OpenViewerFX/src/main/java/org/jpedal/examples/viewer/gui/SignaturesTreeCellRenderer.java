@@ -35,7 +35,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.net.URL;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;

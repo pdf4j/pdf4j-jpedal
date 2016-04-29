@@ -32,8 +32,7 @@
  */
 package org.jpedal.external;
 
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import org.jpedal.PdfDecoderInt;
 
 /**

@@ -34,7 +34,8 @@ package org.jpedal.objects.raw;
 
 
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
@@ -48,7 +49,8 @@ import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.parser.PdfStreamDecoder;
 import org.jpedal.parser.ValueTypes;
-import org.jpedal.render.*;
+import org.jpedal.render.T3Display;
+import org.jpedal.render.T3Renderer;
 import org.jpedal.utils.LogWriter;
 
 
@@ -130,7 +132,7 @@ public class FormStream {
         //set H
         final int key = formObject.getNameAsConstant(PdfDictionary.H);
         if(key!=PdfDictionary.Unknown){
-            /**
+            /*
              * highlighting mode
              * done when the mouse is pressed or held down inside the fields active area
              * N nothing
@@ -177,7 +179,7 @@ public class FormStream {
             formObject.setAppreancesUsed(true);
             formObject.setNormalOnState(formObject.getName(PdfDictionary.AS));
 
-            /**
+            /*
              * workout default selection
              */
             if(APobjN.getDictionary(PdfDictionary.On) !=null){
@@ -211,7 +213,7 @@ public class FormStream {
      */
     private void resolveAdditionalAction(final FormObject formObject) {
 
-        /**
+        /*
          * entries NP, PP, FP, LP never used
          * A action when pressed in active area ?some others should now be ignored?
          * E action when cursor enters active area
@@ -260,29 +262,21 @@ public class FormStream {
             return ExternalHandlers.decode(formObj, currentPdfFile, XObject, subtype, width, height, offsetImage, pageScaling);
         }
         
-        //NOTE iconRotation kept to keep api but iconRotation is never used and NOT needed
-        final boolean useHires=true;
-
     	currentPdfFile.checkResolved(XObject);
     	try{
 
-    		/**
+    		/*
     		 * generate local object to decode the stream
     		 */
             final ObjectStore localStore = new ObjectStore();
 
 
-    		/**
+    		/*
     		 * create renderer object
     		 */
     		final T3Renderer glyphDisplay=new T3Display(0,false,20,localStore);
             
-    		//fix for hires
-    		if(useHires){
-                glyphDisplay.setHiResImageForDisplayMode(useHires);
-            }
-
-            final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile,useHires,null); //switch to hires as well
+            final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile);
             glyphDecoder.setParameters(false,true,15,0,false,false);
 
             glyphDecoder.setStreamType(ValueTypes.FORM);
@@ -291,7 +285,7 @@ public class FormStream {
 
             glyphDecoder.setRenderer(glyphDisplay);
 
-    		/**read any resources*/
+    		/*read any resources*/
     		try{
     			PdfObject Resources =XObject.getDictionary(PdfDictionary.Resources);
 
@@ -310,7 +304,7 @@ public class FormStream {
     			LogWriter.writeLog("Exception: " + e.getMessage());
             }
 
-            /**decode the stream*/
+            /*decode the stream*/
     		final byte[] commands=XObject.getDecodedStream();
 
             final float[] matrix=XObject.getFloatArray(PdfDictionary.Matrix);
@@ -584,23 +578,23 @@ public class FormStream {
 	
 			final ObjectStore localStore = new ObjectStore();
 	
-			/**
+			/*
 			 * create renderer object
 			 */
 			final T3Renderer glyphDisplay=new T3Display(0,false,20,localStore);
 	
-	   		/**
+	   		/*
 			 * generate local object to decode the stream
 			 */
 
-			final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile,false,null); //switch to hires as well
+			final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile,null);
             glyphDecoder.setParameters(false,true,15,0,false,false);
 
             glyphDecoder.setObjectValue(ValueTypes.ObjectStore,localStore);
 
 			glyphDecoder.setRenderer(glyphDisplay);
 
-			/**read any resources*/
+			/*read any resources*/
 			try{
 	
 				final PdfObject Resources =Xobject.getDictionary(PdfDictionary.Resources);
@@ -612,7 +606,7 @@ public class FormStream {
                 LogWriter.writeLog("Exception: " + e.getMessage());
             }
 	
-	        /**decode the stream*/
+	        /*decode the stream*/
 			final byte[] commands=Xobject.getDecodedStream();
 	
 			String textString="";
@@ -676,161 +670,6 @@ public class FormStream {
         return dst;
     }
 
-     /**/
-    /**
-     * join the dots and save the image for the inklist annot
-     *
-     * NO exmaple found i switchover so moved into here for if we need
-     *
-    private static void commandInkList(Object field, FormObject formObject) {
-        //the ink list join the dots array
-        if(debug)
-            System.out.println("inklist array="+field);
-
-        //current shape object being drawn note we pass in handle on pageLines
-        PdfShape currentDrawShape=new PdfShape();
-        Rectangle rect = formObject.getBoundingRectangle();
-
-        String paths = (String)field;
-        StringTokenizer tok = new StringTokenizer(paths,"[] ",true);
-        int countArrays=0;
-        boolean isFirstPoint = false;
-        String next,first=null,second=null;
-        while(tok.hasMoreTokens()){
-            next = tok.nextToken();
-            if(next.equals("[")){
-                countArrays++;
-                isFirstPoint = true;
-                continue;
-            }else if(next.equals("]")){
-                countArrays--;
-                continue;
-            }else if(next.equals(" ")){
-                continue;
-            }else {
-                if(first!=null){
-                    second = next;
-                }else {
-                    first = next;
-                    continue;
-                }
-            }
-
-            if(isFirstPoint){
-                currentDrawShape.moveTo(Float.parseFloat(first)-rect.x,Float.parseFloat(second)-rect.y);
-                isFirstPoint = false;
-            }else{
-                currentDrawShape.lineTo(Float.parseFloat(first)-rect.x,Float.parseFloat(second)-rect.y);
-            }
-
-            first = null;
-        }
-//          close for s command
-//            currentDrawShape.closeShape();
-
-        org.jpedal.objects.GraphicsState currentGraphicsState= new org.jpedal.objects.GraphicsState();
-
-        Shape currentShape =
-                currentDrawShape.generateShapeFromPath(null,
-                        currentGraphicsState.CTM,
-                        false,null,false,null,currentGraphicsState.getLineWidth(),0);
-
-        Stroke inkStroke = currentGraphicsState.getStroke();
-
-        BufferedImage image = new BufferedImage(rect.width,rect.height,BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D)image.getGraphics();
-        g2.setStroke(inkStroke);
-        g2.setColor(Color.red);
-        g2.scale(1,-1);
-        g2.translate(0,-image.getHeight());
-        g2.draw(currentShape);
-
-        g2.dispose();
-
-        formObject.setAppearanceImage(image,PdfDictionary.N,PdfDictionary.Off);
-    }/**/
-
-    //////code from DecodeCommand in AnnotStream
-    /**{
-     //the ink list join the dots array
-
-     //current shape object being drawn note we pass in handle on pageLines
-     PdfShape currentDrawShape=new PdfShape();
-     Rectangle rect = formObject.getBoundingRectangle();
-
-     String paths = Strip.removeArrayDeleminators((String)field);
-     StringTokenizer tok = new StringTokenizer(paths,"[] ",true);
-
-     boolean isFirstPoint = false;
-     String next,first=null,second=null;
-     while(tok.hasMoreTokens()){
-     next = tok.nextToken();
-     if(next.equals("[")){
-     isFirstPoint = true;
-     continue;
-     }else if(next.equals("]")){
-     continue;
-     }else if(next.equals(" ")){
-     continue;
-     }else {
-     if(first!=null){
-     second = next;
-     }else {
-     first = next;
-     continue;
-     }
-     }
-
-     if(isFirstPoint){
-     currentDrawShape.moveTo(Float.parseFloat(first)-rect.x,Float.parseFloat(second)-rect.y);
-     isFirstPoint = false;
-     }else{
-     currentDrawShape.lineTo(Float.parseFloat(first)-rect.x,Float.parseFloat(second)-rect.y);
-     }
-
-     first = null;
-     }
-     //          close for s command
-     //            currentDrawShape.closeShape();
-
-     org.jpedal.objects.GraphicsState currentGraphicsState=formObject.getGraphicsState();
-
-     Shape currentShape =
-     currentDrawShape.generateShapeFromPath(null,
-     currentGraphicsState.CTM,
-     false,null,false,null,currentGraphicsState.getLineWidth(),0);
-
-     Stroke inkStroke = currentGraphicsState.getStroke();
-
-     BufferedImage image = new BufferedImage(rect.width,rect.height,BufferedImage.TYPE_INT_ARGB);
-     Graphics2D g2 = (Graphics2D)image.getGraphics();
-     g2.setStroke(inkStroke);
-     g2.setColor(Color.red);
-     g2.scale(1,-1);
-     g2.translate(0,-image.getHeight());
-     g2.draw(currentShape);
-
-     g2.dispose();
-
-     //ShowGUIMessage.showGUIMessage("path draw",image,"path drawn");
-
-     formObject.setNormalAppOff(image,null);
-
-     //        }else if(command.equals("RD")){
-     //            //rectangle differences left top right bottom order as recieved
-     //            //the bounds of the internal object, in from the Rect
-     //
-     //            StringTokenizer tok = new StringTokenizer(Strip.removeArrayDeleminators((String)field));
-     //            float left = Float.parseFloat(tok.nextToken());
-     //            float top = Float.parseFloat(tok.nextToken());
-     //            float right = Float.parseFloat(tok.nextToken());
-     //            float bottom = Float.parseFloat(tok.nextToken());
-     //
-     //            formObject.setInternalBounds(left,top,right,bottom);
-     //        }else {
-     //        	notFound = true;
-     }
-     /*/
     public boolean hasXFADataSet() {
         return false;
     }

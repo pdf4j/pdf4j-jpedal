@@ -33,17 +33,17 @@
 
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Dimension;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import javax.swing.SwingUtilities;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
-import org.jpedal.examples.viewer.*;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.SharedViewer;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.GUI;
-import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 
 /**
@@ -52,7 +52,7 @@ import org.jpedal.gui.GUIFactory;
  */
 class ModeChange {
     
-    static void changeModeInSwing(final int mode, final PdfDecoderInt decode_pdf, final GUIFactory currentGUI, final Values commonValues, final PropertiesFile properties, final GUISearchWindow searchFrame) {
+    static void changeModeInSwing(final int mode, final PdfDecoderInt decode_pdf, final GUIFactory currentGUI, final Values commonValues) {
                           
         if (SwingUtilities.isEventDispatchThread()) {
             
@@ -66,7 +66,7 @@ class ModeChange {
                 selectCurrentGui(currentGUI);
             } else {
                 ((GUI) currentGUI).setSelectedComboIndex(Commands.ROTATION, 0);
-                ((Container) currentGUI.getFrame()).setMinimumSize(new Dimension(0, 0));
+                ((Component) currentGUI.getFrame()).setMinimumSize(new Dimension(0, 0));
             }
             
         } else {
@@ -85,7 +85,7 @@ class ModeChange {
                         selectCurrentGui(currentGUI);
                     }else{                    
                     ((GUI)currentGUI).setSelectedComboIndex(Commands.ROTATION, 0);
-                    ((Container)currentGUI.getFrame()).setMinimumSize(new Dimension(0, 0));                  
+                    ((Component)currentGUI.getFrame()).setMinimumSize(new Dimension(0, 0));                  
                     }
                     currentGUI.setExecutingCommand(false);
                 }
@@ -94,7 +94,7 @@ class ModeChange {
         }
     }
     
-    static void changeModeInJavaFX(final int mode, final PdfDecoderInt decode_pdf, final GUIFactory currentGUI,final Values commonValues, final PropertiesFile properties, final GUISearchWindow searchFrame) {
+    static void changeModeInJavaFX(final int mode, final PdfDecoderInt decode_pdf, final GUIFactory currentGUI) {
                                     
         if (Platform.isFxApplicationThread()) {
             
@@ -180,7 +180,7 @@ class ModeChange {
                 ((Stage) currentGUI.getFrame()).setMinWidth(w);
                 ((Stage) currentGUI.getFrame()).setMinHeight(h);
             } else {
-                ((Container) currentGUI.getFrame()).setMinimumSize(new Dimension(w, (h)));
+                ((Component) currentGUI.getFrame()).setMinimumSize(new Dimension(w, (h)));
             }
         }
     }

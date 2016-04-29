@@ -129,7 +129,7 @@ public class Hmtx extends Table {
 	
 	@SuppressWarnings("UnusedDeclaration")
     public float getAdvanceWidth(final int i) {
-        /**if (i < hMetrics.length) {
+        /*if (i < hMetrics.length) {
 			return hMetrics[i] >> 16;
 		} else {
 			return hMetrics[hMetrics.length - 1] >> 16;
@@ -138,7 +138,7 @@ public class Hmtx extends Table {
     }
 
     public float getWidth(final int i) {
-        /**if (i < hMetrics.length) {
+        /* if (i < hMetrics.length) {
 			return hMetrics[i] >> 16;
 		} else {
 			return hMetrics[hMetrics.length - 1] >> 16;

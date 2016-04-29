@@ -47,7 +47,7 @@ public interface CustomMessageHandler {
      */
     boolean showMessage(Object message);
 
-    /**example below
+    /*example below
     public boolean showMessage(Object message){
 
         if(message instanceof String)
@@ -70,7 +70,7 @@ public interface CustomMessageHandler {
     @SuppressWarnings("UnusedParameters")
     String requestInput(Object[] args);
 
-    /**
+    /*
     public String requestInput(Object[] args) {
 
         System.out.println("input requested - parameters passed in (String or components");
@@ -87,7 +87,7 @@ public interface CustomMessageHandler {
     @SuppressWarnings("UnusedParameters")
     int requestConfirm(Object[] args);
 
-    /**
+    /*
     public int requestConfirm(Object[] args) {
 
         System.out.println("input requested - parameters passed in (String or components");

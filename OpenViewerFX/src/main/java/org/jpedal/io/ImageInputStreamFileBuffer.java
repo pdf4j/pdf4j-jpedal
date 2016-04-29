@@ -33,11 +33,10 @@
 
 package org.jpedal.io;
 
+import java.io.IOException;
+import javax.imageio.stream.ImageInputStream;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.FastByteArrayOutputStream;
-
-import javax.imageio.stream.ImageInputStream;
-import java.io.*;
 
 public class ImageInputStreamFileBuffer implements RandomAccessBuffer {
 

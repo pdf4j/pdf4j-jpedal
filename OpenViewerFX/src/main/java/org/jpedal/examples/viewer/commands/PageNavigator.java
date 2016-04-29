@@ -33,7 +33,7 @@
 package org.jpedal.examples.viewer.commands;
 
 import javax.swing.JOptionPane;
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
@@ -81,7 +81,7 @@ public class PageNavigator {
             //if loading on linearized thread, see if we can actually display
             if (!decode_pdf.isPageAvailable(newPage)) {
                 currentGUI.showMessageDialog("Page " + newPage + " is not yet loaded");
-                currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, String.valueOf(commonValues.getCurrentPage()));
+                currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, currentGUI.getPageLabel(commonValues.getCurrentPage()));
                 return;
             }
 
@@ -110,7 +110,7 @@ public class PageNavigator {
         } catch (final Exception e) {
             currentGUI.showMessageDialog('>' + page + "< " + Messages.getMessage("PdfViewerInvalidNumber.text")+ ' ' +e);
             newPage = commonValues.getCurrentPage();
-            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, String.valueOf(commonValues.getCurrentPage()));
+            currentGUI.setPageCounterText(PageCounter.PAGECOUNTER2, currentGUI.getPageLabel(commonValues.getCurrentPage()));
         }
 
         navigatePages(newPage - commonValues.getCurrentPage(), commonValues, decode_pdf, currentGUI);

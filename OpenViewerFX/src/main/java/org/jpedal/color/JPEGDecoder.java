@@ -39,17 +39,17 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.io.*;
 import java.util.Iterator;
-
-import static org.jpedal.color.GenericColorSpace.cleanupRaster;
-import org.jpedal.examples.handlers.DefaultImageHelper;
-import org.jpedal.utils.LogWriter;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.jpedal.JDeliHelper;
-import org.jpedal.objects.raw.*;
+import static org.jpedal.color.GenericColorSpace.cleanupRaster;
+import org.jpedal.examples.handlers.DefaultImageHelper;
+import org.jpedal.objects.raw.MaskObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.image.utils.ArrayUtils;
+import org.jpedal.utils.LogWriter;
 
 /**
  *
@@ -66,12 +66,7 @@ public class JPEGDecoder {
             if(ras==null) {
                 return null;
             }
-            
-            /**access the file* 2010 (ms) replace this code with new code above as this deprecated
-             * in = new ByteArrayInputStream(data);
-             * com.sun.image.codec.jpeg.JPEGImageDecoder decoder = com.sun.image.codec.jpeg.JPEGCodec.createJPEGDecoder(in);
-             * Raster ras = decoder.decodeAsRaster();
-             * /***/
+           
             ras=cleanupRaster(ras,pX,pY,3);
             
             final int width = ras.getWidth();
@@ -303,9 +298,7 @@ public class JPEGDecoder {
             }
             
         } catch (Exception e) {
-            if(LogWriter.isOutput()) {
-                LogWriter.writeLog("Exception "+e+" with JPeg Image ");
-            }
+            LogWriter.writeLog("Exception "+e+" with JPeg Image ");
         }
         
         return db;

@@ -85,7 +85,7 @@ public class JavaFXCombo extends ComboBox<String> implements GUICombo{
     
     @Override
     public void setEnabled(final boolean value) {
-        /**
+        /*
          * We reverse the value for JavaFX because Swing uses setEnable()
          * whilst javaFX uses setDisable() so false for swing is true for fx.
          */
@@ -94,6 +94,7 @@ public class JavaFXCombo extends ComboBox<String> implements GUICombo{
 
     @Override
     public void setSelectedItem(Object index) {
+        setSelectedItem((String)index);
     }
 
     public void setSelectedItem(String index) {

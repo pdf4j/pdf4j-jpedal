@@ -39,7 +39,8 @@ import java.util.StringTokenizer;
 import javax.swing.JMenuItem;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.commands.SaveForm;
-import org.jpedal.examples.viewer.utils.*;
+import org.jpedal.examples.viewer.utils.Printer;
+import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;
 import org.w3c.dom.Element;
@@ -221,7 +222,7 @@ public class RecentDocuments implements RecentDocumentsFactory {
                 } else if (Values.isProcessing()) {
                     currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
                 } else {
-                    /**
+                    /*
                      * warn user on forms
                      */
                     SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);

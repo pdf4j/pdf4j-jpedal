@@ -32,39 +32,16 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.JViewport;
-import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
+import javax.swing.text.*;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.commands.generic.GUICopy;
@@ -99,15 +76,12 @@ public class ExtractText extends GUIExtractText {
         }
 
         final int[][] highlights = decode_pdf.getTextLines().getHighlightedAreasAs2DArray(commonValues.getCurrentPage());
-        /**
-         * ensure co-ords in right order
-         */
         if (highlights == null) {
             currentGUI.showMessageDialog("There is no text selected.\nPlease highlight the text you wish to extract.", "No Text selected", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        /**
+        /*
          * Window gui components
          */
         final JScrollPane examplePane = new JScrollPane();
@@ -135,7 +109,7 @@ public class ExtractText extends GUIExtractText {
         final JButton extract = new JButton((String) options[2]);
         display_value.setLayout(layout);
 
-        /**
+        /*
          * Used to udpate the example scrollpane when an option is changed.
          */
         final Runnable r = new Runnable() {
@@ -192,7 +166,7 @@ public class ExtractText extends GUIExtractText {
         layout.putConstraint(SpringLayout.SOUTH, demoMessage, -5, SpringLayout.SOUTH, display_value);
         display_value.add(demoMessage);
 
-        /**
+        /*
          * Add grouping buttons to the top of the display
          */
         //Rectangle grouping
@@ -315,7 +289,7 @@ public class ExtractText extends GUIExtractText {
                         for (int t = 0; t != highlights.length; t++) {
                             String extractedText = "";
 
-                            /**
+                            /*
                              * ensure co-ords in right order
                              */
                             highlights[t] = GUICopy.adjustHighlightForExtraction(highlights[t]);
@@ -395,10 +369,10 @@ public class ExtractText extends GUIExtractText {
                         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
                         scroll.setPreferredSize(new Dimension(400, 400));
 
-                        /**
+                        /*
                          * Create a resizeable pop-up for content
                          */
-                        final JDialog displayFrame = new JDialog((JFrame) null, true);
+                        final JDialog displayFrame = new JDialog((Frame) null, true);
                         displayFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                         if (commonValues.getModeOfOperation() != Values.RUNNING_APPLET) {
                             final Container frame = (Container)currentGUI.getFrame();
@@ -414,7 +388,7 @@ public class ExtractText extends GUIExtractText {
                         buttonBar.setLayout(new BorderLayout());
                         displayFrame.getContentPane().add(buttonBar, BorderLayout.SOUTH);
 
-                        /**
+                        /*
                          * yes option allows user to save content
                          */
                         final JButton yes = new JButton(Messages.getMessage("PdfViewerMenu.return"));
@@ -429,7 +403,7 @@ public class ExtractText extends GUIExtractText {
                             }
                         });
 
-                        /**
+                        /*
                          * no option just removes display
                          */
                         final JButton no = new JButton(Messages.getMessage("PdfViewerFileMenuExit.text"));
@@ -444,9 +418,6 @@ public class ExtractText extends GUIExtractText {
                             }
                         });
 
-                        /**
-                         * show the popup
-                         */
                         displayFrame.setVisible(true);
                     }
                 } catch (final PdfException e1) {
@@ -463,7 +434,7 @@ public class ExtractText extends GUIExtractText {
         SwingUtilities.invokeLater(r);
 
         //Set location over window
-        extractionFrame.setLocationRelativeTo((Container)currentGUI.getFrame());
+        extractionFrame.setLocationRelativeTo((Component)currentGUI.getFrame());
         extractionFrame.setResizable(false);
 
         //Display
@@ -489,10 +460,7 @@ public class ExtractText extends GUIExtractText {
         StyleConstants.setForeground(plain_attribute, Color.black);
         int pointer = 0;
 
-        /**
-         * put content in and color XML
-         */
-        if ((useXML) && (content != null)) {
+        if (useXML && content != null) {
             //tokenise and write out data
             final StringTokenizer data_As_tokens = new StringTokenizer(content, "<>", true);
 
@@ -621,7 +589,7 @@ public class ExtractText extends GUIExtractText {
                     final Component[] coms1 = view.getComponents();
                     for (int j = 0; j != coms1.length; j++) {
                         if (coms1[j] instanceof JTextPane) {
-                            ((JTextPane) coms1[j]).setEditable(false);
+                            ((JTextComponent) coms1[j]).setEditable(false);
                         }
                     }
                 }

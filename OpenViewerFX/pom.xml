@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.jpedal</groupId>
     <artifactId>OpenViewerFX</artifactId>
-    <version>6.11.22</version>
+    <version>7.00b29</version>
     <packaging>jar</packaging>
     
     <name>${project.groupId}:${project.artifactId}</name>

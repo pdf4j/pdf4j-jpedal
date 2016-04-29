@@ -33,8 +33,7 @@
 package org.jpedal.color;
 
 
-import java.awt.*;
-
+import java.awt.TexturePaint;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
@@ -59,11 +58,6 @@ public class PdfTexturePaint extends TexturePaint implements PdfPaint {
     @Override
     public int getRGB() {
         return 0;
-    }
-
-    @Override
-    public void setRenderingType(final int createHtml) {
-        //added for HTML conversion
     }
     
     @Override

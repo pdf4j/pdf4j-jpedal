@@ -33,8 +33,8 @@
 package org.jpedal.fonts.tt;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * font strings partially implemented - full spec is at http://www.microsoft.com/OpenType/OTSpec/name.htm
@@ -89,7 +89,7 @@ public class Name extends Table {
             final int count=currentFontFile.getNextUint16();
             final int offset=currentFontFile.getNextUint16();
 
-            /**
+            /*
              * read strings
              */
             for(int i=0;i<count;i++){

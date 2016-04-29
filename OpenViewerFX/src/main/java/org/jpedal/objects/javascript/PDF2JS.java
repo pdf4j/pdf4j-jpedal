@@ -35,6 +35,7 @@ package org.jpedal.objects.javascript;
 import org.jpedal.objects.raw.FormObject;
 
 /**JS wrapper around formObject for JS*/
+@SuppressWarnings("ALL")
 public class PDF2JS {
 
     //@SuppressWarnings("UnusedDeclaration")

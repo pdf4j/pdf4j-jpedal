@@ -317,7 +317,7 @@ public class Shape67 {
             this.points = points;
         }
     }
-    
+        
     private static boolean isPointInPoly(Point2D[] points,Point2D p){
         boolean c = false;
         int nvert = points.length;
@@ -327,10 +327,16 @@ public class Shape67 {
         for (int i = 0, j = nvert - 1; i < nvert; j = i++) {
             pi = points[i];
             pj = points[j];
-
-            if (((pi.getY() > py) != (pj.getY() > py))
-                    && (px < (pj.getX() - pi.getX()) * (py - pi.getY()) / (pj.getY() - pi.getY()) + pi.getX())) {
-                c = !c;
+            double piY = pi.getY();
+            double pjY = pj.getY();
+            
+            if ((piY > py) != (pjY > py)){
+                
+                double piX = pi.getX();
+            
+                if ((px < (pj.getX() - piX) * (py - piY) / (pjY - piY) + piX)) {
+                    c = !c;
+                }
             }
         }
         return c;

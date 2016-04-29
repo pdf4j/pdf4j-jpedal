@@ -96,7 +96,7 @@ public class Sorts
     
     /** sorts as a tree like structure in array representation */
     public static final int[] quicksort( final int[] primaryIN, final int[] names ){
-        /** copy so we don't sort original */
+        /* copy so we don't sort original */
         final int items = primaryIN.length;
         final int[] primary = new int[items];
         System.arraycopy(primaryIN, 0, primary, 0, items);

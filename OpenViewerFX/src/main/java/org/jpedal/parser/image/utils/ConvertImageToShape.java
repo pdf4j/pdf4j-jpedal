@@ -32,13 +32,12 @@
  */
 package org.jpedal.parser.image.utils;
 
+import java.awt.geom.GeneralPath;
 import org.jpedal.objects.GraphicsState;
+import org.jpedal.objects.SwingShape;
 import org.jpedal.parser.Cmd;
 import org.jpedal.parser.ParserOptions;
 import org.jpedal.render.DynamicVectorRenderer;
-
-import java.awt.geom.GeneralPath;
-import org.jpedal.objects.SwingShape;
 
 public class ConvertImageToShape {
 

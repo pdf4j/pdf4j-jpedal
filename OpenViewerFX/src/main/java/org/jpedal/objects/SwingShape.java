@@ -31,12 +31,14 @@
  * ---------------
  */
 package org.jpedal.objects;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.Serializable;
-
 import org.jpedal.parser.Cmd;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.Vector_Float;
@@ -382,7 +384,7 @@ public class SwingShape implements Serializable, PdfShape
             }
         }
 
-        /**
+        /*
          * fix for single rotated lines with thickness
          */
         if(current_path!=null && CTM[0][0]==1 && CTM[1][1]==-1 && current_path.getBounds().height==1 && thickness>10 ){
@@ -499,42 +501,6 @@ public class SwingShape implements Serializable, PdfShape
     {
         winding_rule = GeneralPath.WIND_EVEN_ODD;
     }
-
-    /**
-     * show the shape segments for debugging
-     *
-     static final private void showShape( Shape current_shape )
-     {
-     PathIterator xx = current_shape.getPathIterator( null );
-     double[] coords = new double[6];
-     while( xx.isDone() == false )
-     {
-     int type = xx.currentSegment( coords );
-     xx.next();
-     switch( type )
-     {
-     case PathIterator.SEG_MOVETO:
-     LogWriter.writeLog( "MoveTo" + coords[0] + ' ' + coords[1] );
-     if( ( coords[0] == 0 ) & ( coords[1] == 0 ) )
-     LogWriter.writeLog( "xxx" );
-     break;
-
-     case PathIterator.SEG_LINETO:
-     LogWriter.writeLog( "LineTo" + coords[0] + ' ' + coords[1] );
-     if( ( coords[0] == 0 ) & ( coords[1] == 0 ) )
-     LogWriter.writeLog( "xxx" );
-     break;
-
-     case PathIterator.SEG_CLOSE:
-     LogWriter.writeLog( "CLOSE" );
-     break;
-
-     default:
-     LogWriter.writeLog( "Other" + coords[0] + ' ' + coords[1] );
-     break;
-     }
-     }
-     }/**/
 
     /**
      * number of segments in current shape (0 if no shape or none)

@@ -33,13 +33,11 @@
 package org.jpedal.objects.acroforms.actions;
 
 import org.jpedal.PdfDecoderInt;
-
 import org.jpedal.objects.Javascript;
-
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.layers.PdfLayerList;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfObject;
 
 @SuppressWarnings({"UnusedParameters", "UnusedDeclaration"})
 public interface ActionHandler {
@@ -180,23 +178,6 @@ public interface ActionHandler {
     void C(FormObject formObject);
 
     PdfDecoderInt getPDFDecoder();
-    
-    /**
-     * creates a returns an action listener that will change the down icon for each click
-     * <br>
-     * 2 icons that need to be changed when the button is sellected and not selected,
-     * so that when the button is pressed the appropriate icon is shown correctly
-     *
-     * (ms) 09-10-08 Added rotation parameter
-     */
-    //public Object setupChangingDownIcon(Object downOff, Object downOn, int rotation);
-
-    /**
-     * setup mouse actions to allow the text of the button to change with the captions provided
-     * <br>
-     * should change the caption as the moouse actions occure on the field
-     */
-    //public Object setupChangingCaption(String normalCaption, String rolloverCaption, String downCaption);
 
     /**
      * setup hand cursor when hovering and reset, on exiting

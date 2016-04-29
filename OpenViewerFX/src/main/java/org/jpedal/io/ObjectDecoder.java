@@ -32,13 +32,14 @@
  */
 package org.jpedal.io;
 
-import org.jpedal.io.types.*;
-import org.jpedal.objects.raw.*;
+import java.io.Serializable;
 import org.jpedal.color.ColorSpaces;
-
-import org.jpedal.utils.*;
-
-import java.io.*;
+import org.jpedal.io.types.*;
+import org.jpedal.objects.raw.ObjectFactory;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.NumberUtils;
+import org.jpedal.utils.StringUtils;
 
 /**
  *
@@ -344,7 +345,7 @@ public class ObjectDecoder implements Serializable {
         }
         
         //allow for other values in D,N,R definitions
-        if(pdfKeyType==-1 && id== PdfDictionary.ClassMap){
+        if(pdfKeyType==-1 && (id== PdfDictionary.ClassMap || id== PdfDictionary.Dests)){
             pdfKeyType = Dictionary.getPairedValues(pdfObject, i, raw, pdfKeyType, length, keyLength, keyStart);
         }else
             //allow for other values in D,N,R definitions as key pairs
@@ -438,7 +439,7 @@ public class ObjectDecoder implements Serializable {
                 //read numbers in [] (may be indirect ref)
             }case PdfDictionary.VALUE_IS_MIXED_ARRAY:{
                 final Array objDecoder=new Array(objectReader, i, endPt, PdfDictionary.VALUE_IS_MIXED_ARRAY);
-                i=objDecoder.readArray(ignoreRecursion, raw, pdfObject, PDFkeyInt);
+                i=objDecoder.readArray(ignoreRecursion && PDFkeyInt!=PdfDictionary.Nums, raw, pdfObject, PDFkeyInt);
                 break;
                 
                 //read numbers in [] (may be indirect ref) same as Mixed but allow for recursion and store as objects

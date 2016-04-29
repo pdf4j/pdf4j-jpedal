@@ -32,18 +32,19 @@
  */
 package org.jpedal.images;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.render.BaseDisplay;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Matrix;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 
 /**
  * class to shrink and clip an extracted image
@@ -144,39 +145,19 @@ public class ImageTransformerDouble {
     /**complete image and workout co-ordinates*/
     public final void completeImage(){
 
-        //Matrix.show(CTM);
-		
-		/*if((CTM[0][1]>0 )&(CTM[1][0]>0 )){
-			//ShowGUIMessage.showGUIMessage("",current_image,"a ");
-			AffineTransform image_at =new AffineTransform();
-			image_at.scale(-1,-1);
-			image_at.translate(-current_image.getWidth(),-current_image.getHeight());
-			AffineTransformOp invert= new AffineTransformOp(image_at,  ColorSpaces.hints);
-			
-			current_image = invert.filter(current_image,null);
-			
-		}*/
-
-        //ShowGUIMessage.showGUIMessage("",current_image,"a ");
-		
-		/**/
-        if(hasClip){
+		if(hasClip){
             i_x=(int)clip.getBounds2D().getMinX();
             i_y=(int) clip.getBounds2D().getMinY();
             i_w=(current_image.getWidth());
             i_h=(current_image.getHeight());
 
-            //System.out.println(current_image.getWidth()+" "+current_image.getHeight());
-            //System.out.println(i_x+" "+i_y+" "+i_w+" "+i_h+" "+clip.getBounds2D());
-
-        }/***/
-
+        }
     }
 
     /**scale image to size*/
     private void scale(final float[][] Trm){
 
-        /**
+        /*
          * transform the image only if needed
          */
         if (Trm[0][0] != 1.0|| Trm[1][1] != 1.0 || Trm[0][1] != 0.0 || Trm[1][0] != 0.0) {
@@ -207,7 +188,7 @@ public class ImageTransformerDouble {
 
             //scale image to produce final version
             if(scaleImage){
-                /**
+                /*
                  * Hack for general-Sept2013/Page-1-BAW-A380-PDP.pdf buttons
                  * the filter performed on images here seems to break on images with a height of 1px
                  * which are being sheared. Resulting in a black image.
@@ -255,7 +236,7 @@ public class ImageTransformerDouble {
             }
         }
 
-        /**now work out as 2 matrices*/
+        /*now work out as 2 matrices*/
         Trm1=new float[3][3];
         Trm2=new float[3][3];
 
@@ -310,7 +291,7 @@ public class ImageTransformerDouble {
                 }
             }
 
-            /**
+            /*
              * correct if image reversed on horizontal axis
              */
             if(Trm1[2][0]<0 && Trm1[0][0]>0 && CTM[0][0]<0){
@@ -319,7 +300,7 @@ public class ImageTransformerDouble {
 
             }
 
-            /**
+            /*
              * correct if image reversed on vertical axis
              */
             if(Trm1[2][1]<0 && Trm1[1][1]>0 && CTM[1][1]<0 && CTM[0][0]<0){
@@ -532,7 +513,7 @@ public class ImageTransformerDouble {
 //if(BaseDisplay.isRectangle(final_clip)<7 && Math.abs(final_clip.getBounds().getWidth()-current_image.getWidth())<=1 && Math.abs(final_clip.getBounds().getHeight()-current_image.getHeight())<=1){
 
 
-        /**
+        /*
          * if not rectangle create inverse of clip and paint on to add transparency
          */
         if(segCount>5){

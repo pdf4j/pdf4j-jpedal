@@ -33,24 +33,23 @@
 package org.jpedal.external;
 
 import java.awt.image.BufferedImage;
-import org.jpedal.objects.Javascript;
-import org.jpedal.objects.acroforms.AcroRenderer;
-import org.jpedal.objects.acroforms.creation.FormFactory;
-import org.jpedal.objects.javascript.ExpressionEngine;
-import org.jpedal.parser.PdfStreamDecoder;
-import org.jpedal.parser.ValueTypes;
-import org.jpedal.render.DynamicVectorRenderer;
-
 import java.util.Map;
 import org.jpedal.FileAccess;
 import org.jpedal.display.GUIModes;
 import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.Javascript;
+import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.objects.acroforms.creation.FormFactory;
 import org.jpedal.objects.acroforms.creation.SwingFormCreator;
+import org.jpedal.objects.javascript.ExpressionEngine;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.parser.PDFtoImageConvertor;
+import org.jpedal.parser.PdfStreamDecoder;
+import org.jpedal.parser.ValueTypes;
 import org.jpedal.parser.swing.PDFtoImageConvertorSwing;
+import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.render.SwingDisplay;
 import org.jpedal.utils.LogWriter;
 
@@ -69,7 +68,7 @@ public class ExternalHandlers {
     static {
         
         loader = ExternalHandlers.class.getClassLoader();
-        /**
+        /*
          * javafx
          */
         final String fxClassPath="org/jpedal/fonts/glyph/javafx/JavaFXSupportImpl.class";
@@ -85,12 +84,12 @@ public class ExternalHandlers {
             }
         }
         
-        /**
+        /*
          * ulc
          */
         ULCSupport = loader.getResourceAsStream("com/ulcjava/base/application/ULCTextComponent.class")!=null;
         
-        /**
+        /*
          * xfa
          */
         final String xfaClassPath="org/jpedal/objects/acroforms/AcroRendererXFA.class";
@@ -594,7 +593,7 @@ public class ExternalHandlers {
         if(userFormFactory!=null) {
             formRenderer.setFormFactory(userFormFactory);
         }
-        /**
+        /*
          * setup Javascript object and pass into objects which use it
          */
         javascript = new Javascript(userExpressionEngine1, formRenderer);

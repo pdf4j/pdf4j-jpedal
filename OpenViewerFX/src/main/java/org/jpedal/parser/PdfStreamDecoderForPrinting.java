@@ -33,23 +33,23 @@
 
 package org.jpedal.parser;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.external.ColorHandler;
 import org.jpedal.external.CustomPrintHintingHandler;
+import org.jpedal.external.ErrorTracker;
 import org.jpedal.external.Options;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.render.SwingDisplay;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import org.jpedal.PdfDecoderInt;
-import org.jpedal.external.ErrorTracker;
-
 public class PdfStreamDecoderForPrinting extends PdfStreamDecoder implements PrintStreamDecoder  {
 
-    public PdfStreamDecoderForPrinting(final PdfObjectReader currentPdfFile, final boolean b, final PdfLayerList layers) {
-        super(currentPdfFile, b, layers);
+    public PdfStreamDecoderForPrinting(final PdfObjectReader currentPdfFile, final PdfLayerList layers) {
+        super(currentPdfFile, layers);
 
         isPrinting = true;
     }
@@ -58,12 +58,14 @@ public class PdfStreamDecoderForPrinting extends PdfStreamDecoder implements Pri
     public void print(final Graphics2D g2, final AffineTransform scaling, final int currentPrintPage,
                       final Rectangle userAnnot, final CustomPrintHintingHandler customPrintHintingHandler, final PdfDecoderInt pdf){
 
+        SwingDisplay swingDisplay=(SwingDisplay) current;
+        
         if(customPrintHintingHandler!=null){
-            current.stopG2HintSetting(true);
+            swingDisplay.stopG2HintSetting(true);
             customPrintHintingHandler.preprint(g2,pdf);
         }
 
-        current.setPrintPage(currentPrintPage);
+        swingDisplay.setPrintPage(currentPrintPage);
 
         current.setCustomColorHandler((ColorHandler) pdf.getExternalHandler(Options.ColorHandler));
 
@@ -78,8 +80,7 @@ public class PdfStreamDecoderForPrinting extends PdfStreamDecoder implements Pri
             objectStoreStreamRef = (ObjectStore)obj;
 
             current=new SwingDisplay(parserOptions.getPageNumber(),objectStoreStreamRef,true);
-            current.setHiResImageForDisplayMode(useHiResImageForDisplay);
-
+            
             if(customImageHandler!=null && current!=null) {
                 current.setCustomImageHandler(customImageHandler);
             }

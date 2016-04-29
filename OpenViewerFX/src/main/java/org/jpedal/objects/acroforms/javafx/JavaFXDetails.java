@@ -33,7 +33,6 @@
 package org.jpedal.objects.acroforms.javafx;
 
 import javafx.beans.property.SimpleStringProperty;
-
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 

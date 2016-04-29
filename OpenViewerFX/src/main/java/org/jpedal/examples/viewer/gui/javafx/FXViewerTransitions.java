@@ -32,12 +32,7 @@
  */
 package org.jpedal.examples.viewer.gui.javafx;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
-import javafx.animation.RotateTransition;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Transition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.util.Duration;
 import org.jpedal.PdfDecoderFX;
 

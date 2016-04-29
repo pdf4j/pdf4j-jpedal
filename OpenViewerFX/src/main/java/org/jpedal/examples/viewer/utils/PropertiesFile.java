@@ -33,15 +33,20 @@
 package org.jpedal.examples.viewer.utils;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
-
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.StyleSheet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -49,16 +54,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.gui.ShowGUIMessage;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 /**holds values stored in XML file on disk*/
 public class PropertiesFile {
@@ -75,6 +75,7 @@ public class PropertiesFile {
     }
     
     private Document doc;
+    private StyleSheet styleSheet;
     
     private static final int noOfRecentDocs = 6;
     
@@ -85,7 +86,6 @@ public class PropertiesFile {
         "Show message about rhino and it's use","showrhinomessage", "false",
         "Set how the search functionality is displayed\n0 : External Window\n1 : Side Tab Bar\n2 : Menu bar","searchWindowType", "2",
       "Set if border should be shown\n0 : Hide Border\n1 : Show Border","borderType", "1",
-      "Flag to turn on hiRes printing","useHiResPrinting", "true",
       "This is set the number of pixels used to represent an inch on screen","resolution", "110",
       "Flag to allow cursor to change such as when over text","allowCursorToChange", "true",
       "Flag to allow view to scroll when dragging the mouse","autoScroll", "true",
@@ -171,6 +171,8 @@ public class PropertiesFile {
       "Show the snapshot button on the button bar","Snapshotbutton", "true",
       "Show the Zoom in button on the button bar","ZoomInbutton", "true",
       "Show the Zoom out button on the button bar","ZoomOutbutton", "true",
+      "Show the Rotate left button on the button bar","RotateLeftbutton", "true",
+      "Show the Rotate right button on the button bar","RotateRightbutton", "true",
       "Show the help button on the button bar","Helpbutton", "true",
       "Show the rss feed button on the button bar","RSSbutton", "true",
       "Show the cursor button on the button bar","CursorButton", "true",
@@ -178,8 +180,7 @@ public class PropertiesFile {
         "ENDCHILDREN",
       "Show the contents of the display options bar, Display options bar remain empty if false","DisplayOptionsMenu", "true",
       "Show the scaling options on the display options bar","Scalingdisplay", "true",
-      "Show the rotation options on the display options bar","Rotationdisplay", "true",
-      "Show the image optimisation options on the display options bar","Imageopdisplay", "false",
+      "Show the rotation options on the display options bar","Rotationdisplay", "false",
       "Show the progress bar / display on the display options bar","Progressdisplay", "true",
       "Show the download progress display on the display options bar","Downloadprogressdisplay", "true",
         "ENDCHILDREN",
@@ -234,7 +235,7 @@ public class PropertiesFile {
       "Flag to use enhanced facing mode","enhancedFacingMode","true",
       "Text to use in the window title","windowTitle","",
       "Flag to control if we requestion confirmation to close the viewer","confirmClose","false",
-      "Location where the icons to be used by the viewer are stored","iconLocation","/org/jpedal/examples/viewer/res/",
+      "Location where the icons to be used by the viewer are stored","iconLocation","/org/jpedal/examples/viewer/res/new/",
       "Flag to control if we show a message when entering page flow mode","showpageflowmessage","true",
       "Specify a default printer to use","defaultPrinter","",
       "Flag to output additional printer / printing info","debugPrinter","false",
@@ -421,6 +422,37 @@ public class PropertiesFile {
         }catch(final Exception e){
             LogWriter.writeLog("Exception " + e + " generating properties file");
         }
+        
+        loadStyle();
+    }
+    
+    public void loadStyle(){
+        
+        //Get file location
+        String path = getValue("iconLocation")+"/style.css";
+        File styleFile = new File(path);
+        
+        //If file not found on system, check if actually within the jar
+        if(!styleFile.exists()){
+            try {
+                URL url = getClass().getResource(path);
+                if(url!=null){
+                    styleFile = new File(url.toURI());
+                }
+            } catch (URISyntaxException ex) {
+                LogWriter.writeLog("Exception attempting to find style.xml " + ex);
+            }
+        }
+        
+        //If a style file was found, load it ready for use
+        if (styleFile.exists() && styleFile.length() > 0) {
+            try {
+                styleSheet = new StyleSheet();
+                styleSheet.loadRules(new FileReader(styleFile), null);
+            } catch (IOException ex) {
+                LogWriter.writeLog("Exception " + ex + " generating properties file");
+            }
+        }
     }
     
     public String[] getRecentDocuments(){
@@ -493,6 +525,45 @@ public class PropertiesFile {
     
     public NodeList getChildren(final String item){
         return doc.getElementsByTagName(item).item(0).getChildNodes();
+    }
+    
+    /**
+     * Method to check if a style file is being used.
+     * @return True is style is being used
+     */
+    public boolean isStyleLoaded(){
+        return styleSheet!=null;
+    }
+    
+    /**
+     * Method to get attribute values from the named style.
+     * @param styleName The name of the style to look within
+     * @param attributeKey The name of the attribute to check for a value
+     * @return The value for this attribute or null if key is not found
+     */
+    public String getStyleAttribute(final String styleName, final String attributeKey){
+        if(styleSheet!=null){
+            Style style = styleSheet.getStyle(styleName);
+            if(style!=null){
+                //style is a Style object returned from PropertiesFile.getStyle(String name)
+                Enumeration e = style.getAttributeNames();
+                while (e.hasMoreElements()) {
+                    Object o = e.nextElement();
+                    if (o instanceof String) {
+                        //Not a pairing
+                    } else if (o == StyleConstants.NameAttribute) {
+                        //Not a pairing
+                    } else if (o == StyleConstants.ResolveAttribute) {
+                        //Not a pairing
+                    } else {
+                        if(attributeKey.equals(o.toString())){
+                            return style.getAttribute(o).toString();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     public String getValue(final String elementName){
@@ -619,7 +690,6 @@ public class PropertiesFile {
     /**
      * Checks a node list for a given value either in the tags or the comments.
      * @param tree :: The NodeList to be searched
-     * @param values :: The value to check for, value must be entire node name
      * @param comments :: Only check the comments if true
      * @return
      */
@@ -725,7 +795,7 @@ public class PropertiesFile {
                     }else{
                         
                         //Is it running in the IDE
-                        if(properties[position+1].equals("6.11.22")){
+                        if(properties[position+1].equals("7.0.29")){
                             //Do nothing as we are in the IDE
                             //Refactor for testing purposes
                             //refactorProperties  = true;

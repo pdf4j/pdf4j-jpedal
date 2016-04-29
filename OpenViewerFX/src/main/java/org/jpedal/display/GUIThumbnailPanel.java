@@ -32,9 +32,8 @@
  */
 package org.jpedal.display;
 
-import java.awt.*;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
-
 import org.jpedal.objects.PdfPageData;
 
 /**generic version to show thumbnails in panel on side*/
@@ -52,7 +51,7 @@ public interface GUIThumbnailPanel {
 
 	void generateOtherVisibleThumbnails(int currentPage);
 
-	void setupThumbnails(int pages, Font textFont, String message, PdfPageData pdfPageData);
+	void setupThumbnails(int pages, Font textFont, PdfPageData pdfPageData);
 
 	//void removeAll();
 

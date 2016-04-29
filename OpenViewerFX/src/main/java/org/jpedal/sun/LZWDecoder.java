@@ -34,9 +34,8 @@
  * LZWDecoder.java
  */
 package org.jpedal.sun;
-import java.io.OutputStream;
 import java.io.IOException;
-
+import java.io.OutputStream;
 import org.jpedal.utils.LogWriter;
 /**
  * A class for performing LZW decoding.

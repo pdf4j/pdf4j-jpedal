@@ -40,16 +40,18 @@ import java.net.URL;
 import java.net.URLConnection;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 import javax.imageio.ImageIO;
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
-import org.jpedal.examples.viewer.commands.*;
+import org.jpedal.examples.viewer.commands.Images;
+import org.jpedal.examples.viewer.commands.OpenFile;
+import org.jpedal.examples.viewer.commands.SaveForm;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.DownloadProgress;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
@@ -61,7 +63,6 @@ import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.OutlineObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 
@@ -75,9 +76,7 @@ public class JavaFXOpenFile {
     private static File file;
     
     private static InputStream inputStream;
-    private static boolean isPDf;
-    
-    
+   
     public static void executeOpenFile(final Object[] args, final GUIFactory currentGUI, final GUISearchWindow searchFrame, final PropertiesFile properties, final GUIThumbnailPanel thumbnails, final PdfDecoderInt decode_pdf, final Values commonValues) {
         
         currentGUI.removePageListener();
@@ -121,19 +120,7 @@ public class JavaFXOpenFile {
                     /**/
 
                     try {
-                        isPDf = true;
                         commonValues.setMultiTiff(false);
-
-                        // get any user set dpi
-                        final String hiresFlag = System.getProperty("org.jpedal.hires");
-                        if (DecoderOptions.hires || hiresFlag != null) {
-                            commonValues.setUseHiresImage(true);
-                        }
-                        // get any user set dpi
-                        final String memFlag = System.getProperty("org.jpedal.memory");
-                        if (memFlag != null) {
-                            commonValues.setUseHiresImage(false);
-                        }
 
                         // reset flag
                         thumbnails.resetToDefault();
@@ -147,15 +134,11 @@ public class JavaFXOpenFile {
                         }
 
                         commonValues.maxViewY = 0;// rensure reset for any  viewport
-
-                        currentGUI.setQualityBoxVisible(isPDf);
-
+                        
                         commonValues.setCurrentPage(1);
 
-                        if (currentGUI.isSingle()) {
-                            decode_pdf.closePdfFile();
-                        }
-
+                        decode_pdf.closePdfFile();
+                        
                         decode_pdf.openPdfArray(data);
 
                         currentGUI.updateStatusMessage("opening file");
@@ -253,7 +236,7 @@ public class JavaFXOpenFile {
                             //  openNewMultiplePage(commonValues.getSelectedFile());
                             try {
                                 //Set to true to show our default download window
-                                openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
+                                openFile(commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
                                 while (Values.isProcessing()) {
                                     Thread.sleep(1000);
 
@@ -444,24 +427,11 @@ public class JavaFXOpenFile {
      *
      * @throws PdfException
      */
-    public static void openFile(final String selectedFile, final Values commonValues, final GUISearchWindow searchFrame,
+    public static void openFile(final Values commonValues, final GUISearchWindow searchFrame,
             final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final PropertiesFile properties,
             final GUIThumbnailPanel thumbnails) {
 
-        isPDf = false;
         commonValues.setMultiTiff(false);
-
-        //get any user set dpi
-        final String hiresFlag = System.getProperty("org.jpedal.hires");
-        if (DecoderOptions.hires || hiresFlag != null) {
-            commonValues.setUseHiresImage(true);
-        }
-
-        //get any user set dpi
-        final String memFlag = System.getProperty("org.jpedal.memory");
-        if (memFlag != null) {
-            commonValues.setUseHiresImage(false);
-        }
 
         //reset flag
         thumbnails.resetToDefault();
@@ -475,11 +445,8 @@ public class JavaFXOpenFile {
         }
 
         commonValues.maxViewY = 0;// rensure reset for any viewport
-        final String ending = selectedFile.toLowerCase().trim();
-        commonValues.setPDF(ending.endsWith(".pdf") || ending.endsWith(".fdf"));
-        if(ending.endsWith(".pdf") || ending.endsWith(".fdf")){
-            isPDf = true;
-        }
+        commonValues.setPDF(true);
+        
 
         //switch off continous mode for images
         if (!commonValues.isPDF()) {
@@ -501,8 +468,6 @@ public class JavaFXOpenFile {
 
         }
         
-        currentGUI.setQualityBoxVisible(commonValues.isPDF());
-
         commonValues.setCurrentPage(1);
         
         try {
@@ -559,22 +524,16 @@ public class JavaFXOpenFile {
         if (!isURL && !testFile.exists()) {
             currentGUI.showMessageDialog(Messages.getMessage("PdfViewerFile.text") + commonValues.getSelectedFile() + Messages.getMessage("PdfViewerNotExist"));
 
-            /**
-             * open the file
-             */
+
         } else if (commonValues.getSelectedFile() != null && !Values.isProcessing()) {
 
-            if (currentGUI.isSingle()) {
-                decode_pdf.flushObjectValues(true);
-            } else {
-                decode_pdf = MultiPages.openNewMultiplePage(currentGUI, commonValues);
-            }
+            decode_pdf.flushObjectValues(true);
 
             //reset the viewableArea before opening a new file
             //decode_pdf.resetViewableArea();
             /**/
 
-            openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
+            openFile(commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
         }
     }
@@ -602,7 +561,7 @@ public class JavaFXOpenFile {
             /**
              * holding all creators that produce OCR pdf's
              */
-            final String[] ocr = {"TeleForm", "dgn2pdf"};
+            final String[] ocr = {"TeleForm", "dgn2pdf", "ABBYY FineReader 8.0 Professional Edition"};
 
             for (int i = 0; i < fields.length; i++) {
 
@@ -616,27 +575,8 @@ public class JavaFXOpenFile {
 
                         }
                     }
-
-                    //track Abbyy and tell JPedal to redraw highlights
-                    if (values[i].equals("ABBYY FineReader 8.0 Professional Edition")) {
-                        decode_pdf.setRenderMode(PdfDecoderInt.RENDERIMAGES + PdfDecoderInt.RENDERTEXT + PdfDecoderInt.OCR_PDF);
-                    }
                 }
             }
-
-            final boolean currentProcessingStatus = Values.isProcessing();
-            Values.setProcessing(true);	//stops listeners processing spurious event
-
-            if (commonValues.isUseHiresImage()) {
-                decode_pdf.useHiResScreenDisplay(true);
-                ((GUI) currentGUI).setSelectedComboIndex(Commands.QUALITY, 1);
-            } else {
-                decode_pdf.useHiResScreenDisplay(false);
-                ((GUI) currentGUI).setSelectedComboIndex(Commands.QUALITY, 0);
-            }
-
-            Values.setProcessing(currentProcessingStatus);
-
         }
 
         /**
@@ -646,7 +586,6 @@ public class JavaFXOpenFile {
             commonValues.setPageCount(decode_pdf.getPageCount());
         } else if (!commonValues.isMultiTiff()) {
             commonValues.setPageCount(1);
-            decode_pdf.useHiResScreenDisplay(true);
         }
 
         if (commonValues.getPageCount() < commonValues.getCurrentPage()) {
@@ -673,7 +612,7 @@ public class JavaFXOpenFile {
 
             //add a border
 
-            Images.decodeImage(DecoderOptions.hires, decode_pdf, currentGUI, thumbnails, commonValues);
+            Images.decodeImage(decode_pdf, currentGUI, thumbnails, commonValues);
 
             Values.setProcessing(false);
         }
@@ -697,10 +636,8 @@ public class JavaFXOpenFile {
 
         boolean fileCanBeOpened = true;
 
-        if (currentGUI.isSingle()) {
-            decode_pdf.closePdfFile();
-        }
-
+        decode_pdf.closePdfFile();
+        
         /**
          * ensure all data flushed from PdfDecoder before we decode the file
          */
@@ -967,15 +904,12 @@ public class JavaFXOpenFile {
         } catch (final PdfException e) {
             LogWriter.writeLog(("Exception " + e + " opening file"));
             
-            if (currentGUI.isSingle()) {
-
-                if (GUI.showMessages) {
-                    System.out.println("ErrorDialog in JavaFXOpenFile.java needs JavaFX Rewrite of Error Dialog class");
-                    //ErrorDialog.showError(e, Messages.getMessage("PdfViewerOpenerror"), currentGUI.getFrame(), commonValues.getSelectedFile());
-                }
-
-                JavaFXExit.exit(thumbnails, currentGUI, commonValues, decode_pdf, properties);
+            if (GUI.showMessages) {
+                System.out.println("ErrorDialog in JavaFXOpenFile.java needs JavaFX Rewrite of Error Dialog class");
+                //ErrorDialog.showError(e, Messages.getMessage("PdfViewerOpenerror"), currentGUI.getFrame(), commonValues.getSelectedFile());
             }
+
+            JavaFXExit.exit(thumbnails, currentGUI, commonValues, decode_pdf, properties);
 
             throw e;
         }
@@ -1015,7 +949,7 @@ public class JavaFXOpenFile {
         final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
         chooser.getExtensionFilters().add(extFilter);
 
-        file = chooser.showOpenDialog((Stage)currentGUI.getFrame());
+        file = chooser.showOpenDialog((Window)currentGUI.getFrame());
 
         /**
          * decode
@@ -1190,10 +1124,6 @@ public class JavaFXOpenFile {
                 
 //                currentGUI.stopThumbnails();
 
-                if(!currentGUI.isSingle()) {
-                    MultiPages.openNewMultiplePage(currentGUI, commonValues);
-                }
-                
                 OpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
             }

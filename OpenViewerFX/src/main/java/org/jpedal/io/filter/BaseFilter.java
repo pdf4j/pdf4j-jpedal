@@ -32,12 +32,11 @@
  */
 package org.jpedal.io.filter;
 
+import java.io.*;
+import java.util.Map;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
-
-import java.io.*;
-import java.util.Map;
 
 /**
  * common values
@@ -138,7 +137,7 @@ public class BaseFilter {
         int predictor;
 		final int bytesAvailable =bis.available();
 
-        /**
+        /*
 		 * calculate values
 		 */
 
@@ -163,13 +162,8 @@ public class BaseFilter {
                     break;
                 }
 
-				//set predictor
 				predictor=mainPred;
 
-
-				/**
-				 * read line
-				 */
 				int i = 0;
 				int offset = bpp;
 
@@ -321,10 +315,6 @@ public class BaseFilter {
         int predictor;
 		final int bytesAvailable =bis.available();
 
-        /**
-		 * calculate values
-		 */
-
 		final int bpp = (colors * bitsPerComponent + 7) / 8; //actual Bytes for a pixel;
 
 		final int rowLength = (columns * colors * bitsPerComponent + 7) / 8+bpp; //length of each row + predictor
@@ -346,13 +336,8 @@ public class BaseFilter {
                     break;
                 }
 
-				//set predictor
 				predictor=mainPred;
 
-
-				/**
-				 * read line
-				 */
 				int i = 0;
 				int offset = bpp;
 

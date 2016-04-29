@@ -31,21 +31,14 @@
  * ---------------
  */
 package org.jpedal.utils.repositories;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Shape;
+import java.awt.TexturePaint;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
+import java.io.*;
 import javax.imageio.ImageIO;
-
 import org.jpedal.color.PdfTexturePaint;
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.fonts.glyph.T1Glyph;

@@ -33,12 +33,12 @@
 package org.jpedal.examples.viewer;
 
 import java.util.Stack;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuItem;
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.examples.viewer.utils.*;
+import org.jpedal.examples.viewer.utils.Printer;
+import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.Messages;
 import org.w3c.dom.Element;
@@ -177,7 +177,7 @@ public class JavaFXRecentDocuments implements RecentDocumentsFactory {
                 } else if (Values.isProcessing()) {
                     currentGUI.showMessageDialog(Messages.getMessage("PdfViewerDecodeWait.message"));
                 } else {
-                    /**
+                    /*
                      * warn user on forms
                      */
                     System.out.println("SaveForm in JavaFXCommands recentDocumentsOption is not yet implemented for FX");

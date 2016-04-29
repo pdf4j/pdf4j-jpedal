@@ -35,15 +35,7 @@ package org.jpedal.objects;
 import java.awt.Shape;
 import java.io.Serializable;
 import javafx.collections.ObservableList;
-
-import javafx.scene.shape.ClosePath;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.FillRule;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.shape.QuadCurveTo;
+import javafx.scene.shape.*;
 
 
 /**

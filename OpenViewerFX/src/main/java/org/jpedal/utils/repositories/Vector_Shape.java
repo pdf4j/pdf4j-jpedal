@@ -36,15 +36,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
+import java.io.*;
 import org.jpedal.io.PathSerializer;
 
 /**
@@ -195,10 +187,10 @@ public class Vector_Shape implements Serializable
 		
 		final ObjectOutput os=new ObjectOutputStream(bos);
 		
-		/** size of array as first item */
+		/* size of array as first item */
 		os.writeObject(max_size);
 		
-		/** iterate through the array, and write out each Area individualy */
+		/* iterate through the array, and write out each Area individualy */
 		for (int i = 0; i < max_size; i++) {
 			final Area nextObj = items[i];
 			
@@ -223,14 +215,14 @@ public class Vector_Shape implements Serializable
 	public void restoreFromStream(final ByteArrayInputStream bis) throws IOException, ClassNotFoundException {
 		final ObjectInput os=new ObjectInputStream(bis);
 		
-		/** the number of elements in this collection */
+		/* the number of elements in this collection */
 		final int size= (Integer) os.readObject();
 				
 		max_size = size;
 		
 		items=new Area[size];
 		
-		/** 
+		/*
 		 * iterate through each item in the stream and store each object in
 		 * the collection
 		 */

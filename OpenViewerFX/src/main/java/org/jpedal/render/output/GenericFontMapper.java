@@ -32,11 +32,10 @@
  */
 package org.jpedal.render.output;
 
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.jpedal.fonts.StandardFonts;
 
 
@@ -260,7 +259,7 @@ public class GenericFontMapper implements org.jpedal.render.output.FontMapper {
             		weight = "bold";
             	}
 
-            	/**
+            	/*
             	 * and style
             	 */
             	if(fontAttributes.equals("it") || fontAttributes.contains("italic") || fontAttributes.contains("kursiv") || fontAttributes.contains("oblique")) {

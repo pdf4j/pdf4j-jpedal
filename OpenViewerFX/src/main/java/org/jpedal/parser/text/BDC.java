@@ -32,6 +32,8 @@
  */
 package org.jpedal.parser.text;
 
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import org.jpedal.io.ObjectDecoder;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
@@ -40,9 +42,6 @@ import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.ParserOptions;
 import org.jpedal.render.DynamicVectorRenderer;
-
-import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
 
 public class BDC {
 
@@ -68,9 +67,6 @@ public class BDC {
             }
         }
 
-        /**
-         * read Dictionary object
-         */
         if(hasDictionary){// &&(parserOptions.getPdfLayerList()!=null && parserOptions.isLayerVisible())){
             //System.out.println(new String(raw));
             final ObjectDecoder objectDecoder=new ObjectDecoder(currentPdfFile.getObjectReader());

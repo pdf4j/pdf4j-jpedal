@@ -32,10 +32,9 @@
  */
 package org.jpedal.fonts.tt;
 
-import org.jpedal.fonts.objects.FontData;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import org.jpedal.fonts.objects.FontData;
 
 /**
  * @author markee
@@ -175,7 +174,6 @@ public class FontFile2 implements Serializable{
     /**read the table offsets*/
     private void readHeader(){
         
-        /**code to read the data at start of file*/
         //scalertype
         final int scalerType=getNextUint32();
         

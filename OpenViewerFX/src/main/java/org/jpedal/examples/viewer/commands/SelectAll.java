@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.gui.GUIFactory;

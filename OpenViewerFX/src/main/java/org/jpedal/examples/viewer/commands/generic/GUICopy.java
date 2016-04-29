@@ -77,7 +77,7 @@ public class GUICopy {
 
         if (highlights != null) {
             for (int t = 0; t != highlights.length; t++) {
-                /**
+                /*
                  * ensure co-ords in right order
                  */
 
@@ -131,20 +131,20 @@ public class GUICopy {
                 String extractedText;
 
                 try {
-                    /**
+                    /*
                      * create a grouping object to apply grouping to data
                      */
                     final PdfGroupingAlgorithms currentGrouping = decode_pdf.getGroupingObject();
 
-                    /**
+                    /*
                      * get the text
                      */
                     extractedText = currentGrouping.extractTextInRectangle(
                             t_x1, t_y1, t_x2, t_y2, commonValues.getCurrentPage(), false,
                             true);
 
-                    /**
-                     * find out if xml or text - as we need to turn xml off
+                    /*
+                     *find out if xml or text - as we need to turn xml off
                      * before extraction. So we assume xml and strip out. This
                      * is obviously
                      */

@@ -33,12 +33,11 @@
 package org.jpedal.examples.handlers;
 
 
-import org.jpedal.exception.PdfException;
-import org.jpedal.external.ImageHelper;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.io.*;
+import java.io.IOException;
+import org.jpedal.exception.PdfException;
+import org.jpedal.external.ImageHelper;
 
 /**
  * abstract image saving and reading so we can move between different libraries if ImageIO not sufficient

@@ -35,13 +35,10 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
-
 import javax.swing.JToggleButton;
-
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;

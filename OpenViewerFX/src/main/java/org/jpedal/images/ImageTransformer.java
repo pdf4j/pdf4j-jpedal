@@ -39,7 +39,6 @@ import java.awt.geom.Area;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.io.ColorSpaceConvertor;
 import org.jpedal.objects.GraphicsState;
@@ -99,15 +98,14 @@ public class ImageTransformer {
 			}
 		}
 
-
 		scale(w,h);
 
-		completeImage();
+		calcCoordinates();
 	}
 
 	private void scale(final int w, final int h){
 
-        /**
+        /*
          * transform the image only if needed
          */
         if (Trm[0][0] != 1.0 || Trm[1][1] != 1.0 || Trm[0][1] != 0.0 || Trm[1][0] != 0.0) {
@@ -130,7 +128,7 @@ public class ImageTransformer {
             float d=Trm[1][1];
             image_at =new AffineTransform(a,b,c,d,-nx,-ny);
 
-            /**
+            /*
              * avoid upscaling
              */
             if(a<0) {
@@ -226,7 +224,7 @@ public class ImageTransformer {
         }
 
         destImage=new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-        /**if not sheer/rotate, then bicubic*/
+        /*if not sheer/rotate, then bicubic*/
         if(h>1){
 
             boolean failed=false;
@@ -249,44 +247,6 @@ public class ImageTransformer {
             }
         }
     }
-
-    /**
-	 * complete image
-	 */
-	private void completeImage(){
-
-		/**
-		 * now workout correct screen co-ords allow for rotation
-		 *
-		if ((CTM[1][0] == 0) &( (CTM[0][1] == 0))){
-			i_w =(int) Math.sqrt((CTM[0][0] * CTM[0][0]) + (CTM[0][1] * CTM[0][1]));
-			i_h =(int) Math.sqrt((CTM[1][1] * CTM[1][1]) + (CTM[1][0] * CTM[1][0]));
-
-		}else{
-			i_h =(int) Math.sqrt((CTM[0][0] * CTM[0][0]) + (CTM[0][1] * CTM[0][1]));
-			i_w =(int) Math.sqrt((CTM[1][1] * CTM[1][1]) + (CTM[1][0] * CTM[1][0]));
-		}
-
-		if (CTM[1][0] < 0)
-			i_x = (int) (CTM[2][0] + CTM[1][0]);
-		else
-			i_x = (int) CTM[2][0];
-
-		if (CTM[0][1] < 0) {
-			i_y = (int) (CTM[2][1] + CTM[0][1]);
-		} else {
-			i_y = (int) CTM[2][1];
-		}
-
-		//alter to allow for back to front or reversed
-		if (CTM[1][1] < 0)
-			i_y = i_y - i_h;
-
-		if (CTM[0][0] < 0)
-			i_x = i_x - i_w;
-*/
-		calcCoordinates();
-	}
 
 	/**
 	 * workout correct screen co-ords allow for rotation

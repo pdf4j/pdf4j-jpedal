@@ -32,10 +32,10 @@
  */
 package org.jpedal.io.types;
 
-import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 import java.io.IOException;
 import org.jpedal.io.RandomAccessBuffer;
 import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 
 /**
  *
@@ -51,12 +51,12 @@ public class Trailer {
         int charReached = 0, charReached2 = 0, trailerCount = 0;
         final int end = 4;
         
-        /**read in the bytes, using the startRef as our terminator*/
+        /*read in the bytes, using the startRef as our terminator*/
         final FastByteArrayOutputStream bis = new FastByteArrayOutputStream();
         
         while (true) {
             
-            /** adjust buffer if less than 1024 bytes left in file */
+            /* adjust buffer if less than 1024 bytes left in file */
             if (pointer + bufSize > eof) {
                 bufSize = eof - pointer;
             }
@@ -76,19 +76,19 @@ public class Trailer {
             
             boolean endFound = false;
             
-            /** write out and lookf for startref at end */
+            /* write out and lookf for startref at end */
             for (int i = 0; i < bufSize; i++) {
                 
                 final byte currentByte = buffer[i];
                 
-                /** check for startref at end - reset if not */
+                /* check for startref at end - reset if not */
                 if (currentByte == EOFpattern[charReached]) {
                     charReached++;
                 } else {
                     charReached = 0;
                 }
                 
-                /** check for trailer at end - ie second spurious trailer obj */
+                /* check for trailer at end - ie second spurious trailer obj */
                 if (currentByte == trailerpattern[charReached2]) {
                     charReached2++;
                 } else {

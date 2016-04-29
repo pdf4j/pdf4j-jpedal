@@ -33,8 +33,8 @@
 
 package org.jpedal.objects.acroforms.gui.certificates;
 
-import javax.swing.JDialog;
 import java.math.BigInteger;
+import javax.swing.JDialog;
 
 public class CertificateHolder extends javax.swing.JPanel {
 

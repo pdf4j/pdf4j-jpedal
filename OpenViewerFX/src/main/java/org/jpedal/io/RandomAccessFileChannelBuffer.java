@@ -33,10 +33,10 @@
 
 package org.jpedal.io;
 
-import org.jpedal.utils.LogWriter;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import org.jpedal.utils.LogWriter;
 
 public class RandomAccessFileChannelBuffer implements RandomAccessBuffer {
 

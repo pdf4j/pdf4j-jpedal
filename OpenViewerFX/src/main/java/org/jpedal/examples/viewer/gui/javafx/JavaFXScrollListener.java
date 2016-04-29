@@ -44,9 +44,9 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.gui.GUI;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.utils.LogWriter;
 
 /**

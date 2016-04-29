@@ -33,19 +33,21 @@
 package org.jpedal.io;
 
 
-import org.jpedal.constants.PDFflags;
-import org.jpedal.exception.PdfException;
-import org.jpedal.exception.PdfSecurityException;
-import org.jpedal.io.types.*;
-import org.jpedal.objects.raw.*;
-import org.jpedal.utils.LogWriter;
-
 import java.io.*;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.jpedal.constants.PDFflags;
+import org.jpedal.exception.PdfException;
+import org.jpedal.exception.PdfSecurityException;
+import org.jpedal.io.types.CompressedObjects;
+import org.jpedal.io.types.ObjectReader;
+import org.jpedal.io.types.Offsets;
+import org.jpedal.io.types.RefTable;
+import org.jpedal.objects.raw.*;
+import org.jpedal.utils.LogWriter;
 
 /**
  * provides access to the file using Random access class to

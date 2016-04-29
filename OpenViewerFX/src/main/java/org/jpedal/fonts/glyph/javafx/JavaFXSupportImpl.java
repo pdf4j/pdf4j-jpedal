@@ -32,12 +32,11 @@
  */
 package org.jpedal.fonts.glyph.javafx;
 
-import org.jpedal.fonts.glyph.T1GlyphFX;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.gui.javafx.JavaFXCommandListener;
 import org.jpedal.fonts.glyph.JavaFXSupport;
 import org.jpedal.fonts.glyph.PdfGlyph;
-
+import org.jpedal.fonts.glyph.T1GlyphFX;
 import org.jpedal.fonts.tt.*;
 import org.jpedal.fonts.tt.hinting.TTVM;
 import org.jpedal.objects.FXClip;

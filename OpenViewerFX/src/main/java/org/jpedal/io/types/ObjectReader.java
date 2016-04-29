@@ -121,14 +121,14 @@ public class ObjectReader {
         byte currentByte ;
         int i=bufSize-1;
 
-        /**read the object or block adjust buffer if less than bytes left in file*/
+        /*read the object or block adjust buffer if less than bytes left in file*/
         while (inLoop) {
 
             i++;
 
             if(i==bufSize){
 
-                /** read the next block and adjust buffer if less than bytes left in file*/
+                /* read the next block and adjust buffer if less than bytes left in file*/
                 final long pointer = getPointer();
 
                 if (pointer + bufSize > eof) {
@@ -148,7 +148,7 @@ public class ObjectReader {
                     LogWriter.writeLog("Unable to fill buffer "+ex);
                 }
 
-                /**
+                /*
                  * allow for offset being wrong on first block and hitting part of endobj and cleanup so does not break later code
                  * and set DataRead to buffer
                  */
@@ -187,7 +187,7 @@ public class ObjectReader {
 
             currentByte = dataRead[realPos];
 
-            if(!inStream){ /**check for endobj at end - reset if not*/
+            if(!inStream){ //check for endobj at end - reset if not
                 if (currentByte == endPattern[charReached]) {
                     charReached++;
                 } else{

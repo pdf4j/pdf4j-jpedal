@@ -32,9 +32,9 @@
  */
 package org.jpedal.objects.javascript.functions;
 
-import org.jpedal.objects.acroforms.actions.ActionHandler;
-import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.constants.ErrorCodes;
+import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.sun.PrintfFormat;
 
@@ -155,7 +155,7 @@ public class AFSpecial extends JSFunction{
 
             }else if(type==FORMAT){
 
-                /**
+                /*
                  * strip out number value or 0 for no value
                  */
                 final float number=0;

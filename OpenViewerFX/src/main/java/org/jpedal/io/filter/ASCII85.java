@@ -32,13 +32,12 @@
  */
 package org.jpedal.io.filter;
 
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -90,9 +89,7 @@ public class ASCII85 extends BaseFilter implements PdfFilter {
         final byte[] temp_data = new byte[data_size - returns + 1 + (special_cases * 3)];
         int ii,next;
 
-        /**
-         * translate each set of 5 to 4 bytes (note lookup tables)
-         */
+        // translate each set of 5 to 4 bytes (note lookup tables)
 
         // 5 bytes in base 85
         for (int i = 0; i < data_size; i++) {
@@ -174,11 +171,8 @@ public class ASCII85 extends BaseFilter implements PdfFilter {
         int nextValue;
 
         try {
-            /**
-             * translate each set of 5 to 4 bytes (note lookup tables)
-             */
+            // translate each set of 5 to 4 bytes (note lookup tables)
 
-            //int data_size = bis.available(), lastValue = 0;
             boolean ignoreLastItem = false;
             while (bis.available() > 0) {
                 value = 0;

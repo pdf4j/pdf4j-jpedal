@@ -36,9 +36,8 @@
 package org.jpedal.sun;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
-
+import java.io.OutputStream;
 import org.jpedal.utils.LogWriter;
 /**
  * A class for performing LZW decoding on inputStream as opposed to byte[]

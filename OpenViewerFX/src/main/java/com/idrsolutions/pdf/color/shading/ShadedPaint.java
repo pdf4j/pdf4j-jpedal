@@ -32,6 +32,15 @@
  */
 package com.idrsolutions.pdf.color.shading;
 
+import java.awt.Paint;
+import java.awt.PaintContext;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ColorModel;
+import java.io.Serializable;
+import java.util.ArrayList;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.function.FunctionFactory;
@@ -39,18 +48,10 @@ import org.jpedal.function.PDFFunction;
 import org.jpedal.io.ObjectDecoder;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.FunctionObject;
-import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.DecoderOptions;
-import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.utils.Matrix;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.ColorModel;
-import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * template for all shading operations
@@ -66,11 +67,6 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
     public static final int TENSOR = 7;
 
     private static final boolean debug = false;
-
-    /**
-     * used to show whether we are rendering PDF, turning into HTMl, etc
-     */
-    private int renderingType = DynamicVectorRenderer.CREATE_PATTERN;
 
     protected PDFFunction[] function;
 
@@ -278,7 +274,7 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
                 if(textX == 0 && textY==0){
                     pt = new AxialShadeContext(xform, shadingColorSpace, background, Shading, matrix, function);
                 }else{
-                    pt = new AxialContext(xform, renderingType, isPrinting, offX, offY, cropX, cropH, 1f / scaling, isExtended, domain, coords, shadingColorSpace, colorsReversed, background, function);
+                    pt = new AxialContext(xform, isPrinting, offX, offY, cropX, cropH, 1f / scaling, isExtended, domain, coords, shadingColorSpace, colorsReversed, background, function);
                 }
                 break;
 
@@ -287,11 +283,11 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
                 break;
 
             case FREEFORM:
-                pt = new FreeFormContext(shadingColorSpace, Shading, matrix, cropH, scaling, offX, offY);
+                pt = new FreeFormContext(shadingColorSpace, background, Shading, matrix, cropH, scaling, offX, offY);
                 break;
 
             case LATTICEFORM:
-                pt = new LatticeFormContext(shadingColorSpace, null, Shading, matrix, cropH, scaling, offX, offY);
+                pt = new LatticeFormContext(shadingColorSpace, background, Shading, matrix, cropH, scaling, offX, offY);
                 break;
 
             case COONS:
@@ -349,17 +345,6 @@ public class ShadedPaint implements PdfPaint, Paint, Serializable {
     @Override
     public int getRGB() {
         return 0;
-    }
-
-    /**
-     * set type of parsing going on if not PDF - introduced for HTML5 as we
-     * render onto image indirectly
-     *
-     * @param type
-     */
-    @Override
-    public void setRenderingType(final int type) {
-        this.renderingType = type;
     }
 
     @Override

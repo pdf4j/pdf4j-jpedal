@@ -32,24 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands.javafx;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -97,9 +85,7 @@ public class JavaFXDocInfo {
 
     private static void getPropertiesBox(final String selectedFile, final long fileSize, final int pageCount, final int currentPage, final PdfDecoderInt decode_pdf) {
 
-        /**
-         * Setup Vars to Pass.
-         */
+        //Setup Vars to Pass.
         final String user_dir = System.getProperty("user.dir");
         final PdfFileInformation currentFileInformation=decode_pdf.getFileInformationData();
 
@@ -113,9 +99,7 @@ public class JavaFXDocInfo {
         final String path = selectedFile.substring(0, ptr + 1);
 
 
-        /**
-         * Build the Default Tabs.
-         */
+        //Build the Default Tabs.
         final TabPane tabPane = new TabPane();
         tabPane.setId("docProp");
         final Tab properties = new Tab("Properties");
@@ -125,49 +109,35 @@ public class JavaFXDocInfo {
 
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE); //Stops ability to close tabs
 
-        /**
-         * Populate the Properties Tab.
-         */
+        //Populate the Properties Tab.
         properties.setContent(getPropTab(currentFileInformation,file, path, user_dir, fileSize, pageCount, currentPage, decode_pdf));
 
-        /**
-         * Populate the Fonts Tab.
-         */
+        //Populate the Fonts Tab.
         fonts.setContent(getFontTab(decode_pdf.getInfo(PdfDictionary.Font)));
 
-        /**
-         * Populate the Available Tab.
-         */
+        //Populate the Available Tab.
         available.setContent(getAvailableTab());
         
-        /**
-         * Populate the Aliases Tab.
-         */
+        //Populate the Aliases Tab.
         aliases.setContent(getAliasesTab());
         
         tabPane.getTabs().addAll(properties, fonts, available, aliases); //Add tabs to tabPane
         
-        /**
-         * Populate the Forms Tab.
-         */
+        //Populate the Forms Tab.
         if(getFormsTab(decode_pdf)!=null){
             final Tab forms = new Tab("Forms");
             forms.setContent(getFormsTab(decode_pdf));
             tabPane.getTabs().add(forms);
         }
         
-        /**
-         * Populate the Image Tab.
-         */
+        //Populate the Image Tab.
         if (org.jpedal.parser.image.ImageCommands.trackImages) {
             final Tab image = new Tab("Image");
             image.setContent(getImageTab(decode_pdf));
             tabPane.getTabs().add(image);
         }
         
-        /**
-         * Populate the XML Tab.
-         */
+        //Populate the XML Tab.
         final String xmlText=currentFileInformation.getFileXMLMetaData();
         if(!xmlText.isEmpty()){
             final Tab xml = new Tab("XML");
@@ -181,7 +151,6 @@ public class JavaFXDocInfo {
 
     /**
      * Grabs the Contents for the Properties Tab.
-     *
      * @param file
      * @param path
      * @param user_dir
@@ -193,24 +162,17 @@ public class JavaFXDocInfo {
      */
     private static ScrollPane getPropTab(final PdfFileInformation currentFileInformation, final String file, final String path, final String user_dir, final long size, final int pageCount, final int currentPage, final PdfDecoderInt decode_pdf) {
 
-
-        /**
-         * Setup the ScrollPane.
-         */
+        //Setup the ScrollPane.
         final ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        /**
-         * get the Pdf file information object to extract info from
-         */
+        //get the Pdf file information object to extract info from
         if (currentFileInformation != null) {
 
             final VBox content = new VBox();
 
-            /**
-             * Setup General Content.
-             */
+            //Setup General Content.
             final Text generalTitle = new Text(lb + Messages.getMessage("PdfViewerGeneral"));
             generalTitle.setFont(headerFont);
 
@@ -230,9 +192,7 @@ public class JavaFXDocInfo {
             );
             generalContent.setFont(textFont);
 
-            /**
-             * Setup Properties Content.
-             */
+            //Setup Properties Content.
             final Text propertiesTitle = new Text(Messages.getMessage("PdfViewerProperties"));
             propertiesTitle.setFont(headerFont);
 
@@ -251,9 +211,7 @@ public class JavaFXDocInfo {
             //Populate the VBox with current information
             content.getChildren().addAll(generalTitle, generalContent, propertiesTitle, propertiesContent);
 
-            /**
-             * Setup Page Coordinates Content.
-             */
+            //Setup Page Coordinates Content.
             final PdfPageData currentPageSize = decode_pdf.getPdfPageData();
             if (currentPageSize != null) {
                 final Text pageCoordsTitle = new Text(Messages.getMessage("PdfViewerCoords.text"));
@@ -277,22 +235,17 @@ public class JavaFXDocInfo {
 
     /**
      * Grabs the Contents for the Fonts Tab.
-     *
      * @param xmlTxt
      * @return ScrollPane Object
      */
     private static ScrollPane getFontTab(final String xmlTxt) {
 
-        /**
-         * Setup the ScrollPane.
-         */
+        //Setup the ScrollPane.
         final ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        /**
-         * List of Fonts.
-         */
+        //List of Fonts.
         StringBuilder xmlText = new StringBuilder( "Font Substitution Mode: ");
 
         switch (FontMappings.getFontSubstitutionMode()) {
@@ -339,22 +292,17 @@ public class JavaFXDocInfo {
 
     /**
      * Grabs the Contents for the Image Tab.
-     * 
      * @param decode_pdf
      * @return ScrollPane Object
      */
     private static ScrollPane getImageTab(final PdfDecoderInt decode_pdf) {
 
-        /**
-         * Setup the ScrollPane.
-         */
+        //Setup the ScrollPane.
         final ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        /**
-         * list of Images (not forms).
-         */
+        //list of Images (not forms).
         final String xmlTxt = decode_pdf.getInfo(PdfDictionary.Image);
 
         if (!xmlTxt.isEmpty()) {
@@ -377,22 +325,17 @@ public class JavaFXDocInfo {
     
     /**
      * Grabs the Contents for the XML Tab.
-     * 
      * @param xmlText
      * @return ScrollPane Object
      */
     private static ScrollPane getXMLTab(final String xmlText){
 
-        /**
-         * Setup the ScrollPane.
-         */
+        //Setup the ScrollPane.
         final ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         
-        /**
-         * Fill the VBox with Content.
-         */
+        //Fill the VBox with Content.
         final VBox content = new VBox();
 
         final Text imageListTitle = new Text(lb + "XML Content");
@@ -410,7 +353,6 @@ public class JavaFXDocInfo {
     
     /**
      * Grabs the Contents for the Forms Tab.
-     * 
      * @param decode_pdf
      * @return ScrollPane Object
      */
@@ -431,25 +373,19 @@ public class JavaFXDocInfo {
 
                 final int formCount = formsOnPage.length;
 
-                /**
-                 * Setup the ScrollPane.
-                 */
+                //Setup the ScrollPane.
                 scrollPane = new ScrollPane();
                 scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
                 scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-                /**
-                 * Fill the VBox with Content.
-                 */
+                //Fill the VBox with Content.
                 final VBox content = new VBox();
 
                 final Text tabTitle = new Text(lb + "Page Contains " + formCount + " Form Objects" + lb);
                 tabTitle.setFont(headerFont);
                 content.getChildren().addAll(tabTitle);
 
-                /**
-                 * populate our list with details
-                 */
+                //populate our list with details
                 for (final Object aFormsOnPage : formsOnPage) {
 
                     // get name of form
@@ -494,33 +430,25 @@ public class JavaFXDocInfo {
             }
 
         }
-
         return scrollPane;
     }
     
     /**
      * Grabs the Contents for the Aliases Tab.
-     *
      * @return ScrollPane Object
      */
     private static ScrollPane getAliasesTab() {
 
-        /**
-         * Setup the ScrollPane.
-         */
+        //Setup the ScrollPane.
         final ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        /**
-         * Add Tab Title
-         */
+        //Add Tab Title
         final Text aliasesTitle = new Text(lb + "Aliases Content");
         aliasesTitle.setFont(headerFont);
 
-        /**
-         * list of all fonts fonts
-         */
+        //list of all fonts fonts
         final Text aliasesContent = new Text();
         aliasesContent.setFont(textFont);
         for (final String nextFont : FontMappings.fontSubstitutionAliasTable.keySet()) {
@@ -540,15 +468,11 @@ public class JavaFXDocInfo {
 
         final VBox container = new VBox();
         
-        /**
-         * Setup Title.
-         */
+        //Setup Title.
         final Text titleText = new Text (lb+"Available Fonts");
         titleText.setFont(headerFont);
         
-        /**
-         * Setup the Filter Options.
-         */
+        //Setup the Filter Options.
         final GridPane filterContainer = new GridPane();
 
         final Text filterText = new Text("Filter Font List");
@@ -569,9 +493,10 @@ public class JavaFXDocInfo {
         filterContainer.setAlignment(Pos.CENTER);
         filterContainer.setHgap(20);
 
-        /**
+        /*
          * Setup the Search Display.
          */
+        
         //Add format buttons to a toggle group, so only one be selected.
         final ToggleGroup docInfoGroup = new ToggleGroup();
         sortFolder.setSelected(true);

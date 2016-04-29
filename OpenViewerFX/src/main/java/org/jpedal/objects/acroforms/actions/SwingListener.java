@@ -32,15 +32,14 @@
  */
 package org.jpedal.objects.acroforms.actions;
 
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.objects.raw.PdfDictionary;
-
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.event.*;
+import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.event.*;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfDictionary;
 
 public class SwingListener extends PDFListener implements MouseListener, KeyListener, FocusListener, MouseMotionListener, ActionListener, ListSelectionListener{
     /*
@@ -156,7 +155,7 @@ public class SwingListener extends PDFListener implements MouseListener, KeyList
         if(!keyIgnored){
             
             if(e.getKeyChar()=='\n' && !(e.getSource() instanceof JTextArea)) {
-                ((JComponent) e.getSource()).transferFocus();
+                ((Component) e.getSource()).transferFocus();
             }
             //acrorend.getCompData().loseFocus();
             

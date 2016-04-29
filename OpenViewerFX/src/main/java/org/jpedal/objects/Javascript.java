@@ -32,13 +32,17 @@
  */
 package org.jpedal.objects;
 
-import org.jpedal.objects.acroforms.actions.ActionHandler;
-import org.jpedal.objects.javascript.*;
-import org.jpedal.objects.raw.FormObject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.jpedal.objects.acroforms.AcroRenderer;
-
-import java.util.*;
-
+import org.jpedal.objects.acroforms.actions.ActionHandler;
+import org.jpedal.objects.javascript.DefaultParser;
+import org.jpedal.objects.javascript.ExpressionEngine;
+import org.jpedal.objects.javascript.GenericParser;
+import org.jpedal.objects.javascript.RhinoParser;
+import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.Vector_String;
@@ -93,7 +97,7 @@ public class Javascript {
             }
         }
 
-        /**
+        /*
          * set here so if user passes in we still configure
          */
         jsParser.setAcroRenderer(acro);

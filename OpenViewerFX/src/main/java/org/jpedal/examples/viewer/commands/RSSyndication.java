@@ -38,15 +38,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
-
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.utils.BrowserLauncher;

@@ -60,8 +60,10 @@ package org.jpedal.sun;
 //
 
 
-import java.util.*;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * PrintfFormat allows the formatting of an array of
@@ -636,22 +638,22 @@ public class PrintfFormat {
         }
         if (o[i] instanceof Byte) {
             sb.append(cs.internalsprintf(
-                    ((Byte) o[i]).byteValue()));
+                    ((Number) o[i]).byteValue()));
         } else if (o[i] instanceof Short) {
             sb.append(cs.internalsprintf(
-                    ((Short) o[i]).shortValue()));
+                    ((Number) o[i]).shortValue()));
         } else if (o[i] instanceof Integer) {
             sb.append(cs.internalsprintf(
-                    ((Integer) o[i]).intValue()));
+                    ((Number) o[i]).intValue()));
         } else if (o[i] instanceof Long) {
             sb.append(cs.internalsprintf(
-                    ((Long) o[i]).longValue()));
+                    ((Number) o[i]).longValue()));
         } else if (o[i] instanceof Float) {
             sb.append(cs.internalsprintf(
-                    ((Float) o[i]).floatValue()));
+                    ((Number) o[i]).floatValue()));
         } else if (o[i] instanceof Double) {
             sb.append(cs.internalsprintf(
-                    ((Double) o[i]).doubleValue()));
+                    ((Number) o[i]).doubleValue()));
         } else if (o[i] instanceof Character) {
             sb.append(cs.internalsprintf(
                     ((Character) o[i]).charValue()));
@@ -827,22 +829,22 @@ public class PrintfFormat {
       } else {
         if (x instanceof Byte) {
             sb.append(cs.internalsprintf(
-                    ((Byte) x).byteValue()));
+                    ((Number) x).byteValue()));
         } else if (x instanceof Short) {
             sb.append(cs.internalsprintf(
-                    ((Short) x).shortValue()));
+                    ((Number) x).shortValue()));
         } else if (x instanceof Integer) {
             sb.append(cs.internalsprintf(
-                    ((Integer) x).intValue()));
+                    ((Number) x).intValue()));
         } else if (x instanceof Long) {
             sb.append(cs.internalsprintf(
-                    ((Long) x).longValue()));
+                    ((Number) x).longValue()));
         } else if (x instanceof Float) {
             sb.append(cs.internalsprintf(
-                    ((Float) x).floatValue()));
+                    ((Number) x).floatValue()));
         } else if (x instanceof Double) {
             sb.append(cs.internalsprintf(
-                    ((Double) x).doubleValue()));
+                    ((Number) x).doubleValue()));
         } else if (x instanceof Character) {
             sb.append(cs.internalsprintf(
                     ((Character) x).charValue()));

@@ -32,21 +32,10 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.GUIDisplay;
 import org.jpedal.gui.GUIFactory;

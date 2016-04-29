@@ -32,19 +32,20 @@
  */
 package org.jpedal.parser;
 
+import java.awt.Rectangle;
+import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.TextState;
 import org.jpedal.objects.acroforms.creation.AnnotationFactory;
 import org.jpedal.objects.acroforms.overridingImplementations.ReadOnlyTextIcon;
-import org.jpedal.objects.raw.*;
-import org.jpedal.parser.image.MaskUtils;
-
-import java.awt.*;
-import java.awt.geom.Area;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.image.mask.MaskUtils;
 import org.jpedal.render.BaseDisplay;
 import org.jpedal.render.DynamicVectorRenderer;
 
@@ -64,7 +65,7 @@ public class FormFlattener {
             return;
         }
         
-        /**
+        /*
          * ignore if not going to be drawn
          */
         //int type=form.getParameterConstant(PdfDictionary.Subtype);
@@ -111,7 +112,7 @@ public class FormFlattener {
                 imgObj=(PdfObject)otherValues.get(defaultState);
             }else {
                 if(otherValues!=null && !otherValues.isEmpty()){
-                    /**final Iterator keys=otherValues.keySet().iterator();
+                    /*final Iterator keys=otherValues.keySet().iterator();
                     final PdfObject val;
                     final String key;
                     //while(keys.hasNext()){
@@ -147,7 +148,7 @@ public class FormFlattener {
             }
         }
 
-        /**
+        /*
          * we have some examples where no text inside AP datastream so we ignore in this case
          * and use the text
          */
@@ -164,12 +165,12 @@ public class FormFlattener {
             }
         }
 
-        /**
+        /*
          * alternative to draw image for icon
          */
         final byte[] DA=form.getTextStreamValueAsByte(PdfDictionary.DA);
 
-        /**
+        /*
          * if no object present try to create a fake one using Swing code
          * for readonly text icons
          */
@@ -229,7 +230,7 @@ public class FormFlattener {
             pdfStreamDecoder.readResources(resources, false);
         }
 
-        /**
+        /*
          * see if bounding box and set
          */
         float[] BBox=form.getFloatArray(PdfDictionary.Rect);
@@ -422,12 +423,12 @@ public class FormFlattener {
             pdfStreamDecoder.gs.updateClip(new Area(newClip));
         }
         pdfStreamDecoder.current.drawClip(pdfStreamDecoder.gs, pdfStreamDecoder.parserOptions.defaultClip, false) ;
-        /**
+        /*
          * avoid values in main stream
          */
         final TextState oldState= pdfStreamDecoder.gs.getTextState();
         pdfStreamDecoder.gs.setTextState(new TextState());
-        /**
+        /*
          * write out forms as images in HTML mode - hooks into flatten forms mode
          */
         if(isHTML){
@@ -463,7 +464,6 @@ public class FormFlattener {
 
         }else{
 
-            /**decode the stream*/
             if(formData!=null){
                 pdfStreamDecoder.BBox=BBox;
 
@@ -482,7 +482,7 @@ public class FormFlattener {
             }
 
         }
-        /**
+        /*
          * we need to reset clip otherwise items drawn afterwards
          * like forms data in image or print will not appear.
          */

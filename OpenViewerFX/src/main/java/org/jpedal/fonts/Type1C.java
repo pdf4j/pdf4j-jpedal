@@ -32,21 +32,18 @@
  */
 package org.jpedal.fonts;
 
+import java.awt.Rectangle;
 import java.io.*;
 import java.util.Map;
-import java.awt.*;
-
-import org.jpedal.fonts.glyph.T1Glyphs;
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
+import org.jpedal.fonts.glyph.T1Glyphs;
 import org.jpedal.fonts.glyph.objects.T1GlyphNumber;
 import org.jpedal.fonts.objects.FontData;
-
-import org.jpedal.io.PdfObjectReader;
 import org.jpedal.io.ObjectStore;
-
-import org.jpedal.utils.LogWriter;
-import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 
 

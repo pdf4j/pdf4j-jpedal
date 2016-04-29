@@ -33,12 +33,10 @@
 package org.jpedal.fonts;
 
 import java.io.BufferedReader;
-import org.jpedal.utils.repositories.FastByteArrayOutputStream;
-
 import java.io.StringReader;
 import java.util.StringTokenizer;
-
 import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 
 /**
  * handles type1 specifics
@@ -723,11 +721,11 @@ public class Type1 extends PdfFont {
             end = size;
         }
         
-        /** now decode the array */
+        /* now decode the array */
         int r = 55665;
         final int n = 4;
         
-        /** workout if binary or ascii - assume true and disprove */
+        /* workout if binary or ascii - assume true and disprove */
         boolean isAscii = true;
         for (i = charstringStart; i < charstringStart + (n * 2); i++) {
             final char c = (char) (cont[i]);
@@ -787,7 +785,7 @@ public class Type1 extends PdfFont {
             cont = bos.toByteArray();
         }
         
-        /** now charset decode and store */
+        /* now charset decode and store */
         //n=4;//set default value for n
         
         
@@ -818,7 +816,7 @@ public class Type1 extends PdfFont {
         
         br.close();
         
-        /**extract the contents*/
+        /*extract the contents*/
         
         //find dictionary entries
         final int l=cont.length;
@@ -908,7 +906,7 @@ public class Type1 extends PdfFont {
             
         }
         
-        /**extract charstrings*/
+        /*extract charstrings*/
         if(charstringStart==-1){
             this.isFontSubstituted=false;
             
@@ -918,7 +916,7 @@ public class Type1 extends PdfFont {
             glyphCount=extractFontData(skipBytes,cont,charstringStart,rd,l,nd);
         }
         
-        /**extract subroutines*/
+        /*extract subroutines*/
         if(subrsStart>-1) {
             extractSubroutineData(skipBytes,cont,subrsStart,charstringStart,rd,l,nd);
         }

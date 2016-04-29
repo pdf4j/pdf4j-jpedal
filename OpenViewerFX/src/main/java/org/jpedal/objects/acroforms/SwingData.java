@@ -33,27 +33,27 @@
 package org.jpedal.objects.acroforms;
 
 
-import org.jpedal.external.CustomFormPrint;
-import org.jpedal.objects.acroforms.overridingImplementations.FixImageIcon;
-import org.jpedal.objects.acroforms.overridingImplementations.ReadOnlyTextIcon;
-import org.jpedal.objects.acroforms.creation.FormFactory;
-import org.jpedal.objects.acroforms.creation.JPedalBorderFactory;
-
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.utils.LogWriter;
-import org.jpedal.display.Display;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.text.JTextComponent;
+import org.jpedal.display.Display;
+import org.jpedal.external.CustomFormPrint;
+import org.jpedal.objects.acroforms.creation.FormFactory;
+import org.jpedal.objects.acroforms.creation.JPedalBorderFactory;
+import org.jpedal.objects.acroforms.overridingImplementations.CustomImageIcon;
+import org.jpedal.objects.acroforms.overridingImplementations.FixImageIcon;
+import org.jpedal.objects.acroforms.overridingImplementations.ReadOnlyTextIcon;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.utils.LogWriter;
 
 /**
  * Swing specific implementation of Widget data
@@ -368,7 +368,6 @@ public class SwingData extends GUIData {
     
     /**
      * render component onto G2 for print of image creation
-     * @param printcombo = tells us to print the raw combobox, and dont do aymore formatting of the combobox, should only be called from this method.
      */
     private void renderComponent(final Graphics2D g2, final FormObject formObject, final boolean isPrinting) {
 
@@ -435,7 +434,7 @@ public class SwingData extends GUIData {
          * off - 1=off 2=on 3=on 4=on 5=on 6=off 7=off 8=off 9=off etc...
          *
          */
-        int borderWidth = FormRenderUtilsG2.renderBorder(g2, formObject, page, pageData.getCropBoxHeight(page));
+        int borderWidth = FormRenderUtilsG2.renderBorder(g2, formObject, pageData.getCropBoxHeight(page));
         
         //Revert back stroke before continuing
         g2.setStroke(st);
@@ -513,7 +512,7 @@ public class SwingData extends GUIData {
             renderFormsOntoG2WithHTML(pageIndex, componentsToIgnore);
         } else if(GraphicsEnvironment.isHeadless() || formFactory==null) ///mark - make 1==1 to enable
         {
-            renderFormsOntoG2InHeadless(raw, pageIndex, currentRotation, componentsToIgnore, formFactory, pageHeight);
+            renderFormsOntoG2InHeadless(raw, pageIndex, componentsToIgnore, formFactory);
         } else {
             renderFormsOntoG2WithSwing(raw, pageIndex, currentIndent, currentRotation, componentsToIgnore, formFactory, pageHeight);
         }
@@ -524,7 +523,7 @@ public class SwingData extends GUIData {
      * Draw forms without swing
      */
     @Override
-    public void renderFormsOntoG2InHeadless(final Object raw, final int pageIndex, final int currentRotation, final Map componentsToIgnore, final FormFactory formFactory, final int pageHeight) {
+    public void renderFormsOntoG2InHeadless(final Object raw, final int pageIndex, final Map componentsToIgnore, final FormFactory formFactory) {
 
         if(formsOrdered==null || formsOrdered[pageIndex]==null) {
             return;
@@ -877,29 +876,29 @@ public class SwingData extends GUIData {
             }
 
             if (curIcon instanceof FixImageIcon) {
-                ((FixImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
+                ((CustomImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
             } else if(curIcon instanceof ReadOnlyTextIcon) {
-                ((ReadOnlyTextIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
+                ((CustomImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
             }
             
             curIcon = but.getPressedIcon();
             if (curIcon instanceof FixImageIcon) {
-                ((FixImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
+                ((CustomImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
             }
             
             curIcon = but.getSelectedIcon();
             if (curIcon instanceof FixImageIcon) {
-                ((FixImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
+                ((CustomImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
             }
             
             curIcon = but.getRolloverIcon();
             if (curIcon instanceof FixImageIcon) {
-                ((FixImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
+                ((CustomImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
             }
             
             curIcon = but.getRolloverSelectedIcon();
             if (curIcon instanceof FixImageIcon) {
-                ((FixImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
+                ((CustomImageIcon) curIcon).setAttributes(curComp.getWidth(), curComp.getHeight(), rotate, displaySingle);
             }
             
         }
@@ -1235,7 +1234,7 @@ public class SwingData extends GUIData {
                         if (comp != null) {
                             
                             //((JComponent)comp).setVisible(false);
-                            panel.remove((JComponent)comp);
+                            panel.remove((Component)comp);
                         }
                     }
                 }

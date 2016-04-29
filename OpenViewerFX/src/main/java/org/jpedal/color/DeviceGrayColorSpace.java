@@ -32,11 +32,10 @@
  */
 package org.jpedal.color;
 
-import org.jpedal.objects.raw.MaskObject;
-import org.jpedal.objects.raw.PdfObject;
-
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import org.jpedal.objects.raw.MaskObject;
+import org.jpedal.objects.raw.PdfObject;
 
 
 /**

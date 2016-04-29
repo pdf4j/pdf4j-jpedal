@@ -63,15 +63,15 @@ public class BooleanValue {
         i--;// move back so loop works
         
         //store value
-        if(raw[keyStart]=='t' && raw[keyStart+1]=='r' && raw[keyStart+2]=='u' && raw[keyStart+3]=='e') {
-            pdfObject.setBoolean(PDFkeyInt,true);
-            
-        }else if(raw[keyStart]=='f' && raw[keyStart+1]=='a' && raw[keyStart+2]=='l' && raw[keyStart+3]=='s' && raw[keyStart+4]=='e'){
-            pdfObject.setBoolean(PDFkeyInt,false);
-         }else if(raw[keyStart]=='0' && raw[keyStart+1]=='/' ){ //allow for zero instead of false (see 24449) 
-            pdfObject.setBoolean(PDFkeyInt,false);
-             
-        }else {
+        if (raw[keyStart] == 't' && raw[keyStart + 1] == 'r' && raw[keyStart + 2] == 'u' && raw[keyStart + 3] == 'e') {
+            pdfObject.setBoolean(PDFkeyInt, true);
+        } else if (raw[keyStart] == 'f' && raw[keyStart + 1] == 'a' && raw[keyStart + 2] == 'l' && raw[keyStart + 3] == 's' && raw[keyStart + 4] == 'e') {
+            pdfObject.setBoolean(PDFkeyInt, false);
+        } else if (raw[keyStart] == '0') { //allow for zero instead of false (see 24449) 
+            pdfObject.setBoolean(PDFkeyInt, false);
+        } else if (raw[keyStart] == '1') { //allow for 1 instead of true (see 24449) 
+            pdfObject.setBoolean(PDFkeyInt, true);
+        } else {
             throw new RuntimeException("Unexpected value for Boolean value for" + PDFkeyInt);
         }
         

@@ -32,12 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.StampImageToPDFPages;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -63,7 +63,7 @@ public class StampImage {
 
                 //get values from user
                 final StampImageToPDFPages stampImage = new StampImageToPDFPages(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int stampImageChoice = stampImage.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerStampImage.text"));
+                final int stampImageChoice = stampImage.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerStampImage.text"));
 
                 //get parameters and call if YES
                 if (stampImageChoice == JOptionPane.OK_OPTION) {

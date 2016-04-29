@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Values;
@@ -55,7 +55,7 @@ public class Nup {
             } else {
                 //					get values from user
                 final ExtractPDFPagesNup nup = new ExtractPDFPagesNup(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int nupChoice = nup.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerNUP.titlebar"));
+                final int nupChoice = nup.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerNUP.titlebar"));
 
                 //get parameters and call if YES
                 if (nupChoice == JOptionPane.OK_OPTION) {

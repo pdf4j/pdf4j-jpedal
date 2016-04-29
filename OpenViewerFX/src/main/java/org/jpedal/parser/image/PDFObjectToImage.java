@@ -66,15 +66,10 @@ public class PDFObjectToImage {
         
         final DynamicVectorRenderer glyphDisplay=new ImageDisplay(0,false,20,localStore);
         
-        glyphDisplay.setMode(DynamicVectorRenderer.Mode.SMASK);
-        
-        final boolean useHiRes=true;
-        
-        final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile,useHiRes,null); //switch to hires as well
+        final PdfStreamDecoder glyphDecoder=new PdfStreamDecoder(currentPdfFile); 
         
         glyphDecoder.setParameters(parserOptions.isPageContent(),parserOptions.isRenderPage(), parserOptions.getRenderMode(), parserOptions.getExtractionMode(), false,false);
         glyphDecoder.setObjectValue(ValueTypes.ObjectStore, localStore);
-        glyphDisplay.setHiResImageForDisplayMode(useHiRes);
         glyphDecoder.setRenderer(glyphDisplay);
         glyphDecoder.setMultiplyer(multiplyer);
         glyphDecoder.setFormLevel(formLevel);
@@ -82,7 +77,7 @@ public class PDFObjectToImage {
         //we need to explicitly set scaling to 1
         //glyphDisplay.setScalingValues(0,0,1);
         
-        /**read any resources*/
+        /*read any resources*/
         try{
             
             final PdfObject SMaskResources =newSMask.getDictionary(PdfDictionary.Resources);
@@ -148,7 +143,7 @@ public class PDFObjectToImage {
             smaskImage=null;
         }
         
-        /**decode the stream*/
+        /*decode the stream*/
         if(objectData!=null) {
             glyphDecoder.decodeStreamIntoObjects(objectData, false);
         }

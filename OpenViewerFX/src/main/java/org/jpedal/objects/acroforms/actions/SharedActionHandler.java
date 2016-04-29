@@ -32,42 +32,40 @@
  */
 package org.jpedal.objects.acroforms.actions;
 
-import org.jpedal.display.*;
-import org.jpedal.examples.viewer.*;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.AbstractButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.text.JTextComponent;
+import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.Display;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
-import org.jpedal.examples.viewer.gui.*;
-
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.Javascript;
-import org.jpedal.objects.layers.PdfLayerList;
-import org.jpedal.objects.acroforms.actions.privateclasses.FieldsHideObject;
 import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.objects.acroforms.ReturnValues;
+import org.jpedal.objects.acroforms.actions.privateclasses.FieldsHideObject;
+import org.jpedal.objects.layers.PdfLayerList;
 import org.jpedal.objects.raw.*;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.BrowserLauncher;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
-
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-
-import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import org.jpedal.*;
-import org.jpedal.objects.acroforms.ReturnValues;
 
 public abstract class SharedActionHandler implements ActionHandler {
     
@@ -303,7 +301,6 @@ public abstract class SharedActionHandler implements ActionHandler {
                     }
                     
                     final File output = new File(ObjectStore.temp_dir + target);
-                    output.deleteOnExit();
                     
                     ObjectStore.copy(new BufferedInputStream(sourceFile),
                             new BufferedOutputStream(new FileOutputStream(output)));
@@ -392,7 +389,7 @@ public abstract class SharedActionHandler implements ActionHandler {
                 break;
 
             case PdfDictionary.GoBack: {
-                final GUIFactory gui = ((GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                final GUIFactory gui = ((GUIFactory) decode_pdf.getExternalHandler(Options.GUIContainer));
                 if (gui != null) {
                     gui.getCommand().executeCommand(Commands.BACK, null);
                 }
@@ -412,7 +409,7 @@ public abstract class SharedActionHandler implements ActionHandler {
                 if (option != -1) {
                     final int selection = scaling.getSelectedIndex();
                     if (selection != -1) {
-                        final GUIFactory swing = (GUI) decode_pdf.getExternalHandler(Options.GUIContainer);
+                        final GUIFactory swing = (GUIFactory) decode_pdf.getExternalHandler(Options.GUIContainer);
                         if (swing != null) {
                             ((GUI) swing).setSelectedComboIndex(Commands.SCALING, selection);
                             swing.scaleAndRotate();
@@ -423,7 +420,7 @@ public abstract class SharedActionHandler implements ActionHandler {
             break;
 
             case PdfDictionary.FullScreen: {
-                final GUIFactory gui = ((GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                final GUIFactory gui = ((GUIFactory) decode_pdf.getExternalHandler(Options.GUIContainer));
                 if (gui != null) {
                     gui.getCommand().executeCommand(Commands.FULLSCREEN, null);
                 }
@@ -443,7 +440,7 @@ public abstract class SharedActionHandler implements ActionHandler {
     private void additionalAction_SaveAs() {
         //- we should call it directly - I have put code below from Commands
         
-        final GUIFactory gui=((GUI)decode_pdf.getExternalHandler(Options.GUIContainer));
+        final GUIFactory gui=((GUIFactory)decode_pdf.getExternalHandler(Options.GUIContainer));
         
         if(gui!=null) {
             gui.getCommand().executeCommand(Commands.SAVEFORM, null);
@@ -935,7 +932,7 @@ public abstract class SharedActionHandler implements ActionHandler {
                                     final float fitR_right=Dest.getNextValueAsFloat();
                                     final float fitR_top=Dest.getNextValueAsFloat();
                                     
-                                    final org.jpedal.gui.GUIFactory gui = ((org.jpedal.examples.viewer.gui.GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                                    final org.jpedal.gui.GUIFactory gui = ((GUIFactory) decode_pdf.getExternalHandler(Options.GUIContainer));
                                     if(gui!=null){
                                     	final float scaling =gui.scaleToVisible(fitR_left, fitR_right, fitR_top, fitR_bottom);
                                     	scale = (int)(100f/scaling);
@@ -1091,7 +1088,7 @@ public abstract class SharedActionHandler implements ActionHandler {
                 
                 //added to check the forms save flag to tell the user how to save the now changed pdf file
                 
-                final org.jpedal.gui.GUIFactory gui = ((org.jpedal.examples.viewer.gui.GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                final org.jpedal.gui.GUIFactory gui = ((GUIFactory) decode_pdf.getExternalHandler(Options.GUIContainer));
                 if(gui!=null){
                     gui.stopThumbnails();
                     // gui.checkformSavedMessage();
@@ -1139,7 +1136,7 @@ public abstract class SharedActionHandler implements ActionHandler {
                         LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                     
-                    /** reset as rotation may change! */
+                    /* reset as rotation may change! */
                     decode_pdf.setPageParameters(-1, page);
                     
                 }
@@ -1150,7 +1147,7 @@ public abstract class SharedActionHandler implements ActionHandler {
             //now available via callback
             final Object gui = this.decode_pdf.getExternalHandler(org.jpedal.external.Options.GUIContainer);
             
-            /**
+            /*
              * Display the page designated by page, with its contents magnified just enough to
              * fit the entire page within the window both horizontally and vertically.
              * If the required horizontal and vertical magnification factors are different,
@@ -1696,7 +1693,7 @@ public abstract class SharedActionHandler implements ActionHandler {
             }
             
             //move focus so that the button does not flash
-            ((JButton)((MouseEvent)raw).getSource()).setFocusable(false);
+            ((Component)((EventObject)raw).getSource()).setFocusable(false);
         }
     }
     

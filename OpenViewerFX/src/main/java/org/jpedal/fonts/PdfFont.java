@@ -34,25 +34,22 @@ package org.jpedal.fonts;
 
 //standard java
 
+import java.awt.Font;
+import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 import org.jpedal.exception.PdfFontException;
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
-import org.jpedal.objects.raw.PdfArrayIterator;
-import org.jpedal.objects.raw.CIDEncodings;
-import org.jpedal.objects.raw.FontObject;
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.objects.raw.PdfDictionary;
-
+import org.jpedal.objects.raw.*;
 import org.jpedal.parser.DecoderOptions;
-import org.jpedal.utils.LogWriter;
-
-import java.awt.*;
-import java.io.*;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.HashMap;
 import org.jpedal.parser.PdfFontFactory;
+import org.jpedal.utils.LogWriter;
 
 /**
  * contains all generic pdf font data for fonts.<P>
@@ -84,7 +81,9 @@ public class PdfFont implements Serializable {
     protected boolean containsHexNumbers, allNumbers;
     
     protected String embeddedFontName,embeddedFamilyName,copyright;
-    
+
+    private int objID;
+
     private float missingWidth=noWidth;
     
     boolean isSingleByte;
@@ -440,8 +439,7 @@ public class PdfFont implements Serializable {
     
     /**return unicode value for this index value */
     public final String getUnicodeMapping(final int char_int){
-        //@sam - fixes case 23962 but is this real problem
-        if(unicodeMappings==null){// || char_int>=unicodeMappings.length) {
+        if(unicodeMappings==null || char_int>=unicodeMappings.length) {
             return null;
         } else {
             return  unicodeMappings[char_int];
@@ -996,7 +994,10 @@ public class PdfFont implements Serializable {
         
         //allow for no value
         if (width ==noWidth || width == 0) {
-            width = 0.2f;
+            
+            width = 0.3f;
+            //Kept original in case new value shows issue in the future
+            //width = 0.2f;
         }
         
         return width;
@@ -1343,7 +1344,10 @@ public class PdfFont implements Serializable {
             //System.out.println("baseFontName="+baseFontName);
         }
         glyphs.setBaseFontName(baseFontName);
-        
+
+        objID = pdfObject.getObjectRefID();
+        glyphs.setObjID(objID);
+
         /**
          * get name less any suffix (needs abcdef+ removed from start)
          **/
@@ -1375,14 +1379,18 @@ public class PdfFont implements Serializable {
     }
     
     /**
-     * used by PDF2HTML to ensure name unique
+     * used by PDF2HTML to replace unsuitable characters and make sure unique
      * @param newName
      */
-    public void resetNameForHTML(final String newName){
+    public void resetNameForHTML(String newName){
         glyphs.fontName=newName;
         glyphs.baseFontName=newName;
     }
-    
+
+    public int getObjID() {
+        return objID;
+    }
+
     protected void setEncoding(final PdfObject pdfObject, final PdfObject pdfFontDescriptor) {
         
         

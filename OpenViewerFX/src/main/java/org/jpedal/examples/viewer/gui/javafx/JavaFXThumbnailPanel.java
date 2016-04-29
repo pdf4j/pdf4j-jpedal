@@ -56,19 +56,14 @@ import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.ThumbnailDecoder;
-import org.jpedal.examples.viewer.Values;
 import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.objects.PdfPageData;
 
 /**
@@ -216,7 +211,6 @@ public class JavaFXThumbnailPanel extends Tab implements GUIThumbnailPanel {
 
             //commonValues.setProcessing(false);
 
-            /** draw thumbnails in background, having checked not already drawing */
             if(drawing) {
                 terminateDrawing();
             }
@@ -225,13 +219,12 @@ public class JavaFXThumbnailPanel extends Tab implements GUIThumbnailPanel {
                 return;
             }
 
-            /** draw thumbnails in background */
             drawThumbnails();
         
     }
 
     @Override
-    public void setupThumbnails(final int pages, final Font textFont, final String message, final PdfPageData pageData) {
+    public void setupThumbnails(final int pages, final Font textFont, final PdfPageData pageData) {
         
         lastPage = -1;
         
@@ -249,6 +242,10 @@ public class JavaFXThumbnailPanel extends Tab implements GUIThumbnailPanel {
         for(int i = 0; i < pages; i++){
             
 			final int page=i+1;
+            String pageLabel = decode_pdf.getIO().convertPageNumberToLabel(page);
+            if(pageLabel==null){
+                pageLabel = String.valueOf(page);
+            }
             
 			//create blank image with correct orientation
 			final int ph;//pw
@@ -272,12 +269,12 @@ public class JavaFXThumbnailPanel extends Tab implements GUIThumbnailPanel {
             
             if(cropWidth > cropHeight){
 //                VBox contents = new VBox(new ImageView(usedLandscape), new Label(message + ' ' + page));
-                final Button imageButton = new Button(message + ' ' + page, new ImageView(usedPortrait));
+                final Button imageButton = new Button(pageLabel, new ImageView(usedPortrait));
                 pageButton[i] = imageButton;
                 isLandscape[i] = true;
             }else{
 //                VBox contents = new VBox(new ImageView(usedPortrait), new Label());
-                final Button imageButton = new Button(message + ' ' + page, new ImageView(usedPortrait));
+                final Button imageButton = new Button(pageLabel, new ImageView(usedPortrait));
                 pageButton[i] = imageButton;
                 isLandscape[i] = false;
             }

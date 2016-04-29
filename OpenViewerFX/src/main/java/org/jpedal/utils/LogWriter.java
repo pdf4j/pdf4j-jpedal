@@ -66,7 +66,7 @@ public class LogWriter
      */
     private static final Set<String> filterValues = getFilterSet();
     
-    public static final boolean isRunningFromIDE=System.getProperty("debugInIDE")!=null && 
+    public static final boolean isRunningFromIDE=System.getProperty("debugInIDE")!=null &&
             System.getProperty("debugInIDE").equalsIgnoreCase("true") &&
             LogWriter.class.getResource("LogWriter.class").toString().startsWith("file:");
     //public static final boolean isRunningFromIDE=true;
@@ -87,22 +87,17 @@ public class LogWriter
         
         return filterSet;
     }
-    
-    /**
-     * @deprecated - should not be used
-     * @return 
-     */
-    @Deprecated
-    public static final boolean isOutput(){
-        return verbose || logScanner!=null;
-        
-    }
-    
-    ///////////////////////////////////////////////
+   
     public static final void writeLog(final String message) {
 
         if (isRunningFromIDE && message.contains("Exception")) {
             System.out.println("[Exception] "+ message);
+
+            try {
+                throw new RuntimeException("Exception thrown at");
+            } catch (RuntimeException e) {
+                e.printStackTrace(System.out);
+            }
         
         }else if (verbose || logScanner != null) {
             writeMessage(message);
@@ -112,7 +107,7 @@ public class LogWriter
     ///////////////////////////////////////////////
     private static void writeMessage(final String message) {
 
-        /**
+        /*
          * ignore any logging if we have set some inclusive values with
          *
          * -Dorg.jpedal.inclusiveLogFilters="memory,error"
@@ -140,9 +135,6 @@ public class LogWriter
             logScanner.message(message);
         }
 
-        /**
-         * write message to pane if client active and put to front
-         */
         if (verbose) {
             System.out.println(message);
         }

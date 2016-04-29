@@ -34,12 +34,7 @@ package org.jpedal.fonts.glyph;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextInputControl;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import org.jpedal.fonts.tt.FontFile2;
 import org.jpedal.fonts.tt.Glyf;
 import org.jpedal.fonts.tt.Hmtx;
@@ -110,9 +105,9 @@ public class JavaFXSupport {
 
     public static void select(Object guiComp, String selectedItem, int formType) {
         if (formType == FormFactory.combobox) {
-            ((ComboBox) guiComp).getSelectionModel().select(selectedItem);
+            ((ComboBox<String>) guiComp).getSelectionModel().select(selectedItem);
         } else {
-            ((ListView) guiComp).getSelectionModel().select(selectedItem);
+            ((ListView<String>) guiComp).getSelectionModel().select(selectedItem);
         }
     }
 

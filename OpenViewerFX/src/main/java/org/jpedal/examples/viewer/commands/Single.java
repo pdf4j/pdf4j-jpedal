@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.SharedViewer;
@@ -59,9 +59,9 @@ public class Single {
             currentGUI.getButtons().alignLayoutMenuOption(Display.SINGLE_PAGE);
 
             if(SharedViewer.isFX()){
-                ModeChange.changeModeInJavaFX(Display.SINGLE_PAGE,decode_pdf,currentGUI,null,null,null);
+                ModeChange.changeModeInJavaFX(Display.SINGLE_PAGE,decode_pdf,currentGUI);
             }else{
-                ModeChange.changeModeInSwing(Display.SINGLE_PAGE,decode_pdf,currentGUI,null,null,null);
+                ModeChange.changeModeInSwing(Display.SINGLE_PAGE,decode_pdf,currentGUI,null);
             }
             
             currentGUI.resetRotationBox();
@@ -70,7 +70,7 @@ public class Single {
             //Change the page number for single page mode
             //This ensures facing mode number is replaced with a single number
             currentGUI.setPageNumber();
-
+            currentGUI.updateTextBoxSize();
         }
     }
 }

@@ -32,12 +32,11 @@
  */
 package org.jpedal.io.filter;
 
+import java.io.*;
+import java.util.Map;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.repositories.FastByteArrayOutputStream;
-
-import java.io.*;
-import java.util.Map;
 
 /**
  *
@@ -99,7 +98,7 @@ public class ASCIIHex extends BaseFilter implements PdfFilter {
 
         final FastByteArrayOutputStream bos = new FastByteArrayOutputStream(data.length);
 
-        /** loop to read and process */
+        //loop to read and process
         while (true) {
 
             current = valuesRead.charAt(i);
@@ -152,7 +151,7 @@ public class ASCIIHex extends BaseFilter implements PdfFilter {
             StringBuffer value = new StringBuffer();
             char current;
 
-            /** loop to read and process */
+            // loop to read and process
             int count = bis.available();
             for (int i = 0; i < count; i++) {
 

@@ -35,16 +35,17 @@ package org.jpedal.color;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-
 import org.jpedal.exception.PdfException;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;

@@ -32,8 +32,8 @@
  */
 package org.jpedal.objects.javascript.functions;
 
-import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.sun.PrintfFormat;
 
@@ -78,9 +78,6 @@ public class AFPercent extends AFNumber{
 
                 currentVal=(String)formObject.getFormValue();
 
-                /**
-                 * get value, format and add %
-                 */
                 float number=0;
                 String mask="";
 

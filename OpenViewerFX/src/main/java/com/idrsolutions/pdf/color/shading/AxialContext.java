@@ -39,10 +39,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.function.PDFFunction;
-import org.jpedal.render.DynamicVectorRenderer;
 
 public class AxialContext implements PaintContext {
 	
@@ -80,19 +78,11 @@ public class AxialContext implements PaintContext {
     
     //private float[][] matrix=null;
 
-    private final boolean isInverted;
-    
-    /**used to show whether we are rendering PDF, turning into HTMl, etc */
-    private int renderingType= DynamicVectorRenderer.CREATE_PATTERN;
-
     //@printIssue - this is where we pass values through
-    AxialContext(final AffineTransform xform, final int renderingType, final boolean isPrinting, final int offX, final int offY, final int minX, final int pHeight, final float scaling, final boolean[] isExtended, final float[] domain,
+    AxialContext(final AffineTransform xform, final boolean isPrinting, final int offX, final int offY, final int minX, final int pHeight, final float scaling, final boolean[] isExtended, final float[] domain,
                         final float[] coords, final GenericColorSpace shadingColorSpace, final boolean colorsReversed, final float[] background, final PDFFunction[] function){
 
-        
-        /**
-         * work out if page rotated
-         */
+
         final double[] aff=new double[6];
         xform.getMatrix(aff);
         
@@ -105,11 +95,6 @@ public class AxialContext implements PaintContext {
         
         //this.isInverted= aff[0]>0 && aff[1]==0 && aff[2]==0 && aff[3]>0 && renderingType==DynamicVectorRenderer.CREATE_SH;
         
-        //not sure if fully correct yet but fixes 18992 also look at test22
-        isInverted=renderingType==DynamicVectorRenderer.CREATE_SMASK;
-
-        this.renderingType=renderingType;
-
     	this.isPrinting=isPrinting;
 
         this.offX=offX;
@@ -133,24 +118,7 @@ public class AxialContext implements PaintContext {
 		this.scaling=scaling;
 		
 		this.minX=minX;
-        
-        
-        //this.pHeight=566;// 566;//(int) (572*2);//(pHeight*(1-scaling));
-          /**
-        if(scaling>1.6){
-            this.pHeight=210;//(int)(566*0.25f);
-        }else if(scaling>1.2){
-            this.pHeight=56;//(int)(566*0.25f);
-        }else if(scaling<0.9){
-            //this.pHeight=56;//(int)(566*0.25f);
-        }
-System.out.println(this.pHeight+" "+scaling+" "+(1f/scaling)+" "+pHeight+" "+pageHeight);
-             /**/
-        //this.matrix=matrix;
-        //isRotated=matrix!=null && matrix[0][0]==0 && matrix[0][1]>0 && matrix[1][1]==0 && matrix[1][0]<0;
 
-        //System.out.println(isRotated+" "+matrix +" matrix[0][0]="+matrix[0][0]+" matrix[0][1]="+matrix[0][1]+
-          //      " matrix[1][1]"+matrix[1][1]+" matrix[1][0]="+matrix[1][0]);
     }
 	@Override
     public void dispose() {}
@@ -169,7 +137,7 @@ System.out.println(this.pHeight+" "+scaling+" "+(1f/scaling)+" "+pHeight+" "+pag
         }
         
 		//just average if tiny and not visible (note we cannot use this in HTML so first test to avoid)
-		final boolean isTooSmall=renderingType==DynamicVectorRenderer.CREATE_PATTERN && (w/scaling<=1f || h/scaling<=1f); //
+		final boolean isTooSmall= (w/scaling<=1f || h/scaling<=1f); //
 ////@mark
         
         //create buffer to hold all this data
@@ -230,98 +198,61 @@ System.out.println(this.pHeight+" "+scaling+" "+(1f/scaling)+" "+pHeight+" "+pag
 			
 			//x co-ordinates			
 			for (int x = 0; x < w; x++) {
-				/**
-				 *take x and y and pass through conversion with domain values - this gives us xx
-				 */
 
-                //hack for MAC which is f**king broken
-                //now appears to work in latest JREs so removed
-                //if(1==2 && PdfDecoder.isRunningOnMac)
-					//xx=((dx*((x+xstart)-x0))+(dy*((y1+y+ystart)-y0)))/divisor;
-				//else
-				{
 
-                    //cache what is quite a slow operation
-                    final float[] xy;
-//					if(x<1000 && y<1000){
-//                        xy= (float[]) cachedXY[x][y];
-//                    }
+				//cache what is quite a slow operation
+				final float[] xy;
 
-                    //if(xy==null){
-                    if(pageRotation != 90){
-                        xy = PixelFactory.convertPhysicalToPDF(isPrinting, x, y, offX, offY, scaling, xstart, ystart, minX, pageHeight);
-                    }else{
-                        // Fix for debug2/StampsProblems and 13jun/A380PDP-pg1
-                        xy = PixelFactory.convertPhysicalToPDF(isPrinting, y, x, offX, offY, scaling, xstart, ystart, minX, pageHeight);
-                    }
-                      //  cachedXY[x][y]=xy;
-                    //}
-                        
-                    pdfX = xy[0];
-                    if(isInverted){
-                        pdfY = -xy[1]; 
-                    }else{
-                        pdfY = xy[1]; 
-                    }
-                    
-                    //if(PdfDecoder.isRunningOnMac && PdfDecoder.javaVersion<1.6){ //fix bug in code
-					//    xx=((dx*(pdfX-x0))+(dy*(this.pHeight-((y1+pdfY)-y0))))/divisor;
-                    //}else
-                    if(isTooSmall){
-                    	xx=0.5f;
-                    }else {
-                        xx = ((dx * (pdfX - x0)) + (dy * ((pdfY) - y0))) / divisor;
-                    }
+				if(pageRotation != 90){
+					xy = PixelFactory.convertPhysicalToPDF(isPrinting, x, y, offX, offY, scaling, xstart, ystart, minX, pageHeight);
+				}else{
+					// Fix for debug2/StampsProblems and 13jun/A380PDP-pg1
+					xy = PixelFactory.convertPhysicalToPDF(isPrinting, y, x, offX, offY, scaling, xstart, ystart, minX, pageHeight);
+				}
 
-                    //invert for print as wrong way round
-                    final float yDiff=y0-y1;
-                    //if(yDiff<0)
-                    	//yDiff=-yDiff;
-                    
-                    //System.out.println("Ydiff=================="+yDiff);
-                    if(isPrinting && yDiff<0) {
-                        xx = 1 - xx;
-                    }
+				pdfX = xy[0];
+				pdfY = xy[1];
 
-                    /**debug code*/
-                    if(pdfX>maxPDFX) {
-                        maxPDFX = pdfX;
-                    }
-                    if(pdfX<minPDFX) {
-                        minPDFX = pdfX;
-                    }
-                    
-                    if(pdfY>maxPDFY) {
-                        maxPDFY = pdfY;
-                    }
-                    if(pdfY<minPDFY) {
-                        minPDFY = pdfY;
-                    }
-                    /**/
-                    
-                }
+				if(isTooSmall){
+					xx=0.5f;
+				}else {
+					xx = ((dx * (pdfX - x0)) + (dy * ((pdfY) - y0))) / divisor;
+				}
 
-                /**check range*/
-				if(xx<0 && isExtended[0]){
+				//invert for print as wrong way round
+				final float yDiff=y0-y1;
+
+				if(isPrinting && yDiff<0) {
+					xx = 1 - xx;
+				}
+
+				if(pdfX>maxPDFX) {
+					maxPDFX = pdfX;
+				}
+				if(pdfX<minPDFX) {
+					minPDFX = pdfX;
+				}
+
+				if(pdfY>maxPDFY) {
+					maxPDFY = pdfY;
+				}
+				if(pdfY<minPDFY) {
+					minPDFY = pdfY;
+				}
+
+
+                if(xx<0 && isExtended[0]){
 					t=t0;
 				}else if(xx>1 && isExtended[1]){
 					t=t1;
 				}else{
 					t=t0+((t1-t0)*xx);
-					//t=1;
 				}
-
-                //if(x==0)
-                //System.out.println(pdfX+" "+pdfY+" "+t+" "+isTooSmall);
-
 
                 if(isTooSmall) {
                     t = 0.5f;
                 }
 
-                /**
-				 * proceed if valid
-				 */
 				if(t>=t0 && t<=t1){
 
                     if(colorsReversed) {
@@ -331,11 +262,7 @@ System.out.println(this.pHeight+" "+scaling+" "+(1f/scaling)+" "+pHeight+" "+pag
                     if(t!=lastT){ //cache unchanging values
 						
 						lastT=t;
-						
-						/**
-						 * workout values
-						 */
-						
+
 						final Color c=calculateColor(t);
 						cr=c.getRed();
 						cg=c.getGreen();
@@ -369,9 +296,6 @@ System.out.println(this.pHeight+" "+scaling+" "+(1f/scaling)+" "+pHeight+" "+pag
 
         final float[] colValues = ShadingFactory.applyFunctions(function,new float[]{val});
 
-        /**
-         * this value is converted to a color
-         */
 		shadingColorSpace.setColor(colValues,colValues.length);
 
         col=(Color) shadingColorSpace.getColor();

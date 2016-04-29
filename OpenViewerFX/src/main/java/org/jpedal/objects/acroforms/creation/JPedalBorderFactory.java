@@ -32,17 +32,12 @@
  */
 package org.jpedal.objects.acroforms.creation;
 
+import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.border.*;
 import org.jpedal.objects.raw.PdfArrayIterator;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import java.awt.*;
 
 @SuppressWarnings("MagicConstant")
 public class JPedalBorderFactory {
@@ -54,7 +49,7 @@ public class JPedalBorderFactory {
      * setup the border style
      */
     public static Border createBorderStyle(final PdfObject BS, final Color borderColor, final Color borderBackgroundColor, final float scaling) {
-        /**Type must be Border
+        /*Type must be Border
          * W width in points (if 0 no border, default =1)
          * S style - (default =S)
          * 	S=solid, D=dashed (pattern specified by D entry below), B=beveled(embossed appears to above page),
@@ -89,7 +84,7 @@ public class JPedalBorderFactory {
             w = 1;
         }
         
-        final float ws = ((float)w)*scaling;
+        final float ws = w*scaling;
         w = (int)(ws+0.5);
         
         int style=PdfDictionary.S;
@@ -152,7 +147,7 @@ public class JPedalBorderFactory {
            
         }
         
-        /** if an X in the BS then thats out XFABorder-
+        /* if an X in the BS then thats out XFABorder-
          * R - right handed
          * L - left handed
          * E - even

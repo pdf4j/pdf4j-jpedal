@@ -32,12 +32,11 @@
  */
 package org.jpedal.display;
 
-import org.jpedal.exception.PdfException;
-import org.jpedal.render.DynamicVectorRenderer;
-
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+import org.jpedal.exception.PdfException;
+import org.jpedal.render.DynamicVectorRenderer;
 
 @SuppressWarnings("UnusedDeclaration")
 public class Overlays {

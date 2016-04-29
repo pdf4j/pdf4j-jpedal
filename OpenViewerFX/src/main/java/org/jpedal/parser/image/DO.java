@@ -32,6 +32,7 @@
  */
 package org.jpedal.parser.image;
 
+import java.awt.image.BufferedImage;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.ErrorTracker;
 import org.jpedal.external.ImageHandler;
@@ -42,11 +43,9 @@ import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 
-import java.awt.image.BufferedImage;
-
 public class DO extends ImageDecoder {
-    public DO(final int imageCount, final PdfObjectReader currentPdfFile, final ErrorTracker errorTracker, final ImageHandler customImageHandler, final ObjectStore objectStoreStreamRef, final PdfImageData pdfImages, final int formLevel, final PdfPageData pageData, final String imagesInFile, final String formName) {
-        super(imageCount, currentPdfFile, errorTracker, customImageHandler, objectStoreStreamRef, pdfImages, formLevel, pageData, imagesInFile, formName);
+    public DO(final int imageCount, final PdfObjectReader currentPdfFile, final ErrorTracker errorTracker, final ImageHandler customImageHandler, final ObjectStore objectStoreStreamRef, final PdfImageData pdfImages, final PdfPageData pageData, final String imagesInFile) {
+        super(imageCount, currentPdfFile, errorTracker, customImageHandler, objectStoreStreamRef, pdfImages, pageData, imagesInFile);
     }
 
 
@@ -55,11 +54,6 @@ public class DO extends ImageDecoder {
      */
     @Override
     public int processImage(String name, final int dataPointer, final PdfObject XObject) throws PdfException {
-
-        //name is not unique if in form so we add form level to separate out
-        if(formLevel>0) {
-            name = formName + '_' + formLevel + '_' + name;
-        }
 
         //set if we need
         String key = null;
@@ -108,8 +102,8 @@ public class DO extends ImageDecoder {
 
         final boolean isForHTML= current.isHTMLorSVG();
 
-        /**don't process unless needed*/
-        if (renderImages || finalImagesExtracted || clippedImagesExtracted || rawImagesExtracted) {
+        /*don't process unless needed*/
+        if (parserOptions.imagesNeeded()) {
 
             //read stream for image
             final byte[] objectData= currentPdfFile.readStream(XObject, true, true, false, false, false, XObject.getCacheName(currentPdfFile.getObjectReader()));
@@ -127,7 +121,7 @@ public class DO extends ImageDecoder {
                 BufferedImage image = processImageXObject(XObject, name, objectData, false, details);
 
                 //fix for oddity in Annotation
-                if (image != null && image.getWidth() == 1 && image.getHeight() == 1 && isType3Font) {
+                if (image != null && image.getWidth() == 1 && image.getHeight() == 1 && parserOptions.isType3Font()) {
                     image.flush();
                     image = null;
                 }
@@ -135,13 +129,13 @@ public class DO extends ImageDecoder {
                 //save transformed image
                 if (image != null) {
 
-                    if (!isForHTML &&  (parserOptions.renderDirectly() || useHiResImageForDisplay)) {
+                    if (!isForHTML) {
 
                         gs.x = gs.CTM[2][0];
                         gs.y = gs.CTM[2][1];
 
-                        /**save details if we are tracking*/
-                        if(finalImagesExtracted || rawImagesExtracted){
+                        /*save details if we are tracking*/
+                        if(parserOptions.isFinalImagesExtracted() || parserOptions.isRawImagesExtracted()){
                             int w=(int)Math.abs(gs.CTM[0][0]);
                             if(w==0) {
                                 w = (int) Math.abs(gs.CTM[0][1]);
@@ -161,7 +155,7 @@ public class DO extends ImageDecoder {
 
                             final int id = current.drawImage(parserOptions.getPageNumber(), image, gs, false, name, previousUse);
 
-                            /**
+                            /*
                              * store last usage in case it reappears unless it is transparent
                              */
                             if (ImageCommands.rejectSuperimposedImages && key != null) {
@@ -170,7 +164,7 @@ public class DO extends ImageDecoder {
                         }
                     } else {
 
-                        if (clippedImagesExtracted  || isForHTML) {
+                        if (parserOptions.isClippedImagesExtracted()  || isForHTML) {
                             generateTransformedImage(image, name);
                         } else {
                             try {

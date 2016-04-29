@@ -32,11 +32,10 @@
  */
 package org.jpedal.fonts.tt;
 
-import javafx.scene.shape.*;
-import org.jpedal.fonts.tt.hinting.TTVM;
-
 import java.io.Serializable;
 import javafx.collections.ObservableList;
+import javafx.scene.shape.*;
+import org.jpedal.fonts.tt.hinting.TTVM;
 
 
 /**
@@ -74,7 +73,7 @@ public class TTGlyphFX extends BaseTTGlyph implements Serializable{
             return;
         }
 
-        /**
+        /*
          * scan data and adjust glyfs after first if do not end in contour
          */
 
@@ -176,7 +175,7 @@ public class TTGlyphFX extends BaseTTGlyph implements Serializable{
             int p2=(j+2)%fc;
             int pm1=(j-1)%fc;
 
-            /**special cases
+            /*special cases
              *
              *round up to last point at end
              *First point
@@ -331,7 +330,7 @@ public class TTGlyphFX extends BaseTTGlyph implements Serializable{
                         System.out.println("curveto " + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2 + ' ' + x3 + ' ' + y3);
                     }
 
-                    /**if end after curve, roll back so we pick up the end*/
+                    /*if end after curve, roll back so we pick up the end*/
                     if( checkEnd && endOfContour[j]){
 
                         isEnd=true;
@@ -393,11 +392,6 @@ public class TTGlyphFX extends BaseTTGlyph implements Serializable{
             }
         }
 
-        /**
-         * store so we can draw glyf as set of paths
-         */
-        //pathsFX=current_path;
-
         if(debug) {
             System.out.println("Ends at " + x1 + ' ' + y1 + " x=" + minX + ',' + maxX + " y=" + minY + ',' + maxY + " glyph x=" + compMinX + ',' + compMaxX + " y=" + compMinY + ',' + compMaxY);
         }
@@ -407,7 +401,7 @@ public class TTGlyphFX extends BaseTTGlyph implements Serializable{
     @Override
     public Path getPath() {
 
-        /**
+        /*
          * we need a new PAth each time so we recreate
          */
         pathsFX=null;

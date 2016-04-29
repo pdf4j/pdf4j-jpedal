@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.Labeled;
 import javafx.scene.input.MouseEvent;
 import org.jpedal.objects.acroforms.actions.PDFListener;
 
@@ -76,7 +77,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
         }
         if((captionChanger != null && e.getSource() instanceof ButtonBase) && 
             (captionChanger.containsKey(("rollover")))){
-                ((ButtonBase)e.getSource()).setText(captionChanger.get("rollover"));
+                ((Labeled)e.getSource()).setText(captionChanger.get("rollover"));
             }
         }
     
@@ -87,7 +88,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
         }
         if ((captionChanger != null && e.getSource() instanceof ButtonBase) &&
             (captionChanger.containsKey("normal"))) {
-                ((ButtonBase) e.getSource()).setText(captionChanger.get("normal"));
+                ((Labeled) e.getSource()).setText(captionChanger.get("normal"));
             }
         }
     
@@ -104,7 +105,7 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
         }
         if ((captionChanger != null && e.getSource() instanceof ButtonBase) &&
              (captionChanger.containsKey("down"))) {
-               ((ButtonBase) e.getSource()).setText(captionChanger.get("down"));
+               ((Labeled) e.getSource()).setText(captionChanger.get("down"));
             }
         }
     
@@ -115,9 +116,9 @@ public class JavaFXFormButtonListener implements EventHandler<MouseEvent>{
          }
          if (captionChanger != null && e.getSource() instanceof ButtonBase){
              if (captionChanger.containsKey("rollover")) {
-               ((ButtonBase) e.getSource()).setText(captionChanger.get("rollover"));
+               ((Labeled) e.getSource()).setText(captionChanger.get("rollover"));
              }else if(captionChanger.containsKey("normal")){
-                 ((ButtonBase)e.getSource()).setText(captionChanger.get("rollover"));
+                 ((Labeled)e.getSource()).setText(captionChanger.get("rollover"));
              }
          } 
     }

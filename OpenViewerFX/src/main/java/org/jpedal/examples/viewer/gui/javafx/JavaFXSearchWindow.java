@@ -33,11 +33,7 @@
 
 package org.jpedal.examples.viewer.gui.javafx;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,12 +43,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -1094,7 +1085,6 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
      * @param y2 the lower y cord
      * @param page :: Page to be searched with the currently set term and settings
      * @param currentKey :: The current search key, used to control results update when search ends
-     * @param model :: [AWI] The list model to append the search results to
      * @return True if search routine should continue
      */
     private boolean searchPage(final int page, final int x1, final int y1, final int x2, final int y2, final int currentKey, final ObservableList<String> resultListModel) throws Exception {
@@ -1127,7 +1117,7 @@ public class JavaFXSearchWindow extends Stage implements GUISearchWindow {
         //Set search term in results list
         resultsList.setSearchTerm(searchText.getText().trim());
         
-        final SortedMap highlightsWithTeasers = grouping.findTextWithinInAreaWithTeasers(x1, y1, x2, y2, pageSize.getRotation(page), page, searchTerms, searchTypeParameters, listener);
+        final SortedMap highlightsWithTeasers = grouping.findTextWithinInAreaWithTeasers(x1, y1, x2, y2, pageSize.getRotation(page), searchTerms, searchTypeParameters, listener);
         
         /**
          * update data structures with results from this page

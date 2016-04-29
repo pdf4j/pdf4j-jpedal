@@ -32,7 +32,7 @@
 * TIFFLZWDecoder.java
 */
 
-/**
+/*
  * A class for performing LZW decoding.
  *
  *
@@ -101,7 +101,6 @@ public class TIFFLZWDecoder
 	 *
 	 * @param data            The compressed data.
 	 * @param uncompData      Array to return the uncompressed data in.
-	 * @param h               The number of rows the compressed data contains.
 	 */
     public void decode( final byte[] data, final byte[] uncompData)
 	{
@@ -119,52 +118,30 @@ public class TIFFLZWDecoder
 		nextBits = 0;
 		int code, oldCode = 0;
 		byte string[];
-		while( ( ( code = getNextCode() ) != 257 ) && dstIndex < uncompData.length )
-		{
-			if( code == 256 )
-			{
+		while( ( ( code = getNextCode() ) != 257 ) && dstIndex < uncompData.length ) {
+			if (code == 256) {
 				initializeStringTable();
 				code = getNextCode();
-				if( code == 257 ) {
-                    break;
-                }
-				writeString( stringTable[code] );
-				oldCode = code;
-			}
-			else
-			{
-				if( code < tableIndex )
-				{
-					string = stringTable[code];
-					writeString( string );
-					addStringToTable( stringTable[oldCode], string[0] );
-					oldCode = code;
+				if (code == 257) {
+					break;
 				}
-				else
-				{
+				writeString(stringTable[code]);
+				oldCode = code;
+			} else {
+				if (code < tableIndex) {
+					string = stringTable[code];
+					writeString(string);
+					addStringToTable(stringTable[oldCode], string[0]);
+					oldCode = code;
+				} else {
 					string = stringTable[oldCode];
-					string = composeString( string, string[0] );
-					writeString( string );
-					addStringToTable( string );
+					string = composeString(string, string[0]);
+					writeString(string);
+					addStringToTable(string);
 					oldCode = code;
 				}
 			}
 		}
-		/**
-		// Horizontal Differencing Predictor
-		if( predictor == 2 )
-		{
-			int count;
-			for( int j = 0;j < h;j++ )
-			{
-				count = samplesPerPixel * ( j * w + 1 );
-				for( int i = samplesPerPixel;i < w * samplesPerPixel;i++ )
-				{
-					uncompData[count] += uncompData[count - samplesPerPixel];
-					count++;
-				}
-			}
-		}*/
 	}
 	
 	

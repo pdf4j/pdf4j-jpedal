@@ -51,8 +51,8 @@ import org.jpedal.utils.LogWriter;
 public class JPegImageDecoder {
     
     
-    public static BufferedImage decode(final String name, int w, int h, boolean arrayInverted,
-            GenericColorSpace decodeColorData, byte[] data, final float[] decodeArray, final ImageData imageData,
+    public static BufferedImage decode(final int w, final int h, final boolean arrayInverted,
+            final GenericColorSpace decodeColorData, byte[] data, final float[] decodeArray, final ImageData imageData,
             final PdfObject XObject, ErrorTracker errorTracker, ParserOptions parserOptions) {
         
         GenericColorSpace jpegDecodeColorData=decodeColorData;
@@ -60,9 +60,9 @@ public class JPegImageDecoder {
         BufferedImage image=null;
         
         //handle JPEGS
-        LogWriter.writeLog("JPeg Image " + name + ' ' + w + "W * " + h + 'H' + " arrayInverted=" + arrayInverted);
+        LogWriter.writeLog("JPeg Image " + w + "W * " + h + 'H' + " arrayInverted=" + arrayInverted);
         
-        /**
+        /*
         try {
             java.io.FileOutputStream a =new java.io.FileOutputStream("/Users/markee/Desktop/jpg.jpg");
             
@@ -108,7 +108,7 @@ public class JPegImageDecoder {
                         }
                     }
                 }catch(final Exception e){
-                    errorTracker.addPageFailureMessage("Unable to use alt colorspace with " + name + " to JPEG");
+                    errorTracker.addPageFailureMessage("Unable to use alt colorspace to JPEG");
                     
                     LogWriter.writeLog("Exception: " + e.getMessage());
                     
@@ -119,7 +119,7 @@ public class JPegImageDecoder {
                 }
             }
         }
-        /**decode if not done above*/
+        /*decode if not done above*/
         if(!decodedOnAltColorspace){
             //separation, renderer
             try{
@@ -132,7 +132,7 @@ public class JPegImageDecoder {
                 
                 //image=simulateOP(image);
             }catch(final Exception e){
-                errorTracker.addPageFailureMessage("Problem converting " + name + " to JPEG");
+                errorTracker.addPageFailureMessage("Problem converting to JPEG");
                 
                 LogWriter.writeLog("Exception: " + e.getMessage());
                 

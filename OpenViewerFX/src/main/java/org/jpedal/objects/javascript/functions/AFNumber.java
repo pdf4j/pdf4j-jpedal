@@ -32,14 +32,13 @@
  */
 package org.jpedal.objects.javascript.functions;
 
-import org.jpedal.objects.acroforms.actions.ActionHandler;
-import org.jpedal.objects.acroforms.AcroRenderer;
-import org.jpedal.objects.raw.FormObject;
-
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.objects.acroforms.actions.ActionHandler;
+import org.jpedal.objects.raw.FormObject;
 
 public class AFNumber extends JSFunction{
 
@@ -162,7 +161,7 @@ public class AFNumber extends JSFunction{
                     currentVal = currentVal.charAt(0) + currentVal.substring(1, currentVal.length()).replaceAll("-", "");
                 }
 				
-				/**
+				/*
 				 * strip out number value or 0 for no value
 				 */
 				double number;

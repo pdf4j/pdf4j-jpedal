@@ -32,7 +32,7 @@
  */
 package org.jpedal.external;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 
 /**
  * custom object to draw onto screen

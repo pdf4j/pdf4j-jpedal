@@ -34,29 +34,23 @@ package org.jpedal.examples.viewer;
 
 import java.util.Map;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import org.jpedal.FileAccess;
-import org.jpedal.PdfDecoderFX;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.commands.*;
 import org.jpedal.examples.viewer.commands.generic.Snapshot;
-
-import org.jpedal.examples.viewer.commands.javafx.*;
-
-import org.jpedal.examples.viewer.gui.GUI;
-import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.commands.generic.ZoomIn;
 import org.jpedal.examples.viewer.commands.generic.ZoomOut;
+import org.jpedal.examples.viewer.commands.javafx.*;
+import org.jpedal.examples.viewer.gui.GUI;
+import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.JPedalActionHandler;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
 
-/**
- *
- * @author Nathan
- */
 public class JavaFXCommands extends Commands {
 
     public JavaFXCommands(final Values commonValues, final GUIFactory currentGUI, final PdfDecoderInt decode_pdf, final GUIThumbnailPanel thumbnails, final PropertiesFile properties, final GUISearchWindow searchFrame) {
@@ -130,7 +124,7 @@ public class JavaFXCommands extends Commands {
                 case SNAPSHOT:
                     extractingAsImage = Snapshot.execute(args, currentGUI, decode_pdf, extractingAsImage); // Snapshot selected area
                     if (extractingAsImage) {
-                        ((PdfDecoderFX) decode_pdf).setCursor(Cursor.CROSSHAIR);
+                        ((Node) decode_pdf).setCursor(Cursor.CROSSHAIR);
                     }
                     break;
                     
@@ -290,13 +284,9 @@ public class JavaFXCommands extends Commands {
     @Override
     public void openTransferedFile() throws PdfException {
         
-        if (currentGUI.isSingle()) {
-            decode_pdf.flushObjectValues(true);
-        } else {
-            decode_pdf = MultiPages.openNewMultiplePage(currentGUI, commonValues);
-        }
-
-        JavaFXOpenFile.openFile(commonValues.getSelectedFile(), commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
+        decode_pdf.flushObjectValues(true);
+        
+        JavaFXOpenFile.openFile(commonValues, searchFrame, currentGUI, decode_pdf, properties, thumbnails);
 
 
     }

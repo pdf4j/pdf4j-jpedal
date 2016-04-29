@@ -37,7 +37,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.jpedal.examples.handlers.DefaultImageHelper;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Strip;
@@ -84,7 +83,7 @@ public class ObjectStore {
     public static final String multiThreaded_root_dir=null;
 
     /**temp storage for raw CMYK images*/
-    private static final String cmyk_dir = temp_dir + "cmyk" + separator;
+    private static String cmyk_dir;
 
     /**key added to each file to make sure unique to pdf being handled*/
     private String key = "jpedal"+Math.random()+ '_';
@@ -146,8 +145,27 @@ public class ObjectStore {
      */
     public ObjectStore(){
 
+        
+        setProperties();
+        
         init();
 
+    }
+    
+    static{
+        setProperties();
+    }
+    
+    private static void setProperties(){
+        
+        final String tempDir=System.getProperty("org.jpedal.tempDir");
+        
+        if(tempDir!=null){
+            temp_dir=tempDir;
+        }
+        
+        cmyk_dir = temp_dir + "cmyk" + separator;
+        
     }
 
 
@@ -175,10 +193,6 @@ public class ObjectStore {
             final File f = new File(temp_dir);
             if (!f.exists()) {
                 f.mkdirs();
-            }
-
-            if(isMultiThreaded) {
-                f.deleteOnExit();
             }
 
         }catch(final Exception e){
@@ -501,17 +515,14 @@ public class ObjectStore {
                 final File[] to_be_del = temp_files.listFiles();
                 if (file_list != null) {
                     for (int ii = 0; ii < file_list.length; ii++) {
-                        if (file_list[ii].contains(key)) {
+                        if (file_list[ii].contains(key) || file_list[ii].endsWith(".bin")) {
                             final File delete_file = new File(temp_dir + file_list[ii]);
                             delete_file.delete();
                         }
                         //can we also delete any file more than 4 hours old here
                         //its a static variable so user can change
 
-                        //flag to turn the redundant obj deletion on/off
-                        final boolean delOldFiles = true;
-
-                        if((delOldFiles) && (!file_list[ii].endsWith(".pdf") && (System.currentTimeMillis()-to_be_del[ii].lastModified() >= time))){
+                        if((!file_list[ii].endsWith(".pdf") && (System.currentTimeMillis()-to_be_del[ii].lastModified() >= time))){
                                 //System.out.println("File time : " + to_be_del[ii].lastModified() );
                                 //System.out.println("Current time: " + System.currentTimeMillis());
                                 //System.out.println("Redundant File Removed : " + to_be_del[ii].getName() );
@@ -1010,7 +1021,6 @@ public class ObjectStore {
             }
 
             final File ff=File.createTempFile("bytes",".bin", new File(ObjectStore.temp_dir));
-            //ff.deleteOnExit();
 
             final BufferedOutputStream to = new BufferedOutputStream(new FileOutputStream(ff));
             to.write(bytes);
@@ -1037,7 +1047,6 @@ public class ObjectStore {
             //System.out.println("ObjectStore.temp_dir="+ObjectStore.temp_dir);
 
             final File ff=File.createTempFile("image",".bin", new File(ObjectStore.temp_dir));
-            //ff.deleteOnExit();
 
             final BufferedOutputStream to = new BufferedOutputStream(new FileOutputStream(ff));
             to.write(bytes);

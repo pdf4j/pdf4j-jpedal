@@ -32,15 +32,16 @@
  */
 package org.jpedal.render;
 
-import org.jpedal.color.ColorSpaces;
-import org.jpedal.utils.LogWriter;
-
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import org.jpedal.color.ColorSpaces;
+import org.jpedal.utils.LogWriter;
 
 /**
  * static helper methods for rendering

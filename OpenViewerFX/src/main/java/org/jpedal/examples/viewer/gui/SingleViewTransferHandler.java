@@ -35,9 +35,7 @@ package org.jpedal.examples.viewer.gui;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.util.List;
-
 import javax.swing.JComponent;
-
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.exception.PdfException;

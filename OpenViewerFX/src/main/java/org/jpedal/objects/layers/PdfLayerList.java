@@ -32,13 +32,12 @@
  */
 package org.jpedal.objects.layers;
 
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.OCObject;
-import org.jpedal.objects.raw.PdfKeyPairsIterator;
-import org.jpedal.io.PdfObjectReader;
-
 import java.util.*;
+import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.raw.OCObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfKeyPairsIterator;
+import org.jpedal.objects.raw.PdfObject;
 
 public class PdfLayerList {
 
@@ -144,7 +143,7 @@ public class PdfLayerList {
             showValues("RBGroups=",PdfDictionary.RBGroups,layerDict);
 
         }
-        /**
+        /*
          * workout list of layers (can be in several places)
          */
 
@@ -161,7 +160,7 @@ public class PdfLayerList {
             addLayer(PdfDictionary.OFF, layerDict.getKeyArray(PdfDictionary.OFF), null);
         }
 
-        /**
+        /*
          * handle case where layers not explicitly switched on
          */
         if(OCBaseState==PdfDictionary.ON){// && layerDict.getKeyArray(PdfDictionary.OFF)==null){
@@ -190,7 +189,7 @@ public class PdfLayerList {
         setAS(layerDict.getKeyArray(PdfDictionary.AS), currentPdfFile);
 
 
-        /**
+        /*
          * read any metadata
          */
         final int[] keys={PdfDictionary.Name,PdfDictionary.Creator};
@@ -924,7 +923,7 @@ public class PdfLayerList {
             final PdfObject OCGs_as_dictionary=layerObj.getDictionary(PdfDictionary.OCGs);
             if(OCGs_as_dictionary!=null){ //look at viewtate first
                 
-                /**
+                /*
                  * NOTE!!!! Print and other modes not implemented yet
                  * (just added what I needed to fix 17584)
                  */

@@ -32,13 +32,12 @@
  */
 package org.jpedal.objects.javascript.jsobjects;
 
+import java.util.HashMap;
+import java.util.List;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.ReturnValues;
 import org.jpedal.objects.raw.FormObject;
 import org.jpedal.objects.raw.PdfDictionary;
-
-import java.util.HashMap;
-import java.util.List;
 
 
 public class JSDoc {

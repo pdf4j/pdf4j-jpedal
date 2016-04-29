@@ -32,9 +32,9 @@
  */
 package org.jpedal.examples.viewer.gui;
 
+import org.jpedal.examples.viewer.Commands;
 import org.jpedal.external.ExternalHandlers;
 import org.jpedal.fonts.glyph.JavaFXSupport;
-import org.jpedal.examples.viewer.Commands;
 
 /**
  * This class is fxSupport wrapper for SwingCommandListener and JavaFXCommandListener.

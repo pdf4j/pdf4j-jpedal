@@ -34,21 +34,14 @@ package org.jpedal.examples.viewer.commands.javafx;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.css.Styleable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jpedal.PdfDecoderInt;
@@ -86,9 +79,7 @@ public class JavaFXExtractText extends GUIExtractText {
         }
 
         final int[][] highlights = decode_pdf.getTextLines().getHighlightedAreasAs2DArray(commonValues.getCurrentPage());
-        /**
-         * ensure co-ords in right order
-         */
+
         if (highlights == null) {
             currentGUI.showMessageDialog("There is no text selected.\nPlease highlight the text you wish to extract.", "No Text selected", FXMessageDialog.ERROR_MESSAGE);
            
@@ -143,9 +134,7 @@ public class JavaFXExtractText extends GUIExtractText {
         extractAsXML.setPadding(new Insets(0,0,0,10));
         extractAsText.setPadding(new Insets(0,10,13,0));
         bottomButtons.setPadding(new Insets(0,5,10,0));
-        /**
-         * Setup button listeners.
-         */
+
         help.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(final ActionEvent t) {
@@ -259,14 +248,14 @@ public class JavaFXExtractText extends GUIExtractText {
                             t_y2 = cropY + cropH;
                         }
 
-                        if ("rectangleExtraction".equals(((RadioButton) selected).getId())) {
+                        if ("rectangleExtraction".equals(((Styleable) selected).getId())) {
 
                             //text extraction
                             extractedText = extractTextRectangle(commonValues, decode_pdf, currentGUI, isXML, t_x1, t_x2, t_y1, t_y2) + ((char) 0x0D) + ((char) 0x0A);
-                        } else if ("tableExtraction".equals(((RadioButton) selected).getId())) {
+                        } else if ("tableExtraction".equals(((Styleable) selected).getId())) {
                             //text table extraction
                             extractedText = extractTextTable(commonValues, decode_pdf, isXML, t_x1, t_x2, t_y1, t_y2);
-                        } else if ("wordListExtraction".equals(((RadioButton) selected).getId())) {
+                        } else if ("wordListExtraction".equals(((Styleable) selected).getId())) {
                             //text wordlist extraction
                             extractedText = extractTextList(decode_pdf, commonValues, currentGUI, isXML, t_x1, t_x2, t_y1, t_y2);
                         }
@@ -284,9 +273,6 @@ public class JavaFXExtractText extends GUIExtractText {
 
     private static void createExtractionWindow(final Toggle selected, final boolean isXML, final PdfDecoderInt decode_pdf, final Values commonValues, final GUIFactory currentGUI) {
 
-        /**
-         * Setup Dialog with Content.
-         */
         final Stage extractionDialog = new Stage();
 
         final TextArea ta = new TextArea();

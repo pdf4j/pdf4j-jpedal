@@ -32,7 +32,9 @@
  */
 package org.jpedal.parser;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.util.HashMap;
 import java.util.Map;
 import org.jpedal.PdfDecoderInt;
@@ -52,10 +54,15 @@ import org.jpedal.io.PdfObjectReader;
 import org.jpedal.io.StatusBar;
 import org.jpedal.objects.*;
 import org.jpedal.objects.layers.PdfLayerList;
-import org.jpedal.objects.raw.*;
-import org.jpedal.parser.color.* ;
-import org.jpedal.parser.gs.*;
-import org.jpedal.parser.image.*;
+import org.jpedal.objects.raw.MCObject;
+import org.jpedal.objects.raw.PdfDictionary ;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.color.*;
+import org.jpedal.parser.gs.CM;
+import org.jpedal.parser.gs.Q;
+import org.jpedal.parser.image.DO;
+import org.jpedal.parser.image.ID;
+import org.jpedal.parser.image.ImageDecoder;
 import org.jpedal.parser.shape.*;
 import org.jpedal.parser.text.*;
 import org.jpedal.utils.LogWriter;
@@ -171,14 +178,9 @@ public class PdfStreamDecoder extends BaseDecoder{
     /**used to store font information from pdf and font functionality*/
     private PdfFont currentFontData;
     
-    /**flag to show we use hi-res images to draw onscreen*/
-    protected boolean useHiResImageForDisplay;
-    
     protected ObjectStore objectStoreStreamRef;
     
     String formName="";
-    
-    protected boolean isType3Font;
     
     public static boolean useTextPrintingForNonEmbeddedFonts;
     
@@ -210,16 +212,14 @@ public class PdfStreamDecoder extends BaseDecoder{
         
     }
     
-    /**
-     * create new StreamDecoder to create screen display with hires images
+     /**
+     * create new StreamDecoder to create display 
      */
-    public PdfStreamDecoder(final PdfObjectReader currentPdfFile, final boolean useHiResImageForDisplay, final PdfLayerList layers) {
+    public PdfStreamDecoder(final PdfObjectReader currentPdfFile, final PdfLayerList layers) {
         
         if(layers!=null) {
             this.layers = layers;
         }
-        
-        this.useHiResImageForDisplay=useHiResImageForDisplay;
         
         init(currentPdfFile);
     }
@@ -229,7 +229,6 @@ public class PdfStreamDecoder extends BaseDecoder{
         cache=new PdfObjectCache();
         gs=new GraphicsState();
         errorTracker=new DefaultErrorTracker();
-        
         pageData = new PdfPageData();
         
         StandardFonts.checkLoaded(StandardFonts.STD);
@@ -320,7 +319,7 @@ public class PdfStreamDecoder extends BaseDecoder{
             }
             
             //flush fonts
-            if(!isType3Font) {
+            if(!parserOptions.isType3Font()) {
                 cache.resetFonts();
             }
             
@@ -410,8 +409,6 @@ public class PdfStreamDecoder extends BaseDecoder{
                  */
             case ValueTypes.DirectRendering:
                 
-                current.setIsRenderingToImage(true);
-                
                 parserOptions.setRenderDirectly(true);
                 
                 if(obj!=null){
@@ -423,14 +420,9 @@ public class PdfStreamDecoder extends BaseDecoder{
                 /** should be called after constructor or other methods may not work*/
             case ValueTypes.ObjectStore:
                 objectStoreStreamRef = (ObjectStore)obj;
-                
-                //current=new SwingDisplay(this.pageNum,objectStoreStreamRef,false);
-                if(current!=null){
-                    current.setHiResImageForDisplayMode(useHiResImageForDisplay);
                     
-                    if(customImageHandler!=null && current!=null) {
-                        current.setCustomImageHandler(customImageHandler);
-                    }
+                if(customImageHandler!=null && current!=null) {
+                    current.setCustomImageHandler(customImageHandler);
                 }
                 
                 break;
@@ -835,9 +827,9 @@ public class PdfStreamDecoder extends BaseDecoder{
                                     final ImageDecoder imageDecoder;
                                     
                                     if(commandID!=Cmd.Do){
-                                        imageDecoder= new ID(imageCount,currentPdfFile,errorTracker,customImageHandler,objectStoreStreamRef,pdfImages, formLevel,pageData,imagesInFile,formName);
+                                        imageDecoder= new ID(imageCount,currentPdfFile,errorTracker,customImageHandler,objectStoreStreamRef,pdfImages,pageData,imagesInFile);
                                     }else{
-                                        imageDecoder= new DO(imageCount,currentPdfFile,errorTracker,customImageHandler,objectStoreStreamRef,pdfImages, formLevel,pageData,imagesInFile,formName);
+                                        imageDecoder= new DO(imageCount,currentPdfFile,errorTracker,customImageHandler,objectStoreStreamRef,pdfImages,pageData,imagesInFile);
                                     }
                                     
                                     imageDecoder.setRes(cache);
@@ -850,7 +842,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                                     //imageDecoder.setFileHandler(currentPdfFile);
                                     imageDecoder.setRenderer(current);
                                     
-                                    imageDecoder.setParameters(parserOptions.isRenderPage(), parserOptions.getRenderMode(), parserOptions.getExtractionMode(), isPrinting,isType3Font,useHiResImageForDisplay);
+                                    parserOptions.isPrinting(isPrinting);
                                     imageDecoder.setParams(parserOptions);
                                     
                                     if(commandID==Cmd.Do){
@@ -859,7 +851,12 @@ public class PdfStreamDecoder extends BaseDecoder{
                                         if(XObject==null || !parserOptions.isLayerVisible() || (layers!=null && !layers.isVisible(XObject)) || (gs.CTM!=null && gs.CTM[1][1]==0 && gs.CTM[1][0]!=0 && Math.abs(gs.CTM[1][0])<0.2)) {
                                             //ignore
                                         } else {
-                                            dataPointer = imageDecoder.processImage(parser.generateOpAsString(0, true), dataPointer, XObject);
+                                            String name=parser.generateOpAsString(0, true);
+                                            //name is not unique if in form so we add form level to separate out
+                                            if(formLevel>0) {
+                                                name = formName + '_' + formLevel + '_' + name;
+                                            }
+                                            dataPointer = imageDecoder.processImage(name, dataPointer, XObject);
                                         }
                                     }else if(parserOptions.isLayerVisible()) {
                                         dataPointer = imageDecoder.processImage(dataPointer, startInlineStream, parser.getStream(), tokenNumber);
@@ -910,7 +907,7 @@ public class PdfStreamDecoder extends BaseDecoder{
                 parser.reset();
                 
                 //increase pointer
-                tokenNumber++;
+                incrementTokenNumber();
             }
             
             //break at end
@@ -1276,10 +1273,7 @@ public class PdfStreamDecoder extends BaseDecoder{
         }
         
         if(commandID ==Cmd.Tj || commandID ==Cmd.TJ || commandID ==Cmd.quote || commandID ==Cmd.doubleQuote){
-            
-            //flag which TJ command we are on
-            current.flagCommand(Cmd.Tj,tokenNumber);
-            
+
             if(currentTextState.hasFontChanged() && currentTextState.getTfs()!=0){ //avoid text which does not appear as zero size
                 
                 //switch to correct font
@@ -1287,7 +1281,6 @@ public class PdfStreamDecoder extends BaseDecoder{
                 final PdfFont restoredFont = FontResolver.resolveFont(gs,this, fontID,pdfFontFactory,cache);
                 if(restoredFont!=null){
                     currentFontData=restoredFont;
-                    current.drawFontBounds(currentFontData.getBoundingBox());
                 }
             }
             
@@ -1501,5 +1494,10 @@ public class PdfStreamDecoder extends BaseDecoder{
     
     public int getBlendMode(){
         return currentBlendMode;
+    }
+
+    public void incrementTokenNumber() {
+        tokenNumber++;
+        current.updateTokenNumber(tokenNumber);
     }
 }

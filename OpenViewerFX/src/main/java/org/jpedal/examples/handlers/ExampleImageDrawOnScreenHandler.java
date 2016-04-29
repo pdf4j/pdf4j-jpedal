@@ -32,14 +32,15 @@
  */
 package org.jpedal.examples.handlers;
 
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import org.jpedal.color.ColorSpaces;
+import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.io.ObjectStore;
-import org.jpedal.color.ColorSpaces;
-
-import java.awt.image.*;
-import java.awt.geom.AffineTransform;
-import java.awt.*;
 import org.jpedal.utils.LogWriter;
 
 /**

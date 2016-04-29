@@ -32,7 +32,7 @@
  */
 package org.jpedal.parser.shape;
 
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.geom.Area;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfShape;
@@ -59,16 +59,14 @@ public class S {
             Object fxPath=null;
             
             float realLineWidth=-1;
-            /**
-             * fx alternative
-             */
+
             if(useJavaFX){
                 fxPath=currentDrawShape.getPath();
             }else {
                 currentShape = currentDrawShape.generateShapeFromPath(gs.CTM, gs.getLineWidth(), Cmd.S);
                 
                 if (currentShape != null) {
-                    /**
+                    /*
                     Rectangle bounds;//=currentShape.getBounds();
                     
                     // System.out.println("S bounds="+bounds+" "+" "+gs.CTM[0][0]+" "+gs.CTM[0][1]+" "+gs.CTM[1][0]+" "+gs.CTM[1][1]);

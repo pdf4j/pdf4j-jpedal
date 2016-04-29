@@ -33,7 +33,7 @@
 
 package org.jpedal.examples.viewer.commands.generic;
 
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.examples.viewer.Commands;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.gui.GUIFactory;

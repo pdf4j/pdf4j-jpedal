@@ -32,8 +32,8 @@
  */
 package org.jpedal.objects.acroforms.utils;
 
+import java.awt.Rectangle;
 import org.jpedal.objects.raw.FormObject;
-import java.awt.*;
 
 /**
  * general purpose functions used in forms
@@ -43,8 +43,7 @@ public class FormUtils {
     /**
      * sorts the integer array into the right order to read the
      * component array in size order largest first
-     * @param allFields
-     */
+	 */
     public static FormObject[] sortGroupLargestFirst(final FormObject[] comps) {
 	
 	return sortCompsDesending(comps);
@@ -58,7 +57,7 @@ public class FormUtils {
 	//reference
 	//Sorts.quicksort(new int[1],new int[1]);
 	
-	/** copy so we don't sort original */
+	/* copy so we don't sort original */
 	final int items = array.length;
 	
 	//pointer to left side of unsorted array
@@ -149,7 +148,7 @@ public class FormUtils {
 		final Rectangle first = arg1.getBoundingRectangle();
 		final Rectangle second = arg2.getBoundingRectangle();
 		
-		/**
+		/*
 		 * sorts by area, same as acrobat
 		 * return (first.width*first.height)>(second.width*second.height);
 		 */

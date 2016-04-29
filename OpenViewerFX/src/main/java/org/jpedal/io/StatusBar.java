@@ -33,10 +33,8 @@
 package org.jpedal.io;
 import java.awt.Color;
 import java.awt.Component;
-
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
-
 import org.jpedal.utils.LogWriter;
 
 /**

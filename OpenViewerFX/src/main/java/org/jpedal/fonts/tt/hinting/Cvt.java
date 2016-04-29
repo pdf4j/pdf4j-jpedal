@@ -32,8 +32,8 @@
  */
 package org.jpedal.fonts.tt.hinting;
 
-import org.jpedal.fonts.tt.Table;
 import org.jpedal.fonts.tt.FontFile2;
+import org.jpedal.fonts.tt.Table;
 import org.jpedal.utils.LogWriter;
 
 

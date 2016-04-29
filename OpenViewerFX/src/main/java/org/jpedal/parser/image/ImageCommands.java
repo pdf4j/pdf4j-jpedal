@@ -32,19 +32,24 @@
  */
 package org.jpedal.parser.image;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.constants.PDFflags;
 import org.jpedal.function.FunctionFactory;
 import org.jpedal.function.PDFFunction;
-import org.jpedal.io.*;
+import org.jpedal.io.ColorSpaceConvertor;
+import org.jpedal.io.DecryptionFactory;
+import org.jpedal.io.PdfFileReader;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
-import org.jpedal.objects.raw.*;
+import org.jpedal.objects.raw.FunctionObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.render.DynamicVectorRenderer;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 
 public class ImageCommands {
     
@@ -295,7 +300,7 @@ public class ImageCommands {
      */
     static BufferedImage applyTR(final BufferedImage image, final PdfObject TR, final PdfObjectReader currentPdfFile) {
         
-        /**
+        /*
          * get TR function first
          **/
         final PDFFunction[] functions =new PDFFunction[4];
@@ -329,7 +334,6 @@ public class ImageCommands {
                 currentPdfFile.readObject(Function);
             }
             
-            /** setup the translation function */
             if(Function!=null) {
                 functions[count] = FunctionFactory.getFunction(Function, currentPdfFile);
                 hasFunction = true;
@@ -341,12 +345,8 @@ public class ImageCommands {
           return image;
         }
 
-        /**
-         * apply colour transform
-         */
         final Raster ras=image.getRaster();
-        //image=ColorSpaceConvertor.convertToARGB(image);
-        
+
         final int[] values=new int[4];
         
         for(int y=0;y<image.getHeight();y++){
@@ -378,7 +378,7 @@ public class ImageCommands {
     /**
      * apply DecodeArray
      */
-    static void applyDecodeArray(final byte[] data, final int d, final float[] decodeArray, final int type) {
+    public static void applyDecodeArray(final byte[] data, final int d, final float[] decodeArray, final int type) {
         
         final int count = decodeArray.length;
         
@@ -389,7 +389,7 @@ public class ImageCommands {
             }
         }
         
-        /**
+        /*
          * see if will not change output
          * and ignore if unnecessary
          */
@@ -419,10 +419,7 @@ public class ImageCommands {
                     
                 }
             }
-            
-            /**
-             * handle rgb
-             */
+
         }else if((d==8 && maxValue>1)&&(type==ColorSpaces.DeviceRGB || type==ColorSpaces.CalRGB || type==ColorSpaces.DeviceCMYK)){
             
             int j=0;
@@ -442,7 +439,7 @@ public class ImageCommands {
                 data[ii]=(byte)currentByte;
             }
         }else{
-            /**
+            /*
              * apply array
              *
              * Assumes black and white or gray colorspace
@@ -461,7 +458,6 @@ public class ImageCommands {
                     
                     current =(int)(decodeArray[min]+ (current* ((decodeArray[max] - decodeArray[min])/ (divisor))));
                     
-                    /**check in range and set*/
                     if (current > maxValue) {
                         current = maxValue;
                     }

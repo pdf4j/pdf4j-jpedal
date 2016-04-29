@@ -32,20 +32,22 @@
  */
 package org.jpedal.fonts;
 
+import java.awt.GraphicsEnvironment;
+import java.io.*;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.exception.PdfFontException;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Strip;
-
-import java.awt.*;
-import java.io.*;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  * Holds Maps which are used to map font names onto actual fonts and files
@@ -306,7 +308,7 @@ public class FontMappings {
         //note different settigns for Win, linux, MAC
         
         //general
-        final String[] aliases6={/**"AcArial"};//,/**/"acarialunicodems__cn"};//,"acarial,bold"};
+        final String[] aliases6={/*"AcArial"};//,/**/"acarialunicodems__cn"};//,"acarial,bold"};
         setSubstitutedFontAliases("adobeheitistd-regular",aliases6);
         
         //platform settings
@@ -392,7 +394,7 @@ public class FontMappings {
             //now in public static variable so can be altered
             setFontDirs(defaultFontDirs);
             
-            /**check for any windows fonts lurking in Adobe folders as well*/
+            /*check for any windows fonts lurking in Adobe folders as well*/
             if(DecoderOptions.isRunningOnWindows){
                 final File adobeFonts=new File("C:\\Program Files\\Adobe\\");
                 

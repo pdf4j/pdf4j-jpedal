@@ -36,7 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXOptionDialog;
 import org.jpedal.gui.GUIFactory;
@@ -59,7 +59,7 @@ public class JavaFXSaveFile {
 
     private static void saveFile(final GUIFactory currentGUI, final Values commonValues) {
 
-        /**
+        /*
          * create the file chooser to select the file
          */
         File file;
@@ -68,9 +68,6 @@ public class JavaFXSaveFile {
 
         while (!finished) {
 
-            /**
-             * Create a FileChooser object to save file as selected filet-type.
-             */
             final FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"),
                                                      new FileChooser.ExtensionFilter("FDF file (*.fdf)", "*.fdf"));
@@ -79,10 +76,7 @@ public class JavaFXSaveFile {
             
             fileChooser.setInitialFileName(fileName);
 
-            /**
-             * Begin file-save process.
-             */
-            file = fileChooser.showSaveDialog((Stage)currentGUI.getFrame());
+            file = fileChooser.showSaveDialog((Window)currentGUI.getFrame());
 
             FileInputStream fis = null;
             FileOutputStream fos = null;
@@ -100,10 +94,7 @@ public class JavaFXSaveFile {
                     return;
                 }
 
-                /**
-                 * Save the File depending on users decision, yes/no.
-                 */
-                if (file.exists()) {
+               if (file.exists()) {
                     final int n = currentGUI.showConfirmDialog(fileToSave + '\n'
                             + Messages.getMessage("PdfViewerMessage.FileAlreadyExists") + '\n'
                             + Messages.getMessage("PdfViewerMessage.ConfirmResave"),

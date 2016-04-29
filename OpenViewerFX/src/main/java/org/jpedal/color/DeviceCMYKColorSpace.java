@@ -33,12 +33,11 @@
 package org.jpedal.color;
 
 import java.awt.color.ColorSpace;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import org.jpedal.JDeliHelper;
 import org.jpedal.examples.handlers.DefaultImageHelper;
-import org.jpedal.objects.raw.PdfObject;
-
 import org.jpedal.exception.PdfException;
+import org.jpedal.objects.raw.PdfObject;
 
 /**
  * handle DeviceCMYKColorSpace

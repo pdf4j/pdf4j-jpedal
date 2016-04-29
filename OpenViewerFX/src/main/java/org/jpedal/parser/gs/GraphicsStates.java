@@ -147,10 +147,7 @@ public class GraphicsStates {
 
             current.resetOnColorspaceChange();
 
-            current.drawFillColor(gs.getNonstrokeColor());
-            current.drawStrokeColor(gs.getStrokeColor());
-
-            /**
+            /*
              * align display
              */
             current.setGraphicsState(GraphicsState.FILL,gs.getAlpha(GraphicsState.FILL),gs.getBMValue());

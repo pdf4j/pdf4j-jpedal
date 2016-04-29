@@ -32,6 +32,9 @@
  */
 package org.jpedal.parser;
 
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.exception.PdfException;
@@ -40,15 +43,11 @@ import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.image.ImageCommands;
-import org.jpedal.parser.image.MaskUtils;
+import org.jpedal.parser.image.mask.MaskUtils;
 import org.jpedal.parser.image.XForm;
+import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Matrix;
-
-import java.awt.*;
-import java.awt.geom.Area;
-import java.awt.image.BufferedImage;
-import org.jpedal.render.DynamicVectorRenderer;
 
 public class XFormDecoder {
     /**
@@ -100,7 +99,7 @@ public class XFormDecoder {
                 float[] transformMatrix=new float[6];
                 float[] matrix=XObject.getFloatArray(PdfDictionary.Matrix);
 
-                /**
+                /*
                  * see if we should ignore scaling because we have already scaled in
                  * see 14jan/test_de_signature.pdf
                  */
@@ -212,15 +211,13 @@ public class XFormDecoder {
                 final PdfObjectCache mainCache = pdfStreamDecoder.cache.copy();   //setup cache
                 pdfStreamDecoder.cache.reset(mainCache);   //copy in data
 
-                /**read any resources*/
                 final PdfObject Resources= XObject.getDictionary(PdfDictionary.Resources);
                 pdfStreamDecoder.readResources(Resources, false);
 
-                /**read any resources*/
                 pdfStreamDecoder.cache.groupObj= XObject.getDictionary(PdfDictionary.Group);
                 pdfStreamDecoder.currentPdfFile.checkResolved(pdfStreamDecoder.cache.groupObj);
 
-                /**
+                /*
                  * see if bounding box and set
                  */
                 float[] BBox= XObject.getFloatArray(PdfDictionary.BBox);
@@ -292,14 +289,13 @@ public class XFormDecoder {
                     
                 }
 
-                /**decode the stream*/
                 if(objectData.length>0){
 
                     final PdfObject newSMask = XForm.getSMask(BBox, pdfStreamDecoder.gs, pdfStreamDecoder.currentPdfFile); //check for soft mask we need to apply
 
                     final int blendMode= pdfStreamDecoder.gs.getBMValue();
 
-                    /**
+                    /*
                      * option to include Form as image if extracting images
                      */
                     if((pdfStreamDecoder.parserOptions.getExtractionMode() & PdfDecoderInt.RASTERIZE_FORMS)==PdfDecoderInt.RASTERIZE_FORMS){
@@ -347,7 +343,7 @@ public class XFormDecoder {
 
                 pdfStreamDecoder.gs.scaleFactor=scaleF;
 
-                /**restore old colorspace and fonts*/
+                /*restore old colorspace and fonts*/
                 pdfStreamDecoder.gs.strokeColorSpace=mainStrokeColorData;
                 pdfStreamDecoder.gs.nonstrokeColorSpace=mainnonStrokeColorData;
 
@@ -407,7 +403,7 @@ if(newSMask==null && pdfStreamDecoder.current.getType()==DynamicVectorRenderer.C
     static void processXFormAsImage(final PdfObject XObject, final PdfStreamDecoder pdfStreamDecoder) {
         float[] BBox;
         BBox= XObject.getFloatArray(PdfDictionary.BBox);
-        /**get form as an image*/
+
         //int fx=(int)BBox[0];
         final int fy=(int)BBox[1];
         final int fw=(int)BBox[2];

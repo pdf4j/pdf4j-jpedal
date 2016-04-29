@@ -43,11 +43,7 @@ import java.util.concurrent.Semaphore;
 import org.jpedal.FileAccess;
 import org.jpedal.PdfDecoderInt;
 import org.jpedal.constants.SpecialOptions;
-import static org.jpedal.display.Display.CONTINUOUS;
-import static org.jpedal.display.Display.CONTINUOUS_FACING;
-import static org.jpedal.display.Display.FACING;
-import static org.jpedal.display.Display.SINGLE_PAGE;
-import static org.jpedal.display.Display.debugLayout;
+import static org.jpedal.display.Display.*;
 import org.jpedal.external.Options;
 import org.jpedal.external.RenderChangeListener;
 import org.jpedal.gui.GUIFactory;
@@ -57,7 +53,9 @@ import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.parser.*;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.parser.PdfStreamDecoder;
+import org.jpedal.parser.ValueTypes;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.text.TextLines;
 import org.jpedal.utils.LogWriter;
@@ -482,16 +480,13 @@ public abstract class MultiPageDecoder {
 
         final DynamicVectorRenderer currentDisplay = getNewDisplay(pageNumber);
             
-        /** set hires mode or not for display */
-        currentDisplay.setHiResImageForDisplayMode(pdf.isHiResScreenDisplay());
-
         int val=0;
         
         if(pdf.getDisplayView()==Display.CONTINUOUS && pdf.getDisplayView()==Display.CONTINUOUS_FACING) {
             val = 1;
         }
         
-        final PdfStreamDecoder current=formRenderer.getStreamDecoder(currentPdfFile, pdf.isHiResScreenDisplay(), fileAccess.getRes().getPdfLayerList(),true);
+        final PdfStreamDecoder current=formRenderer.getStreamDecoder(currentPdfFile, fileAccess.getRes().getPdfLayerList(),true);
 
         /**
          * draw acroform data onto Panel
@@ -545,9 +540,6 @@ public abstract class MultiPageDecoder {
                     textLines.addToLineAreas(pageTextAreas[k], pageTextDirections[k], pageNumber);
                 }
             }
-
-            //tell viewer we have finished so it will generate highlights
-            currentDisplay.flagDecodingFinished();
 
         } catch (final Exception ex) {
             LogWriter.writeLog("Exception: " + ex.getMessage());

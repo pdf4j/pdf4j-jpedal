@@ -37,7 +37,6 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
 import org.jpedal.color.PdfPaint;
 import org.jpedal.render.T3Display;
 import org.jpedal.render.T3Renderer;

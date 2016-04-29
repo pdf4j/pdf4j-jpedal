@@ -32,8 +32,12 @@
  */
 package org.jpedal.parser;
 
-import org.jpedal.display.*;
+import java.awt.Color;
+import java.awt.Paint;
+import java.util.Map;
 import org.jpedal.constants.JPedalSettings;
+import org.jpedal.display.Display;
+import org.jpedal.display.PageOffsets;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.JPedalHelper;
 import org.jpedal.fonts.objects.FontData;
@@ -41,11 +45,8 @@ import org.jpedal.grouping.PdfGroupingAlgorithms;
 import org.jpedal.objects.PdfData;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.parser.text.Tj;
-import org.jpedal.render.*;
+import org.jpedal.render.SwingDisplay;
 import org.jpedal.utils.LogWriter;
-
-import java.awt.*;
-import java.util.Map;
 
 public class DecoderOptions {
 
@@ -85,21 +86,14 @@ public class DecoderOptions {
     @SuppressWarnings("CanBeFinal")
     public static JPedalHelper Helper;//new org.jpedal.examples.ExampleHelper();
     
-    /**custom hi-res val for JPedal settings*/
-    public static boolean hires = true;
-
     /**amount we scroll screen to make visible*/
     public int scrollInterval=10;
     
-    
-    /**
+    /*
      * work out machine type so we can call OS X code to get around Java bugs.
      */
     static {
 
-        /**
-         * see if mac
-         */
         try {
             final String name = System.getProperty("os.name");
             if (name.equals("Mac OS X")) {
@@ -124,8 +118,6 @@ public class DecoderOptions {
     public int insetW;
     public int insetH;
     
-    private boolean useHiResImageForDisplay = true;
-
     private boolean useAcceleration=true;
 
     private PageOffsets currentOffset;
@@ -243,7 +235,7 @@ public class DecoderOptions {
      * Please see org.jpedal.examples.text for example code.
      *
      */
-    public PdfGroupingAlgorithms getGroupingObject(final int lastPageDecoded, final PdfData textData, final PdfPageData pageData) throws PdfException {
+    public PdfGroupingAlgorithms getGroupingObject(final int lastPageDecoded, final PdfData textData) throws PdfException {
 
         if(lastPageDecoded==-1){
 
@@ -256,7 +248,7 @@ public class DecoderOptions {
             if (textData == null) {
                 return null;
             } else {
-                return new PdfGroupingAlgorithms(textData, pageData, isXMLExtraction);
+                return new PdfGroupingAlgorithms(textData, isXMLExtraction);
             }
         }
     }
@@ -267,12 +259,12 @@ public class DecoderOptions {
      * @param pdfBackgroundData
      *
      */
-    public PdfGroupingAlgorithms getBackgroundGroupingObject(final PdfData pdfBackgroundData, final PdfPageData pageData) {
+    public PdfGroupingAlgorithms getBackgroundGroupingObject(final PdfData pdfBackgroundData) {
 
         if (pdfBackgroundData == null) {
             return null;
         } else {
-            return new PdfGroupingAlgorithms(pdfBackgroundData, pageData, isXMLExtraction);
+            return new PdfGroupingAlgorithms(pdfBackgroundData, isXMLExtraction);
         }
     }
     
@@ -475,15 +467,6 @@ public class DecoderOptions {
                     throw new PdfException("JPedalSettings.CACHE_LARGE_FONTS expects an Integer value");
                 }
 
-            }else if(key.equals(JPedalSettings.IMAGE_HIRES)){
-                
-                if(rawValue instanceof Boolean){
-
-                    hires = (Boolean)rawValue;
-                }else {
-                    throw new PdfException("JPedalSettings.IMAGE_HIRES expects a Boolean value");
-                }
-               
             }else if(key.equals(JPedalSettings.EXTRACT_AT_BEST_QUALITY_MAXSCALING)){
 
                 if(rawValue instanceof Integer){
@@ -539,7 +522,7 @@ public class DecoderOptions {
 
 
             }else {
-                throw new PdfException("Unknown or unsupported key " + key);
+              //  throw new PdfException("Unknown or unsupported key " + key);
             }
 
         }else {
@@ -716,15 +699,6 @@ public class DecoderOptions {
     public void useHardwareAcceleration(final boolean newValue) {
         useAcceleration=newValue;
     }
-
-    public boolean useHiResImageForDisplay() {
-        return useHiResImageForDisplay;
-    }
-
-    public void useHiResImageForDisplay(final boolean value) {
-        useHiResImageForDisplay=value;
-    }
-    
     
     public int getPageAlignment() {
         return alignment;

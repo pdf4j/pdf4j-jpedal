@@ -33,21 +33,24 @@
 package org.jpedal.objects.acroforms;
 
 import java.awt.image.BufferedImage;
+import java.util.*;
 import org.jpedal.exception.PdfException;
+import org.jpedal.external.ExternalHandlers;
 import org.jpedal.io.PdfObjectReader;
-import org.jpedal.objects.*;
+import org.jpedal.objects.Javascript;
+import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.acroforms.creation.FormFactory;
-import org.jpedal.objects.acroforms.utils.FormUtils;
-
-import org.jpedal.objects.raw.*;
-import org.jpedal.utils.*;
-
-import java.util.*;
-import org.jpedal.external.ExternalHandlers;
 import org.jpedal.objects.acroforms.creation.SwingFormCreator;
+import org.jpedal.objects.acroforms.utils.FormUtils;
 import org.jpedal.objects.layers.PdfLayerList;
-import org.jpedal.parser.*;
+import org.jpedal.objects.raw.*;
+import org.jpedal.parser.FormFlattener;
+import org.jpedal.parser.PdfStreamDecoder;
+import org.jpedal.parser.PdfStreamDecoderForPrinting;
+import org.jpedal.parser.PrintStreamDecoder;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.StringUtils;
 
 
 /**
@@ -150,7 +153,6 @@ public class AcroRenderer{
     /**
      * used to create version without XFA support in XFA version.
      * Should not be used otherwise.
-     * @param useXFA 
      */
     public AcroRenderer(){}
     
@@ -236,9 +238,9 @@ public class AcroRenderer{
             hasXFA= XFAasStream!=null || XFAasArray!=null;
             isContainXFAStream = hasXFA;
 
-            /**
+            /*
              * now read the fields
-             **/
+             */
             fieldList = acroObj.getMixedArray(PdfDictionary.Fields);
             CO = acroObj.getObjectArray(PdfDictionary.CO);
             
@@ -256,7 +258,7 @@ public class AcroRenderer{
                 AcroRes=null;
             }
             
-            /**
+            /*
              * choose correct decoder for form data
              */
             if (hasXFA && useXFA){
@@ -371,7 +373,7 @@ public class AcroRenderer{
             ATotalCount += size;
             resetToEmpty = false;
             
-            /**
+            /*
              * choose correct decoder for form data
              */
             if(fDecoder==null){
@@ -392,7 +394,7 @@ public class AcroRenderer{
     protected void resetContainers(final boolean resetToEmpty) {
         
         
-        /**form or reset Annots*/
+        /*form or reset Annots*/
         if (resetToEmpty) {
             
             compData.resetComponents(ATotalCount+FfieldCount, pageCount, false);
@@ -409,6 +411,20 @@ public class AcroRenderer{
             //formFactory.setDataObjects(compData);
         }
     }
+    
+    private static boolean flattenForms,ignoreAllForms;
+    
+    static{
+      
+        String s = System.getProperty("org.jpedal.flattenForm");
+        
+        flattenForms=s!=null && s.equalsIgnoreCase("true");
+        
+        s = System.getProperty("org.jpedal.ignoreAllForms");
+        
+        ignoreAllForms=s!=null && s.equalsIgnoreCase("true");
+        
+    }
 
     /**
      * build forms display using standard swing components
@@ -420,18 +436,17 @@ public class AcroRenderer{
         final Map<String, String> formsCreated=new HashMap<String, String>();
         
         //check if we want to flatten forms
-        final String s = System.getProperty("org.jpedal.flattenForm");
-        if(s!=null && s.equalsIgnoreCase("true")){
+        if(flattenForms){
             compData.setRasterizeForms(true);
         }
         
-        /**see if already done*/
-         if (!compData.hasformsOnPageDecoded(page) || (formsRasterizedForDisplay() && current!=null)) {
+        /*see if already done*/
+        if (!ignoreAllForms && (!compData.hasformsOnPageDecoded(page) || (formsRasterizedForDisplay() && current!=null))) {
         
-            /**ensure space for all values*/
+            /* ensure space for all values*/
             compData.initParametersForPage(pageData,page,formFactory,dpi);
             
-            /**
+            /*
              * think this needs to be revised, and different approach maybe storing, and reuse if respecified in file,
              * need to look at other files to work out solution.
              * files :-
@@ -533,7 +548,7 @@ public class AcroRenderer{
                             continue;
                         }
                         
-                        /**
+                        /*
                          * Only allows Annotations if in Annots page stream
                          */
                         if(forms==0 && formObject!=null && formObject.getFormType()==-1){
@@ -782,7 +797,6 @@ public class AcroRenderer{
 
     /**
      * Utility method to ensure formObject is actually an annotation before we continue
-     * @param form FormObject to check
      * @return True if annotation
      */
     static boolean allowsPopup(FormObject formObject){
@@ -819,7 +833,6 @@ public class AcroRenderer{
     
     /**
      * Utility method to ensure formObject is actually an annotation before we continue
-     * @param form FormObject to check
      * @return True if annotation
      */
     static boolean isAnnotation(FormObject formObject){
@@ -1316,7 +1329,7 @@ public class AcroRenderer{
             default:
 
                 //if(formFactory.getType()!=FormFactory.ULC){
-                /**make sure all forms decoded*/
+                /*make sure all forms decoded*/
                 if (pageNumber == -1) {
                     for (int p = 1; p < this.pageCount + 1; p++) //add init method and move scaling/rotation to it
                     {
@@ -1337,7 +1350,7 @@ public class AcroRenderer{
         
         formFactory = newFormFactory;
         
-        /**
+        /*
          * allow user to create custom structure to hold data
          */
         compData=formFactory.getCustomCompData();
@@ -1548,12 +1561,12 @@ public class AcroRenderer{
         
     }
 
-    public PdfStreamDecoder getStreamDecoder(PdfObjectReader currentPdfFile, boolean isHires, PdfLayerList layer,boolean isFirst) {
+    public PdfStreamDecoder getStreamDecoder(PdfObjectReader currentPdfFile, PdfLayerList layer,boolean isFirst) {
     
         if(isFirst){
             return new PdfStreamDecoder(currentPdfFile); 
         }else{
-            return new PdfStreamDecoder(currentPdfFile, isHires,layer);
+            return new PdfStreamDecoder(currentPdfFile,layer);
         }
     }
     
@@ -1588,11 +1601,13 @@ public class AcroRenderer{
         throw new UnsupportedOperationException("outputJavascriptXFA should never be called");
     }
 
-    public PrintStreamDecoder getStreamDecoderForPrinting(PdfObjectReader currentPdfFile, boolean isHires, PdfLayerList pdfLayerList) {
-        return new PdfStreamDecoderForPrinting(currentPdfFile, isHires, pdfLayerList);
+    public PrintStreamDecoder getStreamDecoderForPrinting(PdfObjectReader currentPdfFile,PdfLayerList pdfLayerList) {
+        return new PdfStreamDecoderForPrinting(currentPdfFile, pdfLayerList);
     }
 
     public BufferedImage decode(PdfObject pdfObject, PdfObjectReader currentPdfFile, PdfObject XObject, int subtype, int width, int height, int offsetImage, float pageScaling) {
+        LogWriter.writeLog("called decode("+pdfObject+", "+ currentPdfFile+", "+ XObject+", "+subtype+", "+width+", "+height+", "+offsetImage+", "+pageScaling);
+
       return null;//
     }
 

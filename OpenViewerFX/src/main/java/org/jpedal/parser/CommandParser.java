@@ -148,9 +148,7 @@ public class CommandParser {
             return dataPointer;
         }
 
-        /**
-         * read in value (note several options)
-         */
+        // read in value (note several options)
         boolean matchFound=false;
         final int type=getType(current,  dataPointer);
 
@@ -199,9 +197,7 @@ public class CommandParser {
                 commandID=Cmd.getCommandID(key);
             }
 
-            /**
-             * if command execute otherwise add to stack
-             */
+            // if command execute otherwise add to stack
             if (commandID==-1) {
 
                 opStart[currentOp]=start;

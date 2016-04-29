@@ -93,9 +93,6 @@ public class NumberValue {
                 i++;
             }
             
-            /**
-             * get generation number
-             */
             keyStart=i;
             //move cursor to end of reference
             while(raw[i]!=10 && raw[i]!=13 && raw[i]!=32 && raw[i]!=47 && raw[i]!=60 && raw[i]!=62) {

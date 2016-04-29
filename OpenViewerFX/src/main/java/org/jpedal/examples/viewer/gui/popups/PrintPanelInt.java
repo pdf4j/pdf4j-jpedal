@@ -34,7 +34,6 @@ package org.jpedal.examples.viewer.gui.popups;
 
 import javax.print.attribute.SetOfIntegerSyntax;
 import javax.print.attribute.standard.PrinterResolution;
-
 import org.jpedal.examples.viewer.paper.MarginPaper;
 
 public interface PrintPanelInt{

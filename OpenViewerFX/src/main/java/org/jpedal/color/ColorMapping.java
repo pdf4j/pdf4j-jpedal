@@ -33,11 +33,9 @@
 package org.jpedal.color;
 
 import java.io.Serializable;
-
 import org.jpedal.function.FunctionFactory;
 import org.jpedal.function.PDFFunction;
 import org.jpedal.io.PdfObjectReader;
-
 import org.jpedal.objects.raw.PdfObject;
 
 /**
@@ -51,7 +49,6 @@ public class ColorMapping implements Serializable {
 
 	public ColorMapping (final PdfObjectReader currentPdfFile, final PdfObject functionObj) {
 
-		/** setup the translation function */
 		function = FunctionFactory.getFunction(functionObj, currentPdfFile);
 
 	}

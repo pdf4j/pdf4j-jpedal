@@ -34,11 +34,7 @@ package org.jpedal.examples.viewer.commands.javafx;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarFile;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -49,34 +45,13 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -94,7 +69,6 @@ import org.jpedal.examples.viewer.gui.javafx.FXViewerTransitions;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXDialog;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXMessageDialog;
 import org.jpedal.examples.viewer.gui.javafx.dialog.FXOptionDialog;
-
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
@@ -192,7 +166,6 @@ public class JavaFXPreferences {
     /**
      * Declare Objects for Printing Menu.
      */
-    private static CheckBox hiResPrintingCB;
     private static ComboBox<String> printerCombo=new ComboBox<String>();
     private static ComboBox<String> paperSizesCombo=new ComboBox<String>();
     private static TextField defaultDPITF;
@@ -246,19 +219,12 @@ public class JavaFXPreferences {
          */
         winTitleTF = new TextField();
         iconLocTF = new TextField();
-        final ObservableList<String> layoutOptions;
-        if (currentGUI.isSingle()) {
-            layoutOptions = FXCollections.observableArrayList(
-                    Messages.getMessage("PageLayoutViewMenu.WindowSearch"),
-                    Messages.getMessage("PageLayoutViewMenu.TabbedSearch"),
-                    Messages.getMessage("PageLayoutViewMenu.MenuSearch")
+        final ObservableList<String> layoutOptions = FXCollections.observableArrayList(
+                Messages.getMessage("PageLayoutViewMenu.WindowSearch"),
+                Messages.getMessage("PageLayoutViewMenu.TabbedSearch"),
+                Messages.getMessage("PageLayoutViewMenu.MenuSearch")
             );
-        } else {
-            layoutOptions = FXCollections.observableArrayList(
-                    Messages.getMessage("PageLayoutViewMenu.WindowSearch"),
-                    Messages.getMessage("PageLayoutViewMenu.TabbedSearch")
-            );
-        }
+
         searchStyle = new ComboBox<String>(layoutOptions);
         maxViewerTF = new TextField();
         sideTabTF = new TextField();
@@ -295,8 +261,6 @@ public class JavaFXPreferences {
         /**
          * Initialise Objects for Printing Menu.
          */
-        hiResPrintingCB = new CheckBox(Messages.getMessage("Printing.HiRes"));
-
         
         if(!OpenViewerFX.isOpenFX){
             final List<String> availablePrinters = new ArrayList<String>(Arrays.asList(org.jpedal.examples.viewer.utils.Printer.getAvailablePrinters(properties.getValue("printerBlacklist"))));
@@ -323,7 +287,6 @@ public class JavaFXPreferences {
     /**
      * Ensure Dialog is Setup & Display Preference Dialog.
      *
-     * @param swingGUI
      */
     private static void showPreferenceWindow(final GUIFactory currentGUI) {
 
@@ -919,7 +882,7 @@ public class JavaFXPreferences {
                     }
 
                     if (name.equals("Preferences")) {
-                        newLeaf.selectedProperty().addListener(new ChangeListener() {
+                        newLeaf.selectedProperty().addListener(new ChangeListener<Object>() {
 
                             @Override
                             public void changed(final ObservableValue ov, final Object t, final Object t1) {
@@ -1030,7 +993,7 @@ public class JavaFXPreferences {
          */
         contentVBox.setPadding(new Insets(contentGap));
         contentVBox.setSpacing(contentGap);
-        contentVBox.getChildren().addAll(title, generalOptions, hiResPrintingCB, printerHBox, pageSizeHBox, defaultDPIHBox, blackListHBox);
+        contentVBox.getChildren().addAll(title, generalOptions, printerHBox, pageSizeHBox, defaultDPIHBox, blackListHBox);
         contentScrollPane.setContent(contentVBox);
         return contentScrollPane;
     }
@@ -1328,8 +1291,6 @@ public class JavaFXPreferences {
         /**
          * Update Printing Settings.
          */
-        properties.setValue("useHiResPrinting", String.valueOf(hiResPrintingCB.isSelected()));
-
         if ((printerCombo.getValue()).startsWith("System Default")) {
             properties.setValue("defaultPrinter", "");
         } else {
@@ -1558,12 +1519,6 @@ public class JavaFXPreferences {
         /**
          * Load Printing Settings.
          */
-        propValue = properties.getValue("useHiResPrinting");
-        if (!propValue.isEmpty() && propValue.equals("true")) {
-            hiResPrintingCB.setSelected(true);
-        } else {
-            hiResPrintingCB.setSelected(false);
-        }
 
         propValue = properties.getValue("defaultPrinter");
         if (propValue != null && !propValue.isEmpty()) {

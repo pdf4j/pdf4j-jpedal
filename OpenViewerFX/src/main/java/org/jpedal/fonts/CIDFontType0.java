@@ -33,11 +33,10 @@
 package org.jpedal.fonts;
 
 import java.util.Map;
-
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
 import org.jpedal.fonts.glyph.T1Glyphs;
-import org.jpedal.io.PdfObjectReader;
 import org.jpedal.io.ObjectStore;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 

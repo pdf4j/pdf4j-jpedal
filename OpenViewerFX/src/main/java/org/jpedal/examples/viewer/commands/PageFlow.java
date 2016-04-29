@@ -33,19 +33,17 @@
 package org.jpedal.examples.viewer.commands;
 
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import org.jpedal.*;
+import javax.swing.*;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
 import org.jpedal.display.GUIDisplay;
-import org.jpedal.examples.viewer.*;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.SharedViewer;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -125,7 +123,7 @@ public class PageFlow {
 
                         final Object[] options = {Messages.getMessage("PdfViewer.PageFlowJarsNeeded.Continue")};
                         JOptionPane.showOptionDialog(
-                                (Container)currentGUI.getFrame(),
+                                (Component)currentGUI.getFrame(),
                                 a,
                                 Messages.getMessage("PdfViewer.PageFlowJarsNeeded.Title"),
                                 JOptionPane.DEFAULT_OPTION,
@@ -145,9 +143,9 @@ public class PageFlow {
                 currentGUI.getButtons().alignLayoutMenuOption(Display.PAGEFLOW);
                 
                 if (SharedViewer.isFX()) {
-                    ModeChange.changeModeInJavaFX(Display.PAGEFLOW, decode_pdf, currentGUI, commonValues,  properties, searchFrame);
+                    ModeChange.changeModeInJavaFX(Display.PAGEFLOW, decode_pdf, currentGUI);
                 } else {
-                    ModeChange.changeModeInSwing(Display.PAGEFLOW, decode_pdf, currentGUI, commonValues,  properties, searchFrame);
+                    ModeChange.changeModeInSwing(Display.PAGEFLOW, decode_pdf, currentGUI, commonValues);
                 }
                 
                           
@@ -185,6 +183,8 @@ public class PageFlow {
             }
 
             currentGUI.getCombo(Commands.ROTATION).setEnabled(false);
+            
+            currentGUI.updateTextBoxSize();
         } else {
 
         }

@@ -32,7 +32,9 @@
  */
 package org.jpedal.color;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Paint;
+
 
 /**
  * template for all shading operations
@@ -70,11 +72,6 @@ public class PdfColor extends Color implements PdfPaint,Paint{
     public void setPattern(final int dummy){
 		isPattern=true;
 	}
-
-    @Override
-    public void setRenderingType(final int createHtml) {
-        //added for HTML conversion
-    }
     
     @Override
     public boolean isTexture() {

@@ -32,31 +32,14 @@
  */
 package org.jpedal.display;
 
-import org.jpedal.render.DynamicVectorRenderer;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-
-import org.jpedal.exception.PdfException;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.text.TextLines;
 
 public interface Display {
-
-    @Deprecated
-    /*
-    * Please use PdfDecoder.setBorderPresent(boolean) instead
-    * True : Show border around page.
-    * Flase : Remove border around page.
-    */ int BORDER_SHOW=1;
-
-    @SuppressWarnings("UnusedDeclaration")
-    @Deprecated
-    /*
-    * Please use PdfDecoder.setBorderPresent(boolean) instead
-    * True : Show border around page.
-    * Flase : Remove border around page.
-    */ int BORDER_HIDE=0;
 
     /**when no display is set*/
     int NODISPLAY=0;
@@ -82,16 +65,7 @@ public interface Display {
     
     double getIndent();
 
-    /**
-     * Please use public int[] getCursorBoxOnScreenAsArray() instead.
-     * @deprecated on 04/07/2014
-     */
-    @Deprecated
-    Rectangle getCursorBoxOnScreen();
-    
     int[] getCursorBoxOnScreenAsArray();
-
-    void setCursorBoxOnScreen(Rectangle cursorBoxOnScreen, boolean isSamePage);
 
     void forceRedraw();
 
@@ -99,33 +73,12 @@ public interface Display {
 
     void resetViewableArea();
 
-    void paintPage(Object box, AcroRenderer formRenderer, TextLines textLines);
-    
     void paintPage(Graphics2D g2, AcroRenderer formRenderer, TextLines textLines);
     
     void updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size);
 
-    /**
-     * Deprecated on 04/07/2014, please use 
-     * updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead.
-     * @deprecated
-     */
-    @Deprecated
-    void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor, int pageNumber, int x_size, int y_size);
-
     void drawCursor(Graphics g, float scaling);
 
-    /**
-     * Deprecated on 07/07/2014
-     * Please use setViewableArea(int[] viewport) instead.
-     * 
-     * @deprecated
-     */
-    @Deprecated
-    AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
-    
-    AffineTransform setViewableArea(int[] viewport) throws PdfException;
-    
     void drawFacing(Rectangle visibleRect);
     
     enum BoolValue {

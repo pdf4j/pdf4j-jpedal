@@ -32,9 +32,8 @@
  */
 package org.jpedal.fonts.glyph;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.geom.Area;
-
 import org.jpedal.color.PdfPaint;
 
 /**

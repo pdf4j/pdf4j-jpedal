@@ -35,19 +35,21 @@ package org.jpedal.parser.swing;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
-import org.jpedal.objects.PdfPageData;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-
 import org.jpedal.color.ColorSpaces;
 import org.jpedal.display.swing.SwingHelper;
 import org.jpedal.exception.PdfException;
-import org.jpedal.render.*;
 import org.jpedal.io.ObjectStore;
+import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.parser.*;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.parser.PDFtoImageConvertor;
+import org.jpedal.parser.PdfStreamDecoder;
+import org.jpedal.parser.ValueTypes;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.ImageDisplay;
 
 public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
 
@@ -136,14 +138,14 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
             g2.fillRect(0, 0, w, h);
         }
 
-        /**
+        /*
          * adjustment for upside down images
          */
         if(rotation==180){
             g2.translate(crx*2*multiplyer, -(cry*2*multiplyer));
         }
 
-        /**
+        /*
          * pass in values as needed for patterns
          */
         imageDisplay.setScalingValues(crx*multiplyer, (crh*multiplyer) + cry, multiplyer*scaling);
@@ -156,8 +158,8 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
             if(rotation==90){//90
                 
                 if(multiplyer<1){
-                    cry = (int)(imageScaling.getTranslateX() + cry);
-                    crx = (int)(imageScaling.getTranslateY() + crx);
+                    cry = imageScaling.getTranslateX() + cry;
+                    crx = imageScaling.getTranslateY() + crx;
 
                 }else{
                     cry = (int)((imageScaling.getTranslateX()/multiplyer) + cry);
@@ -179,7 +181,7 @@ public class PDFtoImageConvertorSwing extends PDFtoImageConvertor{
             }
         }
         
-        /** decode and print in 1 go */
+        // decode and print in 1 go
         currentImageDecoder.setObjectValue(ValueTypes.DirectRendering, g2);//(Graphics2D) graphics);
         imageDisplay.setG2(g2);
         currentImageDecoder.decodePageContent(pdfObject);

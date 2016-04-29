@@ -65,10 +65,7 @@ public class B {
 
             
             Object fxPath=null;
-            
-            /**
-             * fx alternative
-             */
+
             if(useJavaFX){
                 fxPath=currentDrawShape.getPath();
             }else{

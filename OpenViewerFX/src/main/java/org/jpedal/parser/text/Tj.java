@@ -32,7 +32,13 @@
  */
 package org.jpedal.parser.text;
 
+import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.external.ErrorTracker;
+import org.jpedal.external.GlyphTracker;
 import org.jpedal.fonts.PdfFont;
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.fonts.glyph.*;
@@ -40,21 +46,17 @@ import org.jpedal.fonts.tt.TTGlyph;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfData;
 import org.jpedal.objects.TextState;
-import org.jpedal.parser.*;
+import org.jpedal.objects.structuredtext.StructuredContentHandler;
+import org.jpedal.parser.BaseDecoder;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.parser.ParserOptions;
+import org.jpedal.parser.PdfStreamDecoder;
 import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.SwingDisplay;
 import org.jpedal.utils.Fonts;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Matrix;
 import org.jpedal.utils.repositories.Vector_Int;
-
-import org.jpedal.external.GlyphTracker;
-
-import org.jpedal.objects.structuredtext.StructuredContentHandler;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import org.jpedal.external.ErrorTracker;
 import org.jpedal.utils.repositories.generic.Vector_Rectangle_Int;
 
 /**
@@ -468,7 +470,7 @@ public class Tj extends BaseDecoder {
                         currentFontData.getGlyphData().isIdentity()){
                     
                     //Check if proper char has been stored instead
-                    int charToUse=(int)glyphData.getRawChar();
+                    int charToUse=glyphData.getRawChar();
                     final int valueForHTML=glyphData.getValueForHTML();
                     if(valueForHTML!=-1){
                         charToUse=valueForHTML;
@@ -634,7 +636,7 @@ public class Tj extends BaseDecoder {
                     }else if(((textPrint!=PdfDecoderInt.TEXTGLYPHPRINT)||(javaFont==null))&&(currentFontData.isFontEmbedded &&
                             currentFontData.isFontSubstituted() &&((glyphData.getRawInt()==9 && !isTabRemapped) || (glyphData.getRawInt()==10 && !isCRRemapped) || (glyphData.getRawInt()==13 && !isReturnRemapped)))){ //&&
                         //lose returns which can cause odd display
-                    }else if(((textPrint!=PdfDecoderInt.TEXTGLYPHPRINT)||(javaFont==null))&&(currentFontData.isFontSubstituted() && currentWidth==0 && (int)glyphData.getDisplayValue().charAt(0)==13)){ //remove substituted  values so do not enter test below
+                    }else if(((textPrint!=PdfDecoderInt.TEXTGLYPHPRINT)||(javaFont==null))&&(currentFontData.isFontSubstituted() && currentWidth==0 && glyphData.getDisplayValue().charAt(0)==13)){ //remove substituted  values so do not enter test below
                     }else if(((textPrint!=PdfDecoderInt.TEXTGLYPHPRINT)||(javaFont==null))&&(currentFontData.isFontEmbedded)){
                         renderText(currentWidth, type, Tmode, multiplyer, isTextShifted);
                         
@@ -819,7 +821,7 @@ public class Tj extends BaseDecoder {
                 if(glyphData.isfirstTime()){
                     glyph=new MarkerGlyph(Trm[0][0], Trm[0][1], Trm[1][0], Trm[1][1], currentFontData.getBaseFontName());
                     
-                    current.checkFontSaved(glyph, currentFontData.getBaseFontName(),currentFontData);
+                    ((SwingDisplay)current).checkFontSaved(glyph, currentFontData.getBaseFontName(),currentFontData);
                     glyphData.setFirstTime(false);
                     
                 }

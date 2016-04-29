@@ -45,11 +45,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 import javafx.util.Callback;
 import org.jpedal.exception.PdfException;
-import org.jpedal.render.*;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.parser.*;
+import org.jpedal.parser.DecoderOptions;
+import org.jpedal.parser.PDFtoImageConvertor;
+import org.jpedal.parser.PdfStreamDecoder;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.render.FXDisplay;
+import org.jpedal.render.FXDisplayForRasterizing;
 
 public class PDFtoImageConvertorFX extends PDFtoImageConvertor{
 
@@ -72,51 +76,6 @@ public class PDFtoImageConvertorFX extends PDFtoImageConvertor{
     public BufferedImage pageToImage(final boolean imageIsTransparent, final PdfStreamDecoder currentImageDecoder,
             final float scaling, final PdfObject pdfObject,final AcroRenderer formRenderer) throws PdfException {
 
-        /**
-        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics graphics = image.getGraphics();
-
-        Graphics2D g2 = (Graphics2D) graphics;
-
-        if (!imageIsTransparent) {
-            g2.setColor(Color.white);
-            g2.fillRect(0, 0, w, h);
-        }
-
-        // adjustment for upside down images
-        if(rotation==180){
-            g2.translate(crx*2*multiplyer, -(cry*2*multiplyer));
-        }
-
-        // pass in values as needed for patterns
-        imageDisplay.setScalingValues(crx*multiplyer, (crh*multiplyer) + cry, multiplyer*scaling);
-
-        g2.setRenderingHints(ColorSpaces.hints);
-        g2.transform(imageScaling);
-
-        if (rotated){
-
-            if(rotation==90){//90
-
-                if(multiplyer<1){
-                    cry = (int)(imageScaling.getTranslateX() + cry);
-                    crx = (int)(imageScaling.getTranslateY() + crx);
-
-                }else{
-                    cry = (int)((imageScaling.getTranslateX()/multiplyer) + cry);
-                    crx = (int)((imageScaling.getTranslateY()/multiplyer) + crx);
-                }
-                g2.translate(-crx, -cry);
-
-            }else{ //270
-                if(cry<0)
-                    g2.translate(-crx, mediaH-crh+cry);
-                else
-                    g2.translate(-crx,mediaH-crh-cry);
-            }
-        }/**/
-        
         final SimpleObjectProperty<BufferedImage> imageProperty = new SimpleObjectProperty<BufferedImage>();
         // Locks the Thread until the image is generated
         final CountDownLatch latch = new CountDownLatch(1);

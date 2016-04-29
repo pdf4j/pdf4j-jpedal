@@ -33,31 +33,28 @@
 package org.jpedal.objects.structuredtext;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.PdfPageData;
 import org.jpedal.objects.PdfResources;
 import org.jpedal.objects.layers.PdfLayerList;
+import org.jpedal.objects.raw.MCObject;
 import org.jpedal.objects.raw.PageObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.objects.raw.MCObject;
-
 import org.jpedal.parser.PdfStreamDecoder;
 import org.jpedal.parser.ValueTypes;
+import org.jpedal.render.SwingDisplay;
 import org.jpedal.utils.LogWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.w3c.dom.Text;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.HashMap;
-import java.util.Map;
-import org.jpedal.PdfDecoderInt;
-import org.jpedal.render.SwingDisplay;
 
 /**
  * extract as marked content
@@ -458,7 +455,7 @@ public class MarkedContentGenerator {
                 /** the ObjectStore for this file */
                 final ObjectStore objectStoreRef = new ObjectStore();
 
-                final PdfStreamDecoder current = new PdfStreamDecoder(currentPdfFile, false, layers);
+                final PdfStreamDecoder current = new PdfStreamDecoder(currentPdfFile,layers);
                 current.setParameters(true, false, 0,PdfDecoderInt.TEXT + PdfDecoderInt.RAWIMAGES + PdfDecoderInt.FINALIMAGES,false,false);
                 current.setXMLExtraction(false);
                 current.setObjectValue(ValueTypes.Name, "markedContent");

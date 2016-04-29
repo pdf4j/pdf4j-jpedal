@@ -34,7 +34,6 @@
 package org.jpedal.examples.viewer.objects;
 
 import java.io.File;
-
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 
 //import com.itextpdf.text.pdf.PdfSignatureAppearance;

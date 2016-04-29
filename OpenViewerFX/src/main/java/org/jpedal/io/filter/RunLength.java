@@ -32,14 +32,13 @@
  */
 package org.jpedal.io.filter;
 
-import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.utils.LogWriter;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.repositories.FastByteArrayOutputStream;
 
 /**
  * RunLength

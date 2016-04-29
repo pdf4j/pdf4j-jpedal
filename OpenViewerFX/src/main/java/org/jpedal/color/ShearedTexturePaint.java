@@ -78,11 +78,6 @@ public class ShearedTexturePaint extends TexturePaint implements PdfPaint{
     }
 
     @Override
-    public void setRenderingType(final int createHtml) {
-        //added for HTML conversion
-    }
-    
-    @Override
     public boolean isTexture() {
         return true;
     }

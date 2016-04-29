@@ -41,7 +41,7 @@ import javax.swing.ListCellRenderer;
 /**
  * set colour on the Cells
  */
-public class ComboColorRenderer extends JLabel implements ListCellRenderer {
+public class ComboColorRenderer extends JLabel implements ListCellRenderer<String> {
 
     Color color = Color.RED;
 
@@ -54,15 +54,15 @@ public class ComboColorRenderer extends JLabel implements ListCellRenderer {
     }
 
     @Override
-    public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+    public Component getListCellRendererComponent(final JList list, final String value, final int index,
                                                   final boolean isSelected, final boolean cellHasFocus) {
 
         setBackground(color);
 
-        if (value == null || ((String) value).isEmpty()) {
+        if (value == null || value.isEmpty()) {
             setText(" ");
         } else {
-            setText((String) value);
+            setText(value);
         }
 
         return this;

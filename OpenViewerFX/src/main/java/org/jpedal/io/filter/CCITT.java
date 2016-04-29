@@ -32,14 +32,13 @@
  */
 package org.jpedal.io.filter;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.util.Map;
 import org.jpedal.io.filter.ccitt.CCITT2D;
 import org.jpedal.io.filter.ccitt.CCITTMix;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.util.Map;
 
 /**
  * CCITT

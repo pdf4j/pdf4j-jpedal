@@ -38,11 +38,7 @@ import static org.jpedal.io.ObjectDecoder.padding;
 import static org.jpedal.io.ObjectDecoder.resolveFully;
 import org.jpedal.io.ObjectUtils;
 import org.jpedal.io.PdfFileReader;
-import org.jpedal.objects.raw.ColorSpaceObject;
-import org.jpedal.objects.raw.NamesObject;
-import org.jpedal.objects.raw.ObjectFactory;
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.objects.raw.*;
 import org.jpedal.utils.NumberUtils;
 import org.jpedal.utils.StringUtils;
 
@@ -427,7 +423,7 @@ public class Dictionary {
             final PdfObject valueObj= ObjectFactory.createObject(PDFkeyInt, pdfObject.getObjectRefAsString(), pdfObject.getObjectType(), pdfObject.getID());
             valueObj.setID(PDFkeyInt);
             
-            /**
+            /*
              * read pairs (stream in data starting at j)
              */
             if(ignoreRecursion) //just skip to end
@@ -928,7 +924,7 @@ public class Dictionary {
                             return j;
                         }
                         
-                        /**
+                        /*
                          * get object ref
                          */
                         keyStart = j;
@@ -968,10 +964,7 @@ public class Dictionary {
                             }
                         }
                     }
-                    
-                    /**
-                     * get generation number
-                     */
+
                     keyStart = j;
                     //move cursor to end of reference
                     while (data[j] != 10 && data[j] != 13 && data[j] != 32 && data[j] != 47 && data[j] != 60 && data[j] != 62) {
@@ -979,10 +972,7 @@ public class Dictionary {
                     }
                     
                     generation = NumberUtils.parseInt(keyStart, j, data);
-                    
-                    /**
-                     * check R at end of reference and abort if wrong
-                     */
+
                     //move cursor to start of R
                     while (data[j] == 10 || data[j] == 13 || data[j] == 32 || data[j] == 47 || data[j] == 60) {
                         j++;
@@ -1006,13 +996,15 @@ public class Dictionary {
                     //disregard corrputed data from start of file
                     if (data != null && data.length > 4 && data[0] == '%' && data[1] == 'P' && data[2] == 'D' && data[3] == 'F') {
                         data = null;
+                    }else if(data[0]=='n' && data[1]=='u' && data[2]=='l' && data[3]=='l'){
+                        data=null;
                     }
                     
                     if (data == null) {
                         break;
                     }
                     
-                    /**
+                    /*
                      * get not indirect and exit if not
                      */
                     int j2 = 0;
@@ -1052,7 +1044,7 @@ public class Dictionary {
                 //allow for no data found (ie /PDFdata/baseline_screens/debug/hp_broken_file.pdf)
                 if (data != null) {
                     
-                    /**
+                    /*
                      * get id from stream
                      */
                     //skip any spaces
@@ -1077,9 +1069,6 @@ public class Dictionary {
                     
                     if (isMissingValue) { //missing value at start for some reason
                         
-                        /**
-                         * get object ref
-                         */
                         keyStart = j;
                         //move cursor to end of reference
                         while (data[j] != 10 && data[j] != 13 && data[j] != 32 && data[j] != 47 && data[j] != 60 && data[j] != 62) {
@@ -1093,9 +1082,6 @@ public class Dictionary {
                             j++;
                         }
                         
-                        /**
-                         * get generation number
-                         */
                         keyStart = j;
                         //move cursor to end of reference
                         while (data[j] != 10 && data[j] != 13 && data[j] != 32 && data[j] != 47 && data[j] != 60 && data[j] != 62) {

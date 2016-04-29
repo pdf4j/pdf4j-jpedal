@@ -86,36 +86,7 @@ public class PdfKeyPairsIterator {
      */
     public String getNextKeyAsString() {
 
-        //System.out.println((char)keys[current-1][0]+"<length="+keys[current-1].length);
-        /**if(convertNumberToString){ //decide if number and convert to value
-            int length=keys[current].length;
-            boolean isNotNumber=false;
-            for(int ii=0;ii<length;ii++){
-                int nextChar=keys[current][ii];
-                if(nextChar>='0' && nextChar<='9'){
-
-                }else{
-                    isNotNumber=true;
-                    ii=length;
-                }
-            }
-
-            if(isNotNumber){
-                return new String(keys[current]);
-            }else{
-                int key=PdfObjectReader.parseInt(0,length,keys[current]);
-
-                //generate if needed and cache
-                if(IntsAsChars[key]==null){
-                    char[] stringChar=new char[1];
-                    stringChar[0]=(char)key;
-                   IntsAsChars[key]=new String(stringChar);
-                }
-
-                return IntsAsChars[key];
-            }
-        }else*/
-            return new String(keys[current]);
+        return new String(keys[current]);
 
     }
     

@@ -34,8 +34,9 @@ package org.jpedal.fonts.glyph;
 
 import java.awt.geom.GeneralPath;
 import org.jpedal.external.ExternalHandlers;
-
-import org.jpedal.fonts.tt.*;
+import org.jpedal.fonts.tt.FontFile2;
+import org.jpedal.fonts.tt.Glyf;
+import org.jpedal.fonts.tt.Hmtx;
 import org.jpedal.fonts.tt.hinting.TTVM;
 import org.jpedal.utils.repositories.Vector_Float;
 import org.jpedal.utils.repositories.Vector_Int;
@@ -183,7 +184,7 @@ public class T1GlyphFactory implements GlyphFactory {
         final int end = shape_primitives.size() - 1;
         final int[] commands=shape_primitives.get();
         
-        /**reset - we need new object as it otherwise we will pass link
+        /*reset - we need new object as it otherwise we will pass link
          to array we then flush*/       
         shape_primitive_x2 = new Vector_Float( 1000 );
         shape_primitive_y = new Vector_Float( 1000 );

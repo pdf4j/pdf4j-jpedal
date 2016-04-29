@@ -43,7 +43,7 @@ public class T3Glyphs extends PdfJavaGlyphs {
 	@Override
     public PdfGlyph getEmbeddedGlyph(final GlyphFactory factory, final String glyph, final float[][] Trm, final int rawInt, final String displayValue, final float currentWidth, final String key) {
 
-		/**flush cache if needed*/
+		/*flush cache if needed*/
 		if((lastTrm[0][0]!=Trm[0][0])|(lastTrm[1][0]!=Trm[1][0])|
 				(lastTrm[0][1]!=Trm[0][1])|(lastTrm[1][1]!=Trm[1][1])){
 			lastTrm=Trm;
@@ -52,20 +52,6 @@ public class T3Glyphs extends PdfJavaGlyphs {
 
 		//either calculate the glyph to draw or reuse if alreasy drawn
 		PdfGlyph transformedGlyph2 = getEmbeddedCachedShape(rawInt);
-
-		//double dY = -1,dX=1;
-
-		//allow for text running up the page
-//		if (((Trm[1][0] < 0)&(Trm[0][1] >= 0))|((Trm[0][1] < 0)&(Trm[1][0] >= 0))) {
-//			dX=1f;
-//			dY =-1f;
-//
-//		}
-
-		/**else if ((Trm[1][0] < 0)|(Trm[0][1] < 0)) {
-		 dX=-dX;
-		 dY =-dY;
-		 } */
 
 		if (transformedGlyph2 == null) {
 
@@ -77,7 +63,6 @@ public class T3Glyphs extends PdfJavaGlyphs {
 
 		}
 
-		//System.out.println(transformedGlyph2);
 		return transformedGlyph2;
 	}
 

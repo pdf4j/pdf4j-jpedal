@@ -70,6 +70,7 @@ public class JPedalSettings {
     //public static final Integer IMAGE_UPSCALE =new Integer(6);
     
     /**allow user to set a flag to use hi res settings*/
+    @Deprecated
     public static final Integer IMAGE_HIRES = 7;
     
     /**allow user to extract best quality images at the cost of memory */

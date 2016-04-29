@@ -33,22 +33,22 @@
 package org.jpedal.parser.shape;
 
 import com.idrsolutions.pdf.color.shading.ShadedPaint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.util.Map;
 import org.jpedal.color.ColorspaceFactory;
 import org.jpedal.color.GenericColorSpace;
 import org.jpedal.color.PdfPaint;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
 import org.jpedal.objects.PdfPageData;
+import org.jpedal.objects.SwingShape;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.render.DynamicVectorRenderer;
-import org.jpedal.utils.LogWriter;
-
-import java.awt.*;
-import java.util.Map;
-import org.jpedal.objects.SwingShape;
 import org.jpedal.parser.Cmd;
 import org.jpedal.parser.PdfObjectCache;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.utils.LogWriter;
 
 public class SH {
 
@@ -64,23 +64,7 @@ public class SH {
         
         //workout shape
         Shape shadeShape=null;
-        /**if(gs.CTM!=null){
-         int x=(int)gs.CTM[2][0];
-         int y=(int)gs.CTM[2][1];
-         int w=(int)gs.CTM[0][0];
-         if(w==0){
-         w=(int)gs.CTM[1][0];
-         }
-         if(w<0)
-         w=-w;
 
-         int h=(int)gs.CTM[1][1];
-         if(h==0)
-         h=(int)gs.CTM[0][1];
-         if(h<0)
-         h=-h;
-         shadeShape=new Rectangle(x,y,w,h);
-         }/**/
         if(shadeShape==null) {
             shadeShape = gs.getClippingShape();
         }
@@ -99,29 +83,20 @@ public class SH {
             current.eliminateHiddenText(shadeShape, gs, 7, true);
         }
 
-        /**
+        /*
          * generate the appropriate shading and then colour in the current clip with it
          */
         try{
 
-            /**
-             * workout colorspace
-             **/
             final PdfObject ColorSpace=Shading.getDictionary(PdfDictionary.ColorSpace);
 
             final GenericColorSpace newColorSpace= ColorspaceFactory.getColorSpaceInstance(currentPdfFile, ColorSpace, shadingColorspacesObjects);
 
             newColorSpace.setPrinting(isPrinting);
             
-            /**setup shading object*/ 
             final PdfPaint shading=new ShadedPaint(Shading, isPrinting,newColorSpace, currentPdfFile,gs.CTM,false);
             
-            //see 18992 and /Users/markee/PDFdata/test_data/sample_pdfs_html/general/test22.pdf
-            if(gs.CTM[0][0]==0 && gs.CTM[0][1]>0 && gs.CTM[1][0]>0 && gs.CTM[1][1]==0 && current.getMode().equals(DynamicVectorRenderer.Mode.SMASK)){
-               shading.setRenderingType(DynamicVectorRenderer.CREATE_SMASK);
-            }
-
-            /**
+            /*
              * shade the current clip
              */
             gs.setFillType(GraphicsState.FILL);

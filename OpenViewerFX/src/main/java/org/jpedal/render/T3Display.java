@@ -32,14 +32,13 @@
  */
 package org.jpedal.render;
 
-import org.jpedal.color.PdfColor;
-import org.jpedal.color.PdfPaint;
-import org.jpedal.io.ObjectStore;
-
-import java.awt.*;
+import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import org.jpedal.color.PdfColor;
+import org.jpedal.color.PdfPaint;
+import org.jpedal.io.ObjectStore;
 import org.jpedal.objects.GraphicsState;
 
 public class T3Display extends SwingDisplay implements T3Renderer{
@@ -55,7 +54,7 @@ public class T3Display extends SwingDisplay implements T3Renderer{
         type = CREATE_T3;
     }
 
-    public T3Display(final byte[] dvr, final Map map) {
+    public T3Display(final byte[] dvr, final Map<Object, Object> map) {
         super(dvr,map);
         type = CREATE_T3;
     }
@@ -97,7 +96,7 @@ public class T3Display extends SwingDisplay implements T3Renderer{
             final GraphicsState currentGraphicsState, final float x, final float y) {
 
         
-        /**
+        /*
          * color type3 glyphs if not black
          */
         if (image !=null && fillCol != null) {

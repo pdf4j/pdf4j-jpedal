@@ -32,15 +32,17 @@
  */
 package org.jpedal.parser;
 
-import org.jpedal.color.GenericColorSpace;
-import org.jpedal.exception.PdfException;
-import org.jpedal.fonts.PdfFont;
-import org.jpedal.objects.raw.*;
-import org.jpedal.utils.StringUtils;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.jpedal.color.GenericColorSpace;
+import org.jpedal.exception.PdfException;
+import org.jpedal.fonts.PdfFont;
+import org.jpedal.objects.raw.ObjectFactory;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfKeyPairsIterator;
+import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.utils.StringUtils;
 
 /**
  * caches for data
@@ -229,9 +231,6 @@ public class PdfObjectCache {
         }
         String id,value;
 
-        /**
-         * new code
-         */
         if(Resources!=null){
 
             final PdfObject resObj=Resources.getDictionary(type);
@@ -242,7 +241,7 @@ public class PdfObjectCache {
 
             if(resObj!=null){
 
-                /**
+                /*
                  * read all the key pairs for Glyphs
                  */
                 final PdfKeyPairsIterator keyPairs=resObj.getKeyPairsIterator();
@@ -278,18 +277,10 @@ public class PdfObjectCache {
                             childObj.setStatus(PdfObject.UNDECODED_DIRECT);
                             childObj.setUnresolvedData(StringUtils.toBytes(value), type);
 
-//                            if(!objectDecoder.resolveFully(childObj)){
-//                                Resources.setFullyResolved(false);
-//                                return;
-//                            }
-
                             //cache if setup
                             if(type==PdfDictionary.Font){
                                 directFonts.put(id,childObj);
                             }
-//                        }else if(!objectDecoder.resolveFully(obj)){
-//                            Resources.setFullyResolved(false);
-//                            return;
                         }
                     }
 
@@ -345,7 +336,7 @@ public class PdfObjectCache {
 
         //reset copies
         localShadings=new HashMap<String, PdfObject>(initSize);
-        resolvedFonts=new HashMap(initSize);
+        resolvedFonts=new HashMap<String, PdfFont>(initSize);
         unresolvedFonts=new HashMap<Object, PdfObject>(initSize);
         directFonts=new HashMap<String, PdfObject>(initSize);
         colorspaces=new HashMap<Object, PdfObject>(initSize);

@@ -32,17 +32,17 @@
  */
 package org.jpedal.io;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.jpedal.objects.Javascript;
 import org.jpedal.objects.raw.*;
 import org.jpedal.utils.StringUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 /**
  * convert names to refs
  */
-public class NameLookup extends HashMap {
+public class NameLookup extends HashMap<String, Object> {
 
     private final PdfFileReader objectReader;
 
@@ -66,18 +66,33 @@ public class NameLookup extends HashMap {
      */
     public void readNames(final PdfObject nameObject, final Javascript javascript, final boolean isKid){
 
+        final Map DestsAsList=nameObject.getOtherDictionaries();
+       
+        if(!DestsAsList.isEmpty()){
+            readDestList(DestsAsList);
+        }else{
+            readNamesObject(nameObject, javascript, isKid);
+        }
+    }
+        
+    /**
+     * read any names
+     * @param nameObject
+     * @param javascript
+     * @param isKid
+     */
+    private void readNamesObject(final PdfObject nameObject, final Javascript javascript, final boolean isKid){
+
+        
         final ObjectDecoder objectDecoder=new ObjectDecoder(objectReader);
         objectDecoder.checkResolved(nameObject);
 
-        /**
-         *  loop to read required values into lookup
-         */
         final int[] nameLists= {PdfDictionary.Dests, PdfDictionary.EmbeddedFiles, PdfDictionary.JavaScript,PdfDictionary.XFAImages};
         int count=nameLists.length;
         if(isKid) {
             count = 1;
         }
-
+        
         PdfObject pdfObj;
         PdfArrayIterator namesArray;
 
@@ -100,7 +115,7 @@ public class NameLookup extends HashMap {
             if(kidList!=null){
                 final int kidCount=kidList.length;
 
-                /** allow for empty value and put next pages in the queue */
+                /* allow for empty value and put next pages in the queue */
                 if (kidCount> 0) {
 
                     for (final byte[] aKidList : kidList) {
@@ -257,5 +272,20 @@ public class NameLookup extends HashMap {
             }
         }
         return returnValues;
+    }
+
+    private void readDestList(final Map DestsAsList) {
+       
+        final Iterator keys=DestsAsList.keySet().iterator();
+        
+        String key,value;
+        PdfObject rawvalue;
+        
+        while(keys.hasNext()){
+            key=(String) keys.next();
+            rawvalue=(PdfObject)DestsAsList.get(key);
+            value=new String(rawvalue.getUnresolvedData());
+            this.put(key, value);
+        }
     }
 }

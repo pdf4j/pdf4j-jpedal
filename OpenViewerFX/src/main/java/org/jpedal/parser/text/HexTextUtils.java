@@ -91,7 +91,7 @@ class HexTextUtils {
         
        // String firstValue = StandardFonts.CMAP[val];
        
-        /**
+        /*
          * read second byte if needed (we always read first time to see if double byte or single)
          */
        // final boolean isEmbedded =currentFontData.isFontEmbedded;
@@ -126,21 +126,7 @@ class HexTextUtils {
                 }
             }
         }
-        /**
-        float actualWidth =-1;
-            
-        //if((currentFontData.getFontType()==StandardFonts.CIDTYPE0 || currentFontData.getFontType()==StandardFonts.CIDTYPE2)){
-                actualWidth = currentFontData.getDefaultWidth(val);
 
-                if(actualWidth==-1){
-                    actualWidth = currentFontData.getDefaultWidth(-1)/2;
-                //    System.exit(1);
-                }
-        //}
-        
-        glyphData.setActualWidth(actualWidth);
-        /**/
-        
         if(isMultiByte){
             return setValue(glyphData, val, i, charSize, currentFontData, parserOptions);
         }else{

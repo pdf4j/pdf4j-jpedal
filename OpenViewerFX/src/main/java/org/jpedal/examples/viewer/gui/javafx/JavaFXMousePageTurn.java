@@ -503,31 +503,6 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                     
                     //update scaling
                     currentGUI.snapScalingToDefaults(currentScaling);
-
-                    /**
-                     * Do not think this is necersary for JavaFX Viewer as the PdfDecoder is set into a ScrollPane
-                     * which handles scrollable view.
-                     
-                    //store mouse location
-                    final Rectangle r = ((PdfDecoder)decode_pdf).getVisibleRect();
-                    final double x = event.getX()/((PdfDecoder)decode_pdf).getBounds().getWidth();
-                    final double y = event.getY()/((PdfDecoder)decode_pdf).getBounds().getHeight();
-                    Thread t = new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                ((PdfDecoder)decode_pdf).scrollRectToVisible(new Rectangle(
-                                        (int)((x*((PdfDecoderFX)decode_pdf).getWidth())-(r.getWidth()/2)),
-                                        (int)((y*((PdfDecoderFX)decode_pdf).getHeight())-(r.getHeight()/2)),
-                                        (int)((PdfDecoder)decode_pdf).getVisibleRect().getWidth(),
-                                        (int)((PdfDecoder)decode_pdf).getVisibleRect().getHeight()));
-                                ((PdfDecoder)decode_pdf).repaint();
-                            } catch (Exception e) {e.printStackTrace();}
-                        }
-                    };
-                    t.setDaemon(true);
-                    t.start();
-                    SwingUtilities.invokeLater(t);*/
                 }
             }
         } else {
@@ -553,11 +528,11 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
             } else if (scroll.getVvalue()==scroll.getVmin() &&
                     timeOfLastPageChange+700 < System.currentTimeMillis() &&
                     currentGUI.getValues().getCurrentPage() > 1) {
-                
+
                 //change page
                 timeOfLastPageChange = System.currentTimeMillis();
                 currentCommands.executeCommand(Commands.BACKPAGE, null);
-                
+
                 //update scrollbar so at bottom of page
                 Platform.runLater(new Runnable() {
                     @Override
@@ -565,20 +540,8 @@ public class JavaFXMousePageTurn extends MouseSelector implements JavaFXMouseFun
                         scroll.setVvalue(scroll.getVmax());
                     }
                 });
-                
-            } 
-            /**
-             * We do not think this is necersary as the PDFContent is hosted within a ScrollPane
-             * so scrolling is done for us.
-            else {
-                //scroll
 
-                Area rect = new Area(((PdfDecoderFX)decode_pdf).getVisibleRect());
-                AffineTransform transform = new AffineTransform();
-                transform.translate(0, event.getUnitsToScroll() * decode_pdf.getScrollInterval());
-                rect = rect.createTransformedArea(transform);
-                ((PdfDecoder)decode_pdf).scrollRectToVisible(rect.getBounds());
-            }*/
+            }
         }
     }
 

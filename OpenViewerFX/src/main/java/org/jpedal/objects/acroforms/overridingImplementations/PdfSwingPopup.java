@@ -32,19 +32,22 @@
  */
 package org.jpedal.objects.acroforms.overridingImplementations;
 
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
-
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.BorderFactory;
+import javax.swing.JInternalFrame;
+import javax.swing.JTextArea;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import org.jpedal.objects.raw.FormObject;
+import org.jpedal.objects.raw.PdfDictionary;
+import org.jpedal.objects.raw.PdfObject;
 
 /**
  * provide PDF poup for Annotations
@@ -65,7 +68,7 @@ public class PdfSwingPopup extends JInternalFrame{
 
         formObject = popupObj;
 	
-	/**
+	/*
 	 * all the popup data is in the Parent not the popup object
 	 */
 	final PdfObject parentObj=popupObj.getParentPdfObj();
@@ -232,7 +235,7 @@ public class PdfSwingPopup extends JInternalFrame{
     }
     
     @Override
-    /**
+    /*
      * Set the font for the popup window.
      * The font is modified in size for the title and the content.
      */
@@ -250,9 +253,4 @@ public class PdfSwingPopup extends JInternalFrame{
         }
 
     }
-       
-    /**
-     * Override paint so that the popup remains in it's current z-position
-     * after a repaint (e.g. resize), preventign it from going behind other elements
-     */
 }

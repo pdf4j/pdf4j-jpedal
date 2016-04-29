@@ -33,32 +33,29 @@
 
 package org.jpedal.display.javafx;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import org.jpedal.*;
+import javafx.scene.Node;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.display.PageFlowFX;
 import org.jpedal.display.PageOffsets;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.JavaFxGUI;
-import org.jpedal.display.GUIThumbnailPanel;
-import org.jpedal.exception.PdfException;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.render.DynamicVectorRenderer;
 import org.jpedal.text.TextLines;
 import org.jpedal.utils.Messages;
 
-/**
- *
- */
 public class PageFlowDisplayFX implements Display {
     
     final PageFlowFX pageFlowFX;
@@ -71,7 +68,7 @@ public class PageFlowDisplayFX implements Display {
         pageFlowFX = new PageFlowFX(pdf, true);
         
         //Update page number on navbar
-        pageFlowFX.getPageNumber().addListener(new ChangeListener() {
+        pageFlowFX.getPageNumber().addListener(new ChangeListener<Object>() {
             @Override
             public void changed(final ObservableValue o, final Object oldVal, final Object newVal) {
                 fxGUI.setPage((int)pageFlowFX.getPageNumber().doubleValue());
@@ -83,9 +80,9 @@ public class PageFlowDisplayFX implements Display {
         
         pageFlowFX.setCursors(fxGUI.getGUICursor().getCursorImageForFX(GUI.GRAB_CURSOR), fxGUI.getGUICursor().getCursorImageForFX(GUI.GRABBING_CURSOR));
 
-        ((PdfDecoderFX)pdf).getChildren().clear();
+        ((Pane)pdf).getChildren().clear();
         
-        final ListChangeListener lcl = new ListChangeListener() {
+        final ListChangeListener<Node> lcl = new ListChangeListener<Node>() {
 
             @Override
             public void onChanged(final ListChangeListener.Change change) {
@@ -131,33 +128,14 @@ public class PageFlowDisplayFX implements Display {
         }
     }
     
-    //public PageFlowFX getPageFlowFX(){
-    //    return pageFlowFX;
-    //}
-    
     @Override
     public double getIndent() {
         throw new UnsupportedOperationException("getIndent Not supported yet."); 
     }
 
-    /**
-     * Please use public int[] getCursorBoxOnScreenAsArray() instead.
-     * @deprecated on 04/07/2014
-     */
-    @Deprecated
-    @Override
-    public Rectangle getCursorBoxOnScreen() {
-        throw new UnsupportedOperationException("getCursorBoxOnScreen Not supported yet."); 
-    }
-
     @Override
     public int[] getCursorBoxOnScreenAsArray() {
         throw new UnsupportedOperationException("getCursorBoxOnScreenAsArray Not supported yet."); 
-    }
-
-    @Override
-    public void setCursorBoxOnScreen(final Rectangle cursorBoxOnScreen, final boolean isSamePage) {
-        throw new UnsupportedOperationException("setCursorBoxOnScreen Not supported yet."); 
     }
 
     @Override
@@ -173,10 +151,6 @@ public class PageFlowDisplayFX implements Display {
     }
 
     @Override
-    public void paintPage(final Object box, final AcroRenderer formRenderer, final TextLines textLines) {
-    }
-
-    @Override
     public void paintPage(final Graphics2D g2, final AcroRenderer formRenderer, final TextLines textLines) {
     }
 
@@ -184,35 +158,8 @@ public class PageFlowDisplayFX implements Display {
     public void updateCursorBoxOnScreen(final int[] newOutlineRectangle, final int outlineColor, final int pageNumber, final int x_size, final int y_size) {
     }
 
-    
-    /**
-     * Deprecated on 04/07/2014, please use 
-     * updateCursorBoxOnScreen(int[] newOutlineRectangle, int outlineColor, int pageNumber,int x_size,int y_size) instead.
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public void updateCursorBoxOnScreen(final Rectangle newOutlineRectangle, final Color outlineColor, final int pageNumber, final int x_size, final int y_size) {
-    }
-
     @Override
     public void drawCursor(final Graphics g, final float scaling) {
-    }
-
-    /**
-     * Deprecated on 07/07/2014.
-     * Please use setViewableArea(int[] viewport) instead.
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public AffineTransform setViewableArea(final Rectangle viewport) throws PdfException {
-        return null;
-    }
-
-    @Override
-    public AffineTransform setViewableArea(final int[] viewport) throws PdfException {
-        return null;
     }
 
     @Override
@@ -222,8 +169,8 @@ public class PageFlowDisplayFX implements Display {
     @Override
     public int[] getPageSize(final int displayView) {
         final int[] pageSize = new int[2];
-        pageSize[0] = (int) ((PdfDecoderFX) pageFlowFX.getPdfDecoderInt()).getWidth();
-        pageSize[1] = (int) ((PdfDecoderFX) pageFlowFX.getPdfDecoderInt()).getHeight();
+        pageSize[0] = (int) ((Region) pageFlowFX.getPdfDecoderInt()).getWidth();
+        pageSize[1] = (int) ((Region) pageFlowFX.getPdfDecoderInt()).getHeight();
         return pageSize;
     }
 
@@ -293,7 +240,7 @@ public class PageFlowDisplayFX implements Display {
 
     @Override
     public void dispose() {
-        /**Could probably go somewhere better when other other viewmodes are
+        /*Could probably go somewhere better when other other viewmodes are
         implemented, or when bugs becomes apparent, but for now it works.**/
         fxGUI.getDisplayPane().getItems().add(fxGUI.getPageContainer());    
         fxGUI.getDisplayPane().getItems().remove(pageFlowFX);

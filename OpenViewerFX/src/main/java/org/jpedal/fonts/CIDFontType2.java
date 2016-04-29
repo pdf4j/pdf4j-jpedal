@@ -33,13 +33,12 @@
 package org.jpedal.fonts;
 
 import java.util.Map;
-
 import org.jpedal.fonts.tt.TTGlyphs;
-import org.jpedal.io.PdfObjectReader;
 import org.jpedal.io.ObjectStore;
-import org.jpedal.parser.PdfFontFactory;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
+import org.jpedal.parser.PdfFontFactory;
 
 
 /**

@@ -33,24 +33,18 @@
 
 package org.jpedal.examples.viewer.gui.popups;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Point;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-
+import org.jpedal.io.ObjectStore;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
-import org.jpedal.io.ObjectStore;
 
 public class FileDownload {
 	//Load file from URL into file then open file

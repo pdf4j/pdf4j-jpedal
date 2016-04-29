@@ -32,21 +32,8 @@
  */
 package org.jpedal;
 
-import org.jpedal.display.Display;
-import org.jpedal.exception.PdfException;
-import org.jpedal.grouping.PdfGroupingAlgorithms;
-import org.jpedal.io.ObjectStore;
-import org.jpedal.io.PdfObjectReader;
-import org.jpedal.objects.*;
-import org.jpedal.objects.acroforms.AcroRenderer;
-import org.jpedal.objects.outlines.OutlineData;
-import org.jpedal.render.DynamicVectorRenderer;
-import org.jpedal.text.TextLines;
-import org.jpedal.utils.DPIFactory;
-import org.w3c.dom.Document;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.security.PrivateKey;
@@ -54,17 +41,29 @@ import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.border.Border;
+import org.jpedal.display.Display;
 import org.jpedal.display.DisplayOffsets;
+import org.jpedal.exception.PdfException;
 import org.jpedal.external.ExternalHandlers;
+import org.jpedal.grouping.PdfGroupingAlgorithms;
+import org.jpedal.io.ObjectStore;
+import org.jpedal.io.PdfObjectReader;
 import org.jpedal.io.StatusBar;
+import org.jpedal.objects.*;
+import org.jpedal.objects.acroforms.AcroRenderer;
+import org.jpedal.objects.outlines.OutlineData;
 import org.jpedal.parser.DecoderOptions;
+import org.jpedal.render.DynamicVectorRenderer;
+import org.jpedal.text.TextLines;
+import org.jpedal.utils.DPIFactory;
+import org.w3c.dom.Document;
 
 public interface PdfDecoderInt {
 
     /**
      * build number of this version
      */
-    String version = "6.11.22";
+    String version = "7.0.29";
     /**
      * flag to show extraction mode should include any text
      */
@@ -92,16 +91,13 @@ public interface PdfDecoderInt {
     /**
      * flag to show extraction of raw cmyk images
      */
-    int CMYKIMAGES = 128;
+    //int CMYKIMAGES = 128;
+    
     /**
      * flag to show extraction of xforms metadata
      */
     int XFORMMETADATA = 256;
-    /**
-     * flag to show extraction of color required (used in Storypad grouping)
-     */
-    //int COLOR = 512;
-    
+
     /**
      * flag to tell code to flatten forms
      */
@@ -122,11 +118,7 @@ public interface PdfDecoderInt {
      * flag to stop forms on decodePage
      */
     int REMOVE_NOFORMS = 32;
-    
-    /**
-     * flag to show text highlights need to be done last
-     */
-    int OCR_PDF = 32;
+
     /**
      * printing mode using inbuilt java fonts and getting java to rasterize
      * fonts using Java font if match found (added to get around limitations in
@@ -314,20 +306,8 @@ public interface PdfDecoderInt {
 
     boolean isPageAvailable(int rawPage);
 
-    boolean isHiResScreenDisplay();
-    
-    /**
-     * Deprecated on 04/07/2014, please use 
-     * updateCursorBoxOnScreen(final int[] rectParams, final int outlineColor) instead
-     * @deprecated
-     */
-    @Deprecated
-    void updateCursorBoxOnScreen(Rectangle newOutlineRectangle, Color outlineColor);
-    
     void updateCursorBoxOnScreen(int[] rectParams, int outlineColor);
    
-    void useHiResScreenDisplay(boolean value);
-
     void decodePageInBackground(int i) throws Exception;
 
     int getPageCount();
@@ -379,15 +359,7 @@ public interface PdfDecoderInt {
     void setStreamCacheSize(int size);
     
     void setUserOffsets(int x, int y, int mode);
-    
-    /**
-     * Deprecated on 07/07/2014
-     * please use getPages().setViewableArea instead.
-     * @deprecated
-     */
-    @Deprecated
-    AffineTransform setViewableArea(Rectangle viewport) throws PdfException;
-    
+
     boolean hasEmbeddedFonts();
 
     int getPageFromObjectRef(String ref);

@@ -32,13 +32,9 @@
  */
 package org.jpedal.fonts.tt;
 
-import org.jpedal.fonts.tt.hinting.TTVM;
-import org.jpedal.io.PathSerializer;
-import org.jpedal.objects.GraphicsState;
-import org.jpedal.utils.LogWriter;
-import org.jpedal.utils.repositories.Vector_Path;
-
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
@@ -46,6 +42,11 @@ import java.awt.geom.PathIterator;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import org.jpedal.fonts.tt.hinting.TTVM;
+import org.jpedal.io.PathSerializer;
+import org.jpedal.objects.GraphicsState;
+import org.jpedal.utils.LogWriter;
+import org.jpedal.utils.repositories.Vector_Path;
 
 public class TTGlyph extends BaseTTGlyph implements Serializable{
 

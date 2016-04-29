@@ -32,20 +32,23 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
+import java.awt.Window;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import org.jpedal.PdfDecoderInt;
-import org.jpedal.examples.viewer.*;
-import org.jpedal.examples.viewer.gui.GUI;
+import org.jpedal.display.Display;
 import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.Commands;
+import org.jpedal.examples.viewer.SharedViewer;
+import org.jpedal.examples.viewer.Values;
+import org.jpedal.examples.viewer.gui.GUI;
+import org.jpedal.examples.viewer.utils.Printer;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
-import org.jpedal.display.Display;
-import org.jpedal.examples.viewer.utils.Printer;
 
 /**
  * Clean up and exit programo
@@ -67,12 +70,12 @@ public class Exit {
 
         thumbnails.terminateDrawing();
 
-        /**
+        /*
          * warn user on forms
          */
         SaveForm.handleUnsaveForms(currentGUI, commonValues, decode_pdf);
 
-        /**
+        /*
          * create the dialog
          */
         if(LogWriter.isRunningFromIDE){
@@ -94,17 +97,15 @@ public class Exit {
         }
 
         
-        /**
-         * cleanup
-         */
+        // cleanup
         decode_pdf.closePdfFile();
 
         //needed to save recent files
         try {
             properties.setValue("lastDocumentPage", String.valueOf(commonValues.getCurrentPage()));
             if (properties.getValue("trackViewerSize").equalsIgnoreCase("true")) {
-                properties.setValue("startViewerWidth", String.valueOf(((Container)currentGUI.getFrame()).getWidth()));
-                properties.setValue("startViewerHeight", String.valueOf(((Container)currentGUI.getFrame()).getHeight()));
+                properties.setValue("startViewerWidth", String.valueOf(((Component)currentGUI.getFrame()).getWidth()));
+                properties.setValue("startViewerHeight", String.valueOf(((Component)currentGUI.getFrame()).getHeight()));
             }
 
             if (properties.getValue("trackScaling").equalsIgnoreCase("true")) {
@@ -140,18 +141,18 @@ public class Exit {
         //formClickTest needs this so that it does not exit after first test.
         if (org.jpedal.DevFlags.GUITESTINGINPROGRESS || !SharedViewer.exitOnClose) {
             
-            ((Container)currentGUI.getFrame()).setVisible(false);
+            ((Component)currentGUI.getFrame()).setVisible(false);
             if (currentGUI.getFrame() instanceof JFrame) {
-                ((JFrame) currentGUI.getFrame()).dispose();
+                ((Window) currentGUI.getFrame()).dispose();
             }
             
             decode_pdf.dispose();
             currentGUI.dispose();
 
         } else {
-            ((Container)currentGUI.getFrame()).setVisible(false);
+            ((Component)currentGUI.getFrame()).setVisible(false);
             if (currentGUI.getFrame() instanceof JFrame) {
-                ((JFrame) currentGUI.getFrame()).dispose();
+                ((Window) currentGUI.getFrame()).dispose();
             }
 
             decode_pdf.dispose();

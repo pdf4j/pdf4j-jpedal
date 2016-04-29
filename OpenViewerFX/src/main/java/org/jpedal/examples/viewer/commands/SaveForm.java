@@ -73,7 +73,7 @@ public class SaveForm {
         if (names == null) {
             currentGUI.showMessageDialog(Messages.getMessage("PdfViewer.NoFields"));
         } else {
-            /**
+            /*
              * create the file chooser to select the file
              */
             File file;
@@ -119,7 +119,7 @@ public class SaveForm {
             final ItextFunctions itextFunctions = new ItextFunctions(currentGUI, commonValues.getSelectedFile(), decode_pdf);
             ItextFunctions.saveFormsData(fileToSave);
 
-            /**
+            /*
              * reset flag and graphical clue
              */
             commonValues.setFormsChanged(false);

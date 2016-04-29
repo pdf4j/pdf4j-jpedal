@@ -32,7 +32,7 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import org.jpedal.*;
+import org.jpedal.PdfDecoderInt;
 import static org.jpedal.examples.viewer.Commands.FIRST_DOCUMENT_SEARCH_RESULT_NOW_SHOWN;
 import static org.jpedal.examples.viewer.Commands.SEARCH_NOT_FOUND;
 import static org.jpedal.examples.viewer.Commands.SEARCH_RETURNED_TO_START;
@@ -130,7 +130,7 @@ public class PreviousResult {
 
                             currentGUI.resetStatusMessage(Messages.getMessage("PdfViewer.LoadingPage") + ' ' + commonValues.getCurrentPage());
 
-                            /**
+                            /*
                              * reset as rotation may change!
                              */
                             decode_pdf.setPageParameters(scaling, commonValues.getCurrentPage());

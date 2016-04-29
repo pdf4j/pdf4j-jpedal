@@ -74,7 +74,7 @@ public class PdfArrayIterator {
         } else{ //look at first char
 			int firstByte;
 
-            /**
+            /*
              * assume number and exit as soon as disproved
              */
             final int len=rawData[currentToken].length;
@@ -237,7 +237,7 @@ public class PdfArrayIterator {
 
                 final int length=raw.length;
                 int elementCount=1, elementReached=0;
-                 /**
+                 /*
                  * first work out number of elements by counting spaces to end
                  */
                 for(int ii=1;ii<length;ii++){
@@ -246,7 +246,7 @@ public class PdfArrayIterator {
                     }
                 }
 
-                /**
+                /*
                  * now create and populate
                  */
                 final float[] values=new float[elementCount];

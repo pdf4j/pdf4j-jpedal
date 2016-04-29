@@ -34,14 +34,12 @@ package org.jpedal.examples.viewer.gui.javafx;
 
 import java.util.Collections;
 import java.util.Map;
-
 import javafx.collections.ObservableList;
-
 import org.jpedal.examples.viewer.gui.generic.GUISearchList;
 
 
 /**used by search function ro provide page number as tooltip*/
-public class JavaFXSearchList extends javafx.scene.control.ListView implements GUISearchList {
+public class JavaFXSearchList extends javafx.scene.control.ListView<String> implements GUISearchList {
 
 	private final Map<Integer, Integer> textPages;
 	private final Map<Integer, Object> textAreas;
@@ -83,7 +81,7 @@ public class JavaFXSearchList extends javafx.scene.control.ListView implements G
 //	}
 
 	@Override
-    public Map getTextPages() {
+    public Map<Integer, Integer> getTextPages() {
 		return Collections.unmodifiableMap(textPages);
 	}
 

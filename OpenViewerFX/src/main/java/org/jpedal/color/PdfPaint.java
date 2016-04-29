@@ -44,6 +44,4 @@ public interface PdfPaint extends Paint {
 
     int getRGB();
 
-    //added for HTML conversion
-    void setRenderingType(int createHtml);
 }

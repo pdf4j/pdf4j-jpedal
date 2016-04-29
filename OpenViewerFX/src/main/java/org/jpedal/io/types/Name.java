@@ -216,7 +216,7 @@ public class Name {
         
         //delete
         //@speed - lose this code once Filters done properly
-        /**
+        /*
          * just check its not /Filter [/FlateDecode ] or [] or [ /ASCII85Decode /FlateDecode ]
          * by checking next valid char not /
          */
@@ -383,9 +383,6 @@ public class Name {
             
         }
         
-        /**
-         * finally set the value
-         */
         if(isMap){
             pdfObject.setName(PDFkey, StringUtils.getTextString(stringBytes, false));
         }else {

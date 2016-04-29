@@ -149,7 +149,6 @@ class ThreeComponentImage {
             image = ColorSpaceConvertor.convertIndexedToFlat(d,w, h, data, index, false,false);
         }else{
             
-            /** create an image from the raw data*/
             final DataBuffer db = new DataBufferByte(data, data.length);
             
             final int[] bands = {0};

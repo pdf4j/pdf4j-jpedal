@@ -32,9 +32,9 @@
  */
 package org.jpedal.fonts.objects;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import org.jpedal.utils.LogWriter;
-
-import java.io.*;
 
 /**
  * provides access to font data and caches large objects

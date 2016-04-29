@@ -56,7 +56,7 @@ public class CCITTMix extends CCITT2D implements CCITTDecoder {
 
         try {
 
-            /** Added to stop errors*/
+            /* Added to stop errors*/
             int[] prev = new int[width + 1];
             int[] curr = new int[width + 1];
 

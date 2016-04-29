@@ -314,9 +314,6 @@ public class Cmd {
                 type=SHADING_COMMAND;
                 break;
 
-            /**
-             * shapes
-             */
             case Cmd.B :
                 type=SHAPE_COMMAND;
                 break;

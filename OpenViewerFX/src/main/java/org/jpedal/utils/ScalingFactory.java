@@ -32,10 +32,9 @@
  */
 package org.jpedal.utils;
 
-import org.jpedal.objects.PdfPageData;
-
 import java.awt.geom.AffineTransform;
 import org.jpedal.objects.PageOrigins;
+import org.jpedal.objects.PdfPageData;
 
 /**
  * workout Transformation to use on image
@@ -62,7 +61,7 @@ public class ScalingFactory {
         final int x_size=(int) (crw+(crx-mediaX));
         final int y_size=(int) (crh+(cry-mediaY));
 	
-        /**
+        /*
          * XFA needs to be other way up so set page as inverted so option added
          */
         switch (rotation) {

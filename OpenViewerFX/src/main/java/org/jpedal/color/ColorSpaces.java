@@ -32,10 +32,9 @@
  */
 package org.jpedal.color;
 
-import org.jpedal.utils.LogWriter;
-
 import java.awt.RenderingHints;
 import java.lang.reflect.Field;
+import org.jpedal.utils.LogWriter;
 
 public class ColorSpaces {
     

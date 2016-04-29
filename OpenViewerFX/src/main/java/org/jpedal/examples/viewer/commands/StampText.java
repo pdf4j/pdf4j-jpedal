@@ -32,12 +32,12 @@
  */
 package org.jpedal.examples.viewer.commands;
 
-import java.awt.Container;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.jpedal.PdfDecoderInt;
+import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.StampTextToPDFPages;
 import org.jpedal.examples.viewer.utils.ItextFunctions;
 import org.jpedal.examples.viewer.utils.PropertiesFile;
@@ -63,7 +63,7 @@ public class StampText {
             } else {
                 //get values from user
                 final StampTextToPDFPages stampText = new StampTextToPDFPages(commonValues.getInputDir(), commonValues.getPageCount(), commonValues.getCurrentPage());
-                final int stampTextChoice = stampText.display((Container)currentGUI.getFrame(), Messages.getMessage("PdfViewerStampText.text"));
+                final int stampTextChoice = stampText.display((Component)currentGUI.getFrame(), Messages.getMessage("PdfViewerStampText.text"));
 
                 //get parameters and call if YES
                 if (stampTextChoice == JOptionPane.OK_OPTION) {

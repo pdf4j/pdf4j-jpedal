@@ -49,21 +49,12 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -166,7 +157,6 @@ public class BaseViewerFX extends Application {
     
     /**
      * launches BaseViewerFX viewer using supplied stage for displaying PDF files
-     * 
      * @param stage is of type final Stage
      */
     @Override
@@ -197,7 +187,7 @@ public class BaseViewerFX extends Application {
         // Get command line arguments
         final List<String> args = this.getParameters().getUnnamed();
 
-        /**
+        /*
          * setup initial display
          * Setting this before loadPDF() gives access to the toolbar buttons 
          * when called in loadPDF() via id.
@@ -229,7 +219,6 @@ public class BaseViewerFX extends Application {
     /**
      * creates all the components and adds change listeners for auto-centering 
      * for JavaFX PDF viewer
-     * 
      * @param w The width to use for the viewer 
      * @param h The height to use for the viewer 
      * @return scene
@@ -269,7 +258,7 @@ public class BaseViewerFX extends Application {
             }
         });
         
-        /**Sets the text to be displayed at the bottom of the FX Viewer**/
+        /*Sets the text to be displayed at the bottom of the FX Viewer**/
         fileLoc = new Text("No PDF Selected");
         fileLoc.setId("file_location");
         bottom.getChildren().add(fileLoc);
@@ -282,7 +271,7 @@ public class BaseViewerFX extends Application {
     public void addListeners(){
         
              
-        /**
+        /*
          * auto adjust so dynamically resized as viewer width alters
          */
         scene.widthProperty().addListener(new ChangeListener<Number>() {
@@ -303,7 +292,7 @@ public class BaseViewerFX extends Application {
             }
         });
         
-        /**
+        /*
          * Controls for dragging a PDF into the scene
          * Using the dragboard, which extends the clipboard class, 
          * detect a file being dragged onto the scene and if the user drops the file
@@ -345,9 +334,7 @@ public class BaseViewerFX extends Application {
     
     /**
      * Sets up a MenuBar to be used at the top of the window.
-     * 
      * It contains one Menu - navMenu - which allows the user to open and navigate pdf files
-     * 
      * @return 
      */
     private ToolBar setupToolBar() {
@@ -378,7 +365,7 @@ public class BaseViewerFX extends Application {
         fitHeight.setId("fitHeight");
         fitPage.setId("fitPage");
         
-        /**
+        /*
          * Open the PDF File
          */
         open.setOnAction(new EventHandler<ActionEvent>() {
@@ -562,7 +549,6 @@ public class BaseViewerFX extends Application {
     
     /**
      * take a File handle to PDF file on local filesystem and displays in PDF viewer
-     * 
      * @param input  The PDF file to load in the viewer 
      */
     public void loadPDF(final File input){
@@ -582,7 +568,6 @@ public class BaseViewerFX extends Application {
     
     /**
      * take a File handle to PDF file on local filesystem and displays in PDF viewer
-     * 
      * @param input The PDF file to load in the viewer  
      */
     public void loadPDF(final String input){
@@ -626,7 +611,7 @@ public class BaseViewerFX extends Application {
             }else{
                 currentPage = 1;
             }
-            /**
+            /*
              * This code block deals with user input and JVM passwords in Encrypted PDF documents.
              */
             if(pdf.isEncrypted()){
@@ -637,7 +622,7 @@ public class BaseViewerFX extends Application {
                 //While the PDF content is not viewable, repeat until the correct password is found
                 while(!pdf.isFileViewable() && !closePasswordPrompt) {
                     
-                    /**
+                    /*
                      * See if there's a JVM flag for the password & Use it if there is
                      * Otherwise prompt the user to enter a password
                      */
@@ -665,7 +650,7 @@ public class BaseViewerFX extends Application {
             }
 
             // Set up top bar values
-            ((Label)top.lookup("#pgCount")).setText("/" + pdf.getPageCount());
+            ((Labeled)top.lookup("#pgCount")).setText("/" + pdf.getPageCount());
             final ComboBox<String> pages = ((ComboBox<String>)top.lookup("#pages"));
             pages.getItems().clear();
             for(int i = 1; i <= pdf.getPageCount(); i++){
@@ -683,10 +668,8 @@ public class BaseViewerFX extends Application {
  
     /**
      * This method will show a popup box and request for a password.
-     * 
      * If the user does not enter the correct password it will ask them to try again.
      * If the user presses the Cross button, the password prompt will close.
-     * 
      * @param passwordCount is an int which represents the current input attempt
      */
     private void showPasswordPrompt(final int passwordCount){
@@ -883,10 +866,10 @@ public class BaseViewerFX extends Application {
             }
         }
      
-        /**
-         * @return the case sensitive full path and name of the PDF file   
-         */
-    public String getPDFfilename(){
+    /**
+     * @return the case sensitive full path and name of the PDF file
+     */
+    public String getPDFfilename() {
         return PDFfile;
     }
     

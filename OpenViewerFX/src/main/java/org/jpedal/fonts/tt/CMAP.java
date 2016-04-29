@@ -35,7 +35,6 @@ package org.jpedal.fonts.tt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jpedal.fonts.StandardFonts;
 import org.jpedal.utils.LogWriter;
 
@@ -86,7 +85,7 @@ public class CMAP extends Table {
     /**CMap format used -1 shows not set*/
     protected int[] CMAPformats,CMAPlength,CMAPlang,CMAPsegCount,CMAPsearchRange, CMAPentrySelector,CMAPrangeShift,CMAPreserved;
 
-    /**Platform-specific ID list*/
+    /*Platform-specific ID list*/
 //	private static String[] PlatformSpecificID={"Roman","Japanese","Traditional Chinese","Korean",
 //			"Arabic","Hebrew","Greek","Russian",
 //			"RSymbol","Devanagari","Gurmukhi","Gujarati",
@@ -96,7 +95,7 @@ public class CMAP extends Table {
 //			"Armenian","Simplified Chinese","Tibetan","Mongolian",
 //			"Geez","Slavic","Vietnamese","Sindhi","(Uninterpreted)"};
 //
-    /**Platform-specific ID list*/
+    /*Platform-specific ID list*/
     //private static String[] PlatformIDName={"Unicode","Macintosh","Reserved","Microsoft"};
 
     /**shows which encoding used*/
@@ -104,7 +103,7 @@ public class CMAP extends Table {
 
     private static final Map<String, Integer> exceptions;
 
-    /**set up differences from Mac Roman*/
+    /*set up differences from Mac Roman*/
     static {
 
         exceptions=new HashMap<String, Integer>();
@@ -272,7 +271,7 @@ public class CMAP extends Table {
         for (int i = 0; i < segCount; i++) {
             idRangeOffset[i] = currentFontFile.getNextUint16();
         }
-        /**create offsets*/
+        /*create offsets*/
         offset = new int[segCount];
         int diff,cumulative=0;
         for (int i = 0; i < segCount; i++) {
@@ -356,7 +355,7 @@ public class CMAP extends Table {
             System.out.println(glyph + " fontMapping=" + fontMapping + " index=" + index+ ' ' +remapType4);
         }
 
-        /**
+        /*
          * convert index if needed
          */
         if ((fontMapping == 1 || fontMapping == 2 || fontMapping == 3 || (fontMapping == 4 && remapType4))){//) && (!"notdef".equals(glyph))) {
@@ -445,7 +444,7 @@ public class CMAP extends Table {
      */
     private int getFormat12Value(final int index, final boolean debugMapping, int value) {
 
-        /**
+        /*
          * cycle through tables and then add offset to Glyph start
          */
         for (int i = 0; i < nGroups ; i++) {
@@ -528,7 +527,7 @@ public class CMAP extends Table {
 
         final int count=platformID.length;
 
-        /**case 1 */
+        /*case 1 */
         for(int i=0;i<count;i++){
             
             if((platformID[i]==3)&&(CMAPformats[i]==1 || CMAPformats[i]==0)){
@@ -542,7 +541,7 @@ public class CMAP extends Table {
             }
         }
 
-        /**case 2*/
+        /*case 2*/
         boolean wasCase2=false;
         if(formatToUse==-1 && hasFormatZero && !isCID){
             
@@ -572,8 +571,8 @@ public class CMAP extends Table {
             }          
         }
         
-        /**case 4 - no simple maps or prefer to last 1*/
-        /**last check uses fl glyph and sticks to case 1 if found*/
+        /*case 4 - no simple maps or prefer to last 1*/
+        /*last check uses fl glyph and sticks to case 1 if found*/
         if(formatToUse==-1 || fontMapping==3 || wasCase2){
             //if((formatToUse==-1)){
             for(int i=0;i<count;i++){
@@ -612,7 +611,7 @@ public class CMAP extends Table {
         }
 
         
-        /**case 3 - no MAC cmap in other ranges and substituting font */
+        /*case 3 - no MAC cmap in other ranges and substituting font */
         if(formatToUse==-1){
             for(int i=0;i<count;i++){
                 if((CMAPformats[i]==6)){
@@ -634,7 +633,7 @@ public class CMAP extends Table {
         }
 
         
-        /**case 5 - type12*/
+        /*case 5 - type12*/
         if(formatToUse==-1){
             for(int i=0;i<count;i++){
                 if((CMAPformats[i]==12)){
@@ -659,7 +658,6 @@ public class CMAP extends Table {
             fontMapping=2;
             
             StandardFonts.checkLoaded(StandardFonts.MAC);
-
 
             if(encodingDebug) {
                 System.out.println("Zapf");

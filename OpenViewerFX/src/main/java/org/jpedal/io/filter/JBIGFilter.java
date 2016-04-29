@@ -37,7 +37,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.util.Map;
 import org.jpedal.io.ObjectStore;
-
 import org.jpedal.jbig2.io.JBIG2;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;

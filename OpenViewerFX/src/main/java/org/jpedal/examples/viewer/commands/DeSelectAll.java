@@ -45,7 +45,7 @@ public class DeSelectAll {
     public static void execute(final GUIFactory currentGUI, final PdfDecoderInt decode_pdf) {
         if (decode_pdf.getDisplayView() == Display.SINGLE_PAGE) {
         	
-            /**
+            /*
              * remove any outline and reset variables used to track change
              */
             decode_pdf.getTextLines().clearHighlights(); //remove highlighted text

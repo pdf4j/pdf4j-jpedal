@@ -33,20 +33,16 @@
 package org.jpedal.fonts.tt;
 
 import java.util.Map;
-
+import org.jpedal.PdfDecoderInt;
+import org.jpedal.fonts.FontMappings;
+import org.jpedal.fonts.StandardFonts;
 import org.jpedal.fonts.glyph.GlyphFactory;
 import org.jpedal.fonts.glyph.MarkerGlyph;
 import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
-
-import org.jpedal.fonts.FontMappings;
-import org.jpedal.fonts.StandardFonts;
 import org.jpedal.fonts.objects.FontData;
-import org.jpedal.PdfDecoderInt;
-
-import org.jpedal.utils.LogWriter;
-
 import org.jpedal.fonts.tt.hinting.TTVM;
+import org.jpedal.utils.LogWriter;
 
 public class TTGlyphs extends PdfJavaGlyphs {
 

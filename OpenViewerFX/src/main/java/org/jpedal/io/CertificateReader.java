@@ -33,25 +33,21 @@
 
 package org.jpedal.io;
 
+import java.security.Key;
+import java.security.cert.Certificate;
 import org.bouncycastle.cms.CMSEnvelopedData;
 import org.bouncycastle.cms.RecipientInformation;
 import org.jpedal.utils.LogWriter;
-
-import java.security.Key;
-import java.security.cert.Certificate;
 
 public class CertificateReader {
     
     public static byte[] readCertificate(final byte[][] recipients, final Certificate certificate, final Key key) {
         
         byte[] envelopedData=null;
-        
-        /**
-         * values for BC
-         */
+
         final String provider="BC";
         
-        /**
+        /*
          * loop through all and get data if match found
          */
         for (final byte[] recipient : recipients) {

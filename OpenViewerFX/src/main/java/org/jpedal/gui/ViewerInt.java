@@ -32,9 +32,8 @@
  */
 package org.jpedal.gui;
 
-import org.jpedal.objects.PdfPageData;
-
 import java.util.Map;
+import org.jpedal.objects.PdfPageData;
 
 public interface ViewerInt {
 	void resetPrintData();
@@ -49,5 +48,5 @@ public interface ViewerInt {
 
 	PdfPageData getPageData();
 
-	Map getFontList();
+	Map<Object, Object> getFontList();
 }

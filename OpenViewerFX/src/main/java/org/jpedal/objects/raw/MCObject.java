@@ -54,7 +54,7 @@ public class MCObject extends PdfObject {
 
 	private byte[] rawActualText, rawLang, rawIDTree, rawT;
 
-    private byte[][] Karray, Nums;
+    private byte[][] Karray;
     
 	private String ActualText, IDTree, Lang, T;
 
@@ -250,9 +250,6 @@ public class MCObject extends PdfObject {
                 x += 8;
             }
 
-            /**
-             * not standard
-             */
             switch(id){
 
 //                case StandardFonts.CIDTYPE0:
@@ -648,40 +645,12 @@ public class MCObject extends PdfObject {
     }
 
     @Override
-    public byte[][] getKeyArray(final int id) {
-
-        switch(id){
-
-            case PdfDictionary.Nums:
-                return Nums;
-
-            default:
-                return super.getKeyArray(id);
-        }
-    }
-
-    @Override
-    public void setKeyArray(final int id, final byte[][] value) {
-
-        switch(id){
-
-            case PdfDictionary.Nums:
-                Nums=value;
-                break;
-
-            default:
-                super.setKeyArray(id, value);
-        }
-
-    }
-
-    @Override
     public byte[][] getStringArray(final int id) {
 
         switch(id){
 
             case PdfDictionary.K:
-                            return deepCopy(Karray);
+                return deepCopy(Karray);
 
             default:
             	return super.getStringArray(id);
@@ -702,5 +671,4 @@ public class MCObject extends PdfObject {
         }
 
     }
-
 }

@@ -77,7 +77,7 @@ class CharReader {
             i++;
         }
         
-        /**flag if we have entered/exited text block*/
+        /*flag if we have entered/exited text block*/
         if (glyphData.isText()) {
             //non CID deliminator (allow for escaped deliminator)
             final char testChar=glyphData.getRawChar();

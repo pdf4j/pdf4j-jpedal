@@ -32,22 +32,21 @@
  */
 package org.jpedal.io.types;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.jpedal.exception.PdfSecurityException;
+import org.jpedal.io.ObjectDecoder;
+import static org.jpedal.io.ObjectDecoder.resolveFully;
+import org.jpedal.io.ObjectUtils;
+import org.jpedal.io.PdfFileReader;
 import org.jpedal.objects.raw.OCObject;
+import org.jpedal.objects.raw.ObjectFactory;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.NumberUtils;
 import org.jpedal.utils.StringUtils;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import org.jpedal.io.ObjectDecoder;
-import static org.jpedal.io.ObjectDecoder.resolveFully;
-import org.jpedal.io.ObjectUtils;
-import org.jpedal.io.PdfFileReader;
-import org.jpedal.objects.raw.ObjectFactory;
 
 /**
  * parse PDF array data from PDF
@@ -546,9 +545,7 @@ public class Array extends ObjectDecoder{
     }
 
     private void setValues(boolean ignoreRecursion, byte[] raw, PdfObject pdfObject, int PDFkeyInt, Map<Integer, String> isRef, int currentElement, int elementCount, int j2, byte[] arrayData, boolean isIndirect, boolean isSingleKey, boolean isSingleNull, int endPtr) {
-        /**
-         * read all values and convert
-         */
+
         if(arrayData[j2]=='n' && arrayData[j2+1]=='u' &&
                 arrayData[j2+2]=='l' && arrayData[j2+3]=='l' && isSingleNull &&
                 (type!= PdfDictionary.VALUE_IS_OBJECT_ARRAY || elementCount==1)){

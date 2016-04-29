@@ -32,15 +32,14 @@
  */
 package org.jpedal.objects.acroforms.creation;
 
-import org.jpedal.objects.Javascript;
-import org.jpedal.objects.acroforms.actions.ActionHandler;
-import org.jpedal.objects.raw.FormObject;
-import org.jpedal.objects.acroforms.GUIData;
-
 import java.util.EnumSet;
 import java.util.Map;
 import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.Javascript;
 import org.jpedal.objects.PdfPageData;
+import org.jpedal.objects.acroforms.GUIData;
+import org.jpedal.objects.acroforms.actions.ActionHandler;
+import org.jpedal.objects.raw.FormObject;
 import org.jpedal.render.DynamicVectorRenderer;
 
 @SuppressWarnings("UnusedDeclaration")

@@ -39,9 +39,9 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import org.jpedal.display.*;
+import org.jpedal.display.Display;
+import org.jpedal.display.GUIDisplay;
 import org.jpedal.examples.viewer.Commands;
-import org.jpedal.examples.viewer.gui.JavaFxGUI;
 import org.jpedal.external.Options;
 import org.jpedal.gui.GUIFactory;
 import org.jpedal.io.PdfObjectReader;
@@ -80,7 +80,7 @@ public class JavaFXDefaultActionHandler extends SharedActionHandler {
                 
                 //added to check the forms save flag to tell the user how to save the now changed pdf file
                 
-                final org.jpedal.gui.GUIFactory gui = ((org.jpedal.examples.viewer.gui.GUI) decode_pdf.getExternalHandler(Options.GUIContainer));
+                final org.jpedal.gui.GUIFactory gui = ((GUIFactory) decode_pdf.getExternalHandler(Options.GUIContainer));
                 if(gui!=null){
                     gui.stopThumbnails();
                     // gui.checkformSavedMessage();
@@ -135,7 +135,7 @@ public class JavaFXDefaultActionHandler extends SharedActionHandler {
                         LogWriter.writeLog("Exception: " + e.getMessage());
                     }
                     
-                    /** reset as rotation may change! */
+                    /* reset as rotation may change! */
                     decode_pdf.setPageParameters(-1, page);
                     
                 }
@@ -144,7 +144,7 @@ public class JavaFXDefaultActionHandler extends SharedActionHandler {
             //now available via callback
             final Object gui = this.decode_pdf.getExternalHandler(org.jpedal.external.Options.GUIContainer);
             
-            /**
+            /*
              * Display the page designated by page, with its contents magnified just enough to
              * fit the entire page within the window both horizontally and vertically.
              * If the required horizontal and vertical magnification factors are different,
@@ -178,7 +178,7 @@ public class JavaFXDefaultActionHandler extends SharedActionHandler {
 //            decode_pdf.scrollRectToVisible((Rectangle) location);
         }
         
-        final GUIFactory javaFXGUI=((JavaFxGUI)decode_pdf.getExternalHandler(Options.GUIContainer));
+        final GUIFactory javaFXGUI=((GUIFactory)decode_pdf.getExternalHandler(Options.GUIContainer));
         if(javaFXGUI!=null){
             javaFXGUI.scaleAndRotate();
             

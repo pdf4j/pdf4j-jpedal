@@ -32,6 +32,7 @@
  */
 package org.jpedal.fonts;
 
+import java.util.Map;
 import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.glyph.T3Glyph;
 import org.jpedal.fonts.glyph.T3Glyphs;
@@ -39,16 +40,14 @@ import org.jpedal.fonts.glyph.T3Size;
 import org.jpedal.io.ObjectStore;
 import org.jpedal.io.PdfObjectReader;
 import org.jpedal.objects.GraphicsState;
-
 import org.jpedal.objects.raw.PdfDictionary;
-import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.objects.raw.PdfKeyPairsIterator;
-
+import org.jpedal.objects.raw.PdfObject;
 import org.jpedal.parser.T3StreamDecoder;
 import org.jpedal.parser.ValueTypes;
-import org.jpedal.render.*;
+import org.jpedal.render.T3Display;
+import org.jpedal.render.T3Renderer;
 import org.jpedal.utils.LogWriter;
-import java.util.Map;
 
 /**
  * handles type1 specifics
@@ -84,7 +83,7 @@ public class Type3 extends PdfFont {
         //generic setup
         init(fontID, renderPage);
         
-        /**
+        /*
          * get FontDescriptor object - if present contains metrics on glyphs
          */
         final PdfObject pdfFontDescriptor=pdfObject.getDictionary(PdfDictionary.FontDescriptor);
@@ -109,8 +108,6 @@ public class Type3 extends PdfFont {
     
     private void readEmbeddedFont(final PdfObject pdfObject, final ObjectStore objectStore) {
         
-        final boolean hires=true;
-        
         int key,otherKey;
         
         final PdfObject CharProcs=pdfObject.getDictionary(PdfDictionary.CharProcs);
@@ -118,7 +115,7 @@ public class Type3 extends PdfFont {
         //handle type 3 charProcs and store for later lookup
         if(CharProcs!=null){
             
-            final T3StreamDecoder glyphDecoder=new T3StreamDecoder(currentPdfFile,hires, isPrinting);
+            final T3StreamDecoder glyphDecoder=new T3StreamDecoder(currentPdfFile, isPrinting);
             glyphDecoder.setParameters(false,true,7,0,false,false);
             
             glyphDecoder.setObjectValue(ValueTypes.ObjectStore, objectStore);
@@ -132,7 +129,7 @@ public class Type3 extends PdfFont {
                 }
             }
             
-            /**
+            /*
              * read all the key pairs for Glyphs
              */
             final PdfKeyPairsIterator keyPairs=CharProcs.getKeyPairsIterator();
@@ -151,7 +148,6 @@ public class Type3 extends PdfFont {
                     //decode and create graphic of glyph
                     final T3Renderer glyphDisplay=new T3Display(0,false,20,objectStore);
                     
-                    glyphDisplay.setHiResImageForDisplayMode(hires);
                     glyphDisplay.setType3Glyph(glyphKey);
                     
                     try{

@@ -34,7 +34,6 @@
 package org.jpedal.objects.acroforms.overridingImplementations;
 
 import java.awt.Image;
-
 import javax.swing.ImageIcon;
 
 public class CustomImageIcon extends ImageIcon {

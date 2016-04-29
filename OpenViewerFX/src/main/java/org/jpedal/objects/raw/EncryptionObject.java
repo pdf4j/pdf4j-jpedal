@@ -206,40 +206,10 @@ public class EncryptionObject extends PdfObject {
                 x += 8;
             }
 
-            /**
-             * not standard
-             */
             switch(id){
-            
-
 
                 default:
 
-//                	if(pdfKeyType==PdfDictionary.Encoding){
-//                		PDFvalue=PdfCIDEncodings.getConstant(id);
-//
-//                		if(PDFvalue==PdfDictionary.Unknown){
-//
-//                			byte[] bytes=new byte[keyLength];
-//
-//                            System.arraycopy(raw,keyStart,bytes,0,keyLength);
-//
-//                			unknownValue=new String(bytes);
-//                		}
-//
-//                		if(debug && PDFvalue==PdfDictionary.Unknown){
-//                			System.out.println("Value not in PdfCIDEncodings");
-//
-//                           	 byte[] bytes=new byte[keyLength];
-//
-//                               System.arraycopy(raw,keyStart,bytes,0,keyLength);
-//                               System.out.println("Add to CIDEncodings and as String");
-//                               System.out.println("key="+new String(bytes)+" "+id+" not implemented in setConstant in PdfFont Object");
-//
-//                               System.out.println("final public static int CMAP_"+new String(bytes)+"="+id+";");
-//                               
-//                		}
-//                	}else
                 	PDFvalue=super.setConstant(pdfKeyType,id);
 
                     if(PDFvalue==-1 && debug){
@@ -261,7 +231,6 @@ public class EncryptionObject extends PdfObject {
             LogWriter.writeLog("Exception: " + e.getMessage());
         }
 
-        //System.out.println(pdfKeyType+"="+PDFvalue);
         switch(pdfKeyType){
 
 

@@ -33,9 +33,8 @@
 
 package org.jpedal.io;
 
-import org.jpedal.utils.LogWriter;
-
 import java.io.*;
+import org.jpedal.utils.LogWriter;
 
 public class RandomAccessMemoryMapBuffer implements RandomAccessBuffer {
 
@@ -60,7 +59,6 @@ public class RandomAccessMemoryMapBuffer implements RandomAccessBuffer {
         try {
 
             file=File.createTempFile("page",".bin", new File(ObjectStore.temp_dir));
-            //file.deleteOnExit();
 
             to =new java.io.FileOutputStream(file);
 

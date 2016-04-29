@@ -33,7 +33,7 @@
 package org.jpedal.examples.viewer.commands;
 
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,13 +44,15 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
-import org.jpedal.*;
+import org.jpedal.JDeliHelper;
+import org.jpedal.PdfDecoderInt;
 import org.jpedal.display.Display;
-import org.jpedal.examples.viewer.*;
+import org.jpedal.display.GUIThumbnailPanel;
+import org.jpedal.examples.viewer.Commands;
 import static org.jpedal.examples.viewer.Commands.isPDFLinearized;
+import org.jpedal.examples.viewer.Values;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.examples.viewer.gui.generic.GUISearchWindow;
-import org.jpedal.display.GUIThumbnailPanel;
 import org.jpedal.examples.viewer.gui.popups.DownloadProgress;
 import org.jpedal.examples.viewer.gui.popups.ErrorDialog;
 import org.jpedal.examples.viewer.utils.FileFilterer;
@@ -64,7 +66,6 @@ import org.jpedal.objects.acroforms.actions.ActionHandler;
 import org.jpedal.objects.raw.OutlineObject;
 import org.jpedal.objects.raw.PdfDictionary;
 import org.jpedal.objects.raw.PdfObject;
-import org.jpedal.parser.DecoderOptions;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;
 
@@ -219,17 +220,6 @@ public class OpenFile {
                         isPDf = true;
                         commonValues.setMultiTiff(false);
 
-                        // get any user set dpi
-                        final String hiresFlag = System.getProperty("org.jpedal.hires");
-                        if (DecoderOptions.hires || hiresFlag != null) {
-                            commonValues.setUseHiresImage(true);
-                        }
-                        // get any user set dpi
-                        final String memFlag = System.getProperty("org.jpedal.memory");
-                        if (memFlag != null) {
-                            commonValues.setUseHiresImage(false);
-                        }
-
                         // reset flag
                         thumbnails.resetToDefault();
 
@@ -247,8 +237,6 @@ public class OpenFile {
                         }
 
                         commonValues.maxViewY = 0;// rensure reset for any  viewport
-
-                        currentGUI.setQualityBoxVisible(isPDf);
 
                         commonValues.setCurrentPage(1);
 
@@ -455,7 +443,7 @@ public class OpenFile {
 
         currentGUI.removePageListener();
         
-        currentGUI.setDisplayView(Display.SINGLE_PAGE, decode_pdf.getPageAlignment());
+//        currentGUI.setDisplayView(Display.SINGLE_PAGE, decode_pdf.getPageAlignment());
         
 //        currentGUI.resetNavBar();
 
@@ -502,10 +490,12 @@ public class OpenFile {
 
         }
         
-        //When opening set displaymode to -1 to force viewer to intialise display mode
-        decode_pdf.getDecoderOptions().setDisplayView(-1);
-        currentGUI.setDisplayView(decode_pdf.getDecoderOptions().getPageMode(), decode_pdf.getPageAlignment());
         
+        if(isPDf){ 
+            //When opening set displaymode to -1 to force viewer to intialise display mode
+            decode_pdf.getDecoderOptions().setDisplayView(-1);
+            currentGUI.setDisplayView(decode_pdf.getDecoderOptions().getPageMode(), decode_pdf.getPageAlignment());
+        }
     }
 
     /**
@@ -519,18 +509,6 @@ public class OpenFile {
 
         isPDf = false;
         commonValues.setMultiTiff(false);
-
-        //get any user set dpi
-        final String hiresFlag = System.getProperty("org.jpedal.hires");
-        if (DecoderOptions.hires || hiresFlag != null) {
-            commonValues.setUseHiresImage(true);
-        }
-
-        //get any user set dpi
-        final String memFlag = System.getProperty("org.jpedal.memory");
-        if (memFlag != null) {
-            commonValues.setUseHiresImage(false);
-        }
 
         //reset flag
         thumbnails.resetToDefault();
@@ -569,8 +547,7 @@ public class OpenFile {
             }
 
         }
-        currentGUI.setQualityBoxVisible(commonValues.isPDF());
-
+        
         commonValues.setCurrentPage(1);
 
         //Thread t = new Thread(new Runnable(){
@@ -922,7 +899,7 @@ public class OpenFile {
             if (currentGUI.isSingle()) {
 
                 if (GUI.showMessages) {
-                    ErrorDialog.showError(e, Messages.getMessage("PdfViewerOpenerror"), (Container)currentGUI.getFrame(), commonValues.getSelectedFile());
+                    ErrorDialog.showError(e, Messages.getMessage("PdfViewerOpenerror"), (Component)currentGUI.getFrame(), commonValues.getSelectedFile());
                 }
 
                 Exit.exit(thumbnails, currentGUI, commonValues, decode_pdf, properties);
@@ -967,7 +944,7 @@ public class OpenFile {
         chooser.addChoosableFileFilter(new FileFilterer(fdf, "fdf (*.fdf)"));
         chooser.addChoosableFileFilter(new FileFilterer(pdf, "Pdf (*.pdf)"));
 
-        final int state = chooser.showOpenDialog((Container)currentGUI.getFrame());
+        final int state = chooser.showOpenDialog((Component)currentGUI.getFrame());
 
         final File file = chooser.getSelectedFile();
 
@@ -1031,7 +1008,7 @@ public class OpenFile {
             /**
              * holding all creators that produce OCR pdf's
              */
-            final String[] ocr = {"TeleForm", "dgn2pdf"};
+            final String[] ocr = {"TeleForm", "dgn2pdf","ABBYY FineReader 8.0 Professional Edition"};
 
             for (int i = 0; i < fields.length; i++) {
 
@@ -1045,27 +1022,8 @@ public class OpenFile {
 
                         }
                     }
-
-                    //track Abbyy and tell JPedal to redraw highlights
-                    if (values[i].equals("ABBYY FineReader 8.0 Professional Edition")) {
-                        decode_pdf.setRenderMode(PdfDecoderInt.RENDERIMAGES + PdfDecoderInt.RENDERTEXT + PdfDecoderInt.OCR_PDF);
-                    }
                 }
             }
-
-            final boolean currentProcessingStatus = Values.isProcessing();
-            Values.setProcessing(true);	//stops listeners processing spurious event
-
-            if (commonValues.isUseHiresImage()) {
-                decode_pdf.useHiResScreenDisplay(true);
-                ((GUI)currentGUI).setSelectedComboIndex(Commands.QUALITY, 1);
-            } else {
-                decode_pdf.useHiResScreenDisplay(false);
-                ((GUI)currentGUI).setSelectedComboIndex(Commands.QUALITY, 0);
-            }
-
-            Values.setProcessing(currentProcessingStatus);
-
         }
 
         /**
@@ -1075,7 +1033,6 @@ public class OpenFile {
             commonValues.setPageCount(decode_pdf.getPageCount());
         } else if (!commonValues.isMultiTiff()) {
             commonValues.setPageCount(1);
-            decode_pdf.useHiResScreenDisplay(true);
         }
 
         if (commonValues.getPageCount() < commonValues.getCurrentPage()) {
@@ -1104,7 +1061,7 @@ public class OpenFile {
             //add a border
             decode_pdf.setPDFBorder(BorderFactory.createLineBorder(Color.black, 1));
 
-            Images.decodeImage(DecoderOptions.hires, decode_pdf, currentGUI, thumbnails, commonValues);
+            Images.decodeImage(decode_pdf, currentGUI, thumbnails, commonValues);
 
             Values.setProcessing(false);
 

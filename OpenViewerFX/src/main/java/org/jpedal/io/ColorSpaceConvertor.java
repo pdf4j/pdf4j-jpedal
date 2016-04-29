@@ -65,7 +65,7 @@ public class ColorSpaceConvertor {
      */
     public static BufferedImage convertFromICCCMYK(final int width, final int height,byte[] data) {
 
-        /**make sure data big enough and pad out if not*/
+        /*make sure data big enough and pad out if not*/
         final int size = width * height * 4;
         if (data.length < size) {
             final byte[] newData = new byte[size];
@@ -181,8 +181,6 @@ public class ColorSpaceConvertor {
             pixelCount = buffer.length;
         }
 
-        //boolean isAllBlack=true;
-
         int r=0,g=0,b=0;
         int lastY =-1, lastCb =-1, lastCr =-1;
         int pixelReached = 0;
@@ -197,8 +195,6 @@ public class ColorSpaceConvertor {
             if((lastY ==Y)&&(lastCb ==Cb)&&(lastCr ==Cr)){
                 //use existing values
             }else{//work out new
-
-                //System.out.println(Y + " " + Cb + ' ' + Cr);
 
                 val1=298.082f*Y;
 
@@ -226,24 +222,6 @@ public class ColorSpaceConvertor {
                     b = 255;
                 }
 
-                //track blanks
-//                if(Y==255 && Cr==0 && Cb==0) {
-//
-//                }else
-//                    isAllBlack=false;
-
-                //if (Y == 255 && Cr == Cb && (Cr!=0)) {
-
-                // System.out.println(Y + " " + Cb + " " + Cr + " " + CENTER);
-
-                //r = 255;
-                //g = 255;
-                //b = 255;
-
-                //}
-
-                //System.out.println(r+" "+g+ ' ' +b);
-
                 lastY =Y;
                 lastCb =Cb;
                 lastCr =Cr;
@@ -256,14 +234,7 @@ public class ColorSpaceConvertor {
 
         }
 
-//            if(!nonTransparent || isAllBlack){
-//
-//               wasRemoved=true;
-//               return null;
-//            }
-
         try {
-            /***/
             image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 
             final Raster raster = createInterleavedRaster(new_data, w, h);
@@ -301,7 +272,6 @@ public class ColorSpaceConvertor {
 
         byte[] newData=convertIndexToRGBByte(index, w, h, components, d, data, isDownsampled, isARGB);
         
-        /**create the image*/
         if(isARGB) {
             image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         } else if(isGrayscale) {
@@ -791,9 +761,7 @@ public class ColorSpaceConvertor {
     }
     
     public static BufferedImage createARGBImage(int width, int height, byte[] data) {
-        
-      //  System.out.println("createARGBImage "+width+" "+height+" "+data.length);
-        
+
         final DataBuffer db = new DataBufferByte(data, data.length);
         
         final int[] bands = { 0, 1, 2,3 };
@@ -883,7 +851,6 @@ public class ColorSpaceConvertor {
         }
 
         try {
-            /***/
             image = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 
             final Raster raster = createInterleavedRaster(new_data, w, h);
@@ -894,66 +861,5 @@ public class ColorSpaceConvertor {
         }
 
         return image;
-    }   
-    
+    }
 }
-//    /** remove this code below in future
-//    public static BufferedImage profileConvertCMYKImageToRGB(final byte[] buffer, final int w, final int h) {
-//
-//    	final ColorSpace CMYK=DeviceCMYKColorSpace.getColorSpaceInstance();
-//    	
-//        BufferedImage image = null;
-//        final byte[] new_data = new byte[w * h * 3];
-//
-//        final int pixelCount = w * h*4;
-//
-//        float lastC=-1,lastM=-1,lastY=-1,lastK=-1;
-//        float C, M, Y, K;
-//        
-//        float[] rgb=new float[3];
-//        
-//        /**
-//         * loop through each pixel changing CMYK values to RGB
-//         */
-//        int pixelReached = 0;
-//        for (int i = 0; i < pixelCount; i += 4) {
-//
-//            C = (buffer[i]&0xff)/255f;
-//            M = (buffer[i + 1]&0xff)/255f;
-//            Y = (buffer[i + 2]&0xff)/255f;
-//            K = (buffer[i + 3]&0xff)/255f;
-//
-//            if(lastC==C && lastM==M && lastY==Y && lastK==K){
-//                //use existing values if not changed
-//            }else{//work out new
-//                
-//            	rgb=CMYK.toRGB(new float[]{C,M,Y,K});
-//
-//                lastC=C;
-//                lastM=M;
-//                lastY=Y;
-//                lastK=K;
-//            }
-//            
-//            
-//            new_data[pixelReached++] =(byte)(rgb[0]*255);
-//            new_data[pixelReached++] = (byte) (rgb[1]*255);
-//            new_data[pixelReached++] = (byte) (rgb[2]*255);
-//
-//        }
-//
-//        /**
-//         * turn data into RGB image
-//         */
-//        try {
-//           
-//            image =new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-//            final Raster raster = createInterleavedRaster(new_data, w, h);
-//            image.setData(raster);
-//
-//        } catch (final Exception e) {
-//            LogWriter.writeLog("Exception " + e + " with 24 bit RGB image");
-//        }
-//
-//        return image;
-//    }

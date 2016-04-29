@@ -45,30 +45,4 @@ public class PropertyUtil
 		//return b.getString(key);
 		return key;
 	}
-	
-	/** Get bundle from .properties files in the current dir. */
-	//private static ResourceBundle getBundle()
-	//{
-		/**
-		 ResourceBundle bundle = null;
-		 
-		 InputStream in = null;
-		 
-		 try {
-		 try {
-		 in = PropertyUtil.class.getResourceAsStream("properties");
-		 } catch(Exception e1) {
-		 }
-		 if(in == null) {
-		 in = new FileInputStream("properties");
-		 }
-		 if (in != null) {
-		 bundle = new PropertyResourceBundle(in);
-		 return bundle;
-		 }
-		 }
-		 
-		 */
-	//	return null;
-	//}
 }

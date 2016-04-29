@@ -33,10 +33,10 @@
 package org.jpedal.fonts.tt;
 
 import org.jpedal.fonts.Type1C;
+import org.jpedal.fonts.glyph.GlyphFactory;
 import org.jpedal.fonts.glyph.PdfGlyph;
 import org.jpedal.fonts.glyph.PdfJavaGlyphs;
 import org.jpedal.fonts.glyph.T1Glyphs;
-import org.jpedal.fonts.glyph.GlyphFactory;
 import org.jpedal.utils.LogWriter;
 
 public class CFF extends Table {

@@ -32,9 +32,8 @@
  */
 package org.jpedal.objects.raw;
 
-import org.jpedal.utils.LogWriter;
-
 import java.io.Serializable;
+import org.jpedal.utils.LogWriter;
 
 public class ShadingObject extends PdfObject implements Serializable {
 

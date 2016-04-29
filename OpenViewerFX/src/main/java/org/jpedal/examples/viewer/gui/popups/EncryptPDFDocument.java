@@ -31,16 +31,12 @@
  * ---------------
  */
 package org.jpedal.examples.viewer.gui.popups;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
+import javax.swing.*;
 
 @SuppressWarnings("UnusedDeclaration")
 public class EncryptPDFDocument extends Save

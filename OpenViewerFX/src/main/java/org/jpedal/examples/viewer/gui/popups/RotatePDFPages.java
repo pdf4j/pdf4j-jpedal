@@ -31,21 +31,13 @@
  * ---------------
  */
 package org.jpedal.examples.viewer.gui.popups;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
 import javax.print.attribute.standard.PageRanges;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-
+import javax.swing.*;
 import org.jpedal.examples.viewer.gui.GUI;
 import org.jpedal.utils.LogWriter;
 import org.jpedal.utils.Messages;

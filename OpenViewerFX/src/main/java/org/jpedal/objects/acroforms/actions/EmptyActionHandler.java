@@ -32,28 +32,31 @@
  */
 package org.jpedal.objects.acroforms.actions;
 
-import org.jpedal.io.PdfObjectReader;
-import org.jpedal.objects.Javascript;
-import org.jpedal.objects.layers.PdfLayerList;
-import org.jpedal.objects.acroforms.actions.privateclasses.FieldsHideObject;
-import org.jpedal.objects.acroforms.AcroRenderer;
-import org.jpedal.objects.raw.*;
-import org.jpedal.utils.LogWriter;
-
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
-import org.jpedal.*;
+import javax.swing.AbstractButton;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
+import org.jpedal.PdfDecoderInt;
+import org.jpedal.io.PdfObjectReader;
+import org.jpedal.objects.Javascript;
+import org.jpedal.objects.acroforms.AcroRenderer;
 import org.jpedal.objects.acroforms.ReturnValues;
+import org.jpedal.objects.acroforms.actions.privateclasses.FieldsHideObject;
+import org.jpedal.objects.layers.PdfLayerList;
+import org.jpedal.objects.raw.*;
+import org.jpedal.utils.LogWriter;
 
 public class EmptyActionHandler implements ActionHandler {
     
@@ -1455,7 +1458,7 @@ public class EmptyActionHandler implements ActionHandler {
             }
             
             //move focus so that the button does not flash
-            ((JButton)((MouseEvent)raw).getSource()).setFocusable(false);
+            ((Component)((EventObject)raw).getSource()).setFocusable(false);
         }
     }
     

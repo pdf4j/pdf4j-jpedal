@@ -270,7 +270,7 @@ public class PageFlowFX extends AnchorPane{
 
     private void setupMouseHandlers() {
 
-        /**
+        /*
          * ******************************************************
          * Handle with care please, especially releasedHandler. *
     	 *******************************************************
@@ -1137,7 +1137,7 @@ public class PageFlowFX extends AnchorPane{
     }
 
     private double getFullPageWidthOrHeight() {
-        return (newSceneHeight / (double) 13) * 12;
+        return (newSceneHeight / 13) * 12;
     }
 
     private double getPageWidthOrHeight() {
@@ -1215,7 +1215,7 @@ public class PageFlowFX extends AnchorPane{
         }
 
         private void setupMouseHandlers() {
-            /**
+            /*
              * pageClickEvent is required to let the scene know that we are
              * handling the mouse event. setOnMouseClicked still runs even when
              * the click includes a drag, hence detecting manually.

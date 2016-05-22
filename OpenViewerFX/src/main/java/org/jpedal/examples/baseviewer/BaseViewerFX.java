@@ -149,7 +149,7 @@ public class BaseViewerFX extends Application {
     public static void main(final String[] args){
          DecoderOptions.javaVersion = Float.parseFloat(System.getProperty("java.specification.version"));
          System.out.println("JAVA VERSION : "+ DecoderOptions.javaVersion);
-            if (DecoderOptions.javaVersion < 1.8f) {
+            if (DecoderOptions.javaVersion < 1.7f) {
                 throw new RuntimeException("You need to Run Java 1.8+");
             }
         launch(args);

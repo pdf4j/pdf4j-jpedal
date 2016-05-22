@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.jpedal</groupId>
-    <artifactId>OpenViewerFX</artifactId>
+    <groupId>org.pdf4j.jpedal</groupId>
+    <artifactId>pdf4j-jpedalfx</artifactId>
     <version>7.00b29</version>
     <packaging>jar</packaging>
     
-    <name>${project.groupId}:${project.artifactId}</name>
+    <name>PDF4J JPedal</name>
     <description>An Open Source JavaFX PDF Viewer</description>
-    <url>https://www.idrsolutions.com/openviewerfx/</url>
+    <url>http://pdf4j.github.io/pdf4j-jpedal</url>
     
     <licenses>
         <license>
@@ -17,26 +17,26 @@
         </license>
     </licenses>
 
-    <developers>
-    <developer>
-      <name>IDRSolutions</name>
-      <email>contact2007@idrsolutions.com</email>
-      <organization>IDRSolutions</organization>
-      <organizationUrl>https://www.idrsolutions.com</organizationUrl>
-    </developer>
-  </developers>
+    <!--    <developers>
+      <developer>
+        <name>IDRSolutions</name>
+        <email>contact2007@idrsolutions.com</email>
+        <organization>IDRSolutions</organization>
+        <organizationUrl>https://www.idrsolutions.com</organizationUrl>
+      </developer>
+    </developers>-->
   
-  <scm>
-      <connection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</connection>
-      <developerConnection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</developerConnection>
-      <url>git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</url>
-  </scm>
+    <!--  <scm>
+        <connection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</connection>
+        <developerConnection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</developerConnection>
+        <url>git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</url>
+    </scm>-->
 
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.birt.runtime.3_7_1</groupId>
+            <groupId>org.eclipse.birt.runtime</groupId>
             <artifactId>org.mozilla.javascript</artifactId>
-            <version>1.7.2</version>
+            <version>1.7.5.v201504281450</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -54,8 +54,8 @@
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
     
       
@@ -63,7 +63,7 @@
     
     <build>
         <plugins>
-            <plugin>
+            <!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <executions>
@@ -75,52 +75,54 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>-->
+      
+            <!--      <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <stagingProfileId>19375019933d12</stagingProfileId>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>-->
+      
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-      
-      <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.3</version>
-          <extensions>true</extensions>
-          <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <stagingProfileId>19375019933d12</stagingProfileId>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-          </configuration>
-      </plugin>
-      
-      <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-source-plugin</artifactId>
-      <executions>
-        <execution>
-          <id>attach-sources</id>
-          <goals>
-            <goal>jar</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
      
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-            <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                    <goal>jar</goal>
-                </goals>
-            </execution>
-        </executions>
-        <configuration>
-            <additionalparam>-Xdoclint:none</additionalparam>
-        </configuration>
-    </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+            </plugin>
       
         </plugins>
     
-  </build>
+    </build>
   
 </project>
